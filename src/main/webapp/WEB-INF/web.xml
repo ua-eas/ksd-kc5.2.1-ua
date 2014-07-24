@@ -15,8 +15,39 @@
       <param-name>web.bootstrap.spring.file</param-name>
       <param-value>classpath:kc-bootstrap-springbeans.xml</param-value>
     </context-param>
-    
-    ${monitoring.filter}
+
+	${monitoring.filter}
+
+	<filter>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<filter-class>org.jasig.cas.client.authentication.AuthenticationFilter</filter-class>
+		<init-param>
+			<param-name>casServerLoginUrl</param-name>
+			<param-value>https://webauth.arizona.edu/webauth/login</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>http://localhost:8080</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>CAS Validation Filter</filter-name>
+		<filter-class>org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter</filter-class>
+		<init-param>
+			<param-name>casServerUrlPrefix</param-name>
+			<param-value>https://webauth.arizona.edu/webauth</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>http://localhost:8080</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>
+	</filter>
     
 	<filter>
 	    <filter-name>HttpRequestLogger</filter-name>
@@ -49,18 +80,13 @@
 
 	<filter>
 	    <filter-name>UserLoginFilter</filter-name>
-	    <filter-class>org.kuali.rice.krad.web.filter.UserLoginFilter</filter-class>
+	    <filter-class>edu.arizona.kra.web.filter.UserLoginFilter</filter-class>
 	</filter>
 
     <filter>
     	<filter-name>UserPreferencesFilter</filter-name>
     	<filter-class>org.kuali.rice.kew.web.UserPreferencesFilter</filter-class>
     </filter>
-
-  <filter>
-    <filter-name>DummyLoginFilter</filter-name>
-    <filter-class>org.kuali.rice.krad.web.filter.DummyLoginFilter</filter-class>
-  </filter>
 
 	${monitoring.mapping}
 
@@ -83,6 +109,36 @@
         <filter-name>ParameterFilter</filter-name>
         <servlet-name>action</servlet-name>
     </filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<servlet-name>action</servlet-name>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS Validation Filter</filter-name>
+		<servlet-name>action</servlet-name>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<servlet-name>action</servlet-name>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<servlet-name>dwr-invoker</servlet-name>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS Validation Filter</filter-name>
+		<servlet-name>dwr-invoker</servlet-name>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<servlet-name>dwr-invoker</servlet-name>
+	</filter-mapping>
 
     <filter-mapping>
       <filter-name>BootstrapFilter</filter-name>
@@ -114,10 +170,6 @@
     	<servlet-name>notification</servlet-name>
   	</filter-mapping>
 
-    <filter-mapping>
-        <filter-name>DummyLoginFilter</filter-name>
-        <servlet-name>login</servlet-name>
-    </filter-mapping>
     <!-- for KCB Spring Web MVC pages -->
     <filter-mapping>
         <filter-name>BootstrapFilter</filter-name>
