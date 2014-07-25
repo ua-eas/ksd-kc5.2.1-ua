@@ -15,16 +15,10 @@
  */
 package edu.arizona.kra.kim.service.impl;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.jws.WebParam;
-
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.kuali.rice.core.api.criteria.CriteriaValue;
 import org.kuali.rice.core.api.exception.RiceIllegalArgumentException;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.entity.Entity;
@@ -39,12 +33,17 @@ import edu.arizona.kra.kim.dao.LdapPrincipalDao;
  * Implementation of {@link IdentityService} that communicates with and serves information
  * from the UA Enterprise Directory Service.
  * 
+ * The methods chosen for overriding were dictated by methods that use LdapPrincipalDao, i.e.,
+ * we needed to ensure all principalDao's are the UA implmentation.
  * 
  * @author Kuali Rice Team (rice.collab@kuali.org)
  */
-@SuppressWarnings("restriction")
 public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl implements edu.arizona.kra.kim.api.identity.IdentityService {
-    private LdapPrincipalDao principalDao;
+	
+	// UA custom DAO
+	private LdapPrincipalDao principalDao;
+
+
 
     @Override
 	public Entity getEntity(String entityId) {
@@ -59,7 +58,8 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
             return super.getEntity(entityId);
         }
 	}
-	
+
+
 	/**
 	 * Overridden to populate this information from the LdapPrincipalDao
 	 */
@@ -76,7 +76,8 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
             return super.getEntityByPrincipalId(principalId);
         }
 	}
-	
+
+
     @Override
 	public Entity getEntityByPrincipalName(String principalName) {
         if (StringUtils.isBlank(principalName)) {
@@ -90,7 +91,8 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
             return super.getEntityByPrincipalName(principalName);
         }
 	}
-	
+
+
     @Override
 	public EntityDefault getEntityDefault(String entityId) {
         if (StringUtils.isBlank(entityId)) {
@@ -105,7 +107,8 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
             return super.getEntityDefault(entityId);
         }
 	}
-	
+
+
     @Override
 	public EntityDefault getEntityDefaultByPrincipalId(String principalId) {
         if (StringUtils.isBlank(principalId)) {
@@ -120,7 +123,8 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
             return super.getEntityDefaultByPrincipalId(principalId);
         }
 	}
-	
+
+
     @Override
 	public EntityDefault getEntityDefaultByPrincipalName(String principalName) {
         if (StringUtils.isBlank(principalName)) {
@@ -135,32 +139,7 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
             return super.getEntityDefaultByPrincipalName(principalName);
         }
 	}
-    
-	
-    private static <U extends CriteriaValue<?>> Object getVal(U toConv) {
-        Object o = toConv.getValue();
-        if (o instanceof DateTime) {
-            return new Timestamp(((DateTime) o).getMillis());
-        }
-        return o;
-    }
-    
-    /**
-     * Password lookups not supported by EDS. Use Natural Authentication strategies instead
-     * of this if that's what you need.
-     *
-     */
-    @Override
-    @Deprecated
-	public Principal getPrincipalByPrincipalNameAndPassword(String principalName, String password) {
-        if (StringUtils.isBlank(principalName)) {
-            throw new RiceIllegalArgumentException("principalName is blank");
-        }
 
-        //not validating password
-
-        return getPrincipalByPrincipalName(principalName);
-    }
 	
     @Override
 	public EntityPrivacyPreferences getEntityPrivacyPreferences(String entityId) {
@@ -170,6 +149,7 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
 
         return getPrincipalDao().getEntityPrivacyPreferences(entityId);
 	}
+
 
     @Override
 	public Principal getPrincipal(String principalId) {
@@ -185,29 +165,6 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
 	    }
     }
 
-    /**
-     * Gets a list of {@link org.kuali.rice.kim.api.identity.principal.Principal} from a string list of principalId.
-     *
-     * <p>
-     * This method will only return principals that exist.  It will return null if the none of the principals exist.
-     * </p>
-     *
-     * @param principalIds the unique id to retrieve the principal by. cannot be null.
-     * @return a list of {@link org.kuali.rice.kim.api.identity.principal.Principal} or null
-     * @throws org.kuali.rice.core.api.exception.RiceIllegalArgumentException if the principalId is blank
-     */
-    @Override
-    public List<Principal> getPrincipals(@WebParam(name = "principalIds") List<String> principalIds) {
-        List<Principal>  ret = new ArrayList<Principal>();
-        for(String p: principalIds) {
-            Principal principalInfo = getPrincipal(p);
-
-            if (principalInfo != null) {
-                ret.add(principalInfo) ;
-            }
-        }
-        return ret;
-    }
 
     @Override
 	public Principal getPrincipalByPrincipalName(String principalName) {
@@ -223,15 +180,19 @@ public class LdapIdentityDelegateServiceImpl extends IdentityServiceImpl impleme
         }
     }
 
+    
     public void setPrincipalDao(LdapPrincipalDao principalDao) {
         this.principalDao = principalDao;
     }
+    
 
     public LdapPrincipalDao getPrincipalDao() {
         return principalDao;
     }
-    
+
+
     public List<EntityDefault> lookupEntityDefault(Map<String,String> searchCriteria, boolean unbounded) {
-    	return this.principalDao.lookupEntityDefault(searchCriteria, unbounded);
+    	return getPrincipalDao().lookupEntityDefault(searchCriteria, unbounded);
     }
+
 }

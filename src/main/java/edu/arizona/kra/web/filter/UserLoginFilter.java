@@ -3,9 +3,7 @@ package edu.arizona.kra.web.filter;
 import java.io.IOException;
 import java.util.UUID;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -26,7 +24,6 @@ import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kim.api.identity.AuthenticationService;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.principal.Principal;
-import org.kuali.rice.kim.api.permission.PermissionService;
 import org.kuali.rice.kim.api.services.KimApiServiceLocator;
 import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.exception.AuthenticationException;
@@ -36,28 +33,31 @@ import org.kuali.rice.krad.util.KRADUtils;
 /**
  * A filter for processing user logins and creating a
  * {@link org.kuali.rice.krad.UserSession}
+ * 
+ * Overridden in KC custom in order to change this.isAuthorizedToLogin() to
+ * always return true. we can only get access to this by extension through
+ * this.doFilter(...), all other methods are private and so had to be pulled
+ * in too.
+ * 
+ * The ultimate goal of extending this class is so that anyone with a valid
+ * NetID that can login to UA services will also be allowed to log into KC.
+ * This seems extreme until one considers that no action can be taken by the
+ * user unless they also have KC role(s) assigned to them.
  *
  * @author Kuali Rice Team (rice.collab@kuali.org)
  * @see org.kuali.rice.krad.UserSession
  */
-public class UserLoginFilter implements Filter {
+public class UserLoginFilter extends org.kuali.rice.krad.web.filter.UserLoginFilter {
 
 	private static final String MDC_USER = "user";
 
-	@SuppressWarnings("unused")
-	private FilterConfig filterConfig;
 	private IdentityService identityService;
-	private PermissionService permissionService;
 	private ConfigurationService kualiConfigurationService;
 	private ParameterService parameterService;
 	
 
 
-	public void init(FilterConfig config) throws ServletException {
-		this.filterConfig = config;
-	}
-
-
+	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,FilterChain chain) throws IOException, ServletException {
 		this.doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
 	}
@@ -73,11 +73,6 @@ public class UserLoginFilter implements Filter {
 		} finally {
 			removeFromMDC();
 		}
-	}
-
-
-	public void destroy() {
-		filterConfig = null;
 	}
 
 
@@ -112,14 +107,11 @@ public class UserLoginFilter implements Filter {
 
 
 	/**
-	 * checks if the passed in principalId is authorized to log in.
+	 * We get here after a cookie has been set by webauth. Only users who
+	 * can login to webauth will be processed here, so always return true.
 	 */
 	private boolean isAuthorizedToLogin(String principalId) {
-		
 		return true;
-		
-		//TODO: UAR-418 -- Need to port/implement derived roles in KC
-		//return getPermissionService().isAuthorized(principalId, KimConstants.KIM_TYPE_DEFAULT_NAMESPACE, KimConstants.PermissionNames.LOG_IN, Collections.singletonMap("principalId", principalId));
 	}
 
 
@@ -202,15 +194,6 @@ public class UserLoginFilter implements Filter {
 			this.identityService = KimApiServiceLocator.getIdentityService();
 		}
 		return this.identityService;
-	}
-
-	
-	@SuppressWarnings("unused")
-	private PermissionService getPermissionService() {
-		if (this.permissionService == null) {
-			this.permissionService = KimApiServiceLocator.getPermissionService();
-		}
-		return this.permissionService;
 	}
 
 

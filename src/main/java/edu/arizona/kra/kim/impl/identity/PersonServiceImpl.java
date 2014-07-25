@@ -17,14 +17,10 @@ package edu.arizona.kra.kim.impl.identity;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,19 +30,10 @@ import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kim.api.identity.entity.EntityDefault;
 import org.kuali.rice.kim.api.identity.external.EntityExternalIdentifierType;
 import org.kuali.rice.kim.api.identity.principal.Principal;
-import org.kuali.rice.kim.api.identity.type.EntityTypeContactInfoDefault;
-import org.kuali.rice.kim.api.role.RoleService;
-import org.kuali.rice.kim.api.services.KimApiServiceLocator;
 import org.kuali.rice.kim.impl.KIMPropertyConstants;
-import org.kuali.rice.kim.impl.identity.PersonImpl;
-import org.kuali.rice.kns.service.BusinessObjectMetaDataService;
-import org.kuali.rice.kns.service.KNSServiceLocator;
-import org.kuali.rice.kns.service.MaintenanceDocumentDictionaryService;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.bo.DataObjectRelationship;
-import org.kuali.rice.krad.lookup.CollectionIncomplete;
 import org.kuali.rice.krad.util.KRADConstants;
-import org.kuali.rice.krad.util.KRADPropertyConstants;
 import org.kuali.rice.krad.util.ObjectUtils;
 
 import edu.arizona.kra.kim.api.identity.IdentityService;
@@ -54,7 +41,10 @@ import edu.arizona.kra.kim.api.identity.IdentityService;
 
 
 /**
- * This is a description of what this class does - kellerj don't forget to fill this in. 
+ * This is a description of what this class does - kellerj don't forget to fill this in.
+ * 
+ * The methods overridden here are dictated by methods that use the UA custom
+ * IdentityService, and the private methods that the former use.
  * 
  * @author Kuali Rice Team (rice.collab@kuali.org)
  *
@@ -63,79 +53,17 @@ import edu.arizona.kra.kim.api.identity.IdentityService;
 public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonServiceImpl {
 
 	private static Logger LOG = Logger.getLogger( PersonServiceImpl.class );
-	protected static final String ENTITY_EXT_ID_PROPERTY_PREFIX = "externalIdentifiers.";
-	protected static final String ENTITY_AFFILIATION_PROPERTY_PREFIX = "affiliations.";
-	protected static final String ENTITY_TYPE_PROPERTY_PREFIX = "entityTypeContactInfos.";
-	protected static final String ENTITY_EMAIL_PROPERTY_PREFIX = "entityTypeContactInfos.emailAddresses.";
-	protected static final String ENTITY_PHONE_PROPERTY_PREFIX = "entityTypeContactInfos.phoneNumbers.";
-	protected static final String ENTITY_ADDRESS_PROPERTY_PREFIX = "entityTypeContactInfos.addresses.";
-	protected static final String ENTITY_NAME_PROPERTY_PREFIX = "names.";
-	protected static final String PRINCIPAL_PROPERTY_PREFIX = "principals.";
-	protected static final String ENTITY_EMPLOYEE_ID_PROPERTY_PREFIX = "employmentInformation.";
-	// KULRICE-4442 Special handling for extension objects
-	protected static final String EXTENSION = "extension";
-	protected static final String EDS_ACTIVE_STATUS_KEY = "principals.active";
-	
-	protected IdentityService identityService;
-	private RoleService roleService;
-	private BusinessObjectMetaDataService businessObjectMetaDataService;
-	private MaintenanceDocumentDictionaryService maintenanceDocumentDictionaryService;
-
-	protected List<String> personEntityTypeCodes = new ArrayList<String>( 4 );
-	// String that can be passed to the lookup framework to create an type = X OR type = Y criteria
 	private String personEntityTypeLookupCriteria = null;
+	
+	// UA Custom changes
+	protected static final String EDS_ACTIVE_STATUS_KEY = "principals.active";
+	protected IdentityService identityService;
     
-	protected Map<String,String> baseLookupCriteria = new HashMap<String,String>();
-	protected Map<String,String> criteriaConversion = new HashMap<String,String>();
-	protected ArrayList<String> personCachePropertyNames = new ArrayList<String>();
-	{
-		// init the criteria which will need to be applied to every lookup against
-		// the identity data tables
-		baseLookupCriteria.put( KIMPropertyConstants.Person.ACTIVE, "Y" );
-		baseLookupCriteria.put( ENTITY_TYPE_PROPERTY_PREFIX + KRADPropertyConstants.ACTIVE, "Y" );
-		
-		// create the field mappings between the Person object and the KimEntity object
-		criteriaConversion.put( KIMPropertyConstants.Person.ENTITY_ID, KIMPropertyConstants.Entity.ID);
-		criteriaConversion.put( KIMPropertyConstants.Person.ACTIVE, PRINCIPAL_PROPERTY_PREFIX + KRADPropertyConstants.ACTIVE );
-		criteriaConversion.put( KIMPropertyConstants.Person.PRINCIPAL_ID, PRINCIPAL_PROPERTY_PREFIX + KIMPropertyConstants.Person.PRINCIPAL_ID );
-		criteriaConversion.put( KIMPropertyConstants.Person.PRINCIPAL_NAME, PRINCIPAL_PROPERTY_PREFIX + KIMPropertyConstants.Person.PRINCIPAL_NAME );
-		criteriaConversion.put( KIMPropertyConstants.Person.FIRST_NAME, "names.firstName" );
-		criteriaConversion.put( KIMPropertyConstants.Person.LAST_NAME, "names.lastName" );
-		criteriaConversion.put( KIMPropertyConstants.Person.MIDDLE_NAME, "names.middleName" );
-		criteriaConversion.put( KIMPropertyConstants.Person.EMAIL_ADDRESS, "entityTypeContactInfos.emailAddresses.emailAddress" );
-		criteriaConversion.put( KIMPropertyConstants.Person.PHONE_NUMBER, "entityTypeContactInfos.phoneNumbers.phoneNumber" );
-		criteriaConversion.put( KIMPropertyConstants.Person.ADDRESS_LINE_1, "entityTypeContactInfos.addresses.line1" );
-		criteriaConversion.put( KIMPropertyConstants.Person.ADDRESS_LINE_2, "entityTypeContactInfos.addresses.line2" );
-		criteriaConversion.put( KIMPropertyConstants.Person.ADDRESS_LINE_3, "entityTypeContactInfos.addresses.line3" );
-		criteriaConversion.put( KIMPropertyConstants.Person.CITY, "entityTypeContactInfos.addresses.city" );
-		criteriaConversion.put( KIMPropertyConstants.Person.STATE_CODE, "entityTypeContactInfos.addresses.stateProvinceCode" );
-		criteriaConversion.put( KIMPropertyConstants.Person.POSTAL_CODE, "entityTypeContactInfos.addresses.postalCode" );
-		criteriaConversion.put( KIMPropertyConstants.Person.COUNTRY_CODE, "entityTypeContactInfos.addresses.countryCode" );
-		criteriaConversion.put( KIMPropertyConstants.Person.CAMPUS_CODE, "affiliations.campusCode" );
-		criteriaConversion.put( KIMPropertyConstants.Person.AFFILIATION_TYPE_CODE, "affiliations.affiliationTypeCode" );
-		criteriaConversion.put( KIMPropertyConstants.Person.EXTERNAL_IDENTIFIER_TYPE_CODE, "externalIdentifiers.externalIdentifierTypeCode" );
-		criteriaConversion.put( KIMPropertyConstants.Person.EXTERNAL_ID, "externalIdentifiers.externalId" );		
-		criteriaConversion.put( KIMPropertyConstants.Person.EMPLOYEE_TYPE_CODE, "employmentInformation.employeeTypeCode" );
-		criteriaConversion.put( KIMPropertyConstants.Person.EMPLOYEE_STATUS_CODE, "employmentInformation.employeeStatusCode" );
-		criteriaConversion.put( KIMPropertyConstants.Person.EMPLOYEE_ID, "employmentInformation.employeeId" );
-		criteriaConversion.put( KIMPropertyConstants.Person.BASE_SALARY_AMOUNT, "employmentInformation.baseSalaryAmount" );
-		criteriaConversion.put( KIMPropertyConstants.Person.PRIMARY_DEPARTMENT_CODE, "employmentInformation.primaryDepartmentCode" );
-
-		personCachePropertyNames.add( KIMPropertyConstants.Person.PRINCIPAL_ID );
-		personCachePropertyNames.add( KIMPropertyConstants.Person.PRINCIPAL_NAME );
-		personCachePropertyNames.add( KIMPropertyConstants.Person.ENTITY_ID );
-		personCachePropertyNames.add( KIMPropertyConstants.Person.FIRST_NAME );
-		personCachePropertyNames.add( KIMPropertyConstants.Person.LAST_NAME );
-		personCachePropertyNames.add( KIMPropertyConstants.Person.MIDDLE_NAME );
-		personCachePropertyNames.add( KIMPropertyConstants.Person.CAMPUS_CODE );
-		personCachePropertyNames.add( KIMPropertyConstants.Person.EMPLOYEE_ID );
-		personCachePropertyNames.add( KIMPropertyConstants.Person.PRIMARY_DEPARTMENT_CODE );
-	}
-
 	
 	/**
 	 * @see org.kuali.rice.kim.api.identity.PersonService#getPerson(java.lang.String)
 	 */
+	@Override
 	public Person getPerson(String principalId) {
 		if ( StringUtils.isBlank(principalId) ) {
 			return null;
@@ -154,34 +82,12 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
 		}
 		return null;
 	}
-
-	protected PersonImpl convertEntityToPerson( EntityDefault entity, Principal principal ) {
-		try {
-			// get the EntityEntityType for the EntityType corresponding to a Person
-			for ( String entityTypeCode : personEntityTypeCodes ) {
-				EntityTypeContactInfoDefault entType = entity.getEntityType( entityTypeCode );
-				// if no "person" identity type present for the given principal, skip to the next type in the list
-				if ( entType == null ) {
-					continue;
-				}
-				// attach the principal and identity objects
-				// PersonImpl has logic to pull the needed elements from the KimEntity-related classes
-				return new PersonImpl( principal, entity, entityTypeCode );
-			}
-			return null;
-		} catch ( Exception ex ) {
-			// allow runtime exceptions to pass through
-			if ( ex instanceof RuntimeException ) {
-				throw (RuntimeException)ex;
-			}
-			throw new RuntimeException( "Problem building person object", ex );
-		}
-	}
 	
 	
 	/**
 	 * @see org.kuali.rice.kim.api.identity.PersonService#getPersonByPrincipalName(java.lang.String)
 	 */
+	@Override
 	public Person getPersonByPrincipalName(String principalName) {
 		if ( StringUtils.isBlank(principalName) ) {
 			return null;
@@ -201,6 +107,8 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
 		return null;
 	}
 
+
+	@Override
 	public Person getPersonByEmployeeId(String employeeId) {
 		if ( StringUtils.isBlank( employeeId  ) ) {
 			return null;
@@ -226,150 +134,16 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
 		return null;
 	}
 	
-	/**
-	 * @see org.kuali.rice.kim.api.identity.PersonService#findPeople(Map)
-	 */
-	public List<Person> findPeople(Map<String, String> criteria) {
-		return findPeople(criteria, true);
-	}
-	
-	/**
-	 * @see org.kuali.rice.kim.api.identity.PersonService#findPeople(java.util.Map, boolean)
-	 */
-	public List<Person> findPeople(Map<String, String> criteria, boolean unbounded) {
-		List<Person> people = null;
-		// protect from NPEs
-		if ( criteria == null ) {
-			criteria = Collections.emptyMap();
-		}
-		// make a copy so it can be modified safely in this method
-		criteria = new HashMap<String, String>( criteria );
-		
-		// extract the role lookup parameters and then remove them since later code will not know what to do with them
-		String roleName = criteria.get( "lookupRoleName" );
-		String namespaceCode = criteria.get( "lookupRoleNamespaceCode" );
-		criteria.remove("lookupRoleName");
-		criteria.remove("lookupRoleNamespaceCode");
-		if ( StringUtils.isNotBlank(namespaceCode) && StringUtils.isNotBlank(roleName) ) {
-			Integer searchResultsLimit = org.kuali.rice.kns.lookup.LookupUtils.getSearchResultsLimit(PersonImpl.class);
-			int searchResultsLimitInt = Integer.MAX_VALUE;
-			if (searchResultsLimit != null) {
-				searchResultsLimitInt = searchResultsLimit.intValue();
-			}
-			if ( LOG.isDebugEnabled() ) {
-				LOG.debug("Performing Person search including role filter: " + namespaceCode + "/" + roleName );
-			}
-			if ( criteria.size() == 1 && criteria.containsKey(KIMPropertyConstants.Person.ACTIVE) ) { // if only active is specified
-				if ( LOG.isDebugEnabled() ) {
-					LOG.debug( "Only active criteria specified, running role search first" );
-				}
-				// in this case, run the role lookup first and pass those results to the person lookup
-				Collection<String> principalIds = getRoleService().getRoleMemberPrincipalIds(namespaceCode, roleName,  Collections.<String, String>emptyMap());
-				StringBuffer sb = new StringBuffer(principalIds.size()*15);
-				Iterator<String> pi = principalIds.iterator();
-				while ( pi.hasNext() ) {
-					sb.append( pi.next() );
-					if ( pi.hasNext() ) sb.append( '|' );
-				}
-				// add the list of principal IDs to the lookup so that only matching Person objects are returned
-				criteria.put( KIMPropertyConstants.Person.PRINCIPAL_ID, sb.toString() );
-				people = findPeopleInternal(criteria, false); // can allow internal method to filter here since no more filtering necessary				
-			} else if ( !criteria.isEmpty() ) { // i.e., person criteria are specified
-				if ( LOG.isDebugEnabled() ) {
-					LOG.debug( "Person criteria also specified, running that search first" );
-				}
-				// run the person lookup first
-				people = findPeopleInternal(criteria, true); // get all, since may need to be filtered
-				// TODO - now check if these people have the given role
-				// build a principal list
-				List<String> principalIds = peopleToPrincipalIds( people );
-				// get sublist of principals that have the given roles
-				principalIds = getRoleService().getPrincipalIdSubListWithRole(principalIds, namespaceCode, roleName,  Collections.<String, String>emptyMap());
-				// re-convert into people objects, wrapping in CollectionIncomplete if needed
-				if ( !unbounded && principalIds.size() > searchResultsLimitInt ) {
-					int actualResultSize = principalIds.size();
-					// trim the list down before converting to people
-					principalIds = new ArrayList<String>(principalIds).subList(0, searchResultsLimitInt); // yes, this is a little wasteful
-					people = getPeople(principalIds); // convert the results to people
-					people = new CollectionIncomplete<Person>( people.subList(0, searchResultsLimitInt), new Long(actualResultSize) );
-				} else {
-					people = getPeople(principalIds);
-				}
-			} else { // only role criteria specified
-				if ( LOG.isDebugEnabled() ) {
-					LOG.debug( "No Person criteria specified - only using role service." );
-				}
-				// run the role criteria to get the principals with the role
-				Collection<String> principalIds = getRoleService().getRoleMemberPrincipalIds(namespaceCode, roleName,  Collections.<String, String>emptyMap());
-				if ( !unbounded && principalIds.size() > searchResultsLimitInt ) {
-					int actualResultSize = principalIds.size();
-					// trim the list down before converting to people
-					principalIds = new ArrayList<String>(principalIds).subList(0, searchResultsLimitInt); // yes, this is a little wasteful
-					people = getPeople(principalIds); // convert the results to people
-					people = new CollectionIncomplete<Person>( people.subList(0, searchResultsLimitInt), new Long(actualResultSize) );
-				} else {
-					people = getPeople(principalIds); // convert the results to people
-				}
-			}
-		} else {
-			if ( LOG.isDebugEnabled() ) {
-				LOG.debug( "No Role criteria specified, running person lookup as normal." );
-			}
-			people = findPeopleInternal(criteria, unbounded);
-		}
-			
-		// The following change is for KULRICE-5694 - It prevents duplicate rows from being returned for the 
-		// person inquiry (In this case, duplicate meaning same entityId, principalId, and principalNm).  
-		// This allows for multiple rows to be returned if an entityID has more then one principal name
-		// or more than one principal ID.  
-        Set<String> peopleNoDupsSet = new HashSet<String>();
-        List<Person> peopleNoDupsList = new ArrayList<Person>();
 
-	    for (Iterator<Person> iter = people.iterator(); iter.hasNext(); ) {
-	        Person person = iter.next();
-	        if (peopleNoDupsSet.add(person.getEntityId() + person.getPrincipalId() + person.getPrincipalName())) {
-	            peopleNoDupsList.add(person);
-	        }
-	    }
-	     
-	    people.clear();
-	    people.addAll(peopleNoDupsList);
-		
-	    return people;
-	}
-	
-
+	@Override
 	protected List<Person> findPeopleInternal(Map<String,String> criteria, boolean unbounded ) {
-		// convert the criteria to a form that can be used by the ORM layer
 
-        //TODO convert this to the new criteria predicates
-		//Map<String,String> entityCriteria = convertPersonPropertiesToEntityProperties( criteria );
-
-        //Predicate predicate = PredicateUtils.convertMapToPredicate(entityCriteria);
-
-        //QueryByCriteria.Builder queryBuilder = QueryByCriteria.Builder.create();
-        //queryBuilder.setPredicates(predicate);
-        
-//		if (!unbounded) {
-//			Integer searchResultsLimit = org.kuali.rice.kns.lookup.LookupUtils.getSearchResultsLimit(PersonImpl.class);
-//    		if (searchResultsLimit != null && searchResultsLimit >= 0) {
-//    			queryBuilder.setMaxResults(searchResultsLimit);
-//    			queryBuilder.setCountFlag(CountFlag.INCLUDE);
-//			}
-//		}
-		
-		
-
-		//EntityDefaultQueryResults qr = getIdentityService().findEntityDefaults( queryBuilder.build() );
-
-		
 		if(criteria.containsKey(KIMPropertyConstants.Person.ACTIVE)){
 			// Convert "active" KIM key to "active" EDS key
 			String value = criteria.get(KIMPropertyConstants.Person.ACTIVE);
 			criteria.remove(KIMPropertyConstants.Person.ACTIVE);
 			criteria.put(EDS_ACTIVE_STATUS_KEY, value);
-		}
-		
+		}		
 
 		List<EntityDefault> entities = ((edu.arizona.kra.kim.api.identity.IdentityService)getIdentityService()).lookupEntityDefault(criteria, unbounded);
 		List<Person> people = new ArrayList<Person>();
@@ -381,45 +155,18 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
 			    }
 		    }
         }
-//        else if (!qr.isMoreResultsAvailable() && entityCriteria.containsKey("principals.principalId")) {
-//            if (!(entityCriteria.containsKey(KIMPropertyConstants.Person.ACTIVE)) || (criteria.get(KIMPropertyConstants.Person.ACTIVE).equals("N"))) {
-//                String principalId =  entityCriteria.get("principals.principalId");
-//                try {
-//                    EntityDefault entityDefault = getIdentityService().getEntityDefaultByPrincipalId(principalId);
-//                    for ( Principal p : entityDefault.getPrincipals() ) {
-//                        if (!p.isActive()){
-//                            people.add( convertEntityToPerson(entityDefault, p ) );
-//                        }
-//                    }
-//                } catch ( Exception e ) {
-//                    LOG.info( "A principal Id of " + principalId + " dose not exist in the system");
-//                }
-//            }
-//        } else if (!qr.isMoreResultsAvailable() &&  entityCriteria.containsKey("principals.principalName")) {
-//            if (!(entityCriteria.containsKey(KIMPropertyConstants.Person.ACTIVE)) || (criteria.get(KIMPropertyConstants.Person.ACTIVE).equals("N"))) {
-//                String principalNm =  entityCriteria.get("principals.principalName");
-//                try {
-//                    EntityDefault entityDefault = getIdentityService().getEntityDefaultByPrincipalName(principalNm);
-//                    for ( Principal p : entityDefault.getPrincipals() ) {
-//                        if (!p.isActive()){
-//                            people.add( convertEntityToPerson(entityDefault, p ) );
-//                        }
-//                    }
-//                } catch ( Exception e ) {
-//                    LOG.info( "A principal name of " + principalNm + " dose not exist in the system");
-//                }
-//            }
-//        }
+
         return people;
 	}
 
+
+	@Override
 	public Map<String,String> convertPersonPropertiesToEntityProperties( Map<String,String> criteria ) {
 		if ( LOG.isDebugEnabled() ) {
 			LOG.debug( "convertPersonPropertiesToEntityProperties: " + criteria );
 		}
 		boolean nameCriteria = false;
 		boolean addressCriteria = false;
-		boolean externalIdentifierCriteria = false;
 		boolean affiliationCriteria = false;
 		boolean affiliationDefaultOnlyCriteria = false;
 		boolean phoneCriteria = false;
@@ -485,9 +232,6 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
 				if ( isNameEntityCriteria( entityProperty ) ) {
 					nameCriteria = true;
 				}
-				if ( isExternalIdentifierEntityCriteria( entityProperty ) ) {
-					externalIdentifierCriteria = true;
-				}
 				if ( isAffiliationEntityCriteria( entityProperty ) ) {
 					affiliationCriteria = true;
 				}
@@ -545,110 +289,6 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
 		return newCriteria;		
 	}
 
-	protected boolean isNameEntityCriteria( String propertyName ) {
-		return propertyName.startsWith( ENTITY_NAME_PROPERTY_PREFIX );
-	}
-	protected boolean isAddressEntityCriteria( String propertyName ) {
-		return propertyName.startsWith( ENTITY_ADDRESS_PROPERTY_PREFIX );
-	}
-	protected boolean isPhoneEntityCriteria( String propertyName ) {
-		return propertyName.startsWith( ENTITY_PHONE_PROPERTY_PREFIX );
-	}
-	protected boolean isEmailEntityCriteria( String propertyName ) {
-		return propertyName.startsWith( ENTITY_EMAIL_PROPERTY_PREFIX );
-	}
-	protected boolean isEmployeeIdEntityCriteria( String propertyName ) {
-		return propertyName.startsWith( ENTITY_EMPLOYEE_ID_PROPERTY_PREFIX );
-	}
-	protected boolean isAffiliationEntityCriteria( String propertyName ) {
-		return propertyName.startsWith( ENTITY_AFFILIATION_PROPERTY_PREFIX );
-	}
-	protected boolean isExternalIdentifierEntityCriteria( String propertyName ) {
-		return propertyName.startsWith( ENTITY_EXT_ID_PROPERTY_PREFIX );
-	}
-	
-	/**
-	 * Get the entityTypeCode that can be associated with a Person.  This will determine
-	 * where EntityType-related data is pulled from within the KimEntity object.  The codes
-	 * in the list will be examined in the order present.
-	 */
-	public List<String> getPersonEntityTypeCodes() {
-		return this.personEntityTypeCodes;
-	}
-
-	public void setPersonEntityTypeCodes(List<String> personEntityTypeCodes) {
-		this.personEntityTypeCodes = personEntityTypeCodes;
-		personEntityTypeLookupCriteria = null;
-		for ( String entityTypeCode : personEntityTypeCodes ) {
-			if ( personEntityTypeLookupCriteria == null ) {
-				personEntityTypeLookupCriteria = entityTypeCode;
-			} else {
-				personEntityTypeLookupCriteria = personEntityTypeLookupCriteria + "|" + entityTypeCode;
-			}
-		}
-	}
-
-	
-	protected List<Person> getPeople( Collection<String> principalIds ) {
-		List<Person> people = new ArrayList<Person>( principalIds.size() );
-		for ( String principalId : principalIds ) {
-			people.add( getPerson(principalId) );
-		}
-		return people;
-	}
-	
-	protected List<String> peopleToPrincipalIds( List<Person> people ) {
-		List<String> principalIds = new ArrayList<String>();
-		
-		for ( Person person : people ) {
-			principalIds.add( person.getPrincipalId() );
-		}
-		
-		return principalIds;
-	}
-	
-	/**
-	 * @see org.kuali.rice.kim.api.identity.PersonService#getPersonByExternalIdentifier(java.lang.String, java.lang.String)
-	 */
-	public List<Person> getPersonByExternalIdentifier(String externalIdentifierTypeCode, String externalId) {
-		if (StringUtils.isBlank( externalIdentifierTypeCode ) || StringUtils.isBlank( externalId ) ) {
-			return null;
-		}
-		Map<String,String> criteria = new HashMap<String,String>( 2 );
-		criteria.put( KIMPropertyConstants.Person.EXTERNAL_IDENTIFIER_TYPE_CODE, externalIdentifierTypeCode );
-		criteria.put( KIMPropertyConstants.Person.EXTERNAL_ID, externalId );
-		return findPeople( criteria );
-	}
-	
-	/**
-	 * @see org.kuali.rice.kim.api.identity.PersonService#updatePersonIfNecessary(java.lang.String, org.kuali.rice.kim.api.identity.Person)
-	 */
-    public Person updatePersonIfNecessary(String sourcePrincipalId, Person currentPerson ) {
-        if (currentPerson  == null // no person set
-                || !StringUtils.equals(sourcePrincipalId, currentPerson.getPrincipalId() ) // principal ID mismatch
-                || currentPerson.getEntityId() == null ) { // syntheticially created Person object
-            Person person = getPerson( sourcePrincipalId );
-            // if a synthetically created person object is present, leave it - required for property derivation and the UI layer for
-            // setting the principal name
-            if ( person == null ) {
-                if ( currentPerson != null && currentPerson.getEntityId() == null ) {
-                    return currentPerson;
-                }
-            }
-            // if both are null, create an empty object for property derivation
-            if ( person == null && currentPerson == null ) {
-            	try {
-            		return new PersonImpl();
-            	} catch ( Exception ex ) {
-            		LOG.error( "unable to instantiate an object of type: " + getPersonImplementationClass() + " - returning null", ex );
-            		return null;
-            	}
-            }
-            return person;
-        }
-        // otherwise, no need to change the given object
-        return currentPerson;
-    }
 
     /**
      * Builds a map containing entries from the passed in Map that do NOT represent properties on an embedded
@@ -683,11 +323,13 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
         }
         return false;
     }
-    
+
+
     /**
      * @see org.kuali.rice.kim.api.identity.PersonService#resolvePrincipalNamesToPrincipalIds(org.kuali.rice.krad.bo.BusinessObject, java.util.Map)
      */
     @SuppressWarnings("unchecked")
+    @Override
 	public Map<String,String> resolvePrincipalNamesToPrincipalIds(BusinessObject businessObject, Map<String,String> fieldValues) {
     	if ( fieldValues == null ) {
     		return null;
@@ -707,7 +349,8 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
                 String personPropertyName = ObjectUtils.getNestedAttributePrimitive( propertyName );
                 // special case - the user ID 
                 if ( StringUtils.equals( KIMPropertyConstants.Person.PRINCIPAL_NAME, personPropertyName) ) {
-                    Class targetBusinessObjectClass = null;
+                    @SuppressWarnings("rawtypes")
+					Class targetBusinessObjectClass = null;
                     BusinessObject targetBusinessObject = null;
                     resolvedPrincipalIdPropertyName.setLength( 0 ); // clear the buffer without requiring a new object allocation on each iteration
                 	// get the property name up until the ".principalName"
@@ -845,37 +488,14 @@ public class PersonServiceImpl extends org.kuali.rice.kim.impl.identity.PersonSe
      * (non-Javadoc)
      * @see org.kuali.rice.kim.impl.identity.PersonServiceImpl#getIdentityService()
      */
+    @Override
 	public IdentityService getIdentityService() {
 		return identityService;
 	}
 
-	public void setIdentityService(IdentityService identityService){
+
+    public void setIdentityService(IdentityService identityService){
 		this.identityService = identityService;
 	}
-	
-	protected RoleService getRoleService() {
-		if ( roleService == null ) {
-			roleService = KimApiServiceLocator.getRoleService();
-		}
-		return roleService;
-	}
 
-
-	public Class<? extends Person> getPersonImplementationClass() {
-		return PersonImpl.class;
-	}
-	
-	protected BusinessObjectMetaDataService getBusinessObjectMetaDataService() {
-		if ( businessObjectMetaDataService == null ) {
-			businessObjectMetaDataService = KNSServiceLocator.getBusinessObjectMetaDataService();
-		}
-		return businessObjectMetaDataService;
-	}
-
-	protected MaintenanceDocumentDictionaryService getMaintenanceDocumentDictionaryService() {
-		if ( maintenanceDocumentDictionaryService == null ) {
-			maintenanceDocumentDictionaryService = KNSServiceLocator.getMaintenanceDocumentDictionaryService();
-		}
-		return maintenanceDocumentDictionaryService;
-	}
 }
