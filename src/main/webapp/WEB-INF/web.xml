@@ -27,7 +27,7 @@
 		</init-param>
 		<init-param>
 			<param-name>serverName</param-name>
-			<param-value>http://localhost:8080</param-value>
+			<param-value>${serverName}</param-value>
 		</init-param>
 	</filter>
 
@@ -40,7 +40,7 @@
 		</init-param>
 		<init-param>
 			<param-name>serverName</param-name>
-			<param-value>http://localhost:8080</param-value>
+			<param-value>${serverName}</param-value>
 		</init-param>
 	</filter>
 
