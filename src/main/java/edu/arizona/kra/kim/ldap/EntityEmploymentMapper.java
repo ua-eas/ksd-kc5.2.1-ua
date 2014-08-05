@@ -46,7 +46,7 @@ public class EntityEmploymentMapper extends BaseMapper<EntityEmployment> {
         //employee.setEmployeeTypeCode(context.getStringAttribute(getConstants().getEmployeeTypeProperty()));
         employee.setEmployeeType(CodedAttribute.Builder.create("P"));
         employee.setBaseSalaryAmount(KualiDecimal.ZERO);
-        
+        employee.setPrimary(true);
         employee.setActive(true);
         return employee;
     }
