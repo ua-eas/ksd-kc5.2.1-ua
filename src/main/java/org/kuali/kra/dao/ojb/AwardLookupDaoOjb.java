@@ -16,6 +16,7 @@ import org.apache.ojb.broker.query.Criteria;
 import org.apache.ojb.broker.query.QueryByCriteria;
 import org.apache.ojb.broker.query.QueryFactory;
 import org.kuali.kra.award.home.Award;
+import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.dao.AwardLookupDao;
 import org.kuali.kra.dao.VersionHistoryLookupDao;
 import org.kuali.kra.timeandmoney.document.TimeAndMoneyDocument;
@@ -44,7 +45,7 @@ public class AwardLookupDaoOjb extends LookupDaoOjb implements AwardLookupDao {
 		for ( Object object : searchResults ) {
 			Award awardSearchBo = (Award) object;
 
-			if ( awardSearchBo.getVersionHistory().isActiveVersion() ) {
+			if ( VersionStatus.ACTIVE.name().equals( awardSearchBo.getAwardSequenceStatus() ) ) {
 				activeAwards.add( awardSearchBo.getAwardNumber() );
 				awardIds.add( awardSearchBo.getAwardId() );
 			}
