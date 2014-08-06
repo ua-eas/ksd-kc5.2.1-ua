@@ -197,7 +197,7 @@
       <property name="parameterDetailTypeCode"   value="Config" />
       <property name="personEntityTypeCode"      value="PERSON" />
       <property name="employeeIdProperty"        value="emplId" />
-      <property name="departmentLdapProperty"    value="employeePrimaryDept" />
+      <property name="departmentLdapProperty"    value="employeeOfficialOrg" />
       <property name="employeeTypeProperty"      value="employeeType" />
       <property name="employeeStatusProperty"    value="employeeStatus" />
       <property name="affiliationLdapProperty"   value="eduPersonAffiliation" />
