@@ -55,6 +55,7 @@ public class EntityAddressMapper extends BaseMapper<EntityAddress> {
         builder.setPostalCode(postalCode);
         builder.setDefaultValue(isdefault);
         builder.setActive(true);
+        builder.setDefaultValue(true);
         return builder;
     }
     
