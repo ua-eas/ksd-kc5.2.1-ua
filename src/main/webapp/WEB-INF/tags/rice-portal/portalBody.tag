@@ -32,7 +32,7 @@
   </c:when>
   <c:otherwise>
 	<table border="0" width="100%"  cellspacing="0" cellpadding="0" id="iframe_portlet_container_table">
-	   	<tr valign="top" bgcolor="#FFFFFF">
+	   	<tr valign="top">
       		<td width="15" class="leftback-focus">&nbsp;</td>
 	 		<c:choose>
 	 		  <%-- then default to tab based actions if they are not focusing in --%>
@@ -65,4 +65,7 @@
 </c:choose>
 
  <div class="footerbevel">&nbsp;</div>
- <div id="footer-copyright"> <bean:message key="app.copyright" /></div>
+ <div id="footer-copyright">
+ 	<p><bean:message key="app.copyright" /></p>
+ 	<div id="footer-logo" />
+ </div>

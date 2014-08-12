@@ -16,11 +16,10 @@
 
 <%@ include file="/rice-portal/jsp/sys/riceTldHeader.jsp"%>
 
-<!DOCTYPE HTML>
-<html lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>Kuali Portal Index</title>
+<title>UAccess Research</title>
 <c:forEach items="${fn:split(ConfigProperties.portal.css.files, ',')}" var="cssFile">
 	<c:if test="${fn:length(fn:trim(cssFile)) > 0}">
         <link href="${pageContext.request.contextPath}/${fn:trim(cssFile)}" rel="stylesheet" type="text/css" />
@@ -41,10 +40,27 @@ if (top.location != self.location) {
 </head>
 <body>
 
+<c:if test="${fn:trim(ConfigProperties.environment) != fn:trim(ConfigProperties.production.environment.code)}" >
+
+<div id="red-bar">
+	<span id="environment-info">environment: <c:out value="${ConfigProperties.environment}"/></span>
+	<c:set var="backboorEnabled" value="<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsBoolean(org.kuali.rice.kew.api.KewApiConstants.KEW_NAMESPACE, org.kuali.rice.krad.util.KRADConstants.DetailTypes.BACKDOOR_DETAIL_TYPE, org.kuali.rice.kew.api.KewApiConstants.SHOW_BACK_DOOR_LOGIN_IND)%>"/>
+      <c:if test="${backboorEnabled}">
+        <html:form action="/backdoorlogin.do" method="post" styleId="backdoor-form">
+          <input name="backdoorId" type="text" class="searchbox" size="10" title="Enter your backdoor ID here.">
+          <input name="imageField" type="hidden" value="backdoor" />
+          <input name="methodToCall" type="hidden" value="login" />
+          <a class="portal_link" onclick="document.getElementById('backdoor-form').submit();">
+		    <span class="icon-enter"></span>
+		  </a>
+        </html:form>
+      </c:if> 
+</div>
+
+</c:if>
+
+
 <div id="header" title="<c:out value="${ConfigProperties.portal.title}"/>"> 
-    <h1 class="headerImage"></h1>
+    <h1><c:out value="${ConfigProperties.portal.title}"/></h1>
   </div>
-  <div id="feedback">
-  	<a class="portal_link" href="<bean:message key="app.feedback.link"/>" target="_blank" title="<bean:message key="app.feedback.linkText" />"><bean:message key="app.feedback.linkText" /></a>
-  </div>
-  <div id="build">${ConfigProperties.version} (${ConfigProperties.datasource.ojb.platform})</div>
+  

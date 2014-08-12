@@ -17,12 +17,12 @@
 
 <c:set var="motd" value="<%= (org.kuali.kra.infrastructure.KraServiceLocator.getService(org.kuali.kra.service.MessageOfTheDayService.class)).getMessagesOfTheDay() %>" scope="page"/>
 <c:if test="${!empty pageScope.motd}">
-	<channel:portalChannelTop channelTitle="Messages Of The Day" />
+	<channel:portalChannelTop channelTitle="Messages Of The Day" visible="${false}" />
 	<c:set var = "printed" value = "false"/>
 	<c:forEach items = "${pageScope.motd}" var = "msg">
 	    	<c:set var= "printed" value = "true"/>
 			<div class="body">
-        		<strong><c:out value="${msg.message}"  /></strong>
+        		<strong class="message-of-the-day"><c:out value="${msg.message}"  /></strong>
         	</div>
    </c:forEach>
 	<c:if test = "${!printed}">

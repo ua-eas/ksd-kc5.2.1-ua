@@ -15,7 +15,7 @@
 --%>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
-<channel:portalChannelTop channelTitle="IACUC Protocols" />
+<channel:portalChannelTop channelTitle="IACUC Protocols" visible="${false}" />
 <div class="body">
   <strong>Actions </strong>
 

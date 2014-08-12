@@ -15,7 +15,7 @@
 --%>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
-<channel:portalChannelTop channelTitle="Conflict of Interest" />
+<channel:portalChannelTop channelTitle="Conflict of Interest" visible="${false}" />
 <div class="body">
 <c:set var="cmotd" value="<%= (org.kuali.kra.infrastructure.KraServiceLocator.getService(org.kuali.kra.coi.service.CoiMessagesService.class)).getMessages() %>" scope="page"/>
 <c:if test="${!empty pageScope.cmotd}">

@@ -16,14 +16,21 @@
 <%@ include file="/rice-portal/jsp/sys/riceTldHeader.jsp"%>
 
 <%@ attribute name="channelTitle" required="true" %>
+<%@ attribute name="visible" required="false" type="java.lang.Boolean" %>
 
+<c:if test="${visible == null}"><c:set var="visible" value="${true}" /></c:if>
 
-<div class="portlet">
-          <div class="header">
-            <div class="portlet-title">
-              <h2 class="portlet-title">${channelTitle}</h2>
-            </div>
-          </div>
-
-
-                <div class="chan-contain">
+<c:choose>
+	<c:when test="${visible}">
+		<div class="portlet">
+	</c:when>
+	<c:otherwise>
+		<div class="portlet hidden">
+	</c:otherwise>
+</c:choose>
+			<div class="header">
+				<div class="portlet-title">
+					<h2 class="portlet-title">${channelTitle}</h2>
+				</div>
+			</div>
+			<div class="chan-contain">
