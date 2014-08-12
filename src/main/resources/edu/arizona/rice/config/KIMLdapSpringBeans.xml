@@ -65,7 +65,14 @@
           abstract="true"
           class="edu.arizona.kra.kim.ldap.EntityAddressMapper" >
       <property name="constants" ref="kimConstants" />
+      <property name="countryService" ref="countryService" />
     </bean>
+
+	<bean id="countryService" class="org.kuali.rice.location.impl.country.CountryServiceImpl">
+		<property name="businessObjectService" ref="rice.kim.import.businessObjectService" />
+		<property name="parameterService" ref="rice.kim.ldap.import.parameterService" />
+		<property name="criteriaLookupService" ref="rice.kim.import.criteriaLookupService" />
+	</bean>
 
     <bean id="ContextMapper-EntityAffiliation"
           parent="ContextMapper-EntityAffiliation-parentBean" />
