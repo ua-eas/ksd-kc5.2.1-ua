@@ -17,6 +17,7 @@ package edu.arizona.kra.kim.ldap;
 
 import org.kuali.rice.kim.api.identity.CodedAttribute;
 import org.kuali.rice.kim.api.identity.address.EntityAddress;
+import org.kuali.rice.location.api.country.CountryService;
 import org.springframework.ldap.core.DirContextOperations;
 
 /**
@@ -24,6 +25,9 @@ import org.springframework.ldap.core.DirContextOperations;
  * @author Kuali Rice Team (rice.collab@kuali.org)
  */
 public class EntityAddressMapper extends BaseMapper<EntityAddress> {
+	
+	private CountryService countryService;
+
 	
 	@Override
 	EntityAddress mapDtoFromContext(DirContextOperations context) {
@@ -46,6 +50,7 @@ public class EntityAddressMapper extends BaseMapper<EntityAddress> {
         final String city               = context.getStringAttribute("employeeCity");
         final String stateProvinceCode  = context.getStringAttribute("employeeState");
         final String postalCode         = context.getStringAttribute("employeeZip");
+        final String countryCode        = getCountryService().getDefaultCountry().getCode();
         
         builder.setAddressType(CodedAttribute.Builder.create("WORK"));
         builder.setLine1(line1);
@@ -53,9 +58,19 @@ public class EntityAddressMapper extends BaseMapper<EntityAddress> {
         builder.setCity(city);
         builder.setStateProvinceCode(stateProvinceCode);
         builder.setPostalCode(postalCode);
+        builder.setCountryCode(countryCode);
         builder.setDefaultValue(isdefault);
         builder.setActive(true);
+        builder.setDefaultValue(true);
         return builder;
     }
-    
+
+	public CountryService getCountryService() {
+		return countryService;
+	}
+
+	public void setCountryService(CountryService countryService) {
+		this.countryService = countryService;
+	}
+
 }
