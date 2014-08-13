@@ -1,0 +1,235 @@
+@font-face {
+	font-family: 'ua-brand';
+	src:
+		url(https://brand.arizona.edu/sites/all/themes/brand/ua-brand-icons/fonts/ua-brand.eot?-gdu1x6);
+	src:
+		url(https://brand.arizona.edu/sites/all/themes/brand/ua-brand-icons/fonts/ua-brand.eot?#iefix-gdu1x6)
+		format('embedded-opentype'),
+		url(https://brand.arizona.edu/sites/all/themes/brand/ua-brand-icons/fonts/ua-brand.woff?-gdu1x6)
+		format('woff'),
+		url(https:///brand.arizona.edusites/all/themes/brand/ua-brand-icons/fonts/ua-brand.ttf?-gdu1x6)
+		format('truetype'),
+		url(https://brand.arizona.edu/sites/all/themes/brand/ua-brand-icons/fonts/ua-brand.svg?-gdu1x6#ua-brand)
+		format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+    font-size: 0.8em;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* reset complete */
+body {
+	font-family: MiloWeb,"Open Sans", sans-serif;
+	font-size: 16px;
+	color: #333333;
+	-webkit-font-smoothing: antialiased;
+	line-height: 1.428571429;
+	background-color: #ffffff;
+}
+
+
+div.backdoor {
+    display: none;
+}
+div#headerarea {
+    padding: 0;
+    background-image: none;
+    height: 81px;
+    border-bottom: none;
+}
+#headerarea h1 {
+    padding-left: 24px;
+    font-size: 1.5em;
+    font-weight: normal;
+    font-family: MiloWeb,"Open Sans", sans-serif;
+    top: 24px;
+}
+#headerarea div.headerbox {
+    right: 20px;
+	font-size: .8em;
+	top: 10px;
+}
+.horz-links-bkgrnd {
+    background-color: #e4e4e4;
+    border: none;
+    padding-top: .5em;
+    height: 32px;
+}
+#tabs dt {
+    background-image: none;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border-bottom: none;
+}
+#tabs .tabright {
+    background: none;
+}
+#tabs input {
+    font-weight: normal;
+    padding: .5em 1em;
+    margin: 0;
+    height: inherit;
+    font-size: .9em;
+    color: #5E5E5E;
+}
+#tabs dt.licurrent {
+    background-image: none;
+    background-color: #FFF;
+    border-top: 1px solid #DDD;
+    border-left: 1px solid #DDD;
+    border-right: 1px solid #DDD;
+}
+#tabs dl.tabul {
+    height: 33px;
+}
+div#tabs {
+    height: 30px;
+}
+div#horz-links {}
+#tabs input:hover {
+    font-weight: normal;
+    text-decoration: none;
+    color: #333;
+    background-image: none;
+    background-color: #DDD;
+    border: 1px solid #A2A2A2;
+}
+#headerarea table {
+    border: 1px solid #999;
+}
+
+
+/* workarea tabs */
+#workarea table.tab {
+    /* line-height: initial; */
+    /* font-size: 1em; */
+    /* height: 20px; */
+    border: 1px solid #BDBDBD;
+    margin-top: 5px;
+}
+#workarea table.tab td.tabtable1-left {
+    background-image: none;
+    padding-left: 20px;
+    /* padding-top: 0px; */
+    /* margin-top: 2px; */
+    width: 96%;
+}
+table.tab img {
+    display: none;
+}
+#workarea table.tab td.tabtable1-mid {
+    background-image: none;
+    /* margin: 0; */
+    /* padding: 0; */
+}
+#workarea table.tab td.tabtable1-right {
+    background-image: none;
+}
+#workarea table.tab td.tabtable2-mid {
+    background-image: none;
+}
+#workarea table.tab td.tabtable2-right {
+    background-image: none;
+}
+#workarea table.tab td {
+    background-color: #D8D8D8;
+}
+#workarea h2 {
+	font-weight: normal;
+	font-size: 1.2em;
+}
+#workarea div.tab-container {
+    background-color: #FFF;
+    border: 1px solid #BDBDBD;
+    background-image: none;
+    margin: 0;
+}
+#workarea td, #workarea th {
+    vertical-align: middle;
+}
+div#workarea {
+    font-size: .8em;
+}
+#workarea table.b3 {
+    background-image: none;
+}
+#workarea td.footer {
+    background: none;
+}
+#workarea td.footer-right {
+    background: none;
+}
+img.bl3 {
+    display: none;
+}
+img.br3 {
+    display: none;
+}
+
+#workarea div.tab-container-error {
+    background-image: none;
+    background-color: #FCE4E4;
+    border-right: 1px solid #BDBDBD;
+    width: auto;
+    border-left: 1px solid #BDBDBD;
+}
+
+.left-errmsg {
+	font-size: .9em;
+}
+
+div.msg-excol {
+	padding: 0;
+}
+
+
+
+
