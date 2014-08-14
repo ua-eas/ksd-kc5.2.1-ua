@@ -31,7 +31,27 @@
 	  </div>
   </c:when>
   <c:otherwise>
-	<table border="0" width="100%"  cellspacing="0" cellpadding="0" id="iframe_portlet_container_table">
+  	<div id="iframe_portlet_container_table">
+	<table border="0" width="100%"  cellspacing="0" cellpadding="0">
+		<tr>
+			<td width="15" class="leftback-focus">&nbsp;</td>
+			<td colspan="3">
+			<c:set var="motd" value="<%= (org.kuali.kra.infrastructure.KraServiceLocator.getService(org.kuali.kra.service.MessageOfTheDayService.class)).getMessagesOfTheDay() %>" scope="page"/>
+			<div id="message-of-the-day">
+				<h2>Message of the Day</h2>
+				<c:set var = "printed" value = "false"/>
+				<c:forEach items = "${pageScope.motd}" var = "msg">
+				    	<c:set var= "printed" value = "true"/>
+						<div class="body">
+			        		<c:out value="${msg.message}"  />
+			        	</div>
+			   </c:forEach>
+				<c:if test = "${!printed}">
+				    <div class = "body">No messages today.</div>
+				</c:if>
+			</div>
+			</td>
+		</tr>
 	   	<tr valign="top">
       		<td width="15" class="leftback-focus">&nbsp;</td>
 	 		<c:choose>
@@ -61,11 +81,15 @@
 	        </c:choose>
        </tr>
     </table>
+    </div>
   </c:otherwise>
 </c:choose>
 
- <div class="footerbevel">&nbsp;</div>
+<div id="footer-container">
  <div id="footer-copyright">
+    <a href="javascript:void(0)" id="footer-toggle" class="icon-arrow-up2"></a>
  	<p><bean:message key="app.copyright" /></p>
+ 	<p>Version: ${ConfigProperties.version}</p>
  	<div id="footer-logo" />
+ </div>
  </div>

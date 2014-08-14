@@ -67,6 +67,10 @@ table {
 
 /* reset complete */
 
+html {
+	/*background-color: #0C234B;*/
+}
+
 body {
 	font-family: MiloWeb,"Open Sans", sans-serif;
 	font-size: 16px;
@@ -172,9 +176,17 @@ div.breadcrumb-focus {
 }
 
 .header2 a.portal_link {
-text-decoration: none;
+	text-decoration: none;
 	margin-right: 10px;
 	color: #333;
+}
+
+.header2 span.icon-link-text {
+    word-spacing: -5px;
+    font-size: 1em;
+}
+.header2 span.icon {
+    font-size: .8em;
 }
 
 div#login-info {
@@ -207,11 +219,29 @@ div#iframe_portlet_container_div {
 	background-image: none;
 }
 
-table#iframe_portlet_container_table {
+#iframe_portlet_container_table {
 	background-color: #FFF;
 	border-top: 5px solid #0C234B;
+	margin-top: 17px;
 }
 
+#message-of-the-day h2 {
+    display: block;
+    float: left;
+    margin-top: 1em;
+    margin-left: 12px;
+    margin-right: .5em;
+    font-weight: bold;
+    font-size: .9em;
+    color: #BDBDBD;
+    text-transform: uppercase;
+}
+#message-of-the-day .body {
+    float: left;
+    margin-top: 1em;
+    font-size: .9em;
+    color: #686868;
+}
 
 td.content {
 	width: 500px;
@@ -251,15 +281,36 @@ ul.chan {
 .footerbevel {
     display: none;
 }
+div#footer-container {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    background: transparent;
+    overflow: hidden;
+    height: 30px;
+}
 div#footer-copyright {
     background-color: #0C234B;
     background-image: none;
+    height: 100px;
+    margin-top: 0px;
+    padding-top: 30px;
+}
+a#footer-toggle {
+    margin-top: -25px;
+    display: block;
+    position: absolute;
+    width: 100%;
+}
+a#footer-toggle:hover {
+    color: #FFF;
 }
 div#footer-logo {
     background-image: url("../static/images/ua-logo.svg");
     width: 169px; 
     height: 40px;
     float: right;
-    margin-top: -40px;
+    margin-top: -61px;
     margin-right: 24px;
+    background-repeat: no-repeat;
 }
