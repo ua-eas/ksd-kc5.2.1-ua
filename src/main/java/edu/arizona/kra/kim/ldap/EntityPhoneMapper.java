@@ -63,7 +63,7 @@ public class EntityPhoneMapper extends BaseMapper<EntityPhone> {
         
         builder.setCountryCode(countryCode);
         builder.setPhoneNumber(phoneNumber);
-        builder.setPhoneType(CodedAttribute.Builder.create("WORK"));
+        builder.setPhoneType(CodedAttribute.Builder.create("WRK")); // Magic string from KcPerson
         builder.setActive(true);
         builder.setDefaultValue(isdefault);
 
