@@ -22,7 +22,7 @@ import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 /**
  * This class represents the Protocol Attachment Protocol.
  */
-public class ProtocolAttachmentProtocol extends ProtocolAttachmentProtocolBase {
+public class ProtocolAttachmentProtocol extends ProtocolAttachmentProtocolBase implements Comparable<ProtocolAttachmentProtocol> {
 
     private static final long serialVersionUID = -7115904344245464654L;
 
@@ -85,4 +85,9 @@ public class ProtocolAttachmentProtocol extends ProtocolAttachmentProtocolBase {
     public void setDeleted() {
         documentStatusCode = ProtocolAttachmentStatus.DELETED;
     }
+    
+    public int compareTo(ProtocolAttachmentProtocol otherProtocal){
+    	return super.getUpdateTimestamp().compareTo(otherProtocal.getUpdateTimestamp());
+    }
+
 }
