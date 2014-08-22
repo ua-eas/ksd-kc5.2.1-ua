@@ -1,0 +1,316 @@
+@font-face {
+	font-family: 'ua-brand';
+	src:
+		url(https://brand.arizona.edu/sites/all/themes/brand/ua-brand-icons/fonts/ua-brand.eot?-gdu1x6);
+	src:
+		url(https://brand.arizona.edu/sites/all/themes/brand/ua-brand-icons/fonts/ua-brand.eot?#iefix-gdu1x6)
+		format('embedded-opentype'),
+		url(https://brand.arizona.edu/sites/all/themes/brand/ua-brand-icons/fonts/ua-brand.woff?-gdu1x6)
+		format('woff'),
+		url(https:///brand.arizona.edusites/all/themes/brand/ua-brand-icons/fonts/ua-brand.ttf?-gdu1x6)
+		format('truetype'),
+		url(https://brand.arizona.edu/sites/all/themes/brand/ua-brand-icons/fonts/ua-brand.svg?-gdu1x6#ua-brand)
+		format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+    font-size: 0.8em;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* reset complete */
+
+html {
+	/*background-color: #0C234B;*/
+}
+
+body {
+	font-family: MiloWeb,"Open Sans", sans-serif;
+	font-size: 16px;
+	color: #333333;
+	-webkit-font-smoothing: antialiased;
+	line-height: 1.428571429;
+	background-color: #ffffff;
+}
+
+.hidden {
+	display: none;
+}
+
+div#red-bar {
+	border-top: 30px solid #AB0520;
+	border-left: 15px solid transparent;
+	border-right: 15px solid transparent;
+	height: 0;
+	width: 400px;
+	position: fixed;
+	top: 0px;
+	left: 34%;
+}
+
+span#environment-info {
+	margin-top: -24px;
+	margin-left: 10px;
+	width: auto;
+	text-align: center;
+	color: #FFF;
+	font-size: 1em;
+	float: left;
+}
+
+#red-bar form {
+	float: right;
+	margin-top: -26px;
+	margin-right: 10px;
+}
+
+#red-bar a.portal_link {
+	color: #FFF;
+}
+
+#red-bar a.portal_link:hover {
+	color: #FFF;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+div#header {
+	background-image: none;
+	border-top: 10px solid #AB0520;
+}
+
+#header h1 {
+	font-family: MiloSerifWeb,serif;
+	color: #333;
+	font-size: 1.3em;
+	padding-left: 24px;
+	padding-top: 5px;
+}
+
+div.header2-left-focus {
+	background-image: none;
+}
+
+div#tabs {
+	position: inherit;
+	float: left;
+	width: 100%;
+	padding-left: 24px;
+}
+#tabs li.red, #tabs li.green {
+	background: none;
+	margin: 0;
+	padding: 0;
+}
+#tabs a {
+	text-transform:uppercase;
+}
+#tabs a.red, #tabs a.green {
+	background: none;
+	padding: 0;
+	font-weight: bold;
+	color: #333;
+	font-size: 0.8em;
+	margin-right: 28px;
+}
+
+div.header2 {
+	background-image: none;
+	background-color: #FFF;
+	margin-top: -20px;
+	width: inherit;
+	height: 23px;
+	float: right;
+	margin-right: 17px;
+}
+
+div.breadcrumb-focus {
+	position: inherit;
+}
+
+.header2 a.portal_link {
+	text-decoration: none;
+	margin-right: 10px;
+	color: #333;
+}
+
+.header2 span.icon-link-text {
+    word-spacing: -5px;
+    font-size: 1em;
+}
+.header2 span.icon {
+    font-size: .8em;
+}
+
+div#login-info {
+	font-size: .9em;
+	top: 15px;
+	right: 24px;
+	color: #333;
+	font-weight: 100;
+}
+
+div#login-info form {
+	display: inline;
+}
+
+div#login-info .login-user-info {
+margin-right: 6px;
+}
+
+/*content container*/
+
+div#iframe_portlet_container_div {
+	background-color: #FFF;
+	border-top: 5px solid #0C234B;
+	background-image: none;
+	padding: 0px;
+	margin-top: 17px;
+}
+
+.leftback-focus {
+	background-image: none;
+}
+
+#iframe_portlet_container_table {
+	background-color: #FFF;
+	border-top: 5px solid #0C234B;
+	margin-top: 17px;
+}
+
+#message-of-the-day h2 {
+    display: block;
+    float: left;
+    margin-top: 1em;
+    margin-left: 12px;
+    margin-right: .5em;
+    font-weight: bold;
+    font-size: .9em;
+    color: #BDBDBD;
+    text-transform: uppercase;
+}
+#message-of-the-day .body {
+    float: left;
+    margin-top: 1em;
+    font-size: .9em;
+    color: #686868;
+}
+
+td.content {
+	width: 500px;
+}
+
+.portlet h2.portlet-title {
+    font-size: 1.4em;
+    font-family: MiloSerifWeb,serif;
+    font-weight: bold;
+    float: none;
+    color: #B75527;
+}
+.portlet .header {
+    background-color: #FFF;
+    background-image: none;
+    height: inherit;
+}
+div.portlet-title {
+    float: none;
+}
+.portlet {
+    border: none;
+}
+.portlet strong {
+    font-size: 1em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+.portlet strong.message-of-the-day {
+    text-transform: none;
+}
+ul.chan {
+    padding: .5em 0em;
+}
+
+/* Footer */
+.footerbevel {
+    display: none;
+}
+div#footer-container {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    background: transparent;
+    overflow: hidden;
+    height: 30px;
+}
+div#footer-copyright {
+    background-color: #0C234B;
+    background-image: none;
+    height: 100px;
+    margin-top: 0px;
+    padding-top: 30px;
+}
+a#footer-toggle {
+    margin-top: -25px;
+    display: block;
+    position: absolute;
+    width: 100%;
+}
+a#footer-toggle:hover {
+    color: #FFF;
+}
+div#footer-logo {
+    background-image: url("../static/images/ua-logo.svg");
+    width: 169px; 
+    height: 40px;
+    float: right;
+    margin-top: -61px;
+    margin-right: 24px;
+    background-repeat: no-repeat;
+}
