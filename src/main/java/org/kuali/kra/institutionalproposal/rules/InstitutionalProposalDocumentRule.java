@@ -46,6 +46,7 @@ import java.util.Map;
 /**
  * This class...
  */
+@SuppressWarnings("rawtypes")
 public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase implements BusinessRuleInterface {
     
     public static final String DOCUMENT_ERROR_PATH = "document";
@@ -73,9 +74,6 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         retval &= processInstitutionalProposalBusinessRules(document);
         retval &= processInstitutionalProposalFinancialRules(document);
         retval &= processInstitutionalProposalPersonBusinessRules(errorMap, document);
-//        moved to processRunAuditBusinessRules()
-//        retval &= processInstitutionalProposalPersonCreditSplitBusinessRules(document);
-//        retval &= processInstitutionalProposalPersonUnitCreditSplitBusinessRules(document);
         retval &= processKeywordBusinessRule(document);
         retval &= processAccountIdBusinessRule(document);
         retval &= processCostShareRules(document);
@@ -83,7 +81,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         return retval;
     }    
         
-    private boolean validateSponsors(Document document) {
+    protected boolean validateSponsors(Document document) {
         boolean valid = true;
         MessageMap errorMap = GlobalVariables.getMessageMap();
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
@@ -106,7 +104,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
     * @param awardDocument
     * @return
     */
-    private boolean processUnrecoveredFandABusinessRules(Document document) {
+    protected boolean processUnrecoveredFandABusinessRules(Document document) {
         boolean valid = true;
         MessageMap errorMap = GlobalVariables.getMessageMap();
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
@@ -146,7 +144,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         
     }
     
-    private boolean processInstitutionalProposalPersonBusinessRules(MessageMap errorMap, Document document) {
+    protected boolean processInstitutionalProposalPersonBusinessRules(MessageMap errorMap, Document document) {
         errorMap.addToErrorPath(DOCUMENT_ERROR_PATH);
         errorMap.addToErrorPath(IP_ERROR_PATH);
         InstitutionalProposalPersonSaveRuleEvent event = new InstitutionalProposalPersonSaveRuleEvent("Project Persons", "projectPersons", document);
@@ -157,18 +155,18 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         return success;
     }
     
-    private boolean processInstitutionalProposalPersonCreditSplitBusinessRules(Document document) {
+    protected boolean processInstitutionalProposalPersonCreditSplitBusinessRules(Document document) {
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
         return new InstitutionalProposalCreditSplitBean(institutionalProposalDocument).recalculateCreditSplit();
         
     }
     
-    private boolean processInstitutionalProposalPersonUnitCreditSplitBusinessRules(Document document) {
+    protected boolean processInstitutionalProposalPersonUnitCreditSplitBusinessRules(Document document) {
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
         return new InstitutionalProposalCreditSplitBean(institutionalProposalDocument).recalculateCreditSplit();
     }
     
-    private boolean processKeywordBusinessRule(Document document) {
+    protected boolean processKeywordBusinessRule(Document document) {
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
         List<InstitutionalProposalScienceKeyword> keywords = institutionalProposalDocument.getInstitutionalProposal().getKeywords();
         for ( InstitutionalProposalScienceKeyword keyword : keywords ) {
@@ -185,7 +183,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         return true;
     }
     
-    private boolean processAccountIdBusinessRule(Document document) {
+    protected boolean processAccountIdBusinessRule(Document document) {
         boolean retVal = true;
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
         InstitutionalProposal institutionalProposal = institutionalProposalDocument.getInstitutionalProposal();
@@ -215,7 +213,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
      * @param proposalDevelopmentDocument
      * @return
     */
-    private boolean processSponsorProgramBusinessRule(Document document) {
+    protected boolean processSponsorProgramBusinessRule(Document document) {
         boolean valid = true;
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
         String errorPath = "institutionalSponsorAndProgram";
@@ -230,7 +228,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
      * @param proposalDevelopmentDocument
      * @return
     */
-    private boolean processInstitutionalProposalFinancialRules(Document document) {
+    protected boolean processInstitutionalProposalFinancialRules(Document document) {
         boolean valid = true;
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
         String errorPath = "institutionalProposalFinancial";
@@ -245,7 +243,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
      * @param proposalDevelopmentDocument
      * @return
     */
-    private boolean processInstitutionalProposalBusinessRules(Document document) {
+    protected boolean processInstitutionalProposalBusinessRules(Document document) {
         boolean valid = true;
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
         String errorPath = "institutionalProposal";
@@ -255,13 +253,14 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         return valid;
     }
 
-    public boolean processRules(KraDocumentEventBaseExtension event) {
+    @SuppressWarnings("unchecked")
+	public boolean processRules(KraDocumentEventBaseExtension event) {
         boolean retVal = false;
         retVal = event.getRule().processRules(event);
         return retVal;
     }   
     
-    private boolean processCostShareRules(Document document) {
+    protected boolean processCostShareRules(Document document) {
         boolean valid = true;
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
         String errorPath = "institutionalProposal";
@@ -275,7 +274,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         return valid;
     }
     
-    private SponsorService getSponsorService() {
+    protected SponsorService getSponsorService() {
         return KraServiceLocator.getService(SponsorService.class);
     }
 }

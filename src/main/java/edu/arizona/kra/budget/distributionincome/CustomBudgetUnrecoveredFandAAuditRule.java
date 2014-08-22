@@ -13,42 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kuali.kra.budget.distributionincome;
+package edu.arizona.kra.budget.distributionincome;
 
 import static org.kuali.rice.kns.util.KNSGlobalVariables.getAuditErrorMap;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.budget.BudgetDecimal;
 import org.kuali.kra.budget.core.Budget;
 import org.kuali.kra.budget.core.BudgetParent;
+import org.kuali.kra.budget.distributionincome.BudgetUnrecoveredFandA;
 import org.kuali.kra.budget.document.BudgetDocument;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.rice.kns.util.AuditCluster;
 import org.kuali.rice.kns.util.AuditError;
 import org.kuali.rice.krad.document.Document;
-import org.kuali.rice.krad.rules.rule.DocumentAuditRule;
 
 @SuppressWarnings("deprecation")
-public class BudgetUnrecoveredFandAAuditRule implements DocumentAuditRule {
-    public static final String BUDGET_UNRECOVERED_F_AND_A_ERROR_KEY = "budgetUnrecoveredFandAAuditErrors";
-    public static final String BUDGET_UNRECOVERED_F_AND_A_WARNING_KEY = "budgetUnrecoveredFandAAuditWarnings";
-    
-    protected String[] params = { "Unrecovered F and A" };
-    protected static final int YEAR_CONSTANT = 1900;
+public class CustomBudgetUnrecoveredFandAAuditRule extends  org.kuali.kra.budget.distributionincome.BudgetUnrecoveredFandAAuditRule {
+
 
     @SuppressWarnings("rawtypes")
+	@Override
 	public boolean processRunAuditBusinessRules(Document document) {
+
         Budget budget = ((BudgetDocument)document).getBudget();
         if (getAuditErrorMap().containsKey(BUDGET_UNRECOVERED_F_AND_A_ERROR_KEY)) {
             List auditErrors = ((AuditCluster) getAuditErrorMap().get(BUDGET_UNRECOVERED_F_AND_A_ERROR_KEY)).getAuditErrorList();
             auditErrors.clear();
         }
-        
+
         // Returns if unrecovered f and a is not applicable
         if (!budget.isUnrecoveredFandAApplicable()) {
             return true;
@@ -74,7 +71,7 @@ public class BudgetUnrecoveredFandAAuditRule implements DocumentAuditRule {
                         params));
             }
         } 
-        String source = null;
+
         Integer fiscalYear = null;
         
         int i=0;
@@ -86,16 +83,9 @@ public class BudgetUnrecoveredFandAAuditRule implements DocumentAuditRule {
         // Forces inclusion of source account
         boolean duplicateEntryFound = false;
         for (BudgetUnrecoveredFandA unrecoveredFandA : unrecoveredFandAs) {
-            source = unrecoveredFandA.getSourceAccount();
+            
             fiscalYear = unrecoveredFandA.getFiscalYear();
             
-            if (null == source || source.length() == 0) {
-                retval = false;
-                getAuditErrors().add(new AuditError("document.budget.budgetUnrecoveredFandA["+i+"].sourceAccount",
-                                                    KeyConstants.AUDIT_ERROR_BUDGET_DISTRIBUTION_SOURCE_MISSING,
-                                                    Constants.BUDGET_DISTRIBUTION_AND_INCOME_PAGE + "." + Constants.BUDGET_UNRECOVERED_F_AND_A_PANEL_ANCHOR,
-                                                    params));
-            }
             if (null == fiscalYear || fiscalYear.intValue() <= 0) {
                 retval = false;
                 getAuditErrors().add(new AuditError("document.budget.budgetUnrecoveredFandA["+i+"].fiscalYear",
@@ -135,41 +125,6 @@ public class BudgetUnrecoveredFandAAuditRule implements DocumentAuditRule {
             i++;
         }
         return retval;
-    }
-
-    /**
-     * This method is a convenience method for obtaining audit errors.
-     * @return List of AuditError instances
-     */    
-    protected List<AuditError> getAuditErrors() {
-        return getAuditProblems(BUDGET_UNRECOVERED_F_AND_A_ERROR_KEY, Constants.AUDIT_ERRORS);
-    }
-    
-    /**
-     * This method is a convenience method for obtaining audit warnings.
-     * @return List of AuditError instances
-     */
-    protected List<AuditError> getAuditWarnings() {
-        return getAuditProblems(BUDGET_UNRECOVERED_F_AND_A_WARNING_KEY, Constants.AUDIT_WARNINGS);
-    }
-    
-    /**
-     * This method should only be called if an audit error is intending to be added because it will actually 
-     * add a <code>{@link List<AuditError>}</code> to the auditErrorMap.
-     * @return List of AuditError instances
-     */
-    @SuppressWarnings("unchecked")
-	protected List<AuditError> getAuditProblems(String key, String problemType) {
-        List<AuditError> auditErrors = new ArrayList<AuditError>();
-        
-        if (!getAuditErrorMap().containsKey(key)) {
-            getAuditErrorMap().put(key, new AuditCluster(Constants.BUDGET_UNRECOVERED_F_AND_A_PANEL_NAME, auditErrors, problemType));
-        }
-        else {
-            auditErrors = ((AuditCluster) getAuditErrorMap().get(key)).getAuditErrorList();
-        }
-        
-        return auditErrors;
     }
 
 }

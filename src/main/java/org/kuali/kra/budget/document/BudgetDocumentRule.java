@@ -15,6 +15,9 @@
  */
 package org.kuali.kra.budget.document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.budget.AwardBudgeCostTotalAuditRule;
 import org.kuali.kra.award.budget.AwardBudgetBudgetTypeAuditRule;
@@ -22,10 +25,29 @@ import org.kuali.kra.award.budget.AwardBudgetCostLimitAuditRule;
 import org.kuali.kra.award.budget.document.AwardBudgetDocument;
 import org.kuali.kra.budget.BudgetDecimal;
 import org.kuali.kra.budget.core.BudgetParent;
-import org.kuali.kra.budget.distributionincome.*;
+import org.kuali.kra.budget.distributionincome.AddBudgetCostShareEvent;
+import org.kuali.kra.budget.distributionincome.AddBudgetCostShareRule;
+import org.kuali.kra.budget.distributionincome.AddBudgetProjectIncomeEvent;
+import org.kuali.kra.budget.distributionincome.AddBudgetProjectIncomeRule;
+import org.kuali.kra.budget.distributionincome.BudgetCostShare;
+import org.kuali.kra.budget.distributionincome.BudgetCostShareAuditRule;
+import org.kuali.kra.budget.distributionincome.BudgetCostShareRuleImpl;
+import org.kuali.kra.budget.distributionincome.BudgetProjectIncome;
+import org.kuali.kra.budget.distributionincome.BudgetProjectIncomeRuleImpl;
+import org.kuali.kra.budget.distributionincome.BudgetUnrecoveredFandAAuditRule;
 import org.kuali.kra.budget.nonpersonnel.BudgetExpensesAuditRule;
 import org.kuali.kra.budget.nonpersonnel.BudgetLineItem;
-import org.kuali.kra.budget.parameters.*;
+import org.kuali.kra.budget.parameters.AddBudgetPeriodEvent;
+import org.kuali.kra.budget.parameters.AddBudgetPeriodRule;
+import org.kuali.kra.budget.parameters.BudgetPeriod;
+import org.kuali.kra.budget.parameters.BudgetPeriodAuditRule;
+import org.kuali.kra.budget.parameters.BudgetPeriodRule;
+import org.kuali.kra.budget.parameters.DeleteBudgetPeriodEvent;
+import org.kuali.kra.budget.parameters.DeleteBudgetPeriodRule;
+import org.kuali.kra.budget.parameters.GenerateBudgetPeriodEvent;
+import org.kuali.kra.budget.parameters.GenerateBudgetPeriodRule;
+import org.kuali.kra.budget.parameters.SaveBudgetPeriodEvent;
+import org.kuali.kra.budget.parameters.SaveBudgetPeriodRule;
 import org.kuali.kra.budget.personnel.BudgetPersonnelAuditRule;
 import org.kuali.kra.budget.personnel.BudgetPersonnelDetails;
 import org.kuali.kra.budget.personnel.BudgetPersonnelRule;
@@ -49,9 +71,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.MessageMap;
 import org.kuali.rice.krad.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@SuppressWarnings("deprecation")
 public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implements AddBudgetPeriodRule, AddBudgetCostShareRule, AddBudgetProjectIncomeRule, SaveBudgetPeriodRule, DeleteBudgetPeriodRule, GenerateBudgetPeriodRule, DocumentAuditRule, SyncModularBudgetRule {
 
     /** 
@@ -87,7 +107,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
         return new BudgetPeriodRule().processGenerateBudgetPeriodBusinessRules(generateBudgetPeriodEvent);    
     }
     
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     protected boolean processCustomSaveDocumentBusinessRules(Document document) {
         if (!(document instanceof BudgetDocument)) {
             return false;
@@ -105,9 +126,7 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
         if(Boolean.valueOf(budgetDocument.getParentDocument().getProposalBudgetFlag())){
             valid &= processBudgetVersionsBusinessRule(budgetDocument.getParentDocument(), true);
         } 
-//        else {
-//            valid &= processBudgetTypeBusinessRules(budgetDocument);
-//        }
+
         GlobalVariables.getMessageMap().removeFromErrorPath("parentDocument");
         
         GlobalVariables.getMessageMap().addToErrorPath("budget"); 
@@ -135,7 +154,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
     * @param budgetDocument
     * @return
     */
-    protected boolean processBudgetProjectIncomeBusinessRule(BudgetDocument budgetDocument) {
+    @SuppressWarnings("rawtypes")
+	protected boolean processBudgetProjectIncomeBusinessRule(BudgetDocument budgetDocument) {
         boolean valid = true;
         MessageMap errorMap = GlobalVariables.getMessageMap();
         int i = 0;
@@ -192,23 +212,6 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
         return valid;
     }
 
-    // change to audit rule
-//    protected boolean processBudgetTypeBusinessRules(BudgetDocument budgetDocument) {
-//        boolean valid = true;
-//        MessageMap errorMap = GlobalVariables.getMessageMap();
-//        errorMap.removeFromErrorPath("parentDocument");
-//        errorMap.removeFromErrorPath("document");
-//        
-//        AwardBudgetExt awardBudget = (AwardBudgetExt)budgetDocument.getBudget();
-//        if ("2".equals(awardBudget.getAwardBudgetTypeCode()) && StringUtils.isBlank(awardBudget.getComments())) {
-//            errorMap.putError("document.budget.comments", KeyConstants.ERROR_REQUIRED, "Comments(Comments)");
-//            valid = false;
-//        }
-//        GlobalVariables.getMessageMap().addToErrorPath("document");        
-//        GlobalVariables.getMessageMap().addToErrorPath("parentDocument");
-//        return valid;
-//    }
-
     /**
     *
     * Validate budget rates. 
@@ -216,7 +219,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
     * @param budgetDocument
     * @return
     */
-    protected boolean processBudgetRatesBusinessRule(BudgetDocument budgetDocument) {
+    @SuppressWarnings("rawtypes")
+	protected boolean processBudgetRatesBusinessRule(BudgetDocument budgetDocument) {
         boolean valid = true;
         final int APPLICABLE_RATE_LENGTH_EXCEEDED = 1;
         final int APPLICABLE_RATE_NEGATIVE = -1;
@@ -292,7 +296,7 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
      * @param applicableRate
      * @return
      */
-    private int verifyApplicableRate(BudgetDecimal applicableRate) {
+    protected int verifyApplicableRate(BudgetDecimal applicableRate) {
         // problematic, such as -100.00 will get 'less than or equal to 999.99 error, also problem with negative less than 1. so rewrote it
         int rateValue = 0;
         if (applicableRate.isNegative()) {
@@ -302,13 +306,15 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
         }            
         return rateValue;
     }
+
     /**
      * This method checks business rules related to Budget Personnel functionality
      * 
      * @param budgetDocument
      * @return
      */
-    protected boolean processBudgetPersonnelBusinessRules(BudgetDocument budgetDocument) {
+    @SuppressWarnings("rawtypes")
+	protected boolean processBudgetPersonnelBusinessRules(BudgetDocument budgetDocument) {
         return new BudgetPersonnelRule().processBudgetPersonnelBusinessRules(budgetDocument);
     }
     
@@ -318,7 +324,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
      * @param budgetDocument
      * @return
      */
-    protected boolean processBudgetExpenseBusinessRules(BudgetDocument budgetDocument) {
+    @SuppressWarnings("rawtypes")
+	protected boolean processBudgetExpenseBusinessRules(BudgetDocument budgetDocument) {
         boolean valid = true;
         //TODO - put budget expense validation rules here.
         MessageMap errorMap = GlobalVariables.getMessageMap();
@@ -338,22 +345,10 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
                     errorMap.putError("budgetCategoryTypes[" + budgetLineItem.getBudgetCategory().getBudgetCategoryTypeCode() + "].budgetPeriods[" + i +"].budgetLineItems[" + j + "].endDate",KeyConstants.ERROR_LINEITEM_ENDDATE_AFTER_PERIOD_ENDDATE);
                     valid = false;
                 }
-//                if (budgetLineItem!=null && budgetLineItem.getCostSharingAmount() != null && budgetLineItem.getCostSharingAmount().isNegative()) {
-//                    errorMap.putError("budgetPeriod[" + i +"].budgetLineItem[" + j + "].costSharingAmount", KeyConstants.ERROR_NEGATIVE_AMOUNT,"Cost Sharing");
-//                    valid = false;
-//                }
                 if (budgetLineItem!=null && budgetLineItem.getQuantity() != null && budgetLineItem.getQuantity().intValue()<0) {
                     errorMap.putError("budgetPeriod[" + i +"].budgetLineItem[" + j + "].quantity", KeyConstants.ERROR_NEGATIVE_AMOUNT,"Quantity");
                     valid = false;
                 }
-//                if (budgetLineItem!=null && budgetLineItem.getLineItemCost() != null && budgetLineItem.getLineItemCost().isNegative()) {
-//                    errorMap.putError("budgetPeriod[" + i +"].budgetLineItem[" + j + "].lineItemCost", KeyConstants.ERROR_NEGATIVE_AMOUNT,"Total Base Cost");
-//                    valid = false;
-//                }
-//                if(budgetLineItem.getEndDate().compareTo(budgetLineItem.getStartDate()) <=0 ) {                        
-//                        errorMap.putError("budgetPeriod["+i+"].budgetLineItem["+j+"].endDate", KeyConstants.ERROR_LINE_ITEM_DATES);
-//                        return false;
-//                }
          
                 j++;
             }
@@ -368,7 +363,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
      * @param budgetDocument
      * @return
      */
-    protected boolean processBudgetPersonnelBudgetBusinessRules(BudgetDocument budgetDocument) {
+    @SuppressWarnings("rawtypes")
+	protected boolean processBudgetPersonnelBudgetBusinessRules(BudgetDocument budgetDocument) {
         boolean valid = true;
 
         MessageMap errorMap = GlobalVariables.getMessageMap();
@@ -412,7 +408,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
     /**
      * @see org.kuali.rice.krad.rules.rule.DocumentAuditRule#processRunAuditBusinessRules(org.kuali.rice.krad.document.Document)
      */
-    public boolean processRunAuditBusinessRules(Document document) {
+    @SuppressWarnings("rawtypes")
+	public boolean processRunAuditBusinessRules(Document document) {
         boolean retval = true;
         
         retval &= super.processRunAuditBusinessRules(document);
@@ -448,7 +445,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
         return retval;
     }
     
-    protected boolean processRunAuditBudgetVersionRule(BudgetParentDocument parentDocument) {
+    @SuppressWarnings("rawtypes")
+	protected boolean processRunAuditBudgetVersionRule(BudgetParentDocument parentDocument) {
         // audit check for budgetversion with final status
         boolean finalAndCompleteBudgetVersionFound = false;
         boolean budgetVersionsExists = false;
@@ -479,7 +477,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
         return retval;
     }
     
-    public boolean processSyncModularBusinessRules(Document document) {
+    @SuppressWarnings("rawtypes")
+	public boolean processSyncModularBusinessRules(Document document) {
         if (!(document instanceof BudgetDocument)) {
             return false;
         }
