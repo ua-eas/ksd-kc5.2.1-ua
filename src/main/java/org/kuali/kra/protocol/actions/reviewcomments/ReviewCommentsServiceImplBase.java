@@ -366,7 +366,7 @@ public abstract class ReviewCommentsServiceImplBase<PRA extends ProtocolReviewAt
                     );                              
     }
 
-    private boolean isAdministrator(String principalId) {
+    protected boolean isAdministrator(String principalId) {
         RoleService roleService = KraServiceLocator.getService(RoleService.class);
         Collection<String> ids = roleService.getRoleMemberPrincipalIds(RoleConstants.DEPARTMENT_ROLE_TYPE,
                getAdministratorRoleHook(), null);
