@@ -301,6 +301,18 @@ public class AwardAttachment extends AwardAssociate implements Comparable<AwardA
      */
     @Override
     protected void preUpdate() {
+    	
+    	if(!isNew()){
+    		/*
+    		 *  Don't update unless this is a new attachment. This is so that
+    		 *  a subsequent call from KraPersistableBusinessObjectBase#setUpdateFields()
+    		 *  does not erroneously overwrite updateUserName with a value from the current session.
+    		 *  I.e, just loading the notes/attachments tabs should not update the user field, only
+    		 *  update when a new note/attachment is actually added.
+    		 */
+    		return;
+    	}
+    	
         super.preUpdate();
         if (this.getVersionNumber() == null) {
             this.setVersionNumber(new Long(0));
