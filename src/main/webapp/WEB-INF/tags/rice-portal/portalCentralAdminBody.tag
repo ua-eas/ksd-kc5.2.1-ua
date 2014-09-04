@@ -22,7 +22,7 @@
 </td>
 <td class="content" valign="top">
       <channel:unitPreSubmissionCompliance />
-      <channel:unitPostSubmissionCompliance />
+      <channel:centralAdminPostSubmissionCompliance />
 </td>
 
 <td class="content" valign="top">
