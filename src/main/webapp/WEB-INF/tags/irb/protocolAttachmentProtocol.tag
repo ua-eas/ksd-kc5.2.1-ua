@@ -260,7 +260,7 @@
 		      <tr id="protocol-attachment-row-${itrStatus.index}" class="fake-class-level-1">
 		        <td>
 		             <c:set var="modify" value="${KualiForm.notesAttachmentsHelper.modifyAttachments and attachmentProtocol.documentStatusCode != '3' and (not KualiForm.document.protocolList[0].renewalWithoutAmendment or attachmentProtocol.documentStatusCode != '2')}" />
-		    			<kul:innerTab tabTitle="${attachmentProtocol.type.description} - ${descDisplay} - ${updateUserDisplay} (${lastUpdateDisplay})" parentTab="Protocol Attachments(${size})" defaultOpen="false" tabErrorKey="document.protocolList[0].attachmentProtocols[${itrStatus.index}]*,document.protocolList[0].attachmentProtocols[${itrStatus.index}]*" useCurrentTabIndexAsKey="true" tabAuditKey="document.protocolList[0].attachmentProtocols[${itrStatus.index}]*" auditCluster="NoteAndAttachmentAuditErrors">
+						<kul:innerTabRightAligned tabTitleRightAligned="${attachmentProtocol.sourceProtocolAmendRenewalNumber}" tabTitle="${attachmentProtocol.type.description} - ${descDisplay} - ${updateUserDisplay} (${lastUpdateDisplay})" parentTab="Protocol Attachments(${size})" defaultOpen="false" tabErrorKey="document.protocolList[0].attachmentProtocols[${itrStatus.index}]*,document.protocolList[0].attachmentProtocols[${itrStatus.index}]*" useCurrentTabIndexAsKey="true" tabAuditKey="document.protocolList[0].attachmentProtocols[${itrStatus.index}]*" auditCluster="NoteAndAttachmentAuditErrors">
 				<div class="innerTab-container" align="left">
             		<table class=tab cellpadding=0 cellspacing="0" summary="">
 						<tr>
@@ -453,8 +453,7 @@
 			         	</tr>
          			</table>
          		</div>
-         	</kul:innerTab>
-		    
+		    </kul:innerTabRightAligned>
 		        </td>
 		      </tr>
 		    </c:when>

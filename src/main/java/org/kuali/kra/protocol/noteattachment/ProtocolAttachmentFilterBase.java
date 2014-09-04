@@ -20,92 +20,128 @@ import java.util.Comparator;
 
 /**
  * 
- * This class is a business object which represents the 
- * ProtocolBase Attachment Filter.  This filter is used to limit
- * and sort protocol attachments.
+ * This class is a business object which represents the ProtocolBase Attachment
+ * Filter. This filter is used to limit and sort protocol attachments.
  */
 public abstract class ProtocolAttachmentFilterBase implements Serializable {
 
-    private static final long serialVersionUID = 53138457226971783L;
-    
-    protected String filterBy;
-    protected String sortBy;
-    
-    public String getFilterBy() {
-        return filterBy;
-    }
-    public void setFilterBy(String filterBy) {
-        this.filterBy = filterBy;
-    }
-    public String getSortBy() {
-        return sortBy;
-    }
-    public void setSortBy(String sortBy) {
-        this.sortBy = sortBy;
-    }
-    
-    /**
-     * 
-     * This method returns a comparator used to sort protocol attachments
-     * @return a comparator used to sort protocol attachments
-     */
-    public Comparator<ProtocolAttachmentProtocolBase> getProtocolAttachmentComparator() {
-        return new ProtocolAttachmentComparatorFactory().getProtocolAttachmentComparator(getSortBy());
-    }
-    
-    
+	private static final long serialVersionUID = 53138457226971783L;
 
+	protected String filterBy;
+	protected String sortBy;
 
-class ProtocolAttachmentComparatorFactory {
-    public Comparator<ProtocolAttachmentProtocolBase> getProtocolAttachmentComparator(String sortBy) {
-        if ("DESC".equalsIgnoreCase(sortBy)) {
-            return new ProtocolAttachmentDescriptionComparator();
-        } else if ("ATTP".equalsIgnoreCase(sortBy)) {
-            return new ProtocolAttachmentAttachmentTypeComparator();
-        } else if ("LAUP".equalsIgnoreCase(sortBy)) {
-            return new ProtocolAttachmentLastUpdatedComparator();
-        } else if ("UPBY".equalsIgnoreCase(sortBy)) {
-            return new ProtocolAttachmentLastUpdatedByComparator();
-        } else {
-            return null;
-        }
-    }
-}
+	public String getFilterBy() {
+		return filterBy;
+	}
 
-    private class ProtocolAttachmentDescriptionComparator implements Comparator<ProtocolAttachmentProtocolBase>
-    {
-    
-        public int compare(ProtocolAttachmentProtocolBase arg0, ProtocolAttachmentProtocolBase arg1) {
-            return arg0.getDescription().compareTo(arg1.getDescription());
-        }
-        
-    }
-    
-    private class ProtocolAttachmentAttachmentTypeComparator implements Comparator<ProtocolAttachmentProtocolBase>
-    {
-    
-        public int compare(ProtocolAttachmentProtocolBase o1, ProtocolAttachmentProtocolBase o2) {
-            return o1.getType().getDescription().compareTo(o2.getType().getDescription());
-        }
-        
-    }
-    
-    private class ProtocolAttachmentLastUpdatedComparator implements Comparator<ProtocolAttachmentProtocolBase>
-    {
-    
-        public int compare(ProtocolAttachmentProtocolBase o1, ProtocolAttachmentProtocolBase o2) {
-            return o1.getUpdateTimestamp().compareTo(o2.getUpdateTimestamp());
-        }
-        
-    }
-    
-    private class ProtocolAttachmentLastUpdatedByComparator implements Comparator<ProtocolAttachmentProtocolBase>
-    {
-    
-        public int compare(ProtocolAttachmentProtocolBase o1, ProtocolAttachmentProtocolBase o2) {
-            return o1.getUpdateUserFullName().compareTo(o2.getUpdateUserFullName());
-        }
-        
-    }
+	public void setFilterBy(String filterBy) {
+		this.filterBy = filterBy;
+	}
+
+	public String getSortBy() {
+		return sortBy;
+	}
+
+	public void setSortBy(String sortBy) {
+		this.sortBy = sortBy;
+	}
+
+	/**
+	 * 
+	 * This method returns a comparator used to sort protocol attachments
+	 * 
+	 * @return a comparator used to sort protocol attachments
+	 */
+	public Comparator<ProtocolAttachmentProtocolBase> getProtocolAttachmentComparator() {
+		return new ProtocolAttachmentComparatorFactory()
+				.getProtocolAttachmentComparator(getSortBy());
+	}
+
+	class ProtocolAttachmentComparatorFactory {
+		public Comparator<ProtocolAttachmentProtocolBase> getProtocolAttachmentComparator(
+				String sortBy) {
+			if ("DESC".equalsIgnoreCase(sortBy)) {
+				return new ProtocolAttachmentDescriptionComparator();
+			} else if ("ATTP".equalsIgnoreCase(sortBy)) {
+				return new ProtocolAttachmentAttachmentTypeComparator();
+			} else if ("LAUP".equalsIgnoreCase(sortBy)) {
+				return new ProtocolAttachmentLastUpdatedComparator();
+			} else if ("UPBY".equalsIgnoreCase(sortBy)) {
+				return new ProtocolAttachmentLastUpdatedByComparator();
+			} else if ("ARNO".equalsIgnoreCase(sortBy)) {
+				return new ProtocolAmendRenewNumberComparator();
+			} else {
+				return null;
+			}
+		}
+	}
+
+	private class ProtocolAttachmentDescriptionComparator implements
+			Comparator<ProtocolAttachmentProtocolBase> {
+
+		public int compare(ProtocolAttachmentProtocolBase arg0,
+				ProtocolAttachmentProtocolBase arg1) {
+			return arg0.getDescription().compareTo(arg1.getDescription());
+		}
+
+	}
+
+	private class ProtocolAttachmentAttachmentTypeComparator implements
+			Comparator<ProtocolAttachmentProtocolBase> {
+
+		public int compare(ProtocolAttachmentProtocolBase o1,
+				ProtocolAttachmentProtocolBase o2) {
+			return o1.getType().getDescription()
+					.compareTo(o2.getType().getDescription());
+		}
+
+	}
+
+	private class ProtocolAttachmentLastUpdatedComparator implements
+			Comparator<ProtocolAttachmentProtocolBase> {
+
+		public int compare(ProtocolAttachmentProtocolBase o1,
+				ProtocolAttachmentProtocolBase o2) {
+			return o1.getUpdateTimestamp().compareTo(o2.getUpdateTimestamp());
+		}
+
+	}
+
+	private class ProtocolAttachmentLastUpdatedByComparator implements
+			Comparator<ProtocolAttachmentProtocolBase> {
+
+		public int compare(ProtocolAttachmentProtocolBase o1,
+				ProtocolAttachmentProtocolBase o2) {
+			return o1.getUpdateUserFullName().compareTo(
+					o2.getUpdateUserFullName());
+		}
+
+	}
+
+	private class ProtocolAmendRenewNumberComparator implements
+			Comparator<ProtocolAttachmentProtocolBase> {
+		public int compare(ProtocolAttachmentProtocolBase o1,
+				ProtocolAttachmentProtocolBase o2) {
+
+			String amendRenewalNumber0 = o1
+					.getSourceProtocolAmendRenewalNumber();
+			String amendRenewalNumber1 = o2
+					.getSourceProtocolAmendRenewalNumber();
+
+			// Primary sort by Amend/Renewal Number, secondary sort by
+			// Date/Timestamp
+			if (amendRenewalNumber0.equalsIgnoreCase(amendRenewalNumber1)) {
+				if (o1.getUpdateTimestamp() != null
+						&& o2.getUpdateTimestamp() != null) {
+					return o1.getUpdateTimestamp().compareTo(
+							o2.getUpdateTimestamp());
+				} else {
+					return 0;
+				}
+			} else {
+				return amendRenewalNumber0.compareTo(amendRenewalNumber1);
+			}
+		}
+	}
 
 }
