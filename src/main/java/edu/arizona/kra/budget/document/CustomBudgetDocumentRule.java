@@ -26,6 +26,7 @@ import org.kuali.kra.budget.parameters.BudgetPeriodAuditRule;
 import org.kuali.kra.budget.personnel.BudgetPersonnelAuditRule;
 import org.kuali.kra.budget.rates.BudgetRateAuditRule;
 import org.kuali.kra.rules.ActivityTypeAuditRule;
+import org.kuali.kra.rules.ResearchDocumentBaseAuditRule;
 import org.kuali.rice.krad.document.Document;
 
 import edu.arizona.kra.budget.distributionincome.CustomBudgetUnrecoveredFandAAuditRule;
@@ -40,7 +41,8 @@ public class CustomBudgetDocumentRule extends  org.kuali.kra.budget.document.Bud
 	public boolean processRunAuditBusinessRules(Document document) {
         boolean retval = true;
         
-        retval &= super.processRunAuditBusinessRules(document);
+        // This was super.processRunAuditBusinessRules(document), but we extended, so now we need super's super, which is:
+        retval &= new ResearchDocumentBaseAuditRule().processRunAuditBusinessRules(document);
 
         retval &= new BudgetPeriodAuditRule().processRunAuditBusinessRules(document);
         
@@ -53,6 +55,8 @@ public class CustomBudgetDocumentRule extends  org.kuali.kra.budget.document.Bud
         // Skipping D and I audits for Awards Budgets since we've temporarily removed the Award D&I tab
         if (!(document instanceof AwardBudgetDocument)) {
         
+        	// This is the main reason this class was extended... we need to use
+        	// CustomBudgetUnrecoveredFandAAuditRule in order to allow for absence of source account
             retval &= new CustomBudgetUnrecoveredFandAAuditRule().processRunAuditBusinessRules(document);
         
             retval &= new BudgetCostShareAuditRule().processRunAuditBusinessRules(document);
