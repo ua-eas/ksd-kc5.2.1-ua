@@ -15,8 +15,6 @@ import org.kuali.rice.krad.bo.TransientBusinessObjectBase;
  */
 @SuppressWarnings("serial")
 public class ProtocolAssociateWorkflowSearch extends TransientBusinessObjectBase {
-	public static final String ASSOCIATE_CUSTOM_ATTRIBUTE_NAME = "Associate";
-	public static final String TRACKING_COMMENT_CUSTOM_ATTRIBUTE_NAME = "Tracking Comments";
 	
 	private String documentNumber;
 	

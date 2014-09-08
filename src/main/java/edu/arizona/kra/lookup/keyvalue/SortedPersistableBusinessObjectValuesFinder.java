@@ -16,6 +16,8 @@ import org.kuali.rice.krad.keyvalues.PersistableBusinessObjectValuesFinder;
  */
 public class SortedPersistableBusinessObjectValuesFinder extends PersistableBusinessObjectValuesFinder<PersistableBusinessObject> {
 
+	private static final long serialVersionUID = 2961645267860584209L;
+
 	@Override
 	public List<KeyValue> getKeyValues() {
 		List<KeyValue> list = super.getKeyValues();

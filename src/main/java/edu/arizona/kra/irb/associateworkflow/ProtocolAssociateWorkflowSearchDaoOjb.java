@@ -30,12 +30,6 @@ public class ProtocolAssociateWorkflowSearchDaoOjb extends PlatformAwareDaoBaseO
 	private static final String CANCELED_ONLINE_REVIEW_STATUS_CODE = "X";
 	private static final String SUBMITTED_TO_IRB = "Submitted to IRB";
 	
-	private static final List<String> MULTISELECT_FIELDS = Arrays.asList( 
-		"protocolStatusCode",
-		"submissionTypeCode",
-		"submissionStatusCode",
-		"committeeId");
-	
 	private LookupDao lookupDao;
 	private DataDictionaryService dataDictionaryService;
 	
@@ -118,7 +112,7 @@ public class ProtocolAssociateWorkflowSearchDaoOjb extends PlatformAwareDaoBaseO
 		Criteria associateCriteria = new Criteria();
 
 		associateCriteria.addEqualTo("value", associate);
-		associateCriteria.addEqualTo("customAttribute.name", ProtocolAssociateWorkflowSearch.ASSOCIATE_CUSTOM_ATTRIBUTE_NAME);
+		associateCriteria.addEqualTo("customAttribute.name", ProtocolAssociateWorkflowConstants.ASSOCIATE_CUSTOM_ATTRIBUTE_NAME);
 		
 		ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(CustomAttributeDocValue.class, associateCriteria);
 		subQuery.setAttributes(new String[]{ "documentNumber" });
@@ -136,7 +130,7 @@ public class ProtocolAssociateWorkflowSearchDaoOjb extends PlatformAwareDaoBaseO
 	private Criteria buildSearchCriteria(Map fieldValues) {
 		
 		//convert search values to collections for multiselects
-		for (String multiselectField : MULTISELECT_FIELDS) {
+		for (String multiselectField : ProtocolAssociateWorkflowConstants.MULTISELECT_FIELDS) {
 			String stringSearhValue = (String)fieldValues.get(multiselectField);
 			
 			if ( !StringUtils.isBlank(stringSearhValue) ) {

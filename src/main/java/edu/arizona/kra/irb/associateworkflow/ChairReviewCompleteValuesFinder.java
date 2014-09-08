@@ -26,10 +26,10 @@ import org.kuali.rice.krad.keyvalues.KeyValuesBase;
  * This class returns list of boolean key value pairs.
  * 
  */
-@SuppressWarnings("serial")
 public class ChairReviewCompleteValuesFinder extends KeyValuesBase {
+    private static final long serialVersionUID = 1577659434443851386L;
 
-    /*
+	/*
      * @see org.kuali.keyvalues.KeyValuesFinder#getKeyValues()
      */
     public List<KeyValue> getKeyValues() {

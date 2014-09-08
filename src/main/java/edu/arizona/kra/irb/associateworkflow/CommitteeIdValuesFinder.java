@@ -27,9 +27,9 @@ import org.kuali.kra.lookup.keyvalue.KeyValueComparator;
  * except that it does not add a "select" element at the top of the list
  * and the getKeyValues is slightly optimized for performance.
  */
-@SuppressWarnings("serial")
 public class CommitteeIdValuesFinder extends KeyValuesBase {
-    
+    private static final long serialVersionUID = -5784750555568604444L;
+	
     private List<ProtocolCorrespondenceTemplate> correspondenceTemplates;
 
     /**

@@ -20,7 +20,6 @@ import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.kns.document.authorization.BusinessObjectRestrictions;
 import org.kuali.rice.kns.lookup.HtmlData;
 import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
-import org.kuali.rice.kns.web.struts.form.LookupForm;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 
@@ -39,13 +38,6 @@ public class ProtocolAssociateWorkflowSearchLookupableHelperServiceImpl extends 
 	private static final String PROTOCOL_PI_NAME_FIELD_NAME = "protocolPiName";
 	private static final String PROTOCOL_PERSON_PI_NAME_FIELD_NAME = "protocol.protocolPersons.personName";
 	private static final String DOC_TYPE_NAME_PARAM = "&docTypeName=";
-	
-	private static final String[] MULTISELECT_FIELDS = new String[] { 
-		"protocolStatusCode",
-		"submissionTypeCode",
-		"submissionStatusCode",
-		"committeeId"
-	};
 	
 	private ProtocolAssociateWorkflowSearchDao dataAccessObject;
 	private KraAuthorizationService kraAuthorizationService;
@@ -67,7 +59,7 @@ public class ProtocolAssociateWorkflowSearchLookupableHelperServiceImpl extends 
 		fieldValues.put(PROTOCOL_PERSON_PI_NAME_FIELD_NAME, fieldValues.remove(PROTOCOL_PI_NAME_FIELD_NAME));
 		
 		//Map the correct multiselect values to the fieldValues. This is not done correctly in the LookupForm in Rice
-		for (String multiselectFieldName : MULTISELECT_FIELDS) {
+		for (String multiselectFieldName : ProtocolAssociateWorkflowConstants.MULTISELECT_FIELDS) {
 			fieldValues.remove(multiselectFieldName);
 			fieldValues.put(multiselectFieldName, getMultiselectFieldValue(multiselectFieldName));
 		}
@@ -101,8 +93,8 @@ public class ProtocolAssociateWorkflowSearchLookupableHelperServiceImpl extends 
 		
 		Collection<String> docNums = buildDocumentNumbersArray(associateWorkflowResults);
 		
-		Collection<CustomAttributeDocValue> associates = dataAccessObject.getCustomAttributeValuesForDocs(docNums, ProtocolAssociateWorkflowSearch.ASSOCIATE_CUSTOM_ATTRIBUTE_NAME);
-		Collection<CustomAttributeDocValue> trackingComments = dataAccessObject.getCustomAttributeValuesForDocs(docNums, ProtocolAssociateWorkflowSearch.TRACKING_COMMENT_CUSTOM_ATTRIBUTE_NAME);
+		Collection<CustomAttributeDocValue> associates = dataAccessObject.getCustomAttributeValuesForDocs(docNums, ProtocolAssociateWorkflowConstants.ASSOCIATE_CUSTOM_ATTRIBUTE_NAME);
+		Collection<CustomAttributeDocValue> trackingComments = dataAccessObject.getCustomAttributeValuesForDocs(docNums, ProtocolAssociateWorkflowConstants.TRACKING_COMMENT_CUSTOM_ATTRIBUTE_NAME);
 		
 		Map<String, String> associatesMap = mapifyCustomAttributeValues(associates);
 		Map<String, String> trackingCommMap = mapifyCustomAttributeValues(trackingComments);
