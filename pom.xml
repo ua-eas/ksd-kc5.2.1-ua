@@ -17,6 +17,7 @@
 		<servlet.version>2.5</servlet.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<spring-context.version>3.2.3.RELEASE</spring-context.version>
+		<kc-printing-xsds.version>2.0.0</kc-printing-xsds.version>
 	</properties>
 
 	<dependencies>
@@ -112,6 +113,11 @@
             <artifactId>spring-context</artifactId>
             <version>${spring-context.version}</version>
         </dependency>
+        <dependency>
+			<groupId>org.kuali.kra.print.xsds</groupId>
+			<artifactId>kc-printing-xsds</artifactId>
+			<version>${kc-printing-xsds.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
