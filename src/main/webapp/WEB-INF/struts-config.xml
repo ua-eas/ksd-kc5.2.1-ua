@@ -28,7 +28,7 @@
 		<form-bean name="DocHandlerForm" type="org.kuali.rice.kew.routing.web.DocHandlerForm" />
 		<form-bean name="UnitHierarchyForm" type="org.kuali.kra.web.struts.form.UnitHierarchyForm" />
 		<form-bean name="SponsorHierarchyForm" type="org.kuali.kra.web.struts.form.SponsorHierarchyForm" />
-		<form-bean name="ProtocolForm" type="edu.arizona.kra.irb.CustomProtocolForm" />
+    <form-bean name="ProtocolForm" type="edu.arizona.kra.irb.CustomProtocolForm" />
 		<form-bean name="ResearchAreasForm" type="org.kuali.kra.irb.ResearchAreasForm" />
 		<form-bean name="CommitteeForm" type="org.kuali.kra.committee.web.struts.form.CommitteeForm" />
 		<form-bean name="IacucCommitteeForm" type="org.kuali.kra.iacuc.committee.web.struts.form.IacucCommitteeForm" />
@@ -62,6 +62,7 @@
         <form-bean name="IacucProtocolCorrespondenceTemplateForm" type="org.kuali.kra.iacuc.correspondence.IacucProtocolCorrespondenceTemplateForm" />
 		<form-bean name="IacucResearchAreasForm" type="org.kuali.kra.iacuc.IacucResearchAreasForm" />
 		<form-bean name="IsrSsrReportGenerationForm" type="org.kuali.kra.subawardReporting.web.struts.form.IsrSsrReportGenerationForm" />
+    <form-bean name="AssociateWorkflowForm" type="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowForm"/>
     </form-beans>
 
 <!-- Rice content Start -->
@@ -426,6 +427,11 @@
 	    &protocol_forwards;
       </action>
       
+      <action path="/associateWorkflow" name="AssociateWorkflowForm" input="/WEB-INF/jsp/irb/associateWorkflow.jsp" type="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+        <forward name="basic" path="/WEB-INF/jsp/irb/associateWorkflow.jsp" />
+	    &protocol_forwards;
+      </action>
+
       <action path="/questionnaire" name="ProtocolForm" input="/WEB-INF/jsp/irb/ProtocolQuestionnaire.jsp" type="org.kuali.kra.irb.questionnaire.ProtocolQuestionnaireAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
         <forward name="basic" path="/WEB-INF/jsp/irb/ProtocolQuestionnaire.jsp" />
 	    &protocol_forwards;

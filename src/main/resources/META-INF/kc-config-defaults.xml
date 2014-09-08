@@ -210,14 +210,11 @@
 	<param name="connection.pool.impl">XAPool</param>
 	 
 	<param name="rice.portal.allowed.regex" override="false">^(${application.url}|${rice.server.url})(/.*|)</param>
-	
 
 	<param name="rice.kc.award.additionalSpringFiles">classpath:edu/arizona/kra/award/CustomAwardSpringBeans.xml</param>
     
     <param name="rice.kc.ip.additionalSpringFiles">classpath:edu/arizona/kra/institutionalproposal/CustomInstitutionalProposalSpringBeans.xml</param>
 
-    <param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/budget/CustomBudgetSpringBeans.xml</param>
-    
-    <param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/irb/CustomIrbSpringBeans.xml</param>
+	<param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/budget/CustomBudgetSpringBeans.xml,classpath:edu/arizona/kra/CustomCoreSpringBeans.xml,classpath:edu/arizona/kra/irb/CustomIrbSpringBeans.xml</param>
 
 </config>
