@@ -212,4 +212,5 @@
 	 
 	<param name="rice.portal.allowed.regex" override="false">^(${application.url}|${rice.server.url})(/.*|)</param>
 	
+    <param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/CustomCoreSpringBeans.xml,classpath:edu/arizona/kra/irb/CustomIrbSpringBeans.xml</param>
 </config>
