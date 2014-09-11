@@ -41,11 +41,11 @@
             <list merge="true">
                 <value>edu.arizona.kra</value>
             </list>
-        </property>
+      </property>
     	<property name="dataDictionaryPackages">
             <list merge="true">
                 <value>edu/arizona/kra/datadictionary</value>
             </list>
-        </property>
+      </property>
     </bean>
 </beans>
