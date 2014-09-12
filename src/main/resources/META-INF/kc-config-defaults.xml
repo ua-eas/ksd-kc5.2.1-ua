@@ -216,4 +216,6 @@
 
     <param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/budget/CustomBudgetSpringBeans.xml</param>
 
+	<param name="rice.kc.award.additionalSpringFiles">classpath:edu/arizona/kra/award/CustomAwardSpringBeans.xml</param>
+	
 </config>
