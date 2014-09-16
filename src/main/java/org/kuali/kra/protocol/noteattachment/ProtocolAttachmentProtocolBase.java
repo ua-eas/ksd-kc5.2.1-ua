@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * This class represents the ProtocolBase Attachment ProtocolBase.
  */
@@ -72,6 +74,10 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
     // an indicator of whether this file has been changed/replaced or not.  This is if documentstatus is 1 or 3.  
     // if it is changed, then the updateuser and updatetimestamp of this record will be updated.  
     protected boolean changed = false;
+    
+    //unique attachment id so attachments added to amendment and renewals can be distinguished from the ones in the base protocol
+    private String versioningId;
+
 
     /**
      * empty ctor to satisfy JavaBean convention.
@@ -243,7 +249,8 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         // probably do it in postsave  
         //this.getProtocol().refreshReferenceObject("attachmentProtocols");  
         for (ProtocolAttachmentProtocolBase attachment : this.getProtocol().getAttachmentProtocols()) {
-            if (attachment.getDocumentId().equals(this.getDocumentId())) {
+            if (attachment.getDocumentId().equals(this.getDocumentId()) &&
+                    StringUtils.equals(attachment.getVersioningId(), this.getVersioningId())) {
                 this.versions.add(attachment);
             }
         }
@@ -253,7 +260,19 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         Collections.sort(this.versions, new Comparator<ProtocolAttachmentProtocolBase>() {
 
             public int compare(ProtocolAttachmentProtocolBase attachment1, ProtocolAttachmentProtocolBase attachment2) {
-                return attachment2.getUpdateTimestamp().compareTo(attachment1.getUpdateTimestamp());
+                if (attachment1.getUpdateTimestamp() != null){
+                    if (attachment2.getUpdateTimestamp() != null){
+                        return attachment1.getUpdateTimestamp().compareTo(attachment2.getUpdateTimestamp());
+                    }
+                    else {
+                        return 1; 
+                    }
+                } else {
+                    if (attachment2.getUpdateTimestamp() != null){
+                        return -1;
+                    }
+                }
+                return 0;
             }
         });
         return this.versions;
@@ -464,6 +483,14 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         if (getCreateTimestamp() == null || createTimestamp == null) {
             this.createTimestamp = createTimestamp;
         }
+    }
+    
+    public String getVersioningId() {
+        return versioningId;
+    }
+
+    public void setVersioningId(String versioningId) {
+        this.versioningId = versioningId;
     }
 
     @Override
