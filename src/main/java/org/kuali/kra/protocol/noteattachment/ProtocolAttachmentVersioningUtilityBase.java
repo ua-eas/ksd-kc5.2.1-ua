@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Class used for versioning protocol attachments.
@@ -228,11 +229,12 @@ public abstract class ProtocolAttachmentVersioningUtilityBase {
      * Adds an attachment to the protocol.
      * @param attachment the attachment to add.
      */
-    private void addAttachment(ProtocolAttachmentBase attachment) {
+    protected void addAttachment(ProtocolAttachmentBase attachment) {
         assert attachment != null : "the attachment is null";
         if (attachment instanceof ProtocolAttachmentProtocolBase) {
             ((ProtocolAttachmentProtocolBase)attachment).setDocumentStatusCode(ATTACHMENT_DRAFTED);
             attachment.setDocumentId(getNextDOcumentId(this.form.getProtocolDocument().getProtocol().getAttachmentProtocols()));
+            ((ProtocolAttachmentProtocolBase)attachment).setVersioningId(UUID.randomUUID().toString());
         }
         this.form.getProtocolDocument().getProtocol().addAttachmentsByType(attachment);
     }
