@@ -260,15 +260,17 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         Collections.sort(this.versions, new Comparator<ProtocolAttachmentProtocolBase>() {
 
             public int compare(ProtocolAttachmentProtocolBase attachment1, ProtocolAttachmentProtocolBase attachment2) {
-                if (attachment1.getUpdateTimestamp() != null){
-                    if (attachment2.getUpdateTimestamp() != null){
-                        return attachment1.getUpdateTimestamp().compareTo(attachment2.getUpdateTimestamp());
+                Timestamp timestamp1 = attachment1.getUpdateTimestamp();
+                Timestamp timestamp2 = attachment2.getUpdateTimestamp();
+                if (timestamp1 != null){
+                    if (timestamp2 != null){
+                        return timestamp1.compareTo(timestamp2);
                     }
                     else {
                         return 1; 
                     }
                 } else {
-                    if (attachment2.getUpdateTimestamp() != null){
+                    if (timestamp2 != null){
                         return -1;
                     }
                 }
