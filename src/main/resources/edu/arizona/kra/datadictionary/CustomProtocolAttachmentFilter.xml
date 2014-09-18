@@ -21,12 +21,14 @@
     http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
     <bean id="ProtocolAttachmentFilter" parent="ProtocolAttachmentFilter-parentBean" >
-        <property name="businessObjectClass" value="edu.arizona.kra.irb.noteattachment.ProtocolAttachmentFilter" />
+        <property name="businessObjectClass" value="edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentFilter" />
     </bean>
+    <!-- bean id="ProtocolAttachmentFilter-filterBy" parent="ProtocolAttachmentFilter-filterBy-parentBean" />
+    </bean-->
     <bean id="ProtocolAttachmentFilter-sortBy" parent="ProtocolAttachmentFilter-sortBy-parentBean" >
         <property name="control" >
           <bean parent="SelectControlDefinition"
-                p:valuesFinderClass="edu.arizona.kra.irb.noteattachment.SortByValuesFinder" />
+                p:valuesFinderClass="edu.arizona.kra.irb.noteattachment.CustomSortByValuesFinder" />
         </property>
     </bean>
 

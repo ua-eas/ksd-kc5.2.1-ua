@@ -19,7 +19,9 @@ import java.util.Comparator;
 
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 
-public class ProtocolAttachmentFilter extends org.kuali.kra.irb.noteattachment.ProtocolAttachmentFilter {
+import edu.arizona.kra.irb.ProtocolUtils;
+
+public class CustomProtocolAttachmentFilter extends org.kuali.kra.irb.noteattachment.ProtocolAttachmentFilter {
 
     private static final long serialVersionUID = -8420432117877485410L;
 
@@ -47,26 +49,21 @@ public class ProtocolAttachmentFilter extends org.kuali.kra.irb.noteattachment.P
     {
         @Override
         public int compare(ProtocolAttachmentProtocolBase o1, ProtocolAttachmentProtocolBase o2) {
-            if ( o1 instanceof ProtocolAttachmentProtocol && o2 instanceof ProtocolAttachmentProtocol){
-                String sparn0 = ((ProtocolAttachmentProtocol) o1).getSourceProtocolAmendRenewalNumber();
-                String sparn1 = ((ProtocolAttachmentProtocol) o2).getSourceProtocolAmendRenewalNumber();
+            if ( o1 instanceof CustomProtocolAttachmentProtocol && o2 instanceof CustomProtocolAttachmentProtocol){
+                String sparn0 = ((CustomProtocolAttachmentProtocol) o1).getSourceProtocolAmendRenewalNumber();
+                String sparn1 = ((CustomProtocolAttachmentProtocol) o2).getSourceProtocolAmendRenewalNumber();
                 
                 if( sparn0.equalsIgnoreCase(sparn1) ){
-                    if( o1.getUpdateTimestamp() != null && o2.getUpdateTimestamp() != null) {
-                        return o1.getUpdateTimestamp().compareTo(o2.getUpdateTimestamp());
-                    }
-                    else 
-                        return 0;
+                    return ProtocolUtils.compareTimestamps(o1.getUpdateTimestamp(), o2.getUpdateTimestamp());
                 }                   
                 else {
                     return sparn0.compareTo(sparn1);
                 }
             }
-            else if (o1.getUpdateTimestamp() != null && o2.getUpdateTimestamp() != null){
-                return o1.getUpdateTimestamp().compareTo(o2.getUpdateTimestamp());
+            else { 
+                return ProtocolUtils.compareTimestamps(o1.getUpdateTimestamp(), o2.getUpdateTimestamp());
             }
-            else 
-                return 0;
+
         }
 
     }
@@ -76,12 +73,7 @@ public class ProtocolAttachmentFilter extends org.kuali.kra.irb.noteattachment.P
     {
         @Override
         public int compare(ProtocolAttachmentProtocolBase o1, ProtocolAttachmentProtocolBase o2) {
-            if(o1.getUpdateTimestamp() != null && o2.getUpdateTimestamp() != null){
-                return o1.getUpdateTimestamp().compareTo(o2.getUpdateTimestamp());
-            }
-            else{
-                return 0;
-            }
+            return ProtocolUtils.compareTimestamps(o1.getUpdateTimestamp(), o2.getUpdateTimestamp());
                 
         }
         
