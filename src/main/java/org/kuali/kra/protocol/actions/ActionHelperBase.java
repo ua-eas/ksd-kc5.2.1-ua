@@ -324,7 +324,7 @@ public abstract class ActionHelperBase implements Serializable {
     protected boolean toAnswerSubmissionQuestionnaire;
     protected ProtocolSubmissionQuestionnaireHelper protocolSubmissionQuestionnaireHelper;
     
-    
+    private List<AmendmentSummary> amendmentSummaries;
     
     
     /**
@@ -2734,8 +2734,9 @@ public abstract class ActionHelperBase implements Serializable {
         
         public AmendmentSummary(ProtocolBase protocol) {
             amendmentType = protocol.isRenewalWithoutAmendment() ? "Renewal" : protocol.isRenewal() ? "Renewal with Amendment" : protocol.isAmendment() ? "Amendment" : "New";
-            versionNumber = protocol.getProtocolNumber().substring(protocol.getProtocolNumber().length() - 3);
-            versionNumberUrl = buildForwardUrl(protocol.getProtocolDocument().getDocumentNumber());
+            //Why even set these here. They will be set blow in the if/else block.
+            //versionNumber = protocol.getProtocolNumber().substring(protocol.getProtocolNumber().length() - 3);
+            //versionNumberUrl = buildForwardUrl(protocol.getProtocolDocument().getDocumentNumber());
             if (protocol.isAmendment() || protocol.isRenewal()) {
                 ProtocolAmendRenewalBase correctAmendment = protocol.getProtocolAmendRenewal();
                 if (correctAmendment != null) {
@@ -2764,22 +2765,28 @@ public abstract class ActionHelperBase implements Serializable {
     }
     
     public List<AmendmentSummary> getAmendmentSummaries() throws Exception {
-        List<AmendmentSummary> results = new ArrayList<AmendmentSummary>();
-        // only list amendments if this protocol is not one
-        if (getProtocol().isNew()) {
-            // Amendment details needs to be displayed even after the amendment has been merged with the protocol.
-            String originalProtocolNumber = getProtocol().getProtocolNumber();
-            List<ProtocolBase> protocols = getProtocolAmendRenewServiceHook().getAmendmentAndRenewals(originalProtocolNumber);
-            Collections.sort(protocols, new Comparator<ProtocolBase>(){
-                public int compare(ProtocolBase p1, ProtocolBase p2) {
-                    return p1.getProtocolDocument().getDocumentNumber().compareTo(p2.getProtocolDocument().getDocumentNumber());
+    	
+    	if ( null != amendmentSummaries ) {
+    		return amendmentSummaries;
+    	}
+    	else {
+    		List<AmendmentSummary> amendmentSummaries = new ArrayList<AmendmentSummary>();
+            // only list amendments if this protocol is not one
+            if (getProtocol().isNew()) {
+                // Amendment details needs to be displayed even after the amendment has been merged with the protocol.
+                String originalProtocolNumber = getProtocol().getProtocolNumber();
+                List<ProtocolBase> protocols = getProtocolAmendRenewServiceHook().getAmendmentAndRenewals(originalProtocolNumber);
+                Collections.sort(protocols, new Comparator<ProtocolBase>(){
+                    public int compare(ProtocolBase p1, ProtocolBase p2) {
+                        return p1.getProtocolDocument().getDocumentNumber().compareTo(p2.getProtocolDocument().getDocumentNumber());
+                    }
+                });
+                for (ProtocolBase protocol: protocols) {
+                	amendmentSummaries.add(new AmendmentSummary(protocol));
                 }
-            });
-            for (ProtocolBase protocol: protocols) {
-                results.add(new AmendmentSummary(protocol));
             }
-        }
-        return results;
+            return amendmentSummaries;
+    	}
     }
 
     protected String buildForwardUrl(String routeHeaderId) {
