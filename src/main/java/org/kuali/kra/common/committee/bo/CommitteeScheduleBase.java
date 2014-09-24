@@ -15,10 +15,24 @@
  */
 package org.kuali.kra.common.committee.bo;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.commons.collections.CollectionUtils;
-import org.drools.core.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.SkipVersioning;
-import org.kuali.kra.common.committee.meeting.*;
+import org.kuali.kra.common.committee.meeting.CommScheduleActItemBase;
+import org.kuali.kra.common.committee.meeting.CommScheduleMinuteDocBase;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleAttachmentsBase;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleAttendanceBase;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
+import org.kuali.kra.common.committee.meeting.ScheduleAgendaBase;
 import org.kuali.kra.common.committee.web.struts.form.schedule.DayOfWeek;
 import org.kuali.kra.common.committee.web.struts.form.schedule.Time12HrFmt;
 import org.kuali.kra.common.permissions.Permissionable;
@@ -27,10 +41,6 @@ import org.kuali.kra.kim.bo.KcKimAttributes;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.kra.util.DateUtils;
-
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.*;
 
 /**
  * This is BO class to support CommitteeScheulde. It has three transient field to support UI.
@@ -79,24 +89,20 @@ public abstract class CommitteeScheduleBase<CS extends CommitteeScheduleBase<CS,
     // Following are related to meeting data.  They will not be serialized to doc content.
     // So, keep the "transient". Also, they are not versioned with version service.   
     // Merging these data from old version committee to the new version committee at the time of "approval" of new version committee.
-    private transient List<CommitteeScheduleAttendanceBase> committeeScheduleAttendances;        
-    private transient List<CSM> committeeScheduleMinutes;  
-    private transient List<CommitteeScheduleAttachmentsBase> committeeScheduleAttachments;
+    //
+    // Initializing these outside of constructor so that OJB does not double init and lose set values
+    private transient List<CommitteeScheduleAttendanceBase> committeeScheduleAttendances = new ArrayList<CommitteeScheduleAttendanceBase>();
+    private transient List<CSM> committeeScheduleMinutes = new ArrayList<CSM>();
+    private transient List<CommitteeScheduleAttachmentsBase> committeeScheduleAttachments = new ArrayList<CommitteeScheduleAttachmentsBase>();
     @SkipVersioning
-    private transient List<PS> protocolSubmissions;        
-    private transient List<CommScheduleActItemBase>  commScheduleActItems;
-    private transient List<CommScheduleMinuteDocBase> minuteDocs;        
-    private transient List<ScheduleAgendaBase> scheduleAgendas;        
+    private transient List<PS> protocolSubmissions = new ArrayList<PS>();
+    private transient List<CommScheduleActItemBase>  commScheduleActItems = new ArrayList<CommScheduleActItemBase>();
+    private transient List<CommScheduleMinuteDocBase> minuteDocs = new ArrayList<CommScheduleMinuteDocBase>();
+    private transient List<ScheduleAgendaBase> scheduleAgendas = new ArrayList<ScheduleAgendaBase>();
 
     
     public CommitteeScheduleBase() { 
-        setCommitteeScheduleAttendances(new ArrayList<CommitteeScheduleAttendanceBase>()); 
-        setCommScheduleActItems(new ArrayList<CommScheduleActItemBase>()); 
-        setProtocolSubmissions(new ArrayList<PS>()); 
-        setCommitteeScheduleMinutes(new ArrayList<CSM>()); 
-        setMinuteDocs(new ArrayList<CommScheduleMinuteDocBase>()); 
-        setScheduleAgendas(new ArrayList<ScheduleAgendaBase>()); 
-        setCommitteeScheduleAttachments(new ArrayList<CommitteeScheduleAttachmentsBase>());
+        //
 	} 
     
     // to be called only when creating a light-weight version of this schedule. 
