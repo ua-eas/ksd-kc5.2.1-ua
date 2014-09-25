@@ -22,7 +22,6 @@ import org.kuali.kra.protocol.actions.ActionHelperBase;
 import edu.arizona.kra.irb.CustomProtocolForm;
 import edu.arizona.kra.irb.actions.amendrenew.CustomProtocolAmendmentBean;
 
-// import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
 
 /**
  * The form helper class for the Protocol Actions tab.

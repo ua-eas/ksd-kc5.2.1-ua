@@ -15,7 +15,6 @@
  */
 package edu.arizona.kra.irb;
 
-import org.kuali.kra.irb.ProtocolForm;
 import org.kuali.kra.protocol.ProtocolFormBase;
 import org.kuali.kra.protocol.actions.ActionHelperBase;
 import org.kuali.kra.protocol.noteattachment.NotesAttachmentsHelperBase;
@@ -35,12 +34,12 @@ public class CustomProtocolForm extends org.kuali.kra.irb.ProtocolForm {
 
     @Override
     protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm) throws Exception {
-        return new CustomActionHelper((CustomProtocolForm) protocolForm);
+        return new CustomActionHelper((CustomProtocolForm)protocolForm);
     }
     
     @Override
     protected NotesAttachmentsHelperBase createNewNotesAttachmentsHelperInstanceHook(ProtocolFormBase protocolForm) {
-        return new CustomNotesAttachmentsHelper((ProtocolForm) protocolForm);
+        return new CustomNotesAttachmentsHelper(protocolForm);
     }
 
 }

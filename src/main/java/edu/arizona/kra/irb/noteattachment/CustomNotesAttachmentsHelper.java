@@ -16,8 +16,9 @@
 package edu.arizona.kra.irb.noteattachment;
 
 import org.kuali.kra.irb.Protocol;
-import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.irb.ProtocolForm;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.ProtocolFormBase;
 import org.kuali.kra.irb.noteattachment.NotesAttachmentsHelper;
 
 import edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentProtocol;
@@ -25,8 +26,8 @@ import edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentProtocol;
 
 public class CustomNotesAttachmentsHelper extends NotesAttachmentsHelper {
 
-    public CustomNotesAttachmentsHelper(ProtocolForm form) {
-        super(form);
+    public CustomNotesAttachmentsHelper(ProtocolFormBase form) {
+        super((ProtocolForm) form, new CustomProtocolAttachmentVersioningUtility(form) );
     }
 
     @Override
