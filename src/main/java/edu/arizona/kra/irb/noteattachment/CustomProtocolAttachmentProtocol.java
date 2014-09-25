@@ -20,12 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.Protocol;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 /**
  * This class represents the UofA Custom Protocol Attachment Protocol.
  */
-public class ProtocolAttachmentProtocol extends org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol {
+public class CustomProtocolAttachmentProtocol extends org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol {
 
     private static final long serialVersionUID = -1874526982821035896L;
 
@@ -33,6 +34,27 @@ public class ProtocolAttachmentProtocol extends org.kuali.kra.irb.noteattachment
     private String sourceProtocolAmendRenewalNumber;
     private String sourceProtocolNumber;
 
+    
+    /**
+     * empty ctor to satisfy JavaBean convention.
+     */
+    public CustomProtocolAttachmentProtocol() {
+        super();
+    }
+
+    /**
+     * Convenience ctor to add the protocol as an owner.
+     * 
+     * <p>
+     * This ctor does not validate any of the properties.
+     * </p>
+     * 
+     * @param protocol the protocol.
+     */
+    public CustomProtocolAttachmentProtocol(final Protocol protocol) {
+        super(protocol);
+    }
+    
     
     /**
      * Returns the source protocol number for when this attachment was last added in.
@@ -45,9 +67,9 @@ public class ProtocolAttachmentProtocol extends org.kuali.kra.irb.noteattachment
                 Map param = new HashMap();
                 param.put("fileId", getFileId());
                 BusinessObjectService businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
-                List<ProtocolAttachmentProtocol> protocolAttachmentProtocols = 
-                        (List<ProtocolAttachmentProtocol>) businessObjectService.findMatchingOrderBy(ProtocolAttachmentProtocol.class, param, "id", true);
-                ProtocolAttachmentProtocol protocolAttachmentProtocol = protocolAttachmentProtocols.get(0);
+                List<CustomProtocolAttachmentProtocol> protocolAttachmentProtocols = 
+                        (List<CustomProtocolAttachmentProtocol>) businessObjectService.findMatchingOrderBy(CustomProtocolAttachmentProtocol.class, param, "id", true);
+                CustomProtocolAttachmentProtocol protocolAttachmentProtocol = protocolAttachmentProtocols.get(0);
                 sourceProtocolNumber = protocolAttachmentProtocol.getProtocolNumber();
             }
             // Null FileId means attachment newly added and is not in the database yet

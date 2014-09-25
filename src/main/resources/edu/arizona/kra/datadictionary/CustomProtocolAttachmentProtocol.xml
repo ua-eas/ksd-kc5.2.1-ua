@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright 2005-2014 The Kuali Foundation
     
@@ -21,7 +20,7 @@
     http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
     <bean id="ProtocolAttachmentProtocol" parent="ProtocolAttachmentProtocol-parentBean" >
-        <property name="businessObjectClass" value="edu.arizona.kra.irb.noteattachment.ProtocolAttachmentProtocol" />
+        <property name="businessObjectClass" value="edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentProtocol" />
     </bean>
 
 </beans>

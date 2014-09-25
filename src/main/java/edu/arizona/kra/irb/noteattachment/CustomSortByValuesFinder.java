@@ -24,7 +24,8 @@ import java.util.List;
  * 
  * This add a new sort for Amendment/Renewal Number for the fields used to sort protocol attachments.
  */
-public class SortByValuesFinder extends org.kuali.kra.irb.noteattachment.SortByValuesFinder {
+@SuppressWarnings("serial")
+public class CustomSortByValuesFinder extends org.kuali.kra.irb.noteattachment.SortByValuesFinder {
 
     @Override
     public List<KeyValue> getKeyValues() {
