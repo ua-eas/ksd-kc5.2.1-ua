@@ -59,12 +59,12 @@ import java.text.ParseException;
 import java.util.*;
 
 public class ScheduleXmlStream extends PrintBaseXmlStream {
-    private CommitteeMembershipService committeeMembershipService;
-    private KcPersonService kcPersonService;
-    private IrbPrintXmlUtilService irbPrintXmlUtilService;
-    private String EXPEDIT_ACTION_TYPE_CODE = "205";
-    private String EXEMPT_ACTION_TYPE_CODE = "206";
-    private String FOLLOW_UP_ACTION_CODE = "109";
+    protected CommitteeMembershipService committeeMembershipService;
+    protected KcPersonService kcPersonService;
+    protected IrbPrintXmlUtilService irbPrintXmlUtilService;
+    protected final String EXPEDIT_ACTION_TYPE_CODE = "205";
+    protected final String EXEMPT_ACTION_TYPE_CODE = "206";
+    protected final String FOLLOW_UP_ACTION_CODE = "109";
 
     public Map<String, XmlObject> generateXmlStream(KraPersistableBusinessObjectBase printableBusinessObject, Map<String, Object> reportParameters) {        
         CommitteeSchedule committeeSchedule = (CommitteeSchedule)printableBusinessObject;
@@ -79,7 +79,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
     }
 
 
-    private CommitteeSchedule findCommitteeSchedule(Committee committee, String scheduleId) {
+    protected CommitteeSchedule findCommitteeSchedule(Committee committee, String scheduleId) {
         List<CommitteeSchedule> committeeSchedules = committee.getCommitteeSchedules();
         for (CommitteeSchedule committeeSchedule : committeeSchedules) {
             if(committeeSchedule.getScheduleId().equals(scheduleId)){
@@ -261,7 +261,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
      * @param protocolSubmission
      * @param protocolSubmissionDetail
      */
-    private void setProtocolSubmissionAction(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission,
+    protected void setProtocolSubmissionAction(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission,
             SubmissionDetails protocolSubmissionDetail) {
         ProtocolAction protcolAction = findProtocolActionForSubmission(protocolSubmission);
         if(protcolAction!=null){
@@ -279,7 +279,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         }
     }
 
-    private void setOtherActionItems(CommitteeSchedule committeeSchedule, Schedule schedule) {
+    protected void setOtherActionItems(CommitteeSchedule committeeSchedule, Schedule schedule) {
         List<CommScheduleActItemBase> otherActions = committeeSchedule.getCommScheduleActItems();
         for (CommScheduleActItemBase otherActionInfoBean : otherActions) {
             otherActionInfoBean.refreshNonUpdateableReferences();
@@ -293,7 +293,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         }
     }
 
-    private String getFundingSourceNameForType(int sourceType, String sourceCode) {
+    protected String getFundingSourceNameForType(int sourceType, String sourceCode) {
         String name = null;
         if (sourceType == 1) {
             Sponsor sponsor = getBusinessObjectService().findBySinglePrimaryKey(Sponsor.class, sourceCode);
@@ -312,7 +312,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
     }
 
 
-    private void setProtocolSubmissionReviewers(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission,
+    protected void setProtocolSubmissionReviewers(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission,
             SubmissionDetails protocolSubmissionDetail) {
         List<org.kuali.kra.protocol.actions.submit.ProtocolReviewer> vecReviewers = protocolSubmission.getProtocolReviewers();
         for (org.kuali.kra.protocol.actions.submit.ProtocolReviewer protocolReviewer : vecReviewers) {
@@ -325,7 +325,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         }
     }
 
-    private void setPerson(ProtocolReviewer protocolReviewer,
+    protected void setPerson(ProtocolReviewer protocolReviewer,
             edu.mit.irb.irbnamespace.ProtocolReviewerDocument.ProtocolReviewer protocolReviewerType) {
         Person personType = protocolReviewerType.addNewPerson();
         boolean nonEmployeeFlag = protocolReviewer.getNonEmployeeFlag();
@@ -343,7 +343,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
     }
 
 
-    private void setSubmissionCheckListinfo(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission,
+    protected void setSubmissionCheckListinfo(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission,
             SubmissionDetails protocolSubmissionDetail) {
         SubmissionChecklistInfo submissionChecklistInfo = protocolSubmissionDetail.addNewSubmissionChecklistInfo();
         String formattedCode = new String();
@@ -373,7 +373,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
     }
 
 
-    private ProtocolAction findProtocolActionForSubmission(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission) {
+    protected ProtocolAction findProtocolActionForSubmission(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission) {
         List<ProtocolActionBase> protocolActions = protocolSubmission.getProtocol().getProtocolActions();
         for (ProtocolActionBase protocolAction : protocolActions) {
             if(protocolAction.getSubmissionNumber()!=null && protocolAction.getSubmissionNumber().equals(protocolSubmission.getSubmissionNumber())){
@@ -383,7 +383,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         return null;
     }
 
-    private void setAttendance(CommitteeSchedule committeeSchedule, Schedule schedule) {
+    protected void setAttendance(CommitteeSchedule committeeSchedule, Schedule schedule) {
         List<CommitteeScheduleAttendanceBase> attendenceList = committeeSchedule.getCommitteeScheduleAttendances();
         for (CommitteeScheduleAttendanceBase attendanceInfoBean : attendenceList) {
             Attendents attendents = schedule.addNewAttendents();
@@ -483,7 +483,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
      * @param nextFlag
      * @return
      */
-    private CommitteeSchedule getNextOrPreviousSchedule(CommitteeSchedule scheduleDetailsBean, boolean nextFlag) {
+    protected CommitteeSchedule getNextOrPreviousSchedule(CommitteeSchedule scheduleDetailsBean, boolean nextFlag) {
         Map<String, String> scheduleParam = new HashMap<String, String>();
         scheduleParam.put("committeeIdFk", scheduleDetailsBean.getParentCommittee().getId().toString());
         List<CommitteeSchedule> schedules = (List) getBusinessObjectService().findMatchingOrderBy(CommitteeSchedule.class, 
