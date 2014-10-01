@@ -16,8 +16,11 @@
 package org.kuali.kra.protocol;
 
 import org.kuali.kra.bo.CoeusSubModule;
+import org.kuali.kra.bo.CustomAttributeDocValue;
 import org.kuali.kra.bo.CustomAttributeDocument;
 import org.kuali.kra.bo.DocumentNextvalue;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentPersonnelBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
@@ -34,6 +37,7 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
 import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.krad.util.KRADPropertyConstants;
 import org.kuali.rice.krad.workflow.service.WorkflowDocumentService;
 
 import java.util.*;
@@ -260,17 +264,25 @@ public abstract class ProtocolVersionServiceImplBase implements ProtocolVersionS
      * @param protocolDocument
      * @param newProtocolDocument
      */
-    protected void copyCustomDataAttributeValues(ProtocolDocumentBase protocolDocument, ProtocolDocumentBase newProtocolDocument) {
-        newProtocolDocument.initialize();
-        if (protocolDocument.getCustomAttributeDocuments().isEmpty()) {
-            protocolDocument.initialize();
-        }
-        for (Entry<String, CustomAttributeDocument> entry : newProtocolDocument.getCustomAttributeDocuments().entrySet()) {
-            CustomAttributeDocument cad = protocolDocument.getCustomAttributeDocuments().get(entry.getKey());
-            if (cad != null) {
-                entry.getValue().getCustomAttribute().setValue(cad.getCustomAttribute().getValue());
+    protected void copyCustomDataAttributeValues(ProtocolDocumentBase src, ProtocolDocumentBase dest) {
+    	for (Map.Entry<String, CustomAttributeDocument> entry: src.getCustomAttributeDocuments().entrySet()) {
+            // Find the attribute value
+            CustomAttributeDocument customAttributeDocument = entry.getValue();
+            Map<String, Object> primaryKeys = new HashMap<String, Object>();
+            primaryKeys.put(KRADPropertyConstants.DOCUMENT_NUMBER, src.getDocumentNumber());
+            primaryKeys.put(Constants.CUSTOM_ATTRIBUTE_ID, customAttributeDocument.getCustomAttributeId());
+            CustomAttributeDocValue customAttributeDocValue = (CustomAttributeDocValue)businessObjectService.findByPrimaryKey(CustomAttributeDocValue.class, primaryKeys);
+            
+            // Store a new CustomAttributeDocValue using the new document's document number
+            if (customAttributeDocValue != null) {
+                CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
+                newDocValue.setDocumentNumber(dest.getDocumentNumber());
+                newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
+                newDocValue.setValue(customAttributeDocValue.getValue());
+                KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
             }
         }
+    	dest.refreshReferenceObject("customDataList");
     }
 
     /**
