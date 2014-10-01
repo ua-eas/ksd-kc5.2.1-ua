@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.dao.KraLookupDao;
+import org.kuali.kra.irb.actions.amendrenew.ProtocolModule;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.ProtocolDocumentBase;
 import org.kuali.kra.protocol.ProtocolFinderDao;
@@ -517,14 +519,17 @@ public abstract class ProtocolAmendRenewServiceImplBase implements
 		List<ProtocolBase> protocols = getAmendmentAndRenewals(protocolNumber);
 		for (ProtocolBase protocol : protocols) {
 			if (!isAmendmentCompleted(protocol)) {
-				ProtocolAmendRenewalBase amendRenewal = protocol
-						.getProtocolAmendRenewal();
+				ProtocolAmendRenewalBase amendRenewal = protocol.getProtocolAmendRenewal();
 				if (amendRenewal != null) {
-					List<ProtocolAmendRenewModuleBase> modules = amendRenewal
-							.getModules();
+					List<ProtocolAmendRenewModuleBase> modules = amendRenewal.getModules();
 					for (ProtocolAmendRenewModuleBase module : modules) {
-						moduleTypeCodes.remove(module
-								.getProtocolModuleTypeCode());
+						if (StringUtils.equals(module.getProtocolModuleTypeCode(), ProtocolModule.OTHERS)
+						    || StringUtils.equals(module.getProtocolModuleTypeCode(), ProtocolModule.ADD_MODIFY_ATTACHMENTS)) {
+							// These two modules should be editable even with ammend/renewals
+							// active. This should be true for both IRB and IACUC.
+							continue;
+						}
+						moduleTypeCodes.remove(module.getProtocolModuleTypeCode());
 					}
 				}
 			}
