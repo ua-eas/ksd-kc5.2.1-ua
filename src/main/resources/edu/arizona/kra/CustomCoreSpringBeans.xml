@@ -35,24 +35,17 @@
                            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
-
-	<bean id="irbModuleConfiguration" parent="irbModuleConfiguration-parentBean">
-		<property name="dataDictionaryPackages">
-			<list merge="true">
-				<value>edu/arizona/kra/datadictionary</value>
-			</list>
-		</property>
-	</bean>
-
-	<bean id="reviewCommentsService" class="edu.arizona.kra.irb.actions.reviewcomments.CustomReviewCommentsServiceImpl">
-		<property name="businessObjectService" ref="businessObjectService" />
-		<property name="committeeService" ref="committeeService" />
-		<property name="protocolFinderDao" ref="protocolFinderDao" />
-		<property name="roleService" ref="roleService" />
-		<property name="dateTimeService" ref="dateTimeService" />
-		<property name="parameterService" ref="parameterService" />
-		<property name="kcPersonService" ref="kcPersonService" />
-	</bean>
- 	 
+    
+    <bean id="coreModuleConfiguration" parent="coreModuleConfiguration-parentBean">
+        <property name="packagePrefixes">
+            <list merge="true">
+                <value>edu.arizona.kra</value>
+            </list>
+        </property>
+        <property name="dataDictionaryPackages">
+            <list merge="true">
+                <value>edu/arizona/kra/datadictionary</value>
+            </list>
+        </property>
+    </bean>
 </beans>
-
