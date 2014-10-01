@@ -61,10 +61,10 @@ import java.util.Map;
  */
 public class ProtocolXmlStream extends ProtocolXmlStreamBase {
 
-    private IrbPrintXmlUtilService irbPrintXmlUtilService;
-    private KcPersonService kcPersonService;
-    private ScheduleXmlStream scheduleXmlStream;
-    private CommitteeXmlStream committeeXmlStream;
+    protected IrbPrintXmlUtilService irbPrintXmlUtilService;
+    protected KcPersonService kcPersonService;
+    protected ScheduleXmlStream scheduleXmlStream;
+    protected CommitteeXmlStream committeeXmlStream;
 
     /**
      * @see org.kuali.kra.printing.xmlstream.XmlStream#generateXmlStream(KraPersistableBusinessObjectBase, java.util.Map)
@@ -92,7 +92,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
         addRiskLevels(protocolInfoBean, protocolType);
         return protocolType ;
     }
-    private Integer getParentSubmissionNumber(org.kuali.kra.irb.Protocol protocolInfoBean, Integer submissionNumber) {
+    protected Integer getParentSubmissionNumber(org.kuali.kra.irb.Protocol protocolInfoBean, Integer submissionNumber) {
         return 0;
     }
 
@@ -111,7 +111,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
         return protocolType;
     }
 
-    private void addRiskLevels(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
+    protected void addRiskLevels(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         List<ProtocolRiskLevel> cvRiskLevels = protocol.getProtocolRiskLevels();
         for (ProtocolRiskLevel protocolRiskLevelBean : cvRiskLevels) {
             protocolRiskLevelBean.refreshNonUpdateableReferences();
@@ -146,11 +146,11 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
         }
     }
 
-    private void addSubmissionDetails(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
+    protected void addSubmissionDetails(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         addSubmissionDetails(protocol, protocolType, null,"No");
         
     }
-    private void addSubmissionDetails(org.kuali.kra.irb.Protocol protocol, Protocol protocolType, Integer submissionNumber, String currentFlag) {
+    protected void addSubmissionDetails(org.kuali.kra.irb.Protocol protocol, Protocol protocolType, Integer submissionNumber, String currentFlag) {
         org.kuali.kra.irb.actions.submit.ProtocolSubmission submissionInfoBean = null;
         submissionInfoBean = submissionNumber==null?protocol.getProtocolSubmission():findProtocolSubmission(protocol,submissionNumber);
         if(submissionInfoBean==null || submissionInfoBean.getSubmissionNumber()==null) return;
@@ -246,7 +246,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
         }
     }
 
-    private ProtocolSubmission findProtocolSubmission(org.kuali.kra.irb.Protocol protocol, Integer submissionNumber) {
+    protected ProtocolSubmission findProtocolSubmission(org.kuali.kra.irb.Protocol protocol, Integer submissionNumber) {
         List<ProtocolSubmission> protocolSubmissions = (List) protocol.getProtocolSubmissions();
         for (ProtocolSubmission protocolSubmission : protocolSubmissions) {
             if(protocolSubmission.getSubmissionNumber().equals(submissionNumber)){
@@ -256,7 +256,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
         return null;
     }
 
-    private void addSpecialReview(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
+    protected void addSpecialReview(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         List<ProtocolSpecialReview> vecSpecialReview = (List) protocol.getSpecialReviews();
         for (ProtocolSpecialReview specialReviewBean : vecSpecialReview) {
             specialReviewBean.refreshNonUpdateableReferences();
@@ -290,7 +290,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
         }
     }
 
-    private void addVulnerableSubject(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
+    protected void addVulnerableSubject(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         List<ProtocolParticipant> protocolParticipants = protocol.getProtocolParticipants();
         for (ProtocolParticipant protocolParticipant : protocolParticipants) {
             protocolParticipant.refreshNonUpdateableReferences();
@@ -303,7 +303,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
 
     }
 
-    private void addFundingSource(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
+    protected void addFundingSource(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         int fundingSourceTypeCode;
         String fundingSourceName, fundingSourceCode;
         List<ProtocolFundingSource> vecFundingSource = (List) protocol.getProtocolFundingSources();
@@ -318,7 +318,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
             }
         }
     }
-    private String getFundingSourceNameForType(int sourceType, String sourceCode) {
+    protected String getFundingSourceNameForType(int sourceType, String sourceCode) {
         String name = null;
         if (sourceType == 1) {
             Sponsor sponsorBean = getBusinessObjectService().findBySinglePrimaryKey(Sponsor.class, sourceCode);
@@ -336,7 +336,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
         return name;
     }
 
-    private void addResearchArea(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
+    protected void addResearchArea(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         List<ProtocolResearchArea> researchAreas = (List) protocol.getProtocolResearchAreas();
         for (ProtocolResearchArea protocolReasearchAreasBean : researchAreas) {
             protocolReasearchAreasBean.refreshNonUpdateableReferences();
@@ -346,7 +346,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
         }    
     }
 
-    private void addProtocolPersons(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
+    protected void addProtocolPersons(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         List<ProtocolPerson> vecInvestigator = (List) protocol.getProtocolPersons();
         for (ProtocolPerson protocolPerson : vecInvestigator) {
             protocolPerson.refreshNonUpdateableReferences();
@@ -380,7 +380,7 @@ public class ProtocolXmlStream extends ProtocolXmlStreamBase {
 
     }
 
-    private void setProtocolMasterData(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
+    protected void setProtocolMasterData(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         ProtocolMasterData protocolMaster = protocolType.addNewProtocolMasterData();
         if (protocol == null)
             return;
