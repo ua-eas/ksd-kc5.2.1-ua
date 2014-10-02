@@ -17,16 +17,19 @@ package org.kuali.kra.protocol.noteattachment;
 
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.krad.service.BusinessObjectService;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 
 /**
  * This class represents the ProtocolBase Attachment ProtocolBase.
@@ -78,6 +81,10 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
     //unique attachment id so attachments added to amendment and renewals can be distinguished from the ones in the base protocol
     private String versioningId;
 
+    //UofA: adding sourceProtocolAmendRenewalNumber to the attachments
+    private String sourceProtocolAmendRenewalNumber;
+    private String sourceProtocolNumber;
+    
 
     /**
      * empty ctor to satisfy JavaBean convention.
@@ -249,8 +256,7 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         // probably do it in postsave  
         //this.getProtocol().refreshReferenceObject("attachmentProtocols");  
         for (ProtocolAttachmentProtocolBase attachment : this.getProtocol().getAttachmentProtocols()) {
-            if (attachment.getDocumentId().equals(this.getDocumentId()) &&
-                    StringUtils.equals(attachment.getVersioningId(), this.getVersioningId())) {
+            if (attachment.getDocumentId().equals(this.getDocumentId())) {
                 this.versions.add(attachment);
             }
         }
@@ -260,21 +266,7 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         Collections.sort(this.versions, new Comparator<ProtocolAttachmentProtocolBase>() {
 
             public int compare(ProtocolAttachmentProtocolBase attachment1, ProtocolAttachmentProtocolBase attachment2) {
-                Timestamp timestamp1 = attachment1.getUpdateTimestamp();
-                Timestamp timestamp2 = attachment2.getUpdateTimestamp();
-                if (timestamp1 != null){
-                    if (timestamp2 != null){
-                        return timestamp1.compareTo(timestamp2);
-                    }
-                    else {
-                        return 1; 
-                    }
-                } else {
-                    if (timestamp2 != null){
-                        return -1;
-                    }
-                }
-                return 0;
+                return attachment2.getUpdateTimestamp().compareTo(attachment1.getUpdateTimestamp());
             }
         });
         return this.versions;
@@ -495,6 +487,61 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         this.versioningId = versioningId;
     }
 
+
+    /**
+     * Returns the source protocol number for when this attachment was last added in.
+     */
+    public String getSourceProtocolNumber() {
+        if (sourceProtocolNumber == null) {
+            if (getFileId() != null) {
+                // find the protocol number for this attachment's most recent attachment/modification
+                // by retrieving all attachments with the same fileId and ordering them by id
+                Map param = new HashMap();
+                param.put("fileId", getFileId());
+                BusinessObjectService businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
+                List<ProtocolAttachmentProtocol> protocolAttachmentProtocols = 
+                        (List<ProtocolAttachmentProtocol>) businessObjectService.findMatchingOrderBy(ProtocolAttachmentProtocol.class, param, "id", true);
+                ProtocolAttachmentProtocol protocolAttachmentProtocol = protocolAttachmentProtocols.get(0);
+                sourceProtocolNumber = protocolAttachmentProtocol.getProtocolNumber();
+            }
+            // Null FileId means attachment newly added and is not in the database yet
+            else {
+                sourceProtocolNumber = getProtocolNumber();
+            }
+        }
+        // avoid further lookups when this field is accessed and NPEs
+        if (sourceProtocolNumber == null) {
+            sourceProtocolNumber = "";
+        }
+        return sourceProtocolNumber;
+    }
+
+    /**
+     * Returns the source amendment or renewal this attachment was added in.
+     */
+    public String getSourceProtocolAmendRenewalNumber() {
+        String sourceProtocolNumber = getSourceProtocolNumber();
+
+        if (sourceProtocolNumber.length() >= 10) {
+            sourceProtocolAmendRenewalNumber = sourceProtocolNumber.substring(10);
+        } else {
+            sourceProtocolAmendRenewalNumber = "";
+        }
+
+        return sourceProtocolAmendRenewalNumber;
+    }
+    
+    /**
+     * Resets the sourceProtocol to null so it will try to determine source
+     * protocol again next time getSourceProtocolNumber is called. You may 
+     * want to do this if the attachment is saved or modified in some way which 
+     * would cause the source protocol to change.
+     */
+    public void resetSourceProtocol() {
+        sourceProtocolNumber = null;
+        sourceProtocolAmendRenewalNumber = null;
+    }
+
     @Override
     protected void prePersist() {
         super.prePersist();
@@ -502,4 +549,6 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
             setCreateTimestamp(((DateTimeService) KraServiceLocator.getService(Constants.DATE_TIME_SERVICE_NAME)).getCurrentTimestamp());
         }
     }
+
+
 }

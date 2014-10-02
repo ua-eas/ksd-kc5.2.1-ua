@@ -15,9 +15,9 @@
 --%>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
-<c:set var="protocolAttachmentProtocolAttributes" value="${DataDictionary.CustomProtocolAttachmentProtocol.attributes}" />
+<c:set var="protocolAttachmentProtocolAttributes" value="${DataDictionary.ProtocolAttachmentProtocol.attributes}" />
 <c:set var="attachmentFileAttributes" value="${DataDictionary.AttachmentFile.attributes}" />
-<c:set var="protocolAttachmentFilterAttributes" value="${DataDictionary.CustomProtocolAttachmentFilter.attributes}" />
+<c:set var="protocolAttachmentFilterAttributes" value="${DataDictionary.ProtocolAttachmentFilter.attributes}" />
 <c:set var="notesAttachmentsHelper" value="${KualiForm.notesAttachmentsHelper}" />
 <c:set var="modify" value="${KualiForm.notesAttachmentsHelper.modifyAttachments}" />
 <c:set var="action" value="protocolNoteAndAttachment" />
