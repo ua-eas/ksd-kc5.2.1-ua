@@ -161,7 +161,8 @@ div#horz-links {}
 table.tab td.tabtable1-left img,
 table.tab td.tabtable1-right img,
 table.tab td.tabtable2-left img,
-table.tab td.tabtable2-right img
+table.tab td.tabtable2-right img,
+table.tab td.tabtable1-left-colspan img
 {
     display: none;
 }
