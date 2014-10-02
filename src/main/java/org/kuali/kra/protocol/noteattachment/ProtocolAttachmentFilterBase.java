@@ -18,6 +18,8 @@ package org.kuali.kra.protocol.noteattachment;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import edu.arizona.kra.irb.ProtocolUtils;
+
 /**
  * 
  * This class is a business object which represents the 
@@ -58,7 +60,9 @@ public abstract class ProtocolAttachmentFilterBase implements Serializable {
 
 class ProtocolAttachmentComparatorFactory {
     public Comparator<ProtocolAttachmentProtocolBase> getProtocolAttachmentComparator(String sortBy) {
-        if ("DESC".equalsIgnoreCase(sortBy)) {
+        if ("ARNO".equalsIgnoreCase(getSortBy())) { 
+            return new ProtocolAmendRenewNumberComparator();
+        } else if ("DESC".equalsIgnoreCase(sortBy)) {
             return new ProtocolAttachmentDescriptionComparator();
         } else if ("ATTP".equalsIgnoreCase(sortBy)) {
             return new ProtocolAttachmentAttachmentTypeComparator();
@@ -94,7 +98,7 @@ class ProtocolAttachmentComparatorFactory {
     {
     
         public int compare(ProtocolAttachmentProtocolBase o1, ProtocolAttachmentProtocolBase o2) {
-            return o1.getUpdateTimestamp().compareTo(o2.getUpdateTimestamp());
+            return ProtocolUtils.compareTimestamps(o1.getUpdateTimestamp(), o2.getUpdateTimestamp());
         }
         
     }
@@ -106,6 +110,29 @@ class ProtocolAttachmentComparatorFactory {
             return o1.getUpdateUserFullName().compareTo(o2.getUpdateUserFullName());
         }
         
+    }
+    
+    /**
+     *  Implements the ARNO - Amendment/Renewal comparator for the default ARNO sorting.
+     *  Primary sort by Amend/Renewal Number, secondary sort by Date/Timestamp, tertiary sort by Attachment Type.
+     */
+    private class ProtocolAmendRenewNumberComparator implements Comparator<ProtocolAttachmentProtocolBase>
+    {
+        @Override
+        public int compare(ProtocolAttachmentProtocolBase o1, ProtocolAttachmentProtocolBase o2) {
+         
+                String sparn0 = o1.getSourceProtocolAmendRenewalNumber();
+                String sparn1 = o2.getSourceProtocolAmendRenewalNumber();
+                
+                if( sparn0.equalsIgnoreCase(sparn1) ){
+                    return ProtocolUtils.compareTimestamps(o1.getUpdateTimestamp(), o2.getUpdateTimestamp());
+                }                   
+                else {
+                    return sparn0.compareTo(sparn1);
+                }
+         
+        }
+
     }
 
 }

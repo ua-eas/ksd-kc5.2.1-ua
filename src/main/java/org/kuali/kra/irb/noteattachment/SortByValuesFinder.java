@@ -34,6 +34,7 @@ public class SortByValuesFinder extends UifKeyValuesFinderBase {
         
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
         keyValues.add(new ConcreteKeyValue("", "None"));
+        keyValues.add(new ConcreteKeyValue("ARNO", new String("Amend/Renewal Number")));
         keyValues.add(new ConcreteKeyValue("ATTP", new String("Attachment Type")));
         keyValues.add(new ConcreteKeyValue("DESC", new String("Description")));
         keyValues.add(new ConcreteKeyValue("LAUP", new String("Last Updated")));
