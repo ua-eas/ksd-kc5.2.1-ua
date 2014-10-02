@@ -58,7 +58,8 @@
         <property name="lookupableHelperService">
             <ref bean="protocolAssociateWorkflowSearchLookupableHelperService" />
         </property>         
-    </bean> 
+    </bean>
+ 
     <bean id="protocolAssociateWorkflowSearchLookupableHelperService" class="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowSearchLookupableHelperServiceImpl" 
         scope="prototype" parent="parentLookupableHelperService">
         <property name="dataAccessObject">
@@ -71,6 +72,7 @@
             <ref bean="kraAuthorizationService" />
         </property>
     </bean>
+
     <bean id="protocolAssociateWorkflowSearchDao" parent="platformAwareDao" class="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowSearchDaoOjb">
         <property name="lookupDao">
             <ref bean="lookupDao" />
@@ -79,6 +81,7 @@
             <ref bean="dataDictionaryService" />
         </property>
     </bean> 
+
     <bean id="protocolCopyService" class="edu.arizona.kra.irb.actions.copy.CustomProtocolCopyServiceImpl">
         <property name="documentService" ref="documentService" />
         <property name="systemAuthorizationService" ref="systemAuthorizationService" />
@@ -88,6 +91,21 @@
             <ref bean="sequenceAccessorService" />
         </property>
     </bean>
+
+	<bean id="protocolXmlStream" class="edu.arizona.kra.irb.actions.print.CustomProtocolXmlStream" parent="printBaseXmlStream">
+		<property name="irbPrintXmlUtilService">
+			<ref bean="irbPrintXmlUtilService" />
+		</property>
+		<property name="kcPersonService">
+			<ref bean="kcPersonService" />
+		</property>
+		<property name="scheduleXmlStream">
+			<ref bean="scheduleXmlStream" />
+		</property>
+		<property name="committeeXmlStream">
+			<ref bean="committeeXmlStream" />
+		</property>
+	</bean>
 
 </beans>
 
