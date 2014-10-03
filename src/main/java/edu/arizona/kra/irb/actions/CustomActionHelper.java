@@ -25,6 +25,7 @@ import org.kuali.kra.irb.actions.ActionHelper;
 import org.kuali.kra.irb.actions.amendrenew.ProtocolAmendmentBean;
 import org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewService;
 import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.irb.actions.correction.AdminCorrectionBean;
 import org.kuali.kra.protocol.actions.ActionHelperBase;
 import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewBase;
 import org.kuali.rice.kew.actiontaken.ActionTakenValue;
@@ -33,6 +34,7 @@ import org.kuali.rice.kew.api.KewApiConstants;
 
 import edu.arizona.kra.irb.CustomProtocolForm;
 import edu.arizona.kra.irb.actions.amendrenew.CustomProtocolAmendmentBean;
+import edu.arizona.kra.irb.actions.correction.CustomAdminCorrectionBean;
 
 
 /**
@@ -134,5 +136,9 @@ public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
 		return protocolOnlineReviewService;
 	}
 
+    @Override
+    protected AdminCorrectionBean getNewAdminCorrectionBeanInstanceHook(ActionHelperBase actionHelper) {
+        return new CustomAdminCorrectionBean((ActionHelper) actionHelper);
+    }
 
 }
