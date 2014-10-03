@@ -15,6 +15,11 @@
  */
 package org.kuali.kra.protocol.onlinereview;
 
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.UnitAclLoadable;
 import org.kuali.kra.bo.KcPerson;
@@ -24,16 +29,12 @@ import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
 import org.kuali.kra.common.permissions.Permissionable;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.RoleConstants;
+import org.kuali.kra.irb.actions.ProtocolStatus;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
 import org.kuali.kra.protocol.actions.submit.ProtocolReviewer;
 import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.rice.krad.util.GlobalVariables;
-
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class encapsulates the notion of a protocol review. Essentially 
@@ -471,10 +472,14 @@ public abstract class ProtocolOnlineReviewBase extends KraPersistableBusinessObj
 
     /*
      * Returns if the review is active or not.
-     * If the review has a status code of 'X' we return false;
+     * 
+     * Return true if the parent protocol is in "Disapproved" status, or if this review's
+     * status code is not 'X'
      */
     public boolean isActive() {
-        return !StringUtils.equals(getProtocolOLRRemovedCancelledStatusCodeHook(), getProtocolOnlineReviewStatusCode());
+    	String protocolStatusCode = getProtocol().getProtocolStatus().getProtocolStatusCode();
+        return StringUtils.equals(protocolStatusCode, ProtocolStatus.DISAPPROVED)
+        		|| !StringUtils.equals(getProtocolOLRRemovedCancelledStatusCodeHook(), getProtocolOnlineReviewStatusCode());
     }
 
     protected abstract String getProtocolOLRRemovedCancelledStatusCodeHook();
