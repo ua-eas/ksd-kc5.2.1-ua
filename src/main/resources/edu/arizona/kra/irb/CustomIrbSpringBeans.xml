@@ -36,7 +36,6 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-<<<<<<< HEAD
 	<bean id="irbModuleConfiguration" parent="irbModuleConfiguration-parentBean">
 		<property name="dataDictionaryPackages">
 			<list merge="true">
