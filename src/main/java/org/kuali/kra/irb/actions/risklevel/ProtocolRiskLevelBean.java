@@ -28,6 +28,8 @@ public class ProtocolRiskLevelBean implements Serializable {
     
     private ProtocolRiskLevel newProtocolRiskLevel;
     
+    private boolean modifyRiskLevels;
+    
     /**
      * Constructs a ProtocolRiskLevelBean.
      */
@@ -49,4 +51,12 @@ public class ProtocolRiskLevelBean implements Serializable {
         this.newProtocolRiskLevel = newProtocolRiskLevel;
     }
 
+	public boolean isModifyRiskLevels() {
+		return modifyRiskLevels;
+	}
+
+	public void setModifyRiskLevels(boolean modifyRiskLevels) {
+		this.modifyRiskLevels = modifyRiskLevels;
+	}
+    
 }

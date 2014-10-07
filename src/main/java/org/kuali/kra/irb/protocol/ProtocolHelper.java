@@ -24,6 +24,9 @@ import org.kuali.kra.irb.ProtocolDocument;
 import org.kuali.kra.irb.ProtocolForm;
 import org.kuali.kra.irb.actions.ProtocolAction;
 import org.kuali.kra.irb.actions.ProtocolActionType;
+import org.kuali.kra.irb.actions.approve.ProtocolApproveBean;
+import org.kuali.kra.irb.actions.risklevel.ProtocolRiskLevel;
+import org.kuali.kra.irb.actions.risklevel.ProtocolRiskLevelBean;
 import org.kuali.kra.irb.actions.submit.ProtocolExemptStudiesCheckListItem;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
 import org.kuali.kra.irb.auth.ProtocolTask;
@@ -64,9 +67,11 @@ public class ProtocolHelper extends ProtocolHelperBase {
 
     private boolean modifySubjects = false;
     
+    private ProtocolForm form;
+    
     public ProtocolHelper(ProtocolForm form) {        
-        
         super(form);
+        this.form = form;
         setNewProtocolParticipant(new ProtocolParticipant());
     }    
     
@@ -249,4 +254,25 @@ public class ProtocolHelper extends ProtocolHelperBase {
         return new ProtocolPerson();
     }
     
+    private ProtocolRiskLevelBean getProtocolRiskLevelBean(){
+    	ProtocolApproveBean protocolApproveBean = (ProtocolApproveBean) form.getActionHelper().getProtocolFullApprovalBean();
+    	return protocolApproveBean.getProtocolRiskLevelBean();
+    }
+    
+    
+    public ProtocolRiskLevel getNewProtocolRiskLevel() {
+        return getProtocolRiskLevelBean().getNewProtocolRiskLevel();
+    }
+    
+    public void setNewProtocolRiskLevel(ProtocolRiskLevel newProtocolRiskLevel) {
+    	getProtocolRiskLevelBean().setNewProtocolRiskLevel(newProtocolRiskLevel);
+    }
+    
+    public boolean getModifyRiskLevels() {
+        return getProtocolRiskLevelBean().isModifyRiskLevels();
+    }
+
+    public void setModifyRiskLevels(boolean modifyRiskLevels) {
+    	getProtocolRiskLevelBean().setModifyRiskLevels(modifyRiskLevels);
+    }
 }

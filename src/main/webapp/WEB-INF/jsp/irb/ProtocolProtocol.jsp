@@ -38,12 +38,7 @@
 
 <kra-irb:protocolRequiredFields />
 <kra-irb:protocolStatusDate />
-
-<c:choose>
-	<c:when test="${KualiForm.displayRiskLevelPanel}" > 
-		<kra-irb:protocolRiskLevel />
-	</c:when>
-</c:choose>
+<kra-irb:protocolRiskLevel />
 <kra-irb:protocolAdditionalInformation />
 <kra-irb:protocolLocations />
 <kra-irb:protocolFundingSources />

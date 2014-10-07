@@ -1677,6 +1677,12 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
         ProtocolForm protocolForm = (ProtocolForm) form;
         if(getProtocolActionRequestService().isOpenProtocolForAdminCorrectionAuthorized(protocolForm)) {
+        	ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
+            if(!(protocolDocument.getProtocol().isAmendment() || 
+            		protocolDocument.getProtocol().isRenewal() || 
+            		protocolDocument.getProtocol().isRenewalWithoutAmendment())){
+            	protocolForm.getProtocolHelper().setModifyRiskLevels(true);
+            }
             String forwardTo = getProtocolActionRequestService().openProtocolForAdminCorrection(protocolForm);
             forward = mapping.findForward(forwardTo);
         }

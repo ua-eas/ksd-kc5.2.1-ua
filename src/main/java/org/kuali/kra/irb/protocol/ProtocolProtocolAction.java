@@ -15,6 +15,16 @@
  */
 package org.kuali.kra.irb.protocol;
 
+import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -25,19 +35,39 @@ import org.kuali.kra.common.notification.service.KcNotificationService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.irb.*;
+import org.kuali.kra.irb.Protocol;
+import org.kuali.kra.irb.ProtocolAction;
+import org.kuali.kra.irb.ProtocolDocument;
+import org.kuali.kra.irb.ProtocolDocumentRule;
+import org.kuali.kra.irb.ProtocolEventBase;
+import org.kuali.kra.irb.ProtocolForm;
+import org.kuali.kra.irb.ResearchArea;
 import org.kuali.kra.irb.actions.ProtocolActionType;
 import org.kuali.kra.irb.actions.notification.FundingSourceNotificationRenderer;
+import org.kuali.kra.irb.actions.risklevel.ProtocolAddRiskLevelEvent;
+import org.kuali.kra.irb.actions.risklevel.ProtocolRiskLevel;
+import org.kuali.kra.irb.actions.risklevel.ProtocolRiskLevelService;
+import org.kuali.kra.irb.actions.risklevel.ProtocolUpdateRiskLevelEvent;
 import org.kuali.kra.irb.notification.IRBNotificationContext;
 import org.kuali.kra.irb.notification.IRBProtocolNotification;
-import org.kuali.kra.irb.protocol.funding.*;
+import org.kuali.kra.irb.protocol.funding.AddProtocolFundingSourceEvent;
+import org.kuali.kra.irb.protocol.funding.LookupProtocolFundingSourceEvent;
+import org.kuali.kra.irb.protocol.funding.ProtocolFundingSource;
+import org.kuali.kra.irb.protocol.funding.ProtocolFundingSourceService;
+import org.kuali.kra.irb.protocol.funding.ProtocolFundingSourceServiceImpl;
+import org.kuali.kra.irb.protocol.funding.ProtocolProposalDevelopmentDocumentService;
+import org.kuali.kra.irb.protocol.funding.SaveProtocolFundingSourceLinkEvent;
 import org.kuali.kra.irb.protocol.location.AddProtocolLocationEvent;
 import org.kuali.kra.irb.protocol.location.ProtocolLocation;
 import org.kuali.kra.irb.protocol.location.ProtocolLocationService;
 import org.kuali.kra.irb.protocol.participant.AddProtocolParticipantEvent;
 import org.kuali.kra.irb.protocol.participant.ProtocolParticipant;
 import org.kuali.kra.irb.protocol.participant.ProtocolParticipantService;
-import org.kuali.kra.irb.protocol.reference.*;
+import org.kuali.kra.irb.protocol.reference.AddProtocolReferenceEvent;
+import org.kuali.kra.irb.protocol.reference.ProtocolReference;
+import org.kuali.kra.irb.protocol.reference.ProtocolReferenceBean;
+import org.kuali.kra.irb.protocol.reference.ProtocolReferenceService;
+import org.kuali.kra.irb.protocol.reference.ProtocolReferenceType;
 import org.kuali.kra.irb.protocol.research.ProtocolResearchAreaService;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
@@ -50,15 +80,6 @@ import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
-
-import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
 
 /**
  * The ProtocolProtocolAction corresponds to the Protocol tab (web page). It is responsible for handling all user requests from that
@@ -663,5 +684,77 @@ public class ProtocolProtocolAction extends ProtocolAction {
     
     private KcNotificationService getKcNotificationService() {
         return KraServiceLocator.getService(KcNotificationService.class);
+    }
+    
+    /**
+     * This method is linked to ProtocolRiskLevelService to perform the action - Add Risk Level. Method is called in
+     * protocolRiskLevel.tag
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public ActionForward addRiskLevel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ProtocolForm protocolForm = (ProtocolForm) form;
+        ProtocolDocument document = protocolForm.getProtocolDocument();
+        ProtocolRiskLevel newProtocolRiskLevel = protocolForm.getProtocolHelper().getNewProtocolRiskLevel();
+
+        if (applyRules(new ProtocolAddRiskLevelEvent(document, "protocolHelper", newProtocolRiskLevel))) {
+        	getProtocolRiskLevelService().addRiskLevel(newProtocolRiskLevel, document.getProtocol());
+            protocolForm.getProtocolHelper().setNewProtocolRiskLevel(new ProtocolRiskLevel());
+        }
+
+        return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+    
+    /** Deletes a risk level from the protocol indicated by the task name in the request.
+    * 
+    * @param mapping The mapping associated with this action.
+    * @param form The Protocol form.
+    * @param request The HTTP request
+    * @param response The HTTP response
+    * @return the forward to the current page
+    */
+    public ActionForward deleteRiskLevel(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+       ProtocolForm protocolForm = (ProtocolForm) form;
+       ProtocolDocument document = protocolForm.getProtocolDocument();
+       int lineNumber = getSelectedLine(request);
+       Protocol protocol = document.getProtocol();
+       getProtocolRiskLevelService().deleteRiskLevel(lineNumber, protocol);
+       return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+
+
+    /**
+     * Updates a persisted risk level , moving the persisted risk level to Inactive status and adding a 
+     * new Active status risk level.
+     * 
+     * @param mapping The mapping associated with this action.
+     * @param form The Protocol form.
+     * @param request The HTTP request
+     * @param response The HTTP response
+     * @return the forward to the current page
+     */
+    public ActionForward updateRiskLevel(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        ProtocolForm protocolForm = (ProtocolForm) form;
+        ProtocolDocument document = protocolForm.getProtocolDocument();
+       
+        int lineNumber = getSelectedLine(request);
+        ProtocolRiskLevel currentProtocolRiskLevel = document.getProtocol().getProtocolRiskLevels().get(lineNumber);
+        ProtocolRiskLevel newProtocolRiskLevel = protocolForm.getProtocolHelper().getNewProtocolRiskLevel();
+        
+        if (applyRules(new ProtocolUpdateRiskLevelEvent(document, lineNumber))) {
+            getProtocolRiskLevelService().updateRiskLevel(currentProtocolRiskLevel, newProtocolRiskLevel);
+        }
+        
+        return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+
+    private ProtocolRiskLevelService getProtocolRiskLevelService() {
+        return KraServiceLocator.getService(ProtocolRiskLevelService.class);
     }
 }
