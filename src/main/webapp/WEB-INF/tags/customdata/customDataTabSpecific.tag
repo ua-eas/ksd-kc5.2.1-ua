@@ -59,7 +59,7 @@
 				</c:otherwise>
 			</c:choose>
 		  </c:forEach>
-	    <kul:tab tabTitle="${tabTitleName}" spanForLongTabTitle="true" defaultOpen="false" transparentBackground="${groupStatus.first && headerAndFooter}" auditCluster="CustomData${fn:replace(fullName,' ','')}Errors" tabErrorKey="${tabErrorKey}" tabAuditKey="${tabErrorKey}" useRiceAuditMode="true">
+	    <kul:tab tabTitle="${tabTitleName}" spanForLongTabTitle="true" defaultOpen="true" transparentBackground="${groupStatus.first && headerAndFooter}" auditCluster="CustomData${fn:replace(fullName,' ','')}Errors" tabErrorKey="${tabErrorKey}" tabAuditKey="${tabErrorKey}" useRiceAuditMode="true">
 			<kra-customdata:customData customAttributeGroups="${customAttributeGroups}" customDataList="${customDataList}" customDataListPrefix="${customDataListPrefix}" fullName="${fullName}" fieldCount="${fieldCount}" excludeInactive="${excludeInactive}" />
 	    </kul:tab>
 	   	<c:set var="fieldCount" value="${fieldCount + fn:length(customAttributeGroup.value)}" />
