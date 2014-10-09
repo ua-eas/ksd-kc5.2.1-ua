@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+ 
+  	<changeSet id="UAR-EXAMPLE-1" author="Josh Shaloo">
+        <comment>
+        	The changeSet id attribute must be unique. Please prefix it with
+        	the jira number this change came from followed by an index.
+        </comment>
+        <createTable tableName="testTable">
+    </changeSet>
+    <changeSet id="UAR-EXAMPLE-2" author="Josh Shaloo">
+        <comment>
+        	Notice how this changeSet id attribute is prefixed with the jira number
+        	and ends with a unique index for the change set.
+        </comment>
+        <createTable tableName="testTable2">
+    </changeSet>
+    <changeSet id="UAR-EXAMPLE-3" author="Josh Shaloo">
+        <comment>
+        	This example works but we should use relevant change clause instead of using custom 
+        	sql tag whenever possible. This will include rollback automatically. Include a rollback 
+        	clause whenever a change doesn’t support out of box rollback. (sql, insert, etc. ).
+        </comment>
+        	<sql>
+			CREATE TABLE testTable3;
+		</sql>
+		<rollback>
+			DROP TABLE testTable3;
+		</rollback>
+    </changeSet>
+</databaseChangeLog>
