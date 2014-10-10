@@ -15,11 +15,14 @@
  */
 package org.kuali.kra.protocol;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.kuali.kra.bo.CoeusSubModule;
-import org.kuali.kra.bo.CustomAttributeDocValue;
-import org.kuali.kra.bo.CustomAttributeDocument;
 import org.kuali.kra.bo.DocumentNextvalue;
-import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentPersonnelBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
@@ -37,11 +40,9 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
 import org.kuali.rice.krad.util.GlobalVariables;
-import org.kuali.rice.krad.util.KRADPropertyConstants;
 import org.kuali.rice.krad.workflow.service.WorkflowDocumentService;
 
-import java.util.*;
-import java.util.Map.Entry;
+import edu.arizona.kra.protocol.ProtocolCustomDataService;
 
 
 /**
@@ -265,24 +266,7 @@ public abstract class ProtocolVersionServiceImplBase implements ProtocolVersionS
      * @param newProtocolDocument
      */
     protected void copyCustomDataAttributeValues(ProtocolDocumentBase src, ProtocolDocumentBase dest) {
-    	for (Map.Entry<String, CustomAttributeDocument> entry: src.getCustomAttributeDocuments().entrySet()) {
-            // Find the attribute value
-            CustomAttributeDocument customAttributeDocument = entry.getValue();
-            Map<String, Object> primaryKeys = new HashMap<String, Object>();
-            primaryKeys.put(KRADPropertyConstants.DOCUMENT_NUMBER, src.getDocumentNumber());
-            primaryKeys.put(Constants.CUSTOM_ATTRIBUTE_ID, customAttributeDocument.getCustomAttributeId());
-            CustomAttributeDocValue customAttributeDocValue = (CustomAttributeDocValue)businessObjectService.findByPrimaryKey(CustomAttributeDocValue.class, primaryKeys);
-            
-            // Store a new CustomAttributeDocValue using the new document's document number
-            if (customAttributeDocValue != null) {
-                CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
-                newDocValue.setDocumentNumber(dest.getDocumentNumber());
-                newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
-                newDocValue.setValue(customAttributeDocValue.getValue());
-                KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
-            }
-        }
-    	dest.refreshReferenceObject("customDataList");
+    	KraServiceLocator.getService(ProtocolCustomDataService.class).copyCustomDataAttributeValues(src, dest);
     }
 
     /**

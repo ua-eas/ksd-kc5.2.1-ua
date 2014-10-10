@@ -15,9 +15,13 @@
  */
 package org.kuali.kra.protocol.actions.copy;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.bo.CustomAttributeDocument;
 import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.ProtocolDocumentBase;
 import org.kuali.kra.protocol.actions.ProtocolActionBase;
@@ -42,10 +46,7 @@ import org.kuali.rice.krad.service.SequenceAccessorService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
+import edu.arizona.kra.protocol.ProtocolCustomDataService;
 
 /**
  * The ProtocolBase Copy Service creates a new ProtocolBase Document
@@ -354,17 +355,7 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
      * @param destProtocolDocument
      */
     protected void copyCustomDataAttributeValues(GenericProtocolDocument srcProtocolDocument, GenericProtocolDocument destProtocolDocument) {
-        destProtocolDocument.initialize();
-        destProtocolDocument.getDocumentNumber();
-        for (Entry<String, CustomAttributeDocument> entry : destProtocolDocument.getCustomAttributeDocuments().entrySet()) {
-            CustomAttributeDocument cad = srcProtocolDocument.getCustomAttributeDocuments().get(entry.getKey());
-            if(ObjectUtils.isNotNull(cad)) {
-                if(ObjectUtils.isNull(cad.getCustomAttribute())) {
-                    cad.refreshReferenceObject("customAttribute");
-                }
-                entry.getValue().getCustomAttribute().setValue(cad.getCustomAttribute().getValue());
-            }
-        }
+    	KraServiceLocator.getService(ProtocolCustomDataService.class).copyCustomDataAttributeValues(srcProtocolDocument, destProtocolDocument);
     }
 
     public void setSequenceAccessorService(SequenceAccessorService sequenceAccessorService) {
