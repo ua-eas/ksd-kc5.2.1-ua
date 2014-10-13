@@ -23,6 +23,7 @@ import java.util.List;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.actions.ActionHelper;
 import org.kuali.kra.irb.actions.amendrenew.ProtocolAmendmentBean;
+import org.kuali.kra.irb.actions.grantexemption.ProtocolGrantExemptionBean;
 import org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewService;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.irb.actions.correction.AdminCorrectionBean;
@@ -31,6 +32,7 @@ import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewBase;
 import org.kuali.rice.kew.actiontaken.ActionTakenValue;
 import org.kuali.rice.kew.actiontaken.service.ActionTakenService;
 import org.kuali.rice.kew.api.KewApiConstants;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 import edu.arizona.kra.irb.CustomProtocolForm;
 import edu.arizona.kra.irb.actions.amendrenew.CustomProtocolAmendmentBean;
@@ -82,7 +84,15 @@ public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
 				approvalDate = new Date(System.currentTimeMillis());
 			}
 		}
-
+		
+		// This isn't being set by anything after the re-factor from 3.1.1 to 5.2.1
+		ProtocolGrantExemptionBean grantExemptionBean = super.getProtocolGrantExemptionBean();
+		if(ObjectUtils.isNotNull(grantExemptionBean)){
+			// Must do null check, as this method is called by ActionHelperBase#buildProtocolApproveBean()
+			// *before* this class has completely intitialized, we only want to set on subsequent calls
+			grantExemptionBean.setApprovalDate(approvalDate);
+		}
+		
 		return approvalDate;
     }
     
