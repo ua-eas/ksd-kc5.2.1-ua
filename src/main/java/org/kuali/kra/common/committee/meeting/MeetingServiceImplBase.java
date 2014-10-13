@@ -142,8 +142,7 @@ public abstract class MeetingServiceImplBase<CS extends CommitteeScheduleBase<CS
         if (!deletedBos.isEmpty()) {
             businessObjectService.delete(deletedBos);
         }
-        
-        refreshAndSaveSchedule(committeeSchedule);
+        businessObjectService.save(committeeSchedule);
         
         // display "successfully saved" message
         KNSGlobalVariables.getMessageList().add(RiceKeyConstants.MESSAGE_SAVED);
@@ -831,26 +830,6 @@ public abstract class MeetingServiceImplBase<CS extends CommitteeScheduleBase<CS
             }
         }
         return isPresent;
-    }
-
-    // this method will refresh the set of protocol submissions and review comments before saving because 
-    // they could have been changed asynchronously in a different concurrent user session.
-    private void refreshAndSaveSchedule(CS committeeSchedule) {
-        // Since a refresh will wipe out all the newly added (unsaved) minutes from the schedule, we will
-        // collect all newly added minutes in a separate collection and add them back after the refresh        
-        List<CSM> preRefreshMinutes = committeeSchedule.getCommitteeScheduleMinutes();
-        List<CSM> newlyAddedMinutes = new ArrayList<CSM>();  
-        for(CSM minute:preRefreshMinutes) {
-            if(null == minute.getCommScheduleMinutesId()) {
-                newlyAddedMinutes.add(minute);
-            }
-        }
-        committeeSchedule.refreshReferenceObject(COMMITTEE_SCHEDULE_MINUTES_REF_ID);
-        List<CSM> postRefreshMinutes = committeeSchedule.getCommitteeScheduleMinutes();
-        postRefreshMinutes.addAll(newlyAddedMinutes);
-        committeeSchedule.refreshReferenceObject(PROTOCOL_SUBMISSIONS_REF_ID);
-        
-        businessObjectService.save(committeeSchedule);
     }
 
 
