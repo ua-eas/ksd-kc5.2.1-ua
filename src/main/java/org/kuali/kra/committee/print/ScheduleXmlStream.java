@@ -59,12 +59,14 @@ import java.text.ParseException;
 import java.util.*;
 
 public class ScheduleXmlStream extends PrintBaseXmlStream {
+
     protected CommitteeMembershipService committeeMembershipService;
     protected KcPersonService kcPersonService;
     protected IrbPrintXmlUtilService irbPrintXmlUtilService;
     protected final String EXPEDIT_ACTION_TYPE_CODE = "205";
     protected final String EXEMPT_ACTION_TYPE_CODE = "206";
     protected final String FOLLOW_UP_ACTION_CODE = "109";
+
 
     public Map<String, XmlObject> generateXmlStream(KraPersistableBusinessObjectBase printableBusinessObject, Map<String, Object> reportParameters) {        
         CommitteeSchedule committeeSchedule = (CommitteeSchedule)printableBusinessObject;
@@ -79,7 +81,9 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
     }
 
 
+
     protected CommitteeSchedule findCommitteeSchedule(Committee committee, String scheduleId) {
+
         List<CommitteeSchedule> committeeSchedules = committee.getCommitteeSchedules();
         for (CommitteeSchedule committeeSchedule : committeeSchedules) {
             if(committeeSchedule.getScheduleId().equals(scheduleId)){
@@ -100,7 +104,9 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         getIrbPrintXmlUtilService().setMinutes(committeeSchedule, schedule);
         setAttendance(committeeSchedule, schedule);
         committeeSchedule.refreshReferenceObject("protocolSubmissions");
-        List<org.kuali.kra.irb.actions.submit.ProtocolSubmission> submissions = committeeSchedule.getLatestProtocolSubmissions();
+
+        List<org.kuali.kra.irb.actions.submit.ProtocolSubmission> submissions = committeeSchedule.getProtocolSubmissions();
+
         for (org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission : submissions) {
         	
             ProtocolSubmission protocolSubmissionType = schedule.addNewProtocolSubmission();            
@@ -279,6 +285,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         }
     }
 
+
     protected void setOtherActionItems(CommitteeSchedule committeeSchedule, Schedule schedule) {
         List<CommScheduleActItemBase> otherActions = committeeSchedule.getCommScheduleActItems();
         for (CommScheduleActItemBase otherActionInfoBean : otherActions) {
@@ -292,6 +299,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
             }
         }
     }
+
 
     protected String getFundingSourceNameForType(int sourceType, String sourceCode) {
         String name = null;
@@ -324,6 +332,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
             protocolReviewerType.setReviewerTypeCode(new BigInteger(String.valueOf(protocolReviewer.getReviewerTypeCode())));
         }
     }
+
 
     protected void setPerson(ProtocolReviewer protocolReviewer,
             edu.mit.irb.irbnamespace.ProtocolReviewerDocument.ProtocolReviewer protocolReviewerType) {
@@ -373,6 +382,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
     }
 
 
+
     protected ProtocolAction findProtocolActionForSubmission(org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission) {
         List<ProtocolActionBase> protocolActions = protocolSubmission.getProtocol().getProtocolActions();
         for (ProtocolActionBase protocolAction : protocolActions) {
@@ -382,6 +392,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         }
         return null;
     }
+
 
     protected void setAttendance(CommitteeSchedule committeeSchedule, Schedule schedule) {
         List<CommitteeScheduleAttendanceBase> attendenceList = committeeSchedule.getCommitteeScheduleAttendances();
