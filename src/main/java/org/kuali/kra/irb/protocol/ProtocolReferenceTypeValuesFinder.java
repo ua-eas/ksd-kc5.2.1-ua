@@ -44,7 +44,7 @@ public class ProtocolReferenceTypeValuesFinder extends ProtocolReferenceTypeValu
 	public List<KeyValue> getKeyValues() {
 		KeyValuesService keyValuesService = (KeyValuesService) KraServiceLocator.getService( "keyValuesService" );
 		Collection protocolReferenceTypes = keyValuesService.findAllOrderBy( ProtocolReferenceType.class,
-				"protocolReferenceTypeCode", true );
+				"description", true );
 		List<KeyValue> keyValues = new ArrayList<KeyValue>();
 		keyValues.add( 0, new ConcreteKeyValue( PrefixValuesFinder.getPrefixKey(), PrefixValuesFinder.getDefaultPrefixValue() ) );
 		for ( Iterator iter = protocolReferenceTypes.iterator() ; iter.hasNext() ; ) {

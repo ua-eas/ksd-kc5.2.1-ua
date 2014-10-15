@@ -29,7 +29,8 @@ public class FundingSourceTypeValuesFinder extends UifKeyValuesFinderBase {
 	public List<KeyValue> getKeyValues() {
 		List<KeyValue> keyValues = new ArrayList<KeyValue>();
 		Collection<FundingSourceType> fundingSourceTypes = (Collection<FundingSourceType>) KraServiceLocator
-				.getService( BusinessObjectService.class ).findAll( FundingSourceType.class );
+				.getService( BusinessObjectService.class ).findAllOrderBy( FundingSourceType.class,
+						"description", true );
 		for ( FundingSourceType fundingSourceType : fundingSourceTypes ) {
 			if ( fundingSourceType.getFundingSourceTypeFlag() ) {
 				keyValues.add( new ConcreteKeyValue( fundingSourceType.getFundingSourceTypeCode(), fundingSourceType.getDescription() ) );
