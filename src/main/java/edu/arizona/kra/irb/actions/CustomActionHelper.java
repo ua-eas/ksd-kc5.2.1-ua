@@ -30,6 +30,9 @@ import edu.arizona.kra.irb.actions.amendrenew.CustomProtocolAmendmentBean;
 public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
 	private static final long serialVersionUID = -4934851153861075291L;
 
+	private static final String PROTOCOL_ACTIONS_REF_OBJECT_NAME = "protocolActions"; 
+	
+	
 	/**
      * Constructs an ActionHelper.
      * @param form the protocol form
@@ -37,6 +40,7 @@ public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
      */
     public CustomActionHelper(CustomProtocolForm form) throws Exception {
         super(form);
+        getProtocol().refreshReferenceObject(PROTOCOL_ACTIONS_REF_OBJECT_NAME);
     }
 
     @Override
