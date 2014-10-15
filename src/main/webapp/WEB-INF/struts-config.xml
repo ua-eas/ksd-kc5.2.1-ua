@@ -29,6 +29,7 @@
 		<form-bean name="UnitHierarchyForm" type="org.kuali.kra.web.struts.form.UnitHierarchyForm" />
 		<form-bean name="SponsorHierarchyForm" type="org.kuali.kra.web.struts.form.SponsorHierarchyForm" />
 		<form-bean name="ProtocolForm" type="edu.arizona.kra.irb.CustomProtocolForm" />
+		<form-bean name="ProtocolForm" type="org.kuali.kra.irb.ProtocolForm" />
 		<form-bean name="ResearchAreasForm" type="org.kuali.kra.irb.ResearchAreasForm" />
 		<form-bean name="CommitteeForm" type="org.kuali.kra.committee.web.struts.form.CommitteeForm" />
 		<form-bean name="IacucCommitteeForm" type="org.kuali.kra.iacuc.committee.web.struts.form.IacucCommitteeForm" />
@@ -62,6 +63,7 @@
         <form-bean name="IacucProtocolCorrespondenceTemplateForm" type="org.kuali.kra.iacuc.correspondence.IacucProtocolCorrespondenceTemplateForm" />
 		<form-bean name="IacucResearchAreasForm" type="org.kuali.kra.iacuc.IacucResearchAreasForm" />
 		<form-bean name="IsrSsrReportGenerationForm" type="org.kuali.kra.subawardReporting.web.struts.form.IsrSsrReportGenerationForm" />
+		<form-bean name="AssociateWorkflowForm" type="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowForm"/>
     </form-beans>
 
 <!-- Rice content Start -->
@@ -398,10 +400,11 @@
 		&protocol_forwards;
       </action>
       
-      <action path="/protocolProtocolActions" name="ProtocolForm" input="/WEB-INF/jsp/irb/ProtocolProtocolActions.jsp" type="org.kuali.kra.irb.actions.ProtocolProtocolActionsAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+      <action path="/protocolProtocolActions" name="ProtocolForm" input="/WEB-INF/jsp/irb/ProtocolProtocolActions.jsp" type="edu.arizona.kra.irb.actions.CustomProtocolProtocolActionsAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
         <forward name="basic" path="/WEB-INF/jsp/irb/ProtocolProtocolActions.jsp" />
 	    &protocol_forwards;
         <forward name="correspondence" path="/WEB-INF/jsp/irb/ProtocolCorrespondenceAction.jsp" />
+        <forward name="protocolActionsHistorySummaryAjax" path="/WEB-INF/jsp/irb/ProtocolActionsHistorySummaryAjax.jsp" />
       </action>
       
       <action path="/protocolOnlineReview" name="ProtocolForm" input="/WEB-INF/jsp/irb/ProtocolOnlineReview.jsp" type="org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
@@ -423,6 +426,11 @@
       
       <action path="/protocolProtocol" name="ProtocolForm" input="/WEB-INF/jsp/irb/ProtocolProtocol.jsp" type="org.kuali.kra.irb.protocol.ProtocolProtocolAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
         <forward name="basic" path="/WEB-INF/jsp/irb/ProtocolProtocol.jsp" />
+	    &protocol_forwards;
+      </action>
+      
+      <action path="/associateWorkflow" name="AssociateWorkflowForm" input="/WEB-INF/jsp/irb/associateWorkflow.jsp" type="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+        <forward name="basic" path="/WEB-INF/jsp/irb/associateWorkflow.jsp" />
 	    &protocol_forwards;
       </action>
       

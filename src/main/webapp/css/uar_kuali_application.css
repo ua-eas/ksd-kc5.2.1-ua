@@ -267,3 +267,11 @@ form[name="ActionListForm"] {
 	font-size: .9em;
 }
 
+/* Hide the Person Lookup Magnafying glass on the Associate Workflow
+ * lookup page. This selects the first element after the 
+ * associateUser.principalName text input element
+ */
+#lookup-criteria input#associateUser\.principalName + input {
+    display: none;
+}
+
