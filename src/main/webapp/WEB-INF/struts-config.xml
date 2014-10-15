@@ -29,7 +29,6 @@
 		<form-bean name="UnitHierarchyForm" type="org.kuali.kra.web.struts.form.UnitHierarchyForm" />
 		<form-bean name="SponsorHierarchyForm" type="org.kuali.kra.web.struts.form.SponsorHierarchyForm" />
 		<form-bean name="ProtocolForm" type="edu.arizona.kra.irb.CustomProtocolForm" />
-		<form-bean name="ProtocolForm" type="org.kuali.kra.irb.ProtocolForm" />
 		<form-bean name="ResearchAreasForm" type="org.kuali.kra.irb.ResearchAreasForm" />
 		<form-bean name="CommitteeForm" type="org.kuali.kra.committee.web.struts.form.CommitteeForm" />
 		<form-bean name="IacucCommitteeForm" type="org.kuali.kra.iacuc.committee.web.struts.form.IacucCommitteeForm" />
