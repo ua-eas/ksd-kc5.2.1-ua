@@ -1258,10 +1258,12 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
             attachment.setSequenceNumber(this.getSequenceNumber());
             attachment.setProtocolId(this.getProtocolId());
             attachment.setId(null);
-            //right here!!!! Why is this set to NULL?!?!!
+            //Commenting out setting FileId to null for attachments because this will result in duplicating the attachment file in the database.
+            //Not sure WHY this was set to NULL?!?!! Not removing the code for now just in case we get future unexpected secondary effects as a result of
+            //not duplicating attachment files.
             //*********************************************
-           // if (attachment.getFile() != null ) { 
-           //     attachment.getFile().setId(null);
+            //if (attachment.getFile() != null ) { 
+            //    attachment.getFile().setId(null);
             //}
             //*********************************************
             if (attachment.isDraft()) {
