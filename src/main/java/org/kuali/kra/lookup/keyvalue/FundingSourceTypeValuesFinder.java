@@ -24,12 +24,17 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.uif.control.UifKeyValuesFinderBase;
 
 public class FundingSourceTypeValuesFinder extends UifKeyValuesFinderBase {
+	/**
+	 * Comment for <code>serialVersionUID</code>
+	 */
+	private static final long serialVersionUID = 2887646485972440099L;
 
 	@Override
 	public List<KeyValue> getKeyValues() {
 		List<KeyValue> keyValues = new ArrayList<KeyValue>();
 		Collection<FundingSourceType> fundingSourceTypes = (Collection<FundingSourceType>) KraServiceLocator
-				.getService( BusinessObjectService.class ).findAll( FundingSourceType.class );
+				.getService( BusinessObjectService.class ).findAllOrderBy( FundingSourceType.class,
+						"description", true );
 		for ( FundingSourceType fundingSourceType : fundingSourceTypes ) {
 			if ( fundingSourceType.getFundingSourceTypeFlag() ) {
 				keyValues.add( new ConcreteKeyValue( fundingSourceType.getFundingSourceTypeCode(), fundingSourceType.getDescription() ) );

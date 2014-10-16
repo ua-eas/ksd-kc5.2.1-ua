@@ -39,11 +39,12 @@ public abstract class ProtocolReferenceTypeValuesFinderBase extends UifKeyValues
 	 * @return the list of &lt;key, value&gt; pairs of abstract types. The first entry is always &lt;"", "select:"&gt;.
 	 * @see org.kuali.rice.krad.keyvalues.KeyValuesFinder#getKeyValues()
 	 */
+	@SuppressWarnings( "rawtypes" )
 	@Override
 	public List<KeyValue> getKeyValues() {
 		KeyValuesService keyValuesService = (KeyValuesService) KraServiceLocator.getService( "keyValuesService" );
 		Collection protocolReferenceTypes = keyValuesService.findAllOrderBy( getProtocolReferenceTypeBOClassHook(),
-				"protocolReferenceTypeCode", true );
+				"description", true );
 		List<KeyValue> keyValues = new ArrayList<KeyValue>();
 		keyValues.add( 0, new ConcreteKeyValue( PrefixValuesFinder.getPrefixKey(), PrefixValuesFinder.getDefaultPrefixValue() ) );
 		for ( Iterator iter = protocolReferenceTypes.iterator() ; iter.hasNext() ; ) {
