@@ -26,6 +26,7 @@
 <%@ attribute name="tabAuditKey" required="false" %>
 <%@ attribute name="useCurrentTabIndexAsKey" required="false" %>
 <%@ attribute name="overrideToggleTabMethodString" required="false" %>
+<%@ attribute name="id" required="false" %>
 <%-- Add 'overrideDivClass', so if this is an inner tab in an innertab.  The child
      innertab can change the inner div properties, such as background color etc.
      ie, the parent and children inner tabs are not exactly the same look. --%>
@@ -33,6 +34,16 @@
 
 <c:set var="currentTabIndex" value="${KualiForm.currentTabIndex}" scope="request"/>
 <c:set var="topLevelTabIndex" value="${KualiForm.currentTabIndex}" scope="request"/>
+
+<!-- Used by protocolAttachmentProtocol.tag and ProtocolNoteAttachment.jsp javascript to sort by id -->
+<c:choose>
+    <c:when test="${empty id} }">
+        <c:set var="completeIdAttribute" value="" scope="request"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="completeIdAttribute" value="id=\"${id}\"" scope="request"/>
+    </c:otherwise>
+</c:choose>
 
 <c:choose>
     <c:when test="${(useCurrentTabIndexAsKey)}">
@@ -81,7 +92,7 @@
 	                 <html:image  property="methodToCall.toggleTab${overrideToggleTabMethodString}.tab${tabKey}" src="${ConfigProperties.kr.externalizable.images.url}tinybutton-show.gif" title="open ${tabTitle}" alt="open ${tabTitle}" styleClass="tinybutton" styleId="tab-${tabKey}-imageToggle" onclick="javascript: return toggleTab${overrideToggleTabMethodString}(document, '${tabKey}'); " align="absmiddle"/>&nbsp;
 	               </c:if>
 	               </c:if>
-	               ${tabTitle} <div style="float: right; margin-right:5px;"> ${tabTitleRightAligned}</div>
+	               ${tabTitle} <div style="float: right; margin-right:5px;" ${completeIdAttribute}> ${tabTitleRightAligned}</div>
 	              </div>
 	              
 
