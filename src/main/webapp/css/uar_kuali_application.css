@@ -280,3 +280,6 @@ form[name="ActionListForm"] {
     display: none;
 }
 
+tr th.grid {
+	vertical-align: middle;
+}
