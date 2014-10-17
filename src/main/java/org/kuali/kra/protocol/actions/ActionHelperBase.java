@@ -112,6 +112,8 @@ public abstract class ActionHelperBase implements Serializable {
 
     private static final String DEFAULT_TAB = "Versions";
     private static final String ALTERNATE_OPEN_TAB = "Parameters";
+
+    private static final String PROTOCOL_ACTIONS_REF_OBJECT_NAME = "protocolActions";
     
     /**
      * Each Helper must contain a reference to its document form
@@ -325,7 +327,7 @@ public abstract class ActionHelperBase implements Serializable {
     protected ProtocolSubmissionQuestionnaireHelper protocolSubmissionQuestionnaireHelper;
     
     private List<AmendmentSummary> amendmentSummaries;
-    
+  
     
     /**
      * Constructs an ActionHelperBase.
@@ -371,7 +373,11 @@ public abstract class ActionHelperBase implements Serializable {
 
         protocolManageReviewCommentsBean = buildProtocolGenericActionBean(getProtocolActionTypeCodeForManageReviewCommentsHook(), 
                 Constants.PROTOCOL_MANAGE_REVIEW_COMMENTS_KEY);
-        getProtocol().getProtocolSubmission().refreshReferenceObject("reviewAttachments");
+
+        ProtocolBase protocol = getProtocol();
+        protocol.getProtocolSubmission().refreshReferenceObject("reviewAttachments");
+        protocol.refreshReferenceObject(PROTOCOL_ACTIONS_REF_OBJECT_NAME);
+
         protocolManageReviewCommentsBean.getReviewAttachmentsBean().setReviewAttachments(getProtocol().getProtocolSubmission().getReviewAttachments());
         if (CollectionUtils.isNotEmpty(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments())) {
             protocolManageReviewCommentsBean.getReviewAttachmentsBean().setHideReviewerName(getReviewerCommentsService().setHideReviewerName(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments()));
@@ -2622,6 +2628,7 @@ public abstract class ActionHelperBase implements Serializable {
 
     public void setToAnswerSubmissionQuestionnaire(boolean toAnswerSubmissionQuestionnaire) {
         this.toAnswerSubmissionQuestionnaire = toAnswerSubmissionQuestionnaire;
+
     }
 
 
@@ -2734,9 +2741,11 @@ public abstract class ActionHelperBase implements Serializable {
         
         public AmendmentSummary(ProtocolBase protocol) {
             amendmentType = protocol.isRenewalWithoutAmendment() ? "Renewal" : protocol.isRenewal() ? "Renewal with Amendment" : protocol.isAmendment() ? "Amendment" : "New";
+
             //Why even set these here. They will be set blow in the if/else block.
             //versionNumber = protocol.getProtocolNumber().substring(protocol.getProtocolNumber().length() - 3);
             //versionNumberUrl = buildForwardUrl(protocol.getProtocolDocument().getDocumentNumber());
+
             if (protocol.isAmendment() || protocol.isRenewal()) {
                 ProtocolAmendRenewalBase correctAmendment = protocol.getProtocolAmendRenewal();
                 if (correctAmendment != null) {
@@ -2787,6 +2796,7 @@ public abstract class ActionHelperBase implements Serializable {
             }
             return amendmentSummaries;
     	}
+
     }
 
     protected String buildForwardUrl(String routeHeaderId) {
