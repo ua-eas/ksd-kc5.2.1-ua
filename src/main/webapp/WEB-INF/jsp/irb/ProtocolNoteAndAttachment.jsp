@@ -86,7 +86,14 @@
     	return $j.trim(attachmentType);
     }
     
+    // This function extracts the Amendment/Renewal number type from the div within the current row.
+    function getAmendRenewNum(index) {
+    	var attachmentType = $j("#amend-renew-num-" +index).html();
+        return $j.trim(attachmentType);
+    }
+    
     //Sorts the table via the four possible criterias:
+    //"ARNO", "Amend/Renewal Number"
     //"ATTP", "Attachment Type"
     //"DESC", "Description"
     //"LAUP", "Last Updated"
@@ -94,8 +101,9 @@
     //
     //Also handles the "None" case...
     function sortTableByCriteria(data) {
-
-    	if (data.value == "ATTP") {
+        if(data.value == "ARNO"){
+        	sortByAmendRenewNum()
+        } else if (data.value == "ATTP") {
     		sortByAttachmentType();
     	} else if (data.value == "DESC") {
     		sortByDescription();
@@ -106,6 +114,21 @@
     	} else {
     		//do nothing?
     	}
+    }
+    
+    function sortByAmendRenewNum() {
+    	var rowList = new Array();
+        var sortingList = new Array();
+        $j("#protocol-attachment-table tr.fake-class-level-1").each(function(idx) {
+            var rowId = $j(this).attr("id");
+            var index = (rowId.split("-"))[3];
+            var rowAmendRenewNum = getAmendRenewNum(index);
+            rowList[index] = rowId;
+            sortingList[index] = rowAmendRenewNum;            
+        });
+                
+        sortLists(rowList, sortingList);        
+        sortTableRows(rowList, sortingList);
     }
     
     function sortByAttachmentType() {
