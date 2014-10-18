@@ -114,6 +114,7 @@ public abstract class ActionHelperBase implements Serializable {
     private static final String ALTERNATE_OPEN_TAB = "Parameters";
 
     private static final String PROTOCOL_ACTIONS_REF_OBJECT_NAME = "protocolActions";
+    private static final String PROTOCOL_SUBMISSIONS_ATTR = "protocolSubmissions";
     
     /**
      * Each Helper must contain a reference to its document form
@@ -375,6 +376,7 @@ public abstract class ActionHelperBase implements Serializable {
                 Constants.PROTOCOL_MANAGE_REVIEW_COMMENTS_KEY);
 
         ProtocolBase protocol = getProtocol();
+ 	protocol.refreshReferenceObject(PROTOCOL_SUBMISSIONS_ATTR);
         protocol.getProtocolSubmission().refreshReferenceObject("reviewAttachments");
         protocol.refreshReferenceObject(PROTOCOL_ACTIONS_REF_OBJECT_NAME);
 
