@@ -40,7 +40,7 @@
   	headerDispatch="${KualiForm.headerDispatch}"
   	headerTabActive="keyPersonnel">
   	
-  	<div id="workarea">
+  	
   	<style>
   		#addPersonDiv table {
   			border-right: 0;
@@ -63,7 +63,7 @@
 <c:set var="viewOnly" value="${not KualiForm.editingMode['modifyProposal']}" />
 <kra:section permission="modifyProposal">
 <c:if test="${not isHierarchyParent}">
-	<div id="addPersonDiv">
+	<div id="addPersonDiv" class="gradient-top">
     <kra:uncollapsable tabTitle="Add Key Person" tabErrorKey="newProposalPerson*" auditCluster="keyPersonnelAuditErrors" tabAuditKey="newProposalPerson*" styleClass="addline">
           <div align="center">
             <table  cellpadding="0" cellspacing="0" class="grid" summary="" style="border-right: 1px solid #999999;">
@@ -148,8 +148,8 @@
             </c:choose>
           </div>
     </kra:uncollapsable>
+    </div>
 </c:if>
-</div>
 </kra:section>
 
     <br/>
@@ -231,5 +231,4 @@ var kualiElements = kualiForm.elements;
 		
 	-->
 </script>
-</div>
 </kul:documentPage>

@@ -32,20 +32,22 @@
   	
   	<div align="right"><kul:help documentTypeName="BudgetDocument" pageName="Modular Budget" /></div>
 	
-	<kra:uncollapsable tabTitle="Select Modular Budget Period">
-  		<div align="center">
-			<label for="modularSelectedPeriod">Budget Period:
-	  			<html:select property="modularSelectedPeriod">
-    				<html:option value="0">View All</html:option>
-    				<c:forEach var="budgetPeriod" items="${KualiForm.document.budget.budgetPeriods}" varStatus="status">
-	      				<html:option value="${budgetPeriod.budgetPeriod}">${budgetPeriod.budgetPeriod}: ${budgetPeriod.dateRange}</html:option>
-    				</c:forEach>
-  				</html:select>
-			</label>
-          	<br/><br/>
-          	<span><html:image property="methodToCall.updateView" src='${ConfigProperties.kra.externalizable.images.url}tinybutton-updateview.gif' styleClass="tinybutton"/></span>
-        </div>
-	</kra:uncollapsable>
+	<div id="BudgetSelectModularBudget" class="gradient-top">
+		<kra:uncollapsable tabTitle="Select Modular Budget Period">
+	  		<div align="center">
+				<label for="modularSelectedPeriod">Budget Period:
+		  			<html:select property="modularSelectedPeriod">
+	    				<html:option value="0">View All</html:option>
+	    				<c:forEach var="budgetPeriod" items="${KualiForm.document.budget.budgetPeriods}" varStatus="status">
+		      				<html:option value="${budgetPeriod.budgetPeriod}">${budgetPeriod.budgetPeriod}: ${budgetPeriod.dateRange}</html:option>
+	    				</c:forEach>
+	  				</html:select>
+				</label>
+	          	<br/><br/>
+	          	<span><html:image property="methodToCall.updateView" src='${ConfigProperties.kra.externalizable.images.url}tinybutton-updateview.gif' styleClass="tinybutton"/></span>
+	        </div>
+		</kra:uncollapsable>
+	</div>
 	<br/>
 	
 	<kra-b:budgetModular periodNum="${KualiForm.modularSelectedPeriod}"/>
