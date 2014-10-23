@@ -80,5 +80,15 @@
         </property>
     </bean> 
  	 
+    <bean id="protocolCopyService" class="edu.arizona.kra.irb.actions.copy.CustomProtocolCopyServiceImpl">
+        <property name="documentService" ref="documentService" />
+        <property name="systemAuthorizationService" ref="systemAuthorizationService" />
+        <property name="kraAuthorizationService" ref="kraAuthorizationService" />
+        <property name="protocolNumberService" ref="protocolNumberService" />
+        <property name="sequenceAccessorService">
+            <ref bean="sequenceAccessorService" />
+        </property>
+    </bean>
+    
 </beans>
 
