@@ -36,7 +36,7 @@
       <c:set var="transparent" value="true" />
     </c:if>
 
-    <c:set var="questReadOnly" value="${!bean.answerQuestionnaire || readOnly}"/>
+    <c:set var="questReadOnly" value="${readOnly}"/>
     	<c:if test="${not bean.answerHeaders[answerHeaderIndex].activeQuestionnaire}">
             <c:set var="inactivate" value="- This Questionnaire has been deactivated." />
             <c:set var="questReadOnly" value="true"/>

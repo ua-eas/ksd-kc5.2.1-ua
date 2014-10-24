@@ -22,7 +22,7 @@
 <%@ attribute name="printLineIndex" required="true" %>
 <%@ attribute name="answerable" required="false" %>
 
-	    <c:if test="${bean.answerHeaders[answerHeaderIndex].newerVersionPublished and not readOnly}">
+	    <c:if test="${bean.answerHeaders[answerHeaderIndex].newerVersionPublished and not questReadOnly}">
             <kra-questionnaire:updateQuestionnaireAnswer  answerHeaderIndex="${answerHeaderIndex}" bean = "${bean}" property = "${property}"/>        
         </c:if>
 	
@@ -61,19 +61,22 @@
             <input type="hidden" name="ruleReferenced" id ="ruleReferenced" value = "${bean.ruleReferenced}" />
         
             <c:set var="questionid" value="" />
+            <c:set var="addFooter" value="false"/>
             <c:forEach items="${bean.answerHeaders[answerHeaderIndex].answers}" var="answer" varStatus="status">   
 
                 <c:if test="${questionid ne answer.questionNumber}" >
                 <%-- This 'if' block displays tab header for each question. if question has multiple answers
                      This is only displayed once when the 1st answer of this question is displayed --%>
-                    <c:if test="${!empty questionid}" >
+                    <c:if test="${addFooter}" >
                     <%-- close tags for each question --%>
                                     </div>
                                 </td>
                             </tr>
                         </table>
+                        <c:set var="addFooter" value="false"/>
                     </c:if>
             
+            		<c:set var="addFooter" value="true"/>
                     <c:set var="questionid" value="${answer.questionNumber}" />
                    	<c:set var="displayCondition" value="({ 'conditionFlag' : '${answer.questionnaireQuestion.conditionFlag}', 'condition': '${answer.questionnaireQuestion.condition}', 'conditionValue' : '${answer.questionnaireQuestion.conditionValue}'})"/>
                     <c:set var="ruleId" value="${answer.questionnaireQuestion.ruleId}"/>
@@ -97,7 +100,7 @@
 				
                 <c:choose>
                     <%-- decide whether it is readonly mode --%>
-                    <c:when test = "${readOnly and not answerable}" >
+                    <c:when test = "${questReadOnly}" >
                        <c:choose>
                             <c:when test = "${answer.question.questionTypeId == 1 or answer.question.questionTypeId == 2}" >
                                 <c:choose>
@@ -138,6 +141,7 @@
             <c:set var="questionid" value="${answer.questionNumber}" />
 
            <%-- following 4 tags is to close the last question's display tag --%>
+             <c:if test="${addFooter}">
                                 </div>
                             </td>
                         </tr>
@@ -153,6 +157,6 @@
                         </tr>
                         </c:if>
                     </table>
-
+			</c:if>
 
         </div>
