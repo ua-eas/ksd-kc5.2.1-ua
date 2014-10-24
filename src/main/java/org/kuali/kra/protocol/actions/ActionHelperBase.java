@@ -112,6 +112,7 @@ public abstract class ActionHelperBase implements Serializable {
 
     private static final String DEFAULT_TAB = "Versions";
     private static final String ALTERNATE_OPEN_TAB = "Parameters";
+    private static final String PROTOCOL_ACTIONS_REF_OBJECT_NAME = "protocolActions";
     
     /**
      * Each Helper must contain a reference to its document form
@@ -371,7 +372,11 @@ public abstract class ActionHelperBase implements Serializable {
 
         protocolManageReviewCommentsBean = buildProtocolGenericActionBean(getProtocolActionTypeCodeForManageReviewCommentsHook(), 
                 Constants.PROTOCOL_MANAGE_REVIEW_COMMENTS_KEY);
-        getProtocol().getProtocolSubmission().refreshReferenceObject("reviewAttachments");
+
+        ProtocolBase protocol = getProtocol();
+        protocol.getProtocolSubmission().refreshReferenceObject("reviewAttachments");
+        protocol.refreshReferenceObject(PROTOCOL_ACTIONS_REF_OBJECT_NAME);
+
         protocolManageReviewCommentsBean.getReviewAttachmentsBean().setReviewAttachments(getProtocol().getProtocolSubmission().getReviewAttachments());
         if (CollectionUtils.isNotEmpty(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments())) {
             protocolManageReviewCommentsBean.getReviewAttachmentsBean().setHideReviewerName(getReviewerCommentsService().setHideReviewerName(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments()));

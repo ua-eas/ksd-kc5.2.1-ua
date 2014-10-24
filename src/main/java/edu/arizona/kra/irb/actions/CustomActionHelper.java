@@ -32,6 +32,8 @@ import edu.arizona.kra.irb.actions.correction.CustomAdminCorrectionBean;
 public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
 	private static final long serialVersionUID = -4934851153861075291L;
 
+	
+	
 	/**
      * Constructs an ActionHelper.
      * @param form the protocol form
