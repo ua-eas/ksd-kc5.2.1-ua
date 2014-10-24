@@ -17,10 +17,12 @@ package edu.arizona.kra.irb.actions;
 
 import org.kuali.kra.irb.actions.ActionHelper;
 import org.kuali.kra.irb.actions.amendrenew.ProtocolAmendmentBean;
+import org.kuali.kra.irb.actions.correction.AdminCorrectionBean;
 import org.kuali.kra.protocol.actions.ActionHelperBase;
 
 import edu.arizona.kra.irb.CustomProtocolForm;
 import edu.arizona.kra.irb.actions.amendrenew.CustomProtocolAmendmentBean;
+import edu.arizona.kra.irb.actions.correction.CustomAdminCorrectionBean;
 
 // import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
 
@@ -30,6 +32,8 @@ import edu.arizona.kra.irb.actions.amendrenew.CustomProtocolAmendmentBean;
 public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
 	private static final long serialVersionUID = -4934851153861075291L;
 
+	
+	
 	/**
      * Constructs an ActionHelper.
      * @param form the protocol form
@@ -42,6 +46,11 @@ public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
     @Override
     protected ProtocolAmendmentBean getNewProtocolAmendmentBeanInstanceHook(ActionHelperBase actionHelper) {
         return new CustomProtocolAmendmentBean((ActionHelper) actionHelper);
+    }
+    
+    @Override
+    protected AdminCorrectionBean getNewAdminCorrectionBeanInstanceHook(ActionHelperBase actionHelper) {
+        return new CustomAdminCorrectionBean((ActionHelper) actionHelper);
     }
 
 }
