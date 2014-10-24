@@ -59,7 +59,7 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.selectedHistoryItem")}
 	                <th>Update Time</th>
  	              <%--  <th>Questionnaire</th> --%>
                 </tr>
-                <c:forEach items="${KualiForm.document.protocol.protocolActions}" var="protocolAction" varStatus="status">
+                <c:forEach items="${KualiForm.document.protocol.protocolActionsSortedByActionId}" var="protocolAction" varStatus="status">
                     <c:if test="${protocolAction.isInFilterView}">
 	            		<tr>
 	            		    <td class="infoline" style="text-align:center;">

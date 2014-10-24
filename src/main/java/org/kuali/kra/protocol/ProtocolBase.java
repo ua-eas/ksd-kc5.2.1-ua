@@ -2106,4 +2106,21 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase
 		}
 	}
 
+	public List<ProtocolActionBase> getProtocolActionsSortedByActionId() {
+		List<ProtocolActionBase> sortedActions = new ArrayList<ProtocolActionBase>();
+
+		for (ProtocolActionBase action : getProtocolActions()) {
+			sortedActions.add(action);
+		}
+
+		Collections.sort(sortedActions, new Comparator<ProtocolActionBase>() {
+			public int compare(ProtocolActionBase action1,
+					ProtocolActionBase action2) {
+				return action2.getActionId().compareTo(action1.getActionId());
+			}
+		});
+
+		return sortedActions;
+	}
+
 }
