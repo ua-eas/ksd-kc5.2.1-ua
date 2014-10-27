@@ -112,7 +112,6 @@ public abstract class ActionHelperBase implements Serializable {
 
     private static final String DEFAULT_TAB = "Versions";
     private static final String ALTERNATE_OPEN_TAB = "Parameters";
-
     private static final String PROTOCOL_ACTIONS_REF_OBJECT_NAME = "protocolActions";
     private static final String PROTOCOL_SUBMISSIONS_ATTR = "protocolSubmissions";
     
@@ -328,7 +327,8 @@ public abstract class ActionHelperBase implements Serializable {
     protected ProtocolSubmissionQuestionnaireHelper protocolSubmissionQuestionnaireHelper;
     
     private List<AmendmentSummary> amendmentSummaries;
-  
+
+
     
     /**
      * Constructs an ActionHelperBase.
@@ -2747,7 +2747,6 @@ public abstract class ActionHelperBase implements Serializable {
             //Why even set these here. They will be set blow in the if/else block.
             //versionNumber = protocol.getProtocolNumber().substring(protocol.getProtocolNumber().length() - 3);
             //versionNumberUrl = buildForwardUrl(protocol.getProtocolDocument().getDocumentNumber());
-
             if (protocol.isAmendment() || protocol.isRenewal()) {
                 ProtocolAmendRenewalBase correctAmendment = protocol.getProtocolAmendRenewal();
                 if (correctAmendment != null) {
@@ -2798,7 +2797,6 @@ public abstract class ActionHelperBase implements Serializable {
             }
             return amendmentSummaries;
     	}
-
     }
 
     protected String buildForwardUrl(String routeHeaderId) {
