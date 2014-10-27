@@ -1,4 +1,4 @@
-/*
+https://github.com/ua-eas/ksd-kc5.2.1-ua/pull/63/*
  * Copyright 2005-2014 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
@@ -61,7 +61,6 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
 import org.kuali.rice.krms.api.engine.Facts.Builder;
 import edu.arizona.kra.protocol.ProtocolCustomDataService;
-
 
 /**
  * 
@@ -145,8 +144,10 @@ public class ProtocolDocument extends ProtocolDocumentBase {
             currentProtocol.setProtocolDocument((ProtocolDocument)getDocumentService().getByDocumentHeaderId(currentProtocol.getProtocolDocument().getDocumentNumber()));
             currentProtocol.setMergeAmendment(true);
             newProtocolDocument = (ProtocolDocument) getProtocolVersionService().versionProtocolDocument(currentProtocol.getProtocolDocument());
-            // merge Custom Data from the amendment back into the main protocol
-            KraServiceLocator.getService(ProtocolCustomDataService.class).copyCustomDataAttributeValues(this, newProtocolDocument);
+
+        	// merge Custom Data from the amendment back into the main protocol
+        	KraServiceLocator.getService(ProtocolCustomDataService.class).copyCustomDataAttributeValues(this, newProtocolDocument);
+        
         } catch (Exception e) {
             throw new ProtocolMergeException(e);
         }
