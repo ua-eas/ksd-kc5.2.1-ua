@@ -84,7 +84,7 @@
 			                    	<c:choose>
 			                    		<c:when test="${ !isParent && ((currentPerson.proposalPersonRoleId == piRole && aUnit.unitNumber != KualiForm.document.developmentProposalList[0].ownedByUnitNumber && currentPerson.homeUnit != aUnit.unitNumber) || (currentPerson.proposalPersonRoleId != piRole && currentPerson.homeUnit != aUnit.unitNumber))}">
 			                    			<html:image property="methodToCall.deleteUnit.${proposalPerson}.line${status.index}" src="${ConfigProperties.kr.externalizable.images.url}tinybutton-delete1.gif" title="Remove Unit" alt="Remove Unit" styleClass="tinybutton" />
-			                    		</c:when>
+			                    		 </c:when>
 			                    		<c:otherwise>
 			                    			&nbsp;
 			                    		</c:otherwise>
