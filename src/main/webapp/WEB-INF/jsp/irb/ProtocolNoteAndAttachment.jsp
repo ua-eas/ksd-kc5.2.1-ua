@@ -231,87 +231,48 @@
     	
     	var mmddyyyy1 = dateParts1[0].split("/");
     	var mmddyyyy2 = dateParts2[0].split("/");
-    	
-    	if (compareYear(mmddyyyy1[2], mmddyyyy2[2]) > 0) {
-    		return 1;
-    	} else if (compareMonth(mmddyyyy1[0], mmddyyyy2[0]) > 0) {
-    		return 1;
-    	} else if (compareDay(mmddyyyy1[1], mmddyyyy2[1]) > 0) {
-    		return 1;
-    	} else {
-    	    return compareTime(dateParts1[1], dateParts1[2], dateParts2[1], dateParts2[2]);
-    	}
-    		
-    	return 0;
-    }
-    
-    function compareYear(year1, year2) {
-    	if (parseInt(year1) == parseInt(year2)) {
-    		return 0;
-    	} else {
-    		if (parseInt(year1) > parseInt(year2)) {
-    			return 1;
-    		} else {
-    			return -1;
-    		}
-    	}
-    }
-    
-    function compareMonth(month1, month2) {
-        if (parseInt(month1) == parseInt(month2)) {
-            return 0;
-        } else {
-            if (parseInt(month1) > parseInt(month2)) {
-                return 1;
-            } else {
-                return -1;
-            }
+        
+        if (compareNumber(mmddyyyy1[2], mmddyyyy2[2]) != 0) {
+            return compareNumber(mmddyyyy1[2], mmddyyyy2[2]);
         }
-    }
-    
-    function compareDay(day1, day2) {
-        if (parseInt(day1) == parseInt(day1)) {
-            return 0;
-        } else {
-            if (parseInt(day1) > parseInt(day1)) {
-                return 1;
-            } else {
-                return -1;
-            }
+        if (compareNumber(mmddyyyy1[0], mmddyyyy2[0]) != 0) {
+            return compareNumber(mmddyyyy1[0], mmddyyyy2[0]);
         }
-    }    
+        if (compareNumber(mmddyyyy1[1], mmddyyyy2[1]) != 0) {
+            return compareNumber(mmddyyyy1[1], mmddyyyy2[1]);
+        }
+        return compareTime(dateParts1[1], dateParts1[2], dateParts2[1], dateParts2[2]);
+    }
     
     function compareTime(hoursMinutes1, ampm1, hoursMinutes2, ampm2) {
-    	if (ampm1 != ampm2) {
-    		if (ampm1 == 'AM') {
-    			return -1;
-    		} else {
-    			return 1;
-    		}
-    	} else {
-    		var hours1 = (hoursMinutes1.split(":"))[0];
-    		var hours2 = (hoursMinutes2.split(":"))[0];
-    		
-    		if (parseInt(hours1) != parseInt(hours2)) {
-    			if (parseInt(hours1) > parseInt(hours2)) {
-    				return 1;
-    			} else {
-    				return -1;
-    			}
-    		} else {
-    			var min1 = (hoursMinutes1.split(":"))[1];
-                var min2 = (hoursMinutes2.split(":"))[1];
-                if (parseInt(min1) != parseInt(min2)) {
-                    if (parseInt(min1) > parseInt(min2)) {
-                        return 1;
-                    } else {
-                        return -1;
-                    } 
-                } else {
-                	return 0;
-                }
-    		}
-    	}
+        if (ampm1 != ampm2) {
+            if (ampm1 == 'AM'){
+                return -1;
+            }
+            return 1;
+        }
+        var hours1 = (hoursMinutes1.split(":"));
+        var hours2 = (hoursMinutes2.split(":"));
+    
+        if (compareNumber(hours1[0], hours2[0]) != 0) {
+            return compareNumber(hours1[0], hours2[0]);
+        }
+    
+        if (compareNumber(hours1[1], hours2[1]) != 0) {
+            return compareNumber(hours1[1], hours2[1]);
+        }
+    
+        return 0;
+    }
+    
+    function compareNumber(x, y) {
+        if (parseInt(x) < parseInt(y)){
+            return -1;
+        }
+        if (parseInt(x) > parseInt(y)){
+            return 1;
+        }
+        return 0;
     }
     
     function sortTableRows(rowList, sortingList) {
