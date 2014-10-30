@@ -100,13 +100,15 @@ public abstract class CustomDataHelperBase<T extends DocumentCustomData> impleme
         return false;
     }
 
-    protected void addToGroup(String groupName, SortedMap<String, List> customAttributeGroups, Entry<String, CustomAttributeDocument> customAttributeDocument) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected void addToGroup(String groupName, SortedMap<String, List> customAttributeGroups, Entry<String, CustomAttributeDocument> customAttributeDocument) {
         List<CustomAttributeDocument> customAttributeDocumentList = customAttributeGroups.get(groupName);   
         if (customAttributeDocumentList == null) {
             customAttributeDocumentList = new ArrayList<CustomAttributeDocument>();
             customAttributeGroups.put(groupName, customAttributeDocumentList);
         }
         customAttributeDocumentList.add(customAttributeDocument.getValue());
+        Collections.sort(customAttributeDocumentList, new LabelComparator() ); 
     }
 
     protected boolean isMatch(T documentCustomData, Entry<String, CustomAttributeDocument> customAttributeDocumentEntry) {
