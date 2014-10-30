@@ -56,7 +56,7 @@
 							</c:if>
 							<c:if test="${!KualiForm.actionHelper.protocolAdminCorrectionBean.protocolReferencesEnabled}">
 								<tr><td width="100%" style="border-left: 0 none; border-right: 0 none; border-bottom: 0 none;">
-								    <kul:htmlAttributeLabel attributeEntry="${amendmentAttributes.protocolReferences}" noColon="true"/>
+								    <kul:htmlAttributeLabel attributeEntry="${amendmentAttributes.protocolReferencesAndOtherIdentifiers}" noColon="true"/>
 								</td></tr>
 							</c:if>
 							<c:if test="${!KualiForm.actionHelper.protocolAdminCorrectionBean.specialReviewEnabled}">
@@ -87,6 +87,11 @@
                             <c:if test="${!KualiForm.actionHelper.protocolAdminCorrectionBean.protocolPermissionsEnabled}">
                                 <tr><td width="100%" style="border-left: 0 none; border-right: 0 none; border-bottom: 0 none;">
                                     <kul:htmlAttributeLabel attributeEntry="${amendmentAttributes.protocolPermissions}" noColon="true"/>
+                                </td></tr>
+                            </c:if>
+                            <c:if test="${!KualiForm.actionHelper.protocolAdminCorrectionBean.questionnaireEnabled}">
+                                <tr><td width="100%" style="border-left: 0 none; border-right: 0 none; border-bottom: 0 none;">
+                                    <kul:htmlAttributeLabel attributeEntry="${amendmentAttributes.questionnaire}" noColon="true"/>
                                 </td></tr>
                             </c:if>
 					</tbody>
