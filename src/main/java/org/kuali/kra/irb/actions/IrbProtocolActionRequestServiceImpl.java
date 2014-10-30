@@ -999,8 +999,8 @@ public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestSe
         ProtocolDocument document = protocolForm.getProtocolDocument();
         Protocol protocol = document.getProtocol();
         ProtocolGenericActionBean actionBean = (ProtocolGenericActionBean) protocolForm.getActionHelper().getProtocolSMRBean();
-        ProtocolDocument newDocument = (ProtocolDocument) getProtocolGenericActionService().returnForSMR(protocol, actionBean);
         generateActionCorrespondence(ProtocolActionType.SPECIFIC_MINOR_REVISIONS_REQUIRED, protocolForm.getProtocolDocument().getProtocol());
+        ProtocolDocument newDocument = (ProtocolDocument) getProtocolGenericActionService().returnForSMR(protocol, actionBean);
         saveReviewComments(protocolForm, actionBean.getReviewCommentsBean());
         refreshAfterProtocolAction(protocolForm, newDocument.getDocumentNumber(), ACTION_NAME_SMR, false);
         protocolForm.getActionHelper().setProtocolCorrespondence(getProtocolCorrespondence(protocolForm, IrbConstants.PROTOCOL_TAB, new ProtocolNotificationRequestBean(protocolForm.getProtocolDocument().getProtocol(),ProtocolActionType.SPECIFIC_MINOR_REVISIONS_REQUIRED, "Specific Minor Revisions Required"), false));
@@ -1015,8 +1015,8 @@ public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestSe
         ProtocolDocument document = protocolForm.getProtocolDocument();
         Protocol protocol = document.getProtocol();
         ProtocolGenericActionBean actionBean = (ProtocolGenericActionBean) protocolForm.getActionHelper().getProtocolSRRBean();
-        ProtocolDocument newDocument = (ProtocolDocument) getProtocolGenericActionService().returnForSRR(protocol, actionBean);
         generateActionCorrespondence(ProtocolActionType.SUBSTANTIVE_REVISIONS_REQUIRED, protocolForm.getProtocolDocument().getProtocol());
+        ProtocolDocument newDocument = (ProtocolDocument) getProtocolGenericActionService().returnForSRR(protocol, actionBean);
         saveReviewComments(protocolForm, actionBean.getReviewCommentsBean());
         refreshAfterProtocolAction(protocolForm, newDocument.getDocumentNumber(), ACTION_NAME_SRR, false);
         protocolForm.getActionHelper().setProtocolCorrespondence(getProtocolCorrespondence(protocolForm, IrbConstants.PROTOCOL_TAB, new ProtocolNotificationRequestBean(protocolForm.getProtocolDocument().getProtocol(),ProtocolActionType.SUBSTANTIVE_REVISIONS_REQUIRED, "Substantive Revisions Required"), false));
