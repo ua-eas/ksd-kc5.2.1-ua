@@ -193,40 +193,182 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
     public String getProtocolSubmissionStatus() {
         return protocolSubmissionStatus;
     }
-
-     
-
        
     /**
-     * 
      * Constructs an ProtocolBase BO.
-     */
+     * 
+     * Note:
+     * Initialization Methods for Instance Variables
+	 * ============================================================================
+	 * We are going to use initialization methods here to encapsulate setting
+	 * instance variables to default values when a new Protocol is instantiated 
+	 * and not loaded by OJB. We have observed that OJB seems to set the variables
+	 * before the constructor is called. This causes the constructor to incorrectly 
+	 * set the variables to blank, empty, or default values over writing what
+	 * is loaded in from the database.
+	 * ============================================================================
+	 */
     public ProtocolBase() {
         super();
-        sequenceNumber = new Integer(0);          
-        protocolResearchAreas = new ArrayList<ProtocolResearchAreaBase>();
-        protocolReferences = new ArrayList<ProtocolReferenceBase>(); 
-        newDescription = getDefaultNewDescription();
-        protocolStatus = getProtocolStatusNewInstanceHook();
-        protocolStatusCode = protocolStatus.getProtocolStatusCode();
-        protocolLocations = new ArrayList<ProtocolLocationBase>(); 
-        protocolPersons = new ArrayList<ProtocolPersonBase>();
-        
-        // set the default protocol type
-        protocolTypeCode = getDefaultProtocolTypeCodeHook();
-
-        protocolFundingSources = new ArrayList<ProtocolFundingSourceBase>();        
-        specialReviews = new ArrayList<ProtocolSpecialReviewBase>();
-        setProtocolActions(new ArrayList<ProtocolActionBase>());
-        setProtocolSubmissions(new ArrayList<ProtocolSubmissionBase>());
-        protocolAmendRenewals = new ArrayList<ProtocolAmendRenewalBase>();
-        
-        // set statuscode default
-        setProtocolStatusCode(getDefaultProtocolStatusCodeHook());
-        this.refreshReferenceObject(Constants.PROPERTY_PROTOCOL_STATUS);
+        initializeSequenceNumber();          
+        initializeProtocolResearchAreas();
+        initializeProtocolReferences(); 
+        initializeNewDescription();
+        initializeProtocolStatus();
+        initializeProtocolStatusCode();
+        initializeProtocolLocations(); 
+        initializeProtocolPersons();
+        initializeProtocolTypeCode();
+        initializeProtocolFundingSources();
+        initializeSpecialReviews();
+        initializeProtocolActions();
+        initializeProtocolSubmissions();
+        initializeProtocolSubmissions();
+        initializeProtocolAmendRenewals();
         initializeProtocolAttachmentFilter();
     }
+	 
+    /**
+     * Initializes the sequence number if it has not already been set
+     * @return void
+     */
+    protected void initializeSequenceNumber() {
+    	if ( ObjectUtils.isNull( getSequenceNumber() ) ) {
+    		setSequenceNumber(new Integer(0));
+    	}
+    }
+
+    /**
+     * Initializes the protocolResearchAreas if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolResearchAreas() {
+    	if ( ObjectUtils.isNull( getProtocolResearchAreas() ) ) {
+    		setProtocolResearchAreas(new ArrayList<ProtocolResearchAreaBase>());
+    	}
+    }
     
+    /**
+     * Initializes the protocolReferences if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolReferences() {
+    	if ( ObjectUtils.isNull( getProtocolReferences() ) ) {
+    		setProtocolReferences(new ArrayList<ProtocolReferenceBase>());
+    	}
+    }
+    
+    /**
+     * Initializes the newDescription if it has not already been set
+     * @return void
+     */
+    protected void initializeNewDescription() {
+    	if ( ObjectUtils.isNull( getNewDescription() ) ) {
+    		setNewDescription( getDefaultNewDescription() );
+    	}
+    }
+    
+    /**
+     * Initializes protocolStatus if it has not already been set
+     * @return
+     */
+    protected void initializeProtocolStatus() {
+    	if ( ObjectUtils.isNull( getProtocolStatus() ) ) {
+    		setProtocolStatus( getProtocolStatusNewInstanceHook() );
+    	}
+    }
+    
+    /**
+     * Initializes protocolStatusCode to the default value if it has not already 
+     * been set
+     * @return
+     */
+    protected void initializeProtocolStatusCode() {
+    	if ( ObjectUtils.isNull( getProtocolStatusCode() ) ) {
+    		setProtocolStatusCode( getDefaultProtocolStatusCodeHook() );
+    		this.refreshReferenceObject(Constants.PROPERTY_PROTOCOL_STATUS);
+    	}
+    }
+    
+    /**
+     * Initializes the protocolLocations if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolLocations() {
+    	if ( ObjectUtils.isNull( getProtocolLocations() ) ) {
+    		setProtocolLocations(new ArrayList<ProtocolLocationBase>());
+    	}
+    }
+    
+    /**
+     * Initializes protocolPersons if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolPersons() {
+    	if ( ObjectUtils.isNull( getProtocolPersons() ) ) {
+    		setProtocolPersons(new ArrayList<ProtocolPersonBase>());
+    	}
+    }
+    
+    /**
+     * Initializes the default protocolTypeCode if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolTypeCode() {
+    	if ( ObjectUtils.isNull( getProtocolTypeCode() ) ) {
+    		setProtocolTypeCode( getDefaultProtocolTypeCodeHook() );
+    	}
+    }
+    
+    /**
+     * Initializes protocolFundingSources if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolFundingSources() {
+    	if( ObjectUtils.isNull( getProtocolFundingSources() ) ) {
+    		setProtocolFundingSources(new ArrayList<ProtocolFundingSourceBase>());
+    	}
+    }
+    
+    /**
+     * Initializes specialReviews if it has not already been set
+     * @return void
+     */
+    protected void initializeSpecialReviews() {
+    	if (  ObjectUtils.isNull( getSpecialReviews() ) ) {
+    		setSpecialReviews( new ArrayList<ProtocolSpecialReviewBase>() );
+    	}
+    }
+    
+    /**
+     * Initializes protocolActions if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolActions() {
+    	if ( ObjectUtils.isNull( getProtocolActions() ) ) {
+    		setProtocolActions(new ArrayList<ProtocolActionBase>());
+    	}
+    }
+    
+    /**
+     * Initializes protocolSubmissions if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolSubmissions() {
+    	if ( ObjectUtils.isNull( getProtocolSubmissions() ) ) {
+    		setProtocolSubmissions(new ArrayList<ProtocolSubmissionBase>());
+    	}
+    }
+    
+    /**
+     * Initializes protocolAmendRenewals if it has not already been set
+     * @return void
+     */
+    protected void initializeProtocolAmendRenewals() {
+    	if ( ObjectUtils.isNull( getProtocolAmendRenewals() ) ) {
+    		setProtocolAmendRenewals(new ArrayList<ProtocolAmendRenewalBase>());
+    	}
+    }
     
     protected abstract ProtocolStatusBase getProtocolStatusNewInstanceHook();
 
