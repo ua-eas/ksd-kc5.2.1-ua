@@ -29,8 +29,7 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-
-    <bean id="committeeDao" parent="platformAwareDao" class="edu.arizona.kra.committee.dao.CommitteeDaoOjb"/>
+   <bean id="committeeDao" parent="platformAwareDao" class="edu.arizona.kra.committee.dao.CommitteeDaoOjb"/>
 
     <bean id="committeeService" class="edu.arizona.kra.committee.service.impl.CustomCommitteeServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
@@ -38,6 +37,17 @@
         <property name="committeeDao" ref="committeeDao" />
     </bean>
 
-</beans>
+    <bean id="scheduleXmlStream" class="edu.arizona.kra.committee.print.CustomScheduleXmlStream" parent="printBaseXmlStream">
+		<property name="irbPrintXmlUtilService">
+			<ref bean="irbPrintXmlUtilService" />
+		</property>
+		<property name="committeeMembershipService">
+			<ref bean="committeeMembershipService" />
+		</property>
+		<property name="kcPersonService">
+			<ref bean="kcPersonService" />
+		</property>
+	</bean>
 
+</beans>
 

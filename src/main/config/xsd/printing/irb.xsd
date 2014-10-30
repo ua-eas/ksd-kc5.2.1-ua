@@ -658,6 +658,7 @@
               <xs:element name="AlternateFlag" type="xs:boolean" />
               <xs:element minOccurs="0" name="AlternateFor" type="xs:string" />
               <xs:element name="PresentFlag" type="xs:boolean" />
+              <xs:element minOccurs="0" name="AttendantComments" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
