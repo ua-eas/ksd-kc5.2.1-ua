@@ -82,13 +82,13 @@
     
     //This function extracts the attachment type from the div within the current row.
     function getAttachmentType(index) {
-    	var attachmentType = $j("#attachment-type-" +index).html();
+    	var attachmentType = $j("#attachment-type-" +index).text();
     	return $j.trim(attachmentType);
     }
     
     // This function extracts the Amendment/Renewal number type from the div within the current row.
     function getAmendRenewNum(index) {
-    	var attachmentType = $j("#amend-renew-num-" +index).html();
+    	var attachmentType = $j("#amend-renew-num-" +index).text();
         return $j.trim(attachmentType);
     }
     
@@ -225,93 +225,51 @@
     	return str1.localeCompare(str2);
     }
 
+    function compareNumber(x, y) {
+        if (parseInt(x) < parseInt(y)){
+            return -1;
+        }
+        if (parseInt(x) > parseInt(y)){
+            return 1;
+        }
+        return 0;
+    }
+
     function compareToDate(date1, date2) {
     	var dateParts1 = date1.split(" ");
     	var dateParts2 = date2.split(" ");
     	
     	var mmddyyyy1 = dateParts1[0].split("/");
     	var mmddyyyy2 = dateParts2[0].split("/");
-    	
-    	if (compareYear(mmddyyyy1[2], mmddyyyy2[2]) > 0) {
-    		return 1;
-    	} else if (compareMonth(mmddyyyy1[0], mmddyyyy2[0]) > 0) {
-    		return 1;
-    	} else if (compareDay(mmddyyyy1[1], mmddyyyy2[1]) > 0) {
-    		return 1;
-    	} else {
-    	    return compareTime(dateParts1[1], dateParts1[2], dateParts2[1], dateParts2[2]);
-    	}
-    		
+
+    	var yyCompare = compareNumber(mmddyyyy1[2], mmddyyyy2[2]); 
+    	var mmCompare = compareNumber(mmddyyyy1[0], mmddyyyy2[0]);
+    	var ddCompare = compareNumber(mmddyyyy1[1], mmddyyyy2[1]);
+    	var timeCompare = compareTime(dateParts1[1], dateParts1[2], dateParts2[1], dateParts2[2]);
+
+    	if (yyCompare != 0)   {    return yyCompare;    }
+    	if (mmCompare != 0)   {    return mmCompare;    }
+    	if (ddCompare != 0)   {    return ddCompare;    }
+    	if (timeCompate != 0) {    return timeCompare;  }
     	return 0;
     }
-    
-    function compareYear(year1, year2) {
-    	if (parseInt(year1) == parseInt(year2)) {
-    		return 0;
-    	} else {
-    		if (parseInt(year1) > parseInt(year2)) {
-    			return 1;
-    		} else {
-    			return -1;
-    		}
-    	}
-    }
-    
-    function compareMonth(month1, month2) {
-        if (parseInt(month1) == parseInt(month2)) {
-            return 0;
-        } else {
-            if (parseInt(month1) > parseInt(month2)) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-    }
-    
-    function compareDay(day1, day2) {
-        if (parseInt(day1) == parseInt(day1)) {
-            return 0;
-        } else {
-            if (parseInt(day1) > parseInt(day1)) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-    }    
     
     function compareTime(hoursMinutes1, ampm1, hoursMinutes2, ampm2) {
     	if (ampm1 != ampm2) {
     		if (ampm1 == 'AM') {
     			return -1;
-    		} else {
-    			return 1;
     		}
-    	} else {
-    		var hours1 = (hoursMinutes1.split(":"))[0];
-    		var hours2 = (hoursMinutes2.split(":"))[0];
-    		
-    		if (parseInt(hours1) != parseInt(hours2)) {
-    			if (parseInt(hours1) > parseInt(hours2)) {
-    				return 1;
-    			} else {
-    				return -1;
-    			}
-    		} else {
-    			var min1 = (hoursMinutes1.split(":"))[1];
-                var min2 = (hoursMinutes2.split(":"))[1];
-                if (parseInt(min1) != parseInt(min2)) {
-                    if (parseInt(min1) > parseInt(min2)) {
-                        return 1;
-                    } else {
-                        return -1;
-                    } 
-                } else {
-                	return 0;
-                }
-    		}
+    		return 1;
     	}
+    	var time1 = (hoursMinutes1.split(":"));
+    	var time2 = (hoursMinutes2.split(":"));
+    	var hhCompare = compareNumber(time1[0], time2[0]); 
+    	var mmCompare = compareNumber(time1[1], time2[1]); 
+        
+        if (hhCompare != 0)   {    return hhCompare;    }
+        if (mmCompare != 0)   {    return mmCompare;    }
+        
+        return 0;
     }
     
     function sortTableRows(rowList, sortingList) {
@@ -323,17 +281,17 @@
     }
     
     function getDescription(index) {
-        var description = $j("#row-description-" +index+ " > textarea").html();
+        var description = $j("#row-description-" +index).text();
         return $j.trim(description);    	
     }
     
     function getUpdatedBy(index) {
-        var updatedBy = $j("#updated-by-" +index).html();
+        var updatedBy = $j("#updated-by-" +index).text();
         return $j.trim(updatedBy);        
     }
     
     function getLastUpdated(index) {
-        var lastUpdated = $j("#last-updated-" +index).html();
+        var lastUpdated = $j("#last-updated-" +index).text();
         return $j.trim(lastUpdated);
     }
     
