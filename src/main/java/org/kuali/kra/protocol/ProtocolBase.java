@@ -65,7 +65,6 @@ import java.sql.Date;
 import java.util.*;
 import java.util.Map.Entry;
 
-
 public abstract class ProtocolBase extends KraPersistableBusinessObjectBase implements SequenceOwner<ProtocolBase>, Permissionable, UnitAclLoadable, Disclosurable, KcKrmsContextBo {
    
     private static final long serialVersionUID = -5556152547067349988L;
@@ -1988,6 +1987,23 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
                 }
             }
         }
+    }
+
+    public List<ProtocolActionBase> getProtocolActionsSortedByActionId() {
+        List<ProtocolActionBase> sortedActions = new ArrayList<ProtocolActionBase>();
+
+        for (ProtocolActionBase action : getProtocolActions()) {
+            sortedActions.add(action);
+        }
+
+        Collections.sort(sortedActions, new Comparator<ProtocolActionBase>() {
+            public int compare(ProtocolActionBase action1,
+                    ProtocolActionBase action2) {
+                return action2.getActionId().compareTo(action1.getActionId());
+            }
+        });
+
+        return sortedActions;
     }
 
 }
