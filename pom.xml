@@ -41,7 +41,18 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.kuali.rice</groupId>
+            <artifactId>rice-krms-impl</artifactId>
+            <version>${rice.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lowagie</groupId>
+                    <artifactId>itext</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
 			<groupId>org.kuali.rice</groupId>
 			<artifactId>rice-kim-ldap</artifactId>
 			<version>${rice.version}</version>
