@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+?xml version="1.0" encoding="utf-8"?>
 <!-- Created with Liquid XML Studio 1.0.8.0 (http://www.liquid-technologies.com) -->
 <xs:schema xmlns="http://irb.mit.edu/irbnamespace" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://irb.mit.edu/irbnamespace" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="Committee">
@@ -423,7 +423,7 @@
         </xs:element>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="VulnerableSubject" />
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="SpecialReview" />
-       <xs:element minOccurs="0" maxOccurs="unbounded" name="RiskLevels">
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="RiskLevels">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="RiskLevelCode" type="xs:integer" />
@@ -437,7 +437,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-         <xs:element minOccurs="0" maxOccurs="unbounded" name="Submissions">
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Submissions">
           <xs:complexType>
             <xs:sequence>
               <xs:element ref="SubmissionDetails" />
@@ -533,7 +533,7 @@
         <xs:element name="ApplicationDate" type="xs:date" />
         <xs:element minOccurs="0" name="ApprovalDate" nillable="true" type="xs:date" />
         <xs:element minOccurs="0" name="ExpirationDate" nillable="true" type="xs:date" />
-         <xs:element minOccurs="0" name="LastApprovalDate" nillable="true" type="xs:date" />
+        <xs:element minOccurs="0" name="LastApprovalDate" nillable="true" type="xs:date" />
         <xs:element minOccurs="0" name="BillableFlag" type="xs:boolean" />
         <xs:element minOccurs="0" name="FdaApplicationNumber" nillable="true">
           <xs:simpleType>
@@ -565,7 +565,7 @@
         <xs:element ref="ProtocolMasterData" />
         <xs:element maxOccurs="unbounded" ref="Investigator" />
         <xs:element minOccurs="0" maxOccurs="unbounded" name="RiskLevels" >
-        <xs:complexType>
+          <xs:complexType>
             <xs:sequence>
               <xs:element name="RiskLevelCode" type="xs:integer" />
               <xs:element name="RiskLevelDescription" type="xs:string" />
@@ -577,7 +577,7 @@
               <xs:element name="UpdateTimestamp" type="xs:date" />
             </xs:sequence>
           </xs:complexType>
-          </xs:element>
+        </xs:element>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="FundingSource">
           <xs:complexType>
             <xs:sequence>
@@ -776,7 +776,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-    <xs:element name="SubmissionDetails">
+  <xs:element name="SubmissionDetails">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="ProtocolNumber">
@@ -961,26 +961,26 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="AttachmentProtocol">
-  	<xs:complexType>
-  	  <xs:sequence>
-	    <xs:element name="AttachmentType" type="xs:string" />
-	    <xs:element name="AttachmentStatus" type="xs:string" />
-	    <xs:element name="AttachmentUploadUser" type="xs:string" />
-	    <xs:element name="AttachmentUploadUserFullName" type="xs:string" />
-	    <xs:element name="AttachmentUpdateTimestamp" type="xs:date" />
-	    <xs:element name="AttachmentComments" type="xs:string" minOccurs="0" />
-	    <xs:element name="AttachmentFilename" type="xs:string" />
-	    <xs:element name="AttachmentDescription" type="xs:string" />
-	    <xs:element name="AttachmentCreateTimestamp" type="xs:date" />
-	    <xs:element name="AttachmentVersion" type="xs:integer" />
-	    <xs:element name="AttachmentProtocolNumber">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="AttachmentType" type="xs:string" />
+        <xs:element name="AttachmentStatus" type="xs:string" />
+        <xs:element name="AttachmentUploadUser" type="xs:string" />
+        <xs:element name="AttachmentUploadUserFullName" type="xs:string" />
+        <xs:element name="AttachmentUpdateTimestamp" type="xs:date" />
+        <xs:element name="AttachmentComments" type="xs:string" minOccurs="0" />
+        <xs:element name="AttachmentFilename" type="xs:string" />
+        <xs:element name="AttachmentDescription" type="xs:string" />
+        <xs:element name="AttachmentCreateTimestamp" type="xs:date" />
+        <xs:element name="AttachmentVersion" type="xs:integer" />
+        <xs:element name="AttachmentProtocolNumber">
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:maxLength value="20" />
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-  	  </xs:sequence>
-  	</xs:complexType>
+      </xs:sequence>
+    </xs:complexType>
   </xs:element>
 </xs:schema>

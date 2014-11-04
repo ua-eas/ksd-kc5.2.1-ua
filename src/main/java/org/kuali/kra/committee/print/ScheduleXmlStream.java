@@ -100,7 +100,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         getIrbPrintXmlUtilService().setMinutes(committeeSchedule, schedule);
         setAttendance(committeeSchedule, schedule);
         committeeSchedule.refreshReferenceObject("protocolSubmissions");
-        List<org.kuali.kra.irb.actions.submit.ProtocolSubmission> submissions = committeeSchedule.getLatestProtocolSubmissions();
+        List<org.kuali.kra.irb.actions.submit.ProtocolSubmission> submissions = committeeSchedule.getProtocolSubmissions();
         for (org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission : submissions) {
         	
             ProtocolSubmission protocolSubmissionType = schedule.addNewProtocolSubmission();            
