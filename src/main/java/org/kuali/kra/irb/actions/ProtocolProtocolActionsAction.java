@@ -993,7 +993,8 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         
         
         if (attachmentSummary.getAttachmentType().startsWith("Protocol: ")) {
-            ProtocolAttachmentProtocol attachment = getProtocolAttachmentService().getAttachment(ProtocolAttachmentProtocol.class, attachmentSummary.getAttachmentId());
+            NotesAttachmentsHelper helper = ((ProtocolForm) form).getNotesAttachmentsHelper();
+            ProtocolAttachmentProtocol attachment = getProtocolAttachmentService().getAttachment(helper.getProtocolAttachmentProtocolClassHook(), attachmentSummary.getAttachmentId());
             return printAttachmentProtocol(mapping, response, attachment, protocolForm);
         } 
         else {

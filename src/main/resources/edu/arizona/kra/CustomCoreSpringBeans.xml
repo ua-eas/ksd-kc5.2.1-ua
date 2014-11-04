@@ -42,15 +42,13 @@
                 <value>edu.arizona.kra</value>
             </list>
         </property>
-    	<property name="dataDictionaryPackages">
+        <property name="dataDictionaryPackages">
             <list merge="true">
                 <value>edu/arizona/kra/datadictionary</value>
             </list>
         </property>
     </bean>
-
     <bean id="protocolCustomDataService" class="edu.arizona.kra.protocol.ProtocolCustomDataServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
     </bean> 
-     
 </beans>
