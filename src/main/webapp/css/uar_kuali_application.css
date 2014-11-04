@@ -190,6 +190,9 @@ table.tab td.tabtable1-left-colspan img
 #workarea table.tab td {
     background-color: #D8D8D8;
 }
+#workarea td.tabtable1-mid1 img {
+	display: none;
+}
 #workarea td.tabtable1-left-colspan,
 #workarea td.tabtable1-mid1 {
     background-image: none;
@@ -200,6 +203,11 @@ table.tab td.tabtable1-left-colspan img
     text-align: right;
     padding-right: 15px;
     border-radius: 0px 5px 0px 0px;
+}
+
+#workarea table.tab td.tabtable1-right,
+#workarea table.tab td.tabtable2-right {
+	background-color: #FFF;
 }
 
 #workarea h2 {
@@ -282,7 +290,7 @@ div.msg-excol {
     display: none;
     float: left;
     clear: left;
-    width: 200px;
+    width: 275px;
     background-color: #fff;
     border: 1px solid #e4e4e4;
   }
