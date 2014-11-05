@@ -89,6 +89,40 @@
             <ref bean="sequenceAccessorService" />
         </property>
     </bean>
-    
+
+    <bean id="protocolActionCorrespondenceService" class="edu.arizona.kra.irb.actions.correspondence.IrbProtocolActionCorrespondenceServiceImpl">
+        <property name="businessObjectService" ref="businessObjectService" />
+    </bean>
+
+	<bean id="irbProtocolActionRequestService"
+		class="org.kuali.kra.irb.actions.IrbProtocolActionRequestServiceImpl">
+		<property name="protocolAssignToAgendaService" ref="protocolAssignToAgendaService" />
+		<property name="protocolAssignCmtSchedService" ref="protocolAssignCmtSchedService" />
+		<property name="protocolApproveService" ref="protocolApproveService" />
+		<property name="reviewCommentsService" ref="reviewCommentsService" />
+		<property name="kualiRuleService" ref="kualiRuleService" />
+		<property name="taskAuthorizationService" ref="taskAuthorizationService" />
+		<property name="businessObjectService" ref="businessObjectService" />
+		<property name="protocolActionCorrespondenceGenerationService" ref="protocolActionCorrespondenceGenerationService" />
+		<property name="notificationService" ref="kcNotificationService" />
+		<property name="protocolSubmitActionService" ref="protocolSubmitActionService" />
+		<property name="protocolAmendRenewService" ref="protocolAmendRenewService" />
+		<property name="protocolWithdrawService" ref="protocolWithdrawService" />
+		<property name="protocolRequestService" ref="protocolRequestService" />
+		<property name="protocolGenericActionService" ref="protocolGenericActionService" />
+		<property name="protocolGrantExemptionService" ref="protocolGrantExemptionService" />
+		<property name="committeeDecisionService" ref="protocolCommitteeDecisionService" />
+		<property name="protocolAbandonService" ref="protocolAbandonService" />
+		<property name="protocolNotifyIrbService" ref="protocolNotifyIrbService" />
+		<property name="protocolNotifyCommitteeService" ref="protocolNotifyCommitteeService" />
+		<property name="committeeService" ref="committeeService" />
+		<property name="protocolReviewNotRequiredService" ref="protocolReviewNotRequiredService" />
+		<property name="protocolAssignReviewersService" ref="protocolAssignReviewersService" />
+		<property name="personService" ref="personService" />
+		<property name="questionnaireAnswerService" ref="questionnaireAnswerService" />
+		<property name="protocolActionService" ref="protocolActionService" />
+		<property name="protocolActionCorrespondenceService" ref="protocolActionCorrespondenceService" />
+	</bean>
+
 </beans>
 
