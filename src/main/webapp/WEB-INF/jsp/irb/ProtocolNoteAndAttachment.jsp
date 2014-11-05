@@ -82,13 +82,13 @@
     
     //This function extracts the attachment type from the div within the current row.
     function getAttachmentType(index) {
-    	var attachmentType = $j("#attachment-type-" +index).html();
+    	var attachmentType = $j("#attachment-type-" +index).text();
     	return $j.trim(attachmentType);
     }
     
     // This function extracts the Amendment/Renewal number type from the div within the current row.
     function getAmendRenewNum(index) {
-    	var attachmentType = $j("#amend-renew-num-" +index).html();
+    	var attachmentType = $j("#amend-renew-num-" +index).text();
         return $j.trim(attachmentType);
     }
     
@@ -225,46 +225,6 @@
     	return str1.localeCompare(str2);
     }
 
-    function compareToDate(date1, date2) {
-    	var dateParts1 = date1.split(" ");
-    	var dateParts2 = date2.split(" ");
-    	
-    	var mmddyyyy1 = dateParts1[0].split("/");
-    	var mmddyyyy2 = dateParts2[0].split("/");
-        
-        if (compareNumber(mmddyyyy1[2], mmddyyyy2[2]) != 0) {
-            return compareNumber(mmddyyyy1[2], mmddyyyy2[2]);
-        }
-        if (compareNumber(mmddyyyy1[0], mmddyyyy2[0]) != 0) {
-            return compareNumber(mmddyyyy1[0], mmddyyyy2[0]);
-        }
-        if (compareNumber(mmddyyyy1[1], mmddyyyy2[1]) != 0) {
-            return compareNumber(mmddyyyy1[1], mmddyyyy2[1]);
-        }
-        return compareTime(dateParts1[1], dateParts1[2], dateParts2[1], dateParts2[2]);
-    }
-    
-    function compareTime(hoursMinutes1, ampm1, hoursMinutes2, ampm2) {
-        if (ampm1 != ampm2) {
-            if (ampm1 == 'AM'){
-                return -1;
-            }
-            return 1;
-        }
-        var hours1 = (hoursMinutes1.split(":"));
-        var hours2 = (hoursMinutes2.split(":"));
-    
-        if (compareNumber(hours1[0], hours2[0]) != 0) {
-            return compareNumber(hours1[0], hours2[0]);
-        }
-    
-        if (compareNumber(hours1[1], hours2[1]) != 0) {
-            return compareNumber(hours1[1], hours2[1]);
-        }
-    
-        return 0;
-    }
-    
     function compareNumber(x, y) {
         if (parseInt(x) < parseInt(y)){
             return -1;
@@ -272,6 +232,43 @@
         if (parseInt(x) > parseInt(y)){
             return 1;
         }
+        return 0;
+    }
+
+    function compareToDate(date1, date2) {
+    	var dateParts1 = date1.split(" ");
+    	var dateParts2 = date2.split(" ");
+    	
+    	var mmddyyyy1 = dateParts1[0].split("/");
+    	var mmddyyyy2 = dateParts2[0].split("/");
+
+    	var yyCompare = compareNumber(mmddyyyy1[2], mmddyyyy2[2]); 
+    	var mmCompare = compareNumber(mmddyyyy1[0], mmddyyyy2[0]);
+    	var ddCompare = compareNumber(mmddyyyy1[1], mmddyyyy2[1]);
+    	var timeCompare = compareTime(dateParts1[1], dateParts1[2], dateParts2[1], dateParts2[2]);
+
+    	if (yyCompare != 0)   {    return yyCompare;    }
+    	if (mmCompare != 0)   {    return mmCompare;    }
+    	if (ddCompare != 0)   {    return ddCompare;    }
+    	if (timeCompate != 0) {    return timeCompare;  }
+    	return 0;
+    }
+    
+    function compareTime(hoursMinutes1, ampm1, hoursMinutes2, ampm2) {
+    	if (ampm1 != ampm2) {
+    		if (ampm1 == 'AM') {
+    			return -1;
+    		}
+    		return 1;
+    	}
+    	var time1 = (hoursMinutes1.split(":"));
+    	var time2 = (hoursMinutes2.split(":"));
+    	var hhCompare = compareNumber(time1[0], time2[0]); 
+    	var mmCompare = compareNumber(time1[1], time2[1]); 
+        
+        if (hhCompare != 0)   {    return hhCompare;    }
+        if (mmCompare != 0)   {    return mmCompare;    }
+        
         return 0;
     }
     
@@ -284,17 +281,17 @@
     }
     
     function getDescription(index) {
-        var description = $j("#row-description-" +index+ " > textarea").html();
+        var description = $j("#row-description-" +index).text();
         return $j.trim(description);    	
     }
     
     function getUpdatedBy(index) {
-        var updatedBy = $j("#updated-by-" +index).html();
+        var updatedBy = $j("#updated-by-" +index).text();
         return $j.trim(updatedBy);        
     }
     
     function getLastUpdated(index) {
-        var lastUpdated = $j("#last-updated-" +index).html();
+        var lastUpdated = $j("#last-updated-" +index).text();
         return $j.trim(lastUpdated);
     }
     
