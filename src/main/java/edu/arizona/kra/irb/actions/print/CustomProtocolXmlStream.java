@@ -1,7 +1,5 @@
 package edu.arizona.kra.irb.actions.print;
 
-import edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentProtocol;
-
 import org.kuali.kra.irb.actions.print.ProtocolXmlStream;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 
@@ -62,7 +60,7 @@ public class CustomProtocolXmlStream extends ProtocolXmlStream {
         	    attachmentProtocolType.setAttachmentDescription(attachmentProtocol.getDescription());
         	    attachmentProtocolType.setAttachmentCreateTimestamp(getDateTimeService().getCalendar(attachmentProtocol.getCreateTimestamp()));
         	    attachmentProtocolType.setAttachmentVersion(BigInteger.valueOf(attachmentProtocol.getAttachmentVersion()));
-        	    attachmentProtocolType.setAttachmentProtocolNumber(((CustomProtocolAttachmentProtocol) attachmentProtocol).getSourceProtocolNumber());
+        	    attachmentProtocolType.setAttachmentProtocolNumber(attachmentProtocol.getSourceProtocolNumber());
     		}
     	}
     }
