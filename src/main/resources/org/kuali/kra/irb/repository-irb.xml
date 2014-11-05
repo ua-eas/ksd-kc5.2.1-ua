@@ -98,7 +98,7 @@
         <collection-descriptor name="specialReviews" proxy="true" element-class-ref="org.kuali.kra.irb.specialreview.ProtocolSpecialReview" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="protocolId" />
         </collection-descriptor>        
-        <collection-descriptor name="attachmentProtocols" proxy="true" element-class-ref="edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentProtocol" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="true" auto-delete="true">
+        <collection-descriptor name="attachmentProtocols" proxy="true" element-class-ref="org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="true" auto-delete="true">
             <inverse-foreignkey field-ref="protocolId" />
         </collection-descriptor>
         <collection-descriptor name="notepads" proxy="false" element-class-ref="org.kuali.kra.irb.noteattachment.ProtocolNotepad" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="true" auto-delete="true">
@@ -604,7 +604,7 @@
         </reference-descriptor>
     </class-descriptor>
     
-    <class-descriptor class="edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentProtocol" table="PROTOCOL_ATTACHMENT_PROTOCOL">
+    <class-descriptor class="org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol" table="PROTOCOL_ATTACHMENT_PROTOCOL">
         <field-descriptor name="id" column="PA_PROTOCOL_ID" jdbc-type="BIGINT" primarykey="true" sequence-name="SEQ_PROTOCOL_ID" autoincrement="true"/>
         <field-descriptor name="protocolId" column="PROTOCOL_ID_FK" jdbc-type="BIGINT" />
         <field-descriptor name="protocolNumber" column="PROTOCOL_NUMBER" jdbc-type="VARCHAR" />

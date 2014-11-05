@@ -429,6 +429,7 @@ public class ProtocolNoteAndAttachmentAction extends ProtocolAction {
         for (ProtocolAttachmentProtocolBase attachment : ((ProtocolForm) form).getProtocolDocument().getProtocol().getAttachmentProtocols()) {
             // for some reason, change and save, this list is not updated under attachment.protocol.attachmentprotocols
             attachment.getProtocol().refreshReferenceObject("attachmentProtocols");
+            attachment.resetSourceProtocol();
         }
         // don't allow edit of saved notes
         for (ProtocolNotepadBase notepad : ((ProtocolForm) form).getProtocolDocument().getProtocol().getNotepads()) {

@@ -30,7 +30,7 @@ import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionType;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentFilter;
-import edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentProtocol;
+import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
 import org.kuali.kra.irb.personnel.ProtocolPersonnelService;
 import org.kuali.kra.irb.protocol.participant.ProtocolParticipant;
 import org.kuali.kra.irb.protocol.research.ProtocolResearchArea;
@@ -48,8 +48,6 @@ import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 import org.kuali.kra.protocol.protocol.research.ProtocolResearchAreaBase;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.kra.questionnaire.answer.ModuleQuestionnaireBean;
-
-import edu.arizona.kra.irb.noteattachment.CustomProtocolAttachmentFilter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -333,12 +331,8 @@ public class Protocol extends ProtocolBase {
         return RoleConstants.PROTOCOL_DOC_ROLE_TYPE;
     }
 
-    /* 
-     * Override the ProtocolAttachmentFilter from the super to include the UA Custom class for sorting protocol attachments on the Amendment/Renewal number
-     */
-    
     public void initializeProtocolAttachmentFilter() {
-        ProtocolAttachmentFilterBase protocolAttachmentFilter = new CustomProtocolAttachmentFilter();
+        ProtocolAttachmentFilterBase protocolAttachmentFilter = new ProtocolAttachmentFilter();
         
         //Load the default set as a parameter for the attachment sort
         try {
@@ -400,7 +394,7 @@ public class Protocol extends ProtocolBase {
 
     @Override
     protected Class<? extends ProtocolAttachmentProtocolBase> getProtocolAttachmentProtocolClassHook() {
-        return CustomProtocolAttachmentProtocol.class;
+        return ProtocolAttachmentProtocol.class;
     }
    
 
