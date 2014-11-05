@@ -25,6 +25,8 @@ import java.util.List;
 
 public class BudgetOnOffCampusValuesFinder extends UifKeyValuesFinderBase {
 
+	private static final long serialVersionUID = -4819705972981826553L;
+
 	/**
      * Constructs the list of Budget Fiscal Years.  Each entry
      * in the list is a &lt;key, value&gt; pair, where the "key" is the unique
@@ -42,9 +44,8 @@ public class BudgetOnOffCampusValuesFinder extends UifKeyValuesFinderBase {
     public List<KeyValue> getKeyValues() {
         List<KeyValue> KeyValues = new ArrayList<KeyValue>();
 
-        for (OnOffCampusFlagConstants onOffCampusFlagConstants : OnOffCampusFlagConstants.values()) {
-            KeyValues.add(new ConcreteKeyValue(onOffCampusFlagConstants.code(), onOffCampusFlagConstants.description()));
-        }
+        KeyValues.add(new ConcreteKeyValue(OnOffCampusFlagConstants.AllOn.code(), OnOffCampusFlagConstants.AllOn.description()));
+        KeyValues.add(new ConcreteKeyValue(OnOffCampusFlagConstants.AllOff.code(), OnOffCampusFlagConstants.AllOff.description()));
         
         return KeyValues; 
     }
