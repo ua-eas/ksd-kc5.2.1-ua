@@ -120,6 +120,8 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
 import org.springframework.util.CollectionUtils;
 
+import edu.arizona.kra.irb.actions.correspondence.IrbProtocolActionCorrespondenceService;
+
 @SuppressWarnings("deprecation")
 public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestServiceImpl implements IrbProtocolActionRequestService {
     private static final Log LOG = LogFactory.getLog(IrbProtocolActionRequestServiceImpl.class);
@@ -141,6 +143,7 @@ public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestSe
     private ProtocolReviewNotRequiredService protocolReviewNotRequiredService;
     private ProtocolAssignReviewersService protocolAssignReviewersService;
     private ProtocolActionService protocolActionService;
+    private IrbProtocolActionCorrespondenceService protocolActionCorrespondenceService;
     
     private static final String ACTION_NAME_RESPONSE_APPROVAL = "Response Approval";
     private static final String ACTION_NAME_CLOSE_ENROLLMENT = "Close Enrollment";
@@ -999,8 +1002,14 @@ public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestSe
         ProtocolDocument document = protocolForm.getProtocolDocument();
         Protocol protocol = document.getProtocol();
         ProtocolGenericActionBean actionBean = (ProtocolGenericActionBean) protocolForm.getActionHelper().getProtocolSMRBean();
-        generateActionCorrespondence(ProtocolActionType.SPECIFIC_MINOR_REVISIONS_REQUIRED, protocolForm.getProtocolDocument().getProtocol());
         ProtocolDocument newDocument = (ProtocolDocument) getProtocolGenericActionService().returnForSMR(protocol, actionBean);
+
+        // Only generates to the old protocol
+        generateActionCorrespondence(ProtocolActionType.SPECIFIC_MINOR_REVISIONS_REQUIRED, protocolForm.getProtocolDocument().getProtocol());
+
+        // Copy correspondence to new version protocol
+        copyActionCorrespondence(protocol, newDocument.getProtocol());
+
         saveReviewComments(protocolForm, actionBean.getReviewCommentsBean());
         refreshAfterProtocolAction(protocolForm, newDocument.getDocumentNumber(), ACTION_NAME_SMR, false);
         protocolForm.getActionHelper().setProtocolCorrespondence(getProtocolCorrespondence(protocolForm, IrbConstants.PROTOCOL_TAB, new ProtocolNotificationRequestBean(protocolForm.getProtocolDocument().getProtocol(),ProtocolActionType.SPECIFIC_MINOR_REVISIONS_REQUIRED, "Specific Minor Revisions Required"), false));
@@ -1015,15 +1024,26 @@ public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestSe
         ProtocolDocument document = protocolForm.getProtocolDocument();
         Protocol protocol = document.getProtocol();
         ProtocolGenericActionBean actionBean = (ProtocolGenericActionBean) protocolForm.getActionHelper().getProtocolSRRBean();
-        generateActionCorrespondence(ProtocolActionType.SUBSTANTIVE_REVISIONS_REQUIRED, protocolForm.getProtocolDocument().getProtocol());
         ProtocolDocument newDocument = (ProtocolDocument) getProtocolGenericActionService().returnForSRR(protocol, actionBean);
+
+        // Only generates to the old protocol
+        generateActionCorrespondence(ProtocolActionType.SUBSTANTIVE_REVISIONS_REQUIRED, protocolForm.getProtocolDocument().getProtocol());
+
+        // Copy correspondence to new version protocol
+        copyActionCorrespondence(protocol, newDocument.getProtocol());
+
         saveReviewComments(protocolForm, actionBean.getReviewCommentsBean());
         refreshAfterProtocolAction(protocolForm, newDocument.getDocumentNumber(), ACTION_NAME_SRR, false);
         protocolForm.getActionHelper().setProtocolCorrespondence(getProtocolCorrespondence(protocolForm, IrbConstants.PROTOCOL_TAB, new ProtocolNotificationRequestBean(protocolForm.getProtocolDocument().getProtocol(),ProtocolActionType.SUBSTANTIVE_REVISIONS_REQUIRED, "Substantive Revisions Required"), false));
         ProtocolNotificationRequestBean notificationBean = new ProtocolNotificationRequestBean(protocolForm.getProtocolDocument().getProtocol(),ProtocolActionType.SUBSTANTIVE_REVISIONS_REQUIRED, "Substantive Revisions Required");
         return getRedirectPathAfterProtocolAction(protocolForm, notificationBean, IrbConstants.PROTOCOL_TAB);
     }
-    
+
+    private void copyActionCorrespondence(Protocol srcProtocol, Protocol destProtocol){
+    	IrbProtocolActionCorrespondenceService correspondenceService = getProtocolActionCorrespondenceService();
+    	correspondenceService.copyActionCorrespondence(srcProtocol, destProtocol);
+    }
+
     /**
      * @see org.kuali.kra.irb.actions.IrbProtocolActionRequestService#returnToPI(org.kuali.kra.irb.ProtocolForm)
      */
@@ -1601,5 +1621,12 @@ public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestSe
         return null;
     }
 
+	protected IrbProtocolActionCorrespondenceService getProtocolActionCorrespondenceService() {
+		return protocolActionCorrespondenceService;
+	}
+
+	public void setProtocolActionCorrespondenceService(IrbProtocolActionCorrespondenceService protocolActionCorrespondenceService) {
+		this.protocolActionCorrespondenceService = protocolActionCorrespondenceService;
+	}
 
 }
