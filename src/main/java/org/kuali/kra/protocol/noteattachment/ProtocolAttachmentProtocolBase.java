@@ -29,7 +29,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This class represents the ProtocolBase Attachment ProtocolBase.
@@ -85,7 +85,6 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
     private String sourceProtocolAmendRenewalNumber;
     private String sourceProtocolNumber;
     
-
     /**
      * empty ctor to satisfy JavaBean convention.
      */
@@ -255,8 +254,11 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         // this is still calling persistenceservice eventually  
         // probably do it in postsave  
         //this.getProtocol().refreshReferenceObject("attachmentProtocols");  
+
         for (ProtocolAttachmentProtocolBase attachment : this.getProtocol().getAttachmentProtocols()) {
-            if (attachment.getDocumentId().equals(this.getDocumentId())) {
+            if (attachment.getDocumentId().equals(this.getDocumentId()) &&
+                    StringUtils.equals(attachment.getVersioningId(), this.getVersioningId())) {
+
                 this.versions.add(attachment);
             
             }
@@ -267,7 +269,21 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         Collections.sort(this.versions, new Comparator<ProtocolAttachmentProtocolBase>() {
 
             public int compare(ProtocolAttachmentProtocolBase attachment1, ProtocolAttachmentProtocolBase attachment2) {
-                return attachment2.getUpdateTimestamp().compareTo(attachment1.getUpdateTimestamp());
+                Timestamp timestamp1 = attachment1.getUpdateTimestamp();
+                Timestamp timestamp2 = attachment2.getUpdateTimestamp();
+                if (timestamp1 != null){
+                    if (timestamp2 != null){
+                        return timestamp1.compareTo(timestamp2);
+                    }
+                    else {
+                        return 1; 
+                    }
+                } else {
+                    if (timestamp2 != null){
+                        return -1;
+                    }
+                }
+                return 0;
             }
         });
         return this.versions;
@@ -488,7 +504,6 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         this.versioningId = versioningId;
     }
 
-
     /**
      * Returns the source protocol number for when this attachment was last added in.
      */
@@ -550,6 +565,5 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
             setCreateTimestamp(((DateTimeService) KraServiceLocator.getService(Constants.DATE_TIME_SERVICE_NAME)).getCurrentTimestamp());
         }
     }
-
 
 }
