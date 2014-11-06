@@ -252,6 +252,7 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
             if (attachment.getDocumentId().equals(this.getDocumentId()) &&
                     StringUtils.equals(attachment.getVersioningId(), this.getVersioningId())) {
                 this.versions.add(attachment);
+            
             }
         }
         if (this.versions.size() == 1) {
