@@ -126,6 +126,9 @@ public class BudgetExpensesAction extends BudgetAction {
 //            }
 
             budgetService.populateNewBudgetLineItem(newBudgetLineItem, budgetPeriod);
+            
+            newBudgetLineItem.setApplyInRateFlag(false);      
+            
             budgetPeriod.getBudgetLineItems().add(newBudgetLineItem);            
             
             getCalculationService().populateCalculatedAmount(budget, newBudgetLineItem);

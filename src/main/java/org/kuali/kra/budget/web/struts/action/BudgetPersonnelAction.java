@@ -223,7 +223,7 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
 //                    newBudgetLineItem.setBudgetVersionNumber(budget.getBudgetPeriod(budgetPeriod.getBudgetPeriod() - 1).getBudgetVersionNumber());
                     newBudgetLineItem.setBudgetId(budget.getBudgetId());
                     newBudgetLineItem.setLineItemNumber(budgetForm.getBudgetDocument().getHackedDocumentNextValue(Constants.BUDGET_LINEITEM_NUMBER));
-                    newBudgetLineItem.setApplyInRateFlag(true);
+                    newBudgetLineItem.setApplyInRateFlag(false);
                     newBudgetLineItem.refreshReferenceObject("costElementBO");
                     
                     // on/off campus flag enhancement
