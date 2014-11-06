@@ -21,8 +21,7 @@ import org.kuali.kra.protocol.actions.ActionHelperBase;
 import edu.arizona.kra.irb.actions.CustomActionHelper;
 
 /**
- * This class...
- * @author Kuali Nervous System Team (kualidev@oncourse.iu.edu)
+ * This is the custom code for the protocol form class for UofA
  */
 public class CustomProtocolForm extends org.kuali.kra.irb.ProtocolForm {
 	private static final long serialVersionUID = -9117901812636757211L;
@@ -33,7 +32,8 @@ public class CustomProtocolForm extends org.kuali.kra.irb.ProtocolForm {
 
     @Override
     protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm) throws Exception {
-        return new CustomActionHelper((CustomProtocolForm) protocolForm);
+        return new CustomActionHelper((CustomProtocolForm)protocolForm);
     }
+ 
 
 }

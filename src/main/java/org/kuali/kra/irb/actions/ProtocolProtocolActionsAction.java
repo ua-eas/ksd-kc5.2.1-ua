@@ -993,7 +993,8 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         
         
         if (attachmentSummary.getAttachmentType().startsWith("Protocol: ")) {
-            ProtocolAttachmentProtocol attachment = getProtocolAttachmentService().getAttachment(ProtocolAttachmentProtocol.class, attachmentSummary.getAttachmentId());
+            NotesAttachmentsHelper helper = ((ProtocolForm) form).getNotesAttachmentsHelper();
+            ProtocolAttachmentProtocol attachment = getProtocolAttachmentService().getAttachment(helper.getProtocolAttachmentProtocolClassHook(), attachmentSummary.getAttachmentId());
             return printAttachmentProtocol(mapping, response, attachment, protocolForm);
         } 
         else {
@@ -1677,7 +1678,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
         ProtocolForm protocolForm = (ProtocolForm) form;
         if(getProtocolActionRequestService().isOpenProtocolForAdminCorrectionAuthorized(protocolForm)) {
-        	ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
+            ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
             if(!(protocolDocument.getProtocol().isAmendment() || 
             		protocolDocument.getProtocol().isRenewal() || 
             		protocolDocument.getProtocol().isRenewalWithoutAmendment())){
