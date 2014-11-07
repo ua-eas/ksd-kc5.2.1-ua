@@ -70,18 +70,32 @@
             <tr>
 				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.ownedByUnitNumber}" /></div></th>
                 <td align="left" valign="middle">
-                  <c:choose>
-                    <c:when test="${empty KualiForm.document.developmentProposalList[0].ownedByUnit or empty KualiForm.document.developmentProposalList[0].ownedByUnit.unitNumber}">
-                    	<kul:htmlControlAttribute property="document.developmentProposalList[0].ownedByUnitNumber" attributeEntry="${proposalDevelopmentAttributes.ownedByUnitNumberRestricted}" />
+                <c:choose>
+                 <c:when test="${empty KualiForm.document.developmentProposalList[0].ownedByUnit.unitName}">
+                    <kul:htmlControlAttribute property="document.developmentProposalList[0].ownedByUnitNumber" attributeEntry="${proposalDevelopmentAttributes.ownedByUnitNumber}" onblur="loadSponsorName('document.developmentProposalList[0].sponsorCode', 'sponsorName');" />
+                    <kul:lookup boClassName="org.kuali.kra.bo.Unit" fieldConversions="unitNumber:document.developmentProposalList[0].ownedByUnitNumber,unitName:document.developmentProposalList[0].ownedByUnit.unitName" anchor="${tabKey}" />
+                    <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="document.developmentProposalList[0].ownedByUnitNumber:unitNumber" anchor="${tabKey}" />
+                    <div id="unitName.div" >
+                        <c:if test="${!empty KualiForm.document.developmentProposalList[0].unitNumber}">
+                            <c:choose>
+                                <c:when test="${empty KualiForm.document.developmentProposalList[0].unit}">
+                                    <span style='color: red;'>not found</span>
+                                </c:when>
+                                <c:otherwise>
+                                        <c:out value="${KualiForm.document.developmentProposalList[0].unit.unitName}" />
+                                </c:otherwise>  
+                            </c:choose>                        
+                        </c:if>
+                    </div>  
                     </c:when>
                     <c:otherwise>
-                      ${KualiForm.document.developmentProposalList[0].ownedByUnit.unitNumber} - ${KualiForm.document.developmentProposalList[0].ownedByUnit.unitName}
-                    </c:otherwise>
-                  </c:choose>
-				</td>
+                        ${KualiForm.document.developmentProposalList[0].ownedByUnitNumber} - ${KualiForm.document.developmentProposalList[0].ownedByUnit.unitName}
+                     </c:otherwise>
+                </c:choose>                  
+                </td>
                 <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.requestedEndDateInitial}" /></div></th>
                 <td align="left" valign="middle">
-                	<kul:htmlControlAttribute property="document.developmentProposalList[0].requestedEndDateInitial" attributeEntry="${proposalDevelopmentAttributes.requestedEndDateInitial}"  />
+                       <kul:htmlControlAttribute property="document.developmentProposalList[0].requestedEndDateInitial" attributeEntry="${proposalDevelopmentAttributes.requestedEndDateInitial}"  />
                 </td>
             </tr>
             <tr>

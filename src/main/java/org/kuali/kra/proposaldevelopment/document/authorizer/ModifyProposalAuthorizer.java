@@ -15,13 +15,13 @@
  */
 package org.kuali.kra.proposaldevelopment.document.authorizer;
 
-import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.kew.KraDocumentRejectionService;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.document.authorization.ProposalTask;
-import org.kuali.kra.service.UnitAuthorizationService;
+import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.kew.api.WorkflowDocument;
 
 
@@ -52,8 +52,13 @@ public class ModifyProposalAuthorizer extends ProposalAuthorizer {
             // we will indicate that the user does not have permission to do that. 
             
             if (unitNumber != null) {
-                UnitAuthorizationService auth = KraServiceLocator.getService(UnitAuthorizationService.class);
-                hasPermission = auth.hasPermission(userId, unitNumber, Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, PermissionConstants.CREATE_PROPOSAL);
+            	KcPersonService kcPersonService = KraServiceLocator.getService(KcPersonService.class);
+                KcPerson kcPerson = kcPersonService.getKcPersonByPersonId(userId);
+                if(kcPerson == null){
+                    return false;
+                } else {
+                	return true;
+                }
             }
         } else {
             /*

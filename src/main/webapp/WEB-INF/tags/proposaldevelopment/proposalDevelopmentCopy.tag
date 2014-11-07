@@ -86,6 +86,8 @@
                 <td align="left" valign="middle">
                     <kul:htmlControlAttribute property="copyCriteria.leadUnitNumber" 
                                               attributeEntry="${proposalCopyCriteriaAttributes.leadUnitNumber}"  readOnly="${!canCopy}"/>
+                <kul:lookup boClassName="org.kuali.kra.bo.Unit" fieldConversions="unitNumber:copyCriteria.leadUnitNumber" anchor="${tabKey}" />
+                <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="copyCriteria.leadUnitNumber" anchor="${tabKey}" />
                 </td>
             </tr>
          

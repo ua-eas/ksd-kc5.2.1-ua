@@ -17,8 +17,9 @@ package org.kuali.kra.authorizer;
 
 import org.kuali.kra.authorization.Task;
 import org.kuali.kra.authorization.TaskAuthorizerImpl;
-import org.kuali.kra.infrastructure.Constants;
-import org.kuali.kra.infrastructure.PermissionConstants;
+import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.service.KcPersonService;
 
 /**
  * The Create Proposal Authorizer checks to see if the user has 
@@ -31,6 +32,12 @@ public class CreateProposalAuthorizer extends TaskAuthorizerImpl {
      * @see org.kuali.kra.authorization.TaskAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.authorization.Task)
      */
     public boolean isAuthorized(String userId, Task task) { 
-        return hasUnitPermission(userId, Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, PermissionConstants.CREATE_PROPOSAL);
+    	KcPersonService kcPersonService = KraServiceLocator.getService(KcPersonService.class);
+        KcPerson kcPerson = kcPersonService.getKcPersonByPersonId(userId);
+        if (kcPerson == null) {
+            return false;
+        } else{
+        	return true;
+        }
     }
 }

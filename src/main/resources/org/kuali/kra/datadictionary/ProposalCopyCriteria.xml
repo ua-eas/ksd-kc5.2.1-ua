@@ -96,9 +96,7 @@
     </property>
     <property name="required" value="true" />
     <property name="control" >
-      <bean parent="SelectControlDefinition"
-            p:valuesFinderClass="org.kuali.kra.proposaldevelopment.lookup.keyvalue.LeadUnitValuesFinder"
-            p:includeKeyInLabel="false" />
+      <bean p:size="8" parent="TextControlDefinition" />
     </property>
     <property name="summary" value="Lead Unit (Owned by Unit)" />
     <property name="description" value="The copied proposal&apos;s fixed home unit that will be used for routing and business rule purposes. AKA Owned by Unit." />

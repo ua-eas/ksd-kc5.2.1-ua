@@ -97,17 +97,17 @@ public class ProposalDevelopmentServiceImpl implements ProposalDevelopmentServic
         if (developmentProposal.getOwnedByUnitNumber() != null && applicantOrganization.getOrganization() == null) {
             // get Lead Unit details
             developmentProposal.refreshReferenceObject("ownedByUnit");
-            String applicantOrganizationId = developmentProposal.getOwnedByUnit().getOrganizationId();
-
-            // get Organzation assoc. w/ Lead Unit, set applicant org
-            applicantOrganization = createProposalSite(applicantOrganizationId, getNextSiteNumber(proposalDevelopmentDocument));
-            developmentProposal.setApplicantOrganization(applicantOrganization);
+            if(developmentProposal.getOwnedByUnit() != null) {
+	            String applicantOrganizationId = developmentProposal.getOwnedByUnit().getOrganizationId();
+	            // get Organzation assoc. w/ Lead Unit, set applicant org
+	            applicantOrganization = createProposalSite(applicantOrganizationId, getNextSiteNumber(proposalDevelopmentDocument));
+	            developmentProposal.setApplicantOrganization(applicantOrganization);
+            }
         }
 
         // On first save, set Performing Organization if not selected
         ProposalSite performingOrganization = developmentProposal.getPerformingOrganization();
-        if (StringUtils.isEmpty(developmentProposal.getProposalNumber()) && performingOrganization.getOrganization() == null
-                && developmentProposal.getOwnedByUnitNumber() != null) {
+        if (StringUtils.isEmpty(developmentProposal.getProposalNumber()) && performingOrganization.getOrganization() == null && developmentProposal.getOwnedByUnit() != null) {
             String performingOrganizationId = developmentProposal.getOwnedByUnit().getOrganizationId();
             performingOrganization = createProposalSite(performingOrganizationId, getNextSiteNumber(proposalDevelopmentDocument));
             developmentProposal.setPerformingOrganization(performingOrganization);

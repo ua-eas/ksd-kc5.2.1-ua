@@ -81,6 +81,7 @@ import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
 import org.kuali.kra.service.SponsorService;
+import org.kuali.kra.service.UnitService;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
 import org.kuali.rice.kns.service.DataDictionaryService;
 import org.kuali.rice.krad.bo.BusinessObject;
@@ -134,11 +135,41 @@ public class ProposalDevelopmentDocumentRule extends ResearchDocumentRuleBase im
         valid &= processSponsorProgramBusinessRule(proposalDevelopmentDocument);
         valid &= processKeywordBusinessRule(proposalDevelopmentDocument);
         valid &= proccessValidateSponsor(proposalDevelopmentDocument);
+        valid &= processUnitBusinessRules(proposalDevelopmentDocument);
         GlobalVariables.getMessageMap().removeFromErrorPath("document.developmentProposalList[0]");
      
         return valid;
     }
-    
+
+    private boolean processUnitBusinessRules(ProposalDevelopmentDocument proposalDevelopmentDocument) {
+		boolean valid = true;
+
+		MessageMap errorMap = GlobalVariables.getMessageMap();
+		DataDictionaryService dataDictionaryService = KraServiceLocator.getService(DataDictionaryService.class);
+
+		proposalDevelopmentDocument.getDevelopmentProposal().refreshReferenceObject("ownedByUnit");
+		String unitNumber = proposalDevelopmentDocument.getDevelopmentProposal().getOwnedByUnitNumber();
+
+		if (unitNumber != null) {
+			valid = false;
+			UnitService unitService = KraServiceLocator.getService(UnitService.class);
+
+			if (unitService.getUnit(unitNumber) != null) {
+				valid = true;
+			} else {
+				errorMap.putError("ownedByUnit", KeyConstants.ERROR_MISSING, dataDictionaryService.getAttributeErrorLabel(
+						DevelopmentProposal.class, "ownedByUnitNumber"));
+			}
+		} else {
+			valid = false;
+			if (proposalDevelopmentDocument.getDevelopmentProposal().getOwnedByUnit() == null) {
+				errorMap.putError("ownedByUnitNumber", KeyConstants.ERROR_MISSING, dataDictionaryService.getAttributeErrorLabel(
+						DevelopmentProposal.class, "ownedByUnitNumber"));
+			}
+		}
+		return valid;
+	}
+
     @Override
     protected boolean processCustomApproveDocumentBusinessRules(ApproveDocumentEvent approveEvent) {
         boolean retval = super.processCustomApproveDocumentBusinessRules(approveEvent);
@@ -147,7 +178,7 @@ public class ProposalDevelopmentDocumentRule extends ResearchDocumentRuleBase im
         
         return retval;
     }
-    
+
     private boolean proccessValidateSponsor(ProposalDevelopmentDocument proposalDevelopmentDocument) {
         System.err.println("proccessValidateSponsor");
         boolean valid = true;
