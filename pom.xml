@@ -1,41 +1,41 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>edu.arizona.kc</groupId>
-	<artifactId>kuali-coeus-5.2.1</artifactId>
-	<version>ua-SNAPSHOT</version>
-	<packaging>war</packaging>
+    <groupId>edu.arizona.kc</groupId>
+    <artifactId>kuali-coeus-5.2.1</artifactId>
+    <version>ua-SNAPSHOT</version>
+    <packaging>war</packaging>
 
-	<name>kc_custom</name>
-	<url>http://maven.apache.org</url>
+    <name>kc_custom</name>
+    <url>http://maven.apache.org</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<kc.version>5.2.1</kc.version>
-		<rice.version>2.3.6</rice.version>
-		<servlet.version>2.5</servlet.version>
-		<commons-lang.version>2.6</commons-lang.version>
-		<spring-context.version>3.2.3.RELEASE</spring-context.version>
-		<kc-printing-xsds.version>2.0.0</kc-printing-xsds.version>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <kc.version>5.2.1</kc.version>
+        <rice.version>2.3.6</rice.version>
+        <servlet.version>2.5</servlet.version>
+        <commons-lang.version>2.6</commons-lang.version>
+        <spring-context.version>3.2.3.RELEASE</spring-context.version>
+        <kc-printing-xsds.version>2.0.0</kc-printing-xsds.version>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.kuali.kra</groupId>
-			<artifactId>kc_project</artifactId>
-			<version>${kc.version}</version>
-			<type>war</type>
-		</dependency>
-		<dependency>
-			<groupId>org.kuali.kra</groupId>
-			<artifactId>kc_project</artifactId>
-			<version>${kc.version}</version>
-			<type>jar</type>
-			<classifier>classes</classifier>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.kuali.kra</groupId>
+            <artifactId>kc_project</artifactId>
+            <version>${kc.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.kuali.kra</groupId>
+            <artifactId>kc_project</artifactId>
+            <version>${kc.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
@@ -45,13 +45,19 @@
             <groupId>org.kuali.rice</groupId>
             <artifactId>rice-krms-impl</artifactId>
             <version>${rice.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lowagie</groupId>
+                    <artifactId>itext</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-		<dependency>
-			<groupId>org.kuali.rice</groupId>
-			<artifactId>rice-kim-ldap</artifactId>
-			<version>${rice.version}</version>
-			<exclusions>
-			    <exclusion>
+        <dependency>
+            <groupId>org.kuali.rice</groupId>
+            <artifactId>rice-kim-ldap</artifactId>
+            <version>${rice.version}</version>
+            <exclusions>
+                <exclusion>
                     <groupId>javax.servlet.jsp</groupId>
                     <artifactId>jsp-api</artifactId>
                 </exclusion>
@@ -91,46 +97,46 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-expression</artifactId>                
                 </exclusion>
-			</exclusions>
-		</dependency>
-	   <dependency>
-		  <groupId>javax.servlet</groupId>
-		  <artifactId>servlet-api</artifactId>
-		  <version>${servlet.version}</version>
-		  <scope>provided</scope>
-	   </dependency>
-	   <dependency>
-          <groupId>commons-lang</groupId>
-          <artifactId>commons-lang</artifactId>
-          <version>${commons-lang.version}</version>
-          <scope>provided</scope>
-       </dependency>
-       <dependency>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>${servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons-lang.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring-context.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.kuali.kra.print.xsds</groupId>
-			<artifactId>kc-printing-xsds</artifactId>
-			<version>${kc-printing-xsds.version}</version>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
-				<configuration>
-					<overlays>
-						<overlay>
-							<groupId>org.kuali.kra</groupId>
-							<artifactId>kc_project</artifactId>
-						</overlay>
-					</overlays>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+            <groupId>org.kuali.kra.print.xsds</groupId>
+            <artifactId>kc-printing-xsds</artifactId>
+            <version>${kc-printing-xsds.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <overlays>
+                        <overlay>
+                            <groupId>org.kuali.kra</groupId>
+                            <artifactId>kc_project</artifactId>
+                        </overlay>
+                    </overlays>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
