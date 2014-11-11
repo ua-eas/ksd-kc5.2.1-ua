@@ -105,7 +105,7 @@ public class AwardBudgetForm extends BudgetForm {
         }
         
         if( tas.isAuthorized(GlobalVariables.getUserSession().getPrincipalId(), new BudgetTask("awardBudget", "rejectBudget", doc))) {
-            addExtraButton("methodToCall.reject", configurationService.getPropertyValueAsString(externalImageURL) + "buttonsmall_reject.gif", "Reject");
+            addExtraButton("methodToCall.reject", configurationService.getPropertyValueAsString(externalImageURL) + "buttonsmall_returnForEdit.gif", "Reject");
         }
         if( tas.isAuthorized(GlobalVariables.getUserSession().getPrincipalId(), new BudgetTask("awardBudget", "cancelBudget", doc))) {
             addExtraButton("methodToCall.cancel", configurationService.getPropertyValueAsString(krImageURL) + "buttonsmall_cancel.gif", "Cancel");

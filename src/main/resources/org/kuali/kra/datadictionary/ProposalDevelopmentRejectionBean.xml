@@ -22,7 +22,7 @@
   <bean id="ProposalDevelopmentRejectionBean-rejectReason-parentBean" abstract="true" parent="AttributeDefinition">
     <property name="name" value="rejectReason" />
     <property name="forceUppercase" value="false" />
-    <property name="label" value="Rejection Reason" />
+    <property name="label" value="Return For Edit Reason" />
     <property name="shortLabel" value="rejectReason" />
     <property name="maxLength" value="4000" />
     <property name="required" value="true" />

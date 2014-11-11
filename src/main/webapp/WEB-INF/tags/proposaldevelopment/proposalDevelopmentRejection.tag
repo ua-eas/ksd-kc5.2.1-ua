@@ -17,11 +17,11 @@
 
 <c:set var="proposalDevelopmentRejectionBeanAttributes" value="${DataDictionary.ProposalDevelopmentRejectionBean.attributes}" />
 
-<kul:tabTop tabTitle="Proposal Developement Rejection Confirmation" defaultOpen="true" tabErrorKey="ProposalDevelopmentRejectionBean*">
+<kul:tabTop tabTitle="Proposal Development Return For Edit Confirmation" defaultOpen="true" tabErrorKey="ProposalDevelopmentRejectionBean*">
 	<div class="tab-container" align="center">
 	<table cellpadding=0 cellspacing=0 summary="">
 		<tr>
-			<th colspan="2">Are you sure you want to reject this document?</th>
+			<th colspan="2">Are you sure you want to return this document for edit?</th>
 		</tr>
 		<tr>
 			<th>

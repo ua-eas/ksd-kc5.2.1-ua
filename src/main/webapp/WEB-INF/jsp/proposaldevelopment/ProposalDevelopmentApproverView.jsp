@@ -160,7 +160,7 @@
 		<c:if
 			test="${!empty KualiForm.editingMode['rejectProposal'] and not suppressRoutingControls}">
 			<html:image
-				src="${ConfigProperties.kra.externalizable.images.url}buttonsmall_reject.gif"
+				src="${ConfigProperties.kra.externalizable.images.url}buttonsmall_returnForEdit.gif"
 				styleClass="globalbuttons" property="methodToCall.reject"
 				title="reject" alt="reject" onclick="resetScrollPosition();"
 				tabindex="${tabindex}" />

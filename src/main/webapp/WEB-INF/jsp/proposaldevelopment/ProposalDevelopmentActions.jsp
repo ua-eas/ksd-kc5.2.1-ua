@@ -110,7 +110,7 @@ http://www.osedu.org/licenses/ECL-2.0
 		<%-- Added document authorizer for the reject functionality. --%>
 		<%-- <c:if test="${not KualiForm.suppressAllButtons}">
 	          <c:if test="${KualiForm.documentActions[Constants.KUALI_ACTION_CAN_APPROVE] and KualiForm.reject}">
-	              <c:set var="extraButtonSource" value="${ConfigProperties.externalizable.images.url}buttonsmall_reject.gif"/>
+	              <c:set var="extraButtonSource" value="${ConfigProperties.externalizable.images.url}buttonsmall_returnForEdit.gif"/>
 	              <c:set var="extraButtonProperty" value="methodToCall.reject"/>
 	              <c:set var="extraButtonAlt" value="Reject the document"/>
 	           </c:if> 

@@ -1204,7 +1204,7 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
         //check to see if they are authorized to reject the document
         
         if( tas.isAuthorized(GlobalVariables.getUserSession().getPrincipalId(), new ProposalTask("rejectProposal",doc))) {
-            String resubmissionImage = configurationService.getPropertyValueAsString(externalImageURL) + "buttonsmall_reject.gif";
+            String resubmissionImage = configurationService.getPropertyValueAsString(externalImageURL) + "buttonsmall_returnForEdit.gif";
             addExtraButton("methodToCall.reject", resubmissionImage, "Reject");
         }
         
