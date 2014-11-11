@@ -197,12 +197,12 @@ table.tab img {
     /* width: 75%; */
     text-align: right;
     padding-right: 15px;
-    border-radius: 0px 5px 0px 0px;
+    border-radius: 0px 0px 0px 0px;
 }
 
 #workarea table.tab td.tabtable1-right,
 #workarea table.tab td.tabtable2-right {
-	background-color: #FFF;
+	border-radius: 0px 5px 0px 0px;
 }
 
 #workarea h2 {
