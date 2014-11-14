@@ -203,6 +203,7 @@ table.tab img {
 #workarea table.tab td.tabtable1-right,
 #workarea table.tab td.tabtable2-right {
 	border-radius: 0px 5px 0px 0px;
+	background-color: rgba(240, 239, 239, 1);
 }
 
 #workarea h2 {
