@@ -250,7 +250,7 @@
     	if (yyCompare != 0)   {    return yyCompare;    }
     	if (mmCompare != 0)   {    return mmCompare;    }
     	if (ddCompare != 0)   {    return ddCompare;    }
-    	if (timeCompate != 0) {    return timeCompare;  }
+    	if (timeCompare != 0) {    return timeCompare;  }
     	return 0;
     }
     
