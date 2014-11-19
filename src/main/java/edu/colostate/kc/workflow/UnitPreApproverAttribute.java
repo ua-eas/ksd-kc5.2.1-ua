@@ -28,20 +28,21 @@ import org.kuali.rice.kew.rule.ResolvedQualifiedRole;
 
 import edu.colostate.kc.infrastructure.CSUKeyConstants;
 
+
 public class UnitPreApproverAttribute extends GenericRoleAttribute {
 	private static final long serialVersionUID = 8284679400892921738L;
+
+	private static final String ROLE_NAME = "UnitAdministrator";
 	private static final String OWNED_BY_UNIT = "ownedByUnitNumber";
-	private static final String ROLE_NAME = "Unit Administrator";
-    private static final List<RoleName> UNIT_ADMIN_ROLE_LIST;
-    static{
-    	UNIT_ADMIN_ROLE_LIST = new LinkedList<RoleName>();
-    	RoleName.Builder roleNameBuilder = RoleName.Builder.create(UnitApproverRoleAttribute.class.getName(), ROLE_NAME, ROLE_NAME);
-    	UNIT_ADMIN_ROLE_LIST.add(roleNameBuilder.build());
-    }
-	
-	
 	private ConfigurationService kualiConfigurationService;
 	private List<String> preApproverCodeList;
+	private static final List<RoleName> UNIT_ADMIN_ROLE_LIST;
+	static{
+		UNIT_ADMIN_ROLE_LIST = new LinkedList<RoleName>();
+		RoleName.Builder roleNameBuilder = RoleName.Builder.create(UnitPreApproverAttribute.class.getName(), ROLE_NAME, ROLE_NAME);
+		UNIT_ADMIN_ROLE_LIST.add(roleNameBuilder.build());
+	}
+
 
 	public List<String> getQualifiedRoleNames(String roleName,
 			DocumentContent documentContent) {
@@ -119,20 +120,18 @@ public class UnitPreApproverAttribute extends GenericRoleAttribute {
 		return this.kualiConfigurationService;
 	}
 
-    
-    private String retrieveDocumentUnitNumber(RouteContext context) {
-        Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
-        String ownedByUnitNumber = null;
-        Collection<Element> documentElements = XmlHelper.findElements(document.getRootElement(), DevelopmentProposal.class.getName());
-        if (documentElements != null) {
-        	Iterator<Element> iter = documentElements.iterator();
-        	if(iter.hasNext()){
-        		Element element = iter.next();
-        		if(element != null){
-        			ownedByUnitNumber = element.getChildText(OWNED_BY_UNIT);
-        		}
-        	}
-        }
-        return ownedByUnitNumber;
-    }
+	private String retrieveDocumentUnitNumber(RouteContext context) {
+		Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
+		String ownedByUnitNumber = null;
+		Collection<Element> documentElements = XmlHelper.findElements(document.getRootElement(), DevelopmentProposal.class.getName());
+		if (documentElements != null) {
+			Iterator<Element> iter = documentElements.iterator();
+			if(iter.hasNext()) {
+				Element element = iter.next();
+				ownedByUnitNumber = element.getChildText(OWNED_BY_UNIT);
+			}
+		}
+		return ownedByUnitNumber;
+	}
+
 }
