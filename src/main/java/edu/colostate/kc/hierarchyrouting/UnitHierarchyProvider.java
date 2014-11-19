@@ -35,7 +35,7 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 public class UnitHierarchyProvider implements HierarchyProvider {
 
 	   private static final Log LOG = LogFactory.getLog(UnitHierarchyProvider.class);
-	    private static final String UNIT_NUMBER_ELEMENT = "unitNumber";
+	   private static final String UNIT_NUMBER_ELEMENT = "homeUnit";
 	    
 
 	    private UnitService unitService;
@@ -93,7 +93,9 @@ public class UnitHierarchyProvider implements HierarchyProvider {
 	            }
 	        }
 	        /*KCI-1122 starts */
-	        leafStops.add(leadUnitStop);
+            if(leadUnitStop != null) {
+                leafStops.add(leadUnitStop);
+            }
 	        /*KCI-1122 ends */
 	        return leafStops;
 	    }
@@ -131,19 +133,18 @@ public class UnitHierarchyProvider implements HierarchyProvider {
 	    }
 	    
 	    private List<String> retrieveProposalUnitNumbers(RouteContext context) {
-	    	Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
-	    	List<String> proposalUnits = null;
-	    	Collection<Element> personUnitElements = XmlHelper.findElements(document.getRootElement(),"org.kuali.kra.proposaldevelopment.bo.ProposalPersonUnit");
-            if (personUnitElements != null) {
-            	proposalUnits = new ArrayList<String>();
-              for (Element personUnitElement: personUnitElements) {
-            	  if (personUnitElement != null) {
-            		  String unitNumber = personUnitElement.getChildText(UNIT_NUMBER_ELEMENT);
-            		  if (!proposalUnits.contains(unitNumber)) {
-                		  proposalUnits.add(unitNumber);
-            		  }
-            	  }
-              }
+            Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
+            List<String> proposalUnits = new ArrayList<String>();
+            Collection<Element> proposalPersonElements = XmlHelper.findElements(document.getRootElement(), "org.kuali.kra.proposaldevelopment.bo.ProposalPerson");
+            if (proposalPersonElements.size() > 0) {
+                for (Element proposalPersonElement : proposalPersonElements) {
+                    if (proposalPersonElement != null) {
+                        String unitNumber = proposalPersonElement.getChildText(UNIT_NUMBER_ELEMENT);
+                        if (!proposalUnits.contains(unitNumber)) {
+                            proposalUnits.add(unitNumber);
+                        }
+                    }
+                }
             }
             
 	    	/*KCI-703 starts */
