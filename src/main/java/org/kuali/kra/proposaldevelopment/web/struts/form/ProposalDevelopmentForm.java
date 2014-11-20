@@ -1205,7 +1205,7 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
         
         if( tas.isAuthorized(GlobalVariables.getUserSession().getPrincipalId(), new ProposalTask("rejectProposal",doc))) {
             String resubmissionImage = configurationService.getPropertyValueAsString(externalImageURL) + "buttonsmall_returnForEdit.gif";
-            addExtraButton("methodToCall.reject", resubmissionImage, "Reject");
+            addExtraButton("methodToCall.reject", resubmissionImage, "Return For Edit");
         }
         
         if (tas.isAuthorized(GlobalVariables.getUserSession().getPrincipalId(), new ProposalTask("deleteProposal", doc))) {
