@@ -35,7 +35,10 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 public class UnitHierarchyProvider implements HierarchyProvider {
 
 	   private static final Log LOG = LogFactory.getLog(UnitHierarchyProvider.class);
-	   private static final String UNIT_NUMBER_ELEMENT = "homeUnit";
+	   private static final String UNIT_NUMBER_ELEMENT_NAME = "homeUnit";
+	   private static final String DOC_NUMBER_ELEMENT_NAME = "documentNumber";
+	   private static final String DOC_NUMBER_DB_COLUMN_NAME = "document_number";
+	   private static final String PROPOSAL_PERSON_CLASS_NAME = "org.kuali.kra.proposaldevelopment.bo.ProposalPerson";
 	    
 
 	    private UnitService unitService;
@@ -115,7 +118,9 @@ public class UnitHierarchyProvider implements HierarchyProvider {
 	            throw new RuntimeException();
 	        }
 	        else {
-	            LOG.warn("id Node state on nodeinstance " + nodeInstance + ": " + state);
+	        	if(LOG.isDebugEnabled()) {
+	        		LOG.debug("id Node state on nodeinstance " + nodeInstance + ": " + state);
+	        	}
 	            return stops.get(state.getValue());
 	        }
 	    }
@@ -135,11 +140,11 @@ public class UnitHierarchyProvider implements HierarchyProvider {
 	    private List<String> retrieveProposalUnitNumbers(RouteContext context) {
             Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
             List<String> proposalUnits = new ArrayList<String>();
-            Collection<Element> proposalPersonElements = XmlHelper.findElements(document.getRootElement(), "org.kuali.kra.proposaldevelopment.bo.ProposalPerson");
+            Collection<Element> proposalPersonElements = XmlHelper.findElements(document.getRootElement(), PROPOSAL_PERSON_CLASS_NAME);
             if (proposalPersonElements.size() > 0) {
                 for (Element proposalPersonElement : proposalPersonElements) {
                     if (proposalPersonElement != null) {
-                        String unitNumber = proposalPersonElement.getChildText(UNIT_NUMBER_ELEMENT);
+                        String unitNumber = proposalPersonElement.getChildText(UNIT_NUMBER_ELEMENT_NAME);
                         if (!proposalUnits.contains(unitNumber)) {
                             proposalUnits.add(unitNumber);
                         }
@@ -151,7 +156,7 @@ public class UnitHierarchyProvider implements HierarchyProvider {
             //Adding Cost share units to workflow
 	    	String documentNumber = context.getDocument().getDocumentId().toString();
 	        Map<String, Object> fieldValues = new HashMap<String, Object>();
-	        fieldValues.put("documentNumber", documentNumber);
+	        fieldValues.put(DOC_NUMBER_ELEMENT_NAME, documentNumber);
 	        BusinessObjectService businessObjectService = getService(BusinessObjectService.class);
 	        List<ProposalDevelopmentDocument> proposalDocuments = (List<ProposalDevelopmentDocument>) businessObjectService.findMatching(ProposalDevelopmentDocument.class, fieldValues);
 
@@ -163,7 +168,7 @@ public class UnitHierarchyProvider implements HierarchyProvider {
 	        if (budgetDocuments != null && budgetDocuments.size() > 0) {            
 	            for(BudgetDocumentVersion budgetDocument : budgetDocuments) {
 	            	fieldValues.clear();
-	                fieldValues.put("document_number", budgetDocument.getDocumentNumber());
+	                fieldValues.put(DOC_NUMBER_DB_COLUMN_NAME, budgetDocument.getDocumentNumber());
 	                List<Budget> budgets = (List<Budget>) businessObjectService.findMatching(Budget.class, fieldValues);
 	                Budget budget = budgets.get(0);
 	                
@@ -241,12 +246,10 @@ public class UnitHierarchyProvider implements HierarchyProvider {
 
 	    public void setStop(RouteNodeInstance requestNodeInstance, Stop stop) {
 	        // TODO : not sure about this one yet ?
-	        // SimpleStop ss = (SimpleStop) stop;
-	    	if(stop == null)
+	    	if(stop == null) {
 	    		return;
+	    	}
 	        requestNodeInstance.addNodeState(new NodeState("id", getStopIdentifier(stop)));
-	        // requestNodeInstance.addNodeState(new NodeState(KEWConstants.RULE_SELECTOR_NODE_STATE_KEY, "named"));
-	        // requestNodeInstance.addNodeState(new NodeState(KEWConstants.RULE_NAME_NODE_STATE_KEY, "NodeInstanceRecipientRule"));
 	    }
 
 	    private UnitService getUnitService() {
