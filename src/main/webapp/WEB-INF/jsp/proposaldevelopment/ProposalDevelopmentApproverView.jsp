@@ -162,7 +162,7 @@
 			<html:image
 				src="${ConfigProperties.kra.externalizable.images.url}buttonsmall_returnForEdit.gif"
 				styleClass="globalbuttons" property="methodToCall.reject"
-				title="reject" alt="reject" onclick="resetScrollPosition();"
+				title="Return For Edit" alt="Return For Edit" onclick="resetScrollPosition();"
 				tabindex="${tabindex}" />
 		</c:if>
 		
