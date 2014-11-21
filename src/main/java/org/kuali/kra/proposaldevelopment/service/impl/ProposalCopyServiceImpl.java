@@ -353,25 +353,28 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
             
     protected void copyProperties(DevelopmentProposal src, DevelopmentProposal dest, List<DocProperty> properties) throws Exception {
         for (DocProperty property : properties) {
-            Object value = property.getter.invoke(src);
-            if (value instanceof Serializable) {
-                // Just to be careful, we don't want the two documents
-                // referencing the same data.  Each must have its own
-                // local copies of the data.
-                value = ObjectUtils.deepCopy((Serializable) value);
+        	String propGetter = property.getter.getName();
+        	if (!StringUtils.equals(propGetter, "getProposalYnqs")) {
+        		Object value = property.getter.invoke(src);
+        		if (value instanceof Serializable) {
+        			// Just to be careful, we don't want the two documents
+        			// referencing the same data.  Each must have its own
+        			// local copies of the data.
+        			value = ObjectUtils.deepCopy((Serializable) value);
                 
-                // If this is a persistable business object, its version number
-                // must be reset to null.  The OJB framework is responsible for
-                // setting the version number for its optimistic locking.  Or in
-                // other words, since this is a new object, its version number 
-                // cannot be the same as the original it was copied from.
+        			// If this is a persistable business object, its version number
+        			// must be reset to null.  The OJB framework is responsible for
+        			// setting the version number for its optimistic locking.  Or in
+        			// other words, since this is a new object, its version number 
+        			// cannot be the same as the original it was copied from.
                 
-                if (value instanceof PersistableBusinessObjectBase) {
-                    PersistableBusinessObjectBase obj = (PersistableBusinessObjectBase) value;
-                    obj.setVersionNumber(null);
-                }
-            }
-            property.setter.invoke(dest, value);
+        			if (value instanceof PersistableBusinessObjectBase) {
+        				PersistableBusinessObjectBase obj = (PersistableBusinessObjectBase) value;
+        				obj.setVersionNumber(null);
+        			}
+        		}
+        		property.setter.invoke(dest, value);
+        	}	
         }
     }
     
