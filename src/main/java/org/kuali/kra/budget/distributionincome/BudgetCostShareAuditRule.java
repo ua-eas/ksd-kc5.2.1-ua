@@ -15,21 +15,23 @@
  */
 package org.kuali.kra.budget.distributionincome;
 
+import static org.kuali.rice.kns.util.KNSGlobalVariables.getAuditErrorMap;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.kuali.kra.budget.core.Budget;
 import org.kuali.kra.budget.core.Budget.FiscalYearSummary;
 import org.kuali.kra.budget.document.BudgetDocument;
 import org.kuali.kra.costshare.CostShareRuleResearchDocumentBase;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.service.UnitService;
 import org.kuali.rice.kns.util.AuditCluster;
 import org.kuali.rice.kns.util.AuditError;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.DocumentAuditRule;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.kuali.rice.kns.util.KNSGlobalVariables.getAuditErrorMap;
 
 /**
  * 
@@ -76,7 +78,7 @@ public class BudgetCostShareAuditRule extends CostShareRuleResearchDocumentBase 
                                     params));
             }
         }
-        String source = null;
+
         Integer fiscalYear = null;
 
         List<Integer> validFiscalYears = new ArrayList<Integer>();
@@ -87,17 +89,21 @@ public class BudgetCostShareAuditRule extends CostShareRuleResearchDocumentBase 
         int i = 0;
         // Forces inclusion of source account
         for (BudgetCostShare costShare : costShares) {
-            source = costShare.getSourceAccount();
+            
+            UnitService unitService = KraServiceLocator.getService(UnitService.class);
+            String sourceUnitNumber = null;
             fiscalYear = costShare.getProjectPeriod();
-            if (null == source || source.length() == 0) {
+            sourceUnitNumber = costShare.getSourceUnitNumber();
+            if (null == sourceUnitNumber || sourceUnitNumber.length() == 0 || null == unitService.getUnit(sourceUnitNumber)) {
                 retval = false;
-                getAuditErrors()
-                        .add(
-                                new AuditError("document.budget.budgetCostShare[" + i + "].sourceAccount",
-                                    KeyConstants.AUDIT_ERROR_BUDGET_DISTRIBUTION_SOURCE_MISSING,
-                                    Constants.BUDGET_DISTRIBUTION_AND_INCOME_PAGE + "." + Constants.BUDGET_COST_SHARE_PANEL_ANCHOR,
-                                    params));
+            	getAuditErrors()
+                .add(
+                        new AuditError("document.budget.budgetCostShare[" + i + "].sourceUnitNumber",
+                            KeyConstants.ERROR_BUDGET_DISTRIBUTION_SOURCE_UNIT_INVALID,
+                            Constants.BUDGET_DISTRIBUTION_AND_INCOME_PAGE + "." + Constants.BUDGET_COST_SHARE_PANEL_ANCHOR,
+                            params));
             }
+        	
             int numberOfProjectPeriods = -1;
             if (budget.getBudgetPeriods() != null) {
                 numberOfProjectPeriods = budget.getBudgetPeriods().size();

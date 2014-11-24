@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.budget.distributionincome;
 
+import org.kuali.kra.bo.Unit;
 import org.kuali.kra.budget.BudgetDecimal;
 import org.kuali.kra.proposaldevelopment.hierarchy.HierarchyMaintainable;
 
@@ -30,8 +31,8 @@ public class BudgetCostShare extends BudgetDistributionAndIncomeComponent implem
     private BudgetDecimal shareAmount;
     private BudgetDecimal sharePercentage;
     private String sourceAccount;
-    private String sourceUnit;
-
+    private Unit sourceUnit;
+    private String sourceUnitNumber;
     private String hierarchyProposalNumber;
     private boolean hiddenInHierarchy;
 
@@ -189,13 +190,13 @@ public class BudgetCostShare extends BudgetDistributionAndIncomeComponent implem
         this.sourceAccount = sourceAcocunt;
     }
     
-    public String getSourceUnit() {
-        return sourceUnit;
-    }
+    public Unit getSourceUnit() {
+		return sourceUnit;
+	}
 
-    public void setSourceUnit(String sourceUnit) {
-        this.sourceUnit = sourceUnit;
-    }
+	public void setSourceUnit(Unit sourceUnit) {
+		this.sourceUnit = sourceUnit;
+	}
  
     public String getHierarchyProposalNumber() {
         return hierarchyProposalNumber;
@@ -212,4 +213,12 @@ public class BudgetCostShare extends BudgetDistributionAndIncomeComponent implem
     public void setHiddenInHierarchy(boolean hiddenInHierarchy) {
         this.hiddenInHierarchy = hiddenInHierarchy;
     }
+
+	public String getSourceUnitNumber() {
+		return sourceUnitNumber;
+	}
+
+	public void setSourceUnitNumber(String sourceUnitNumber) {
+		this.sourceUnitNumber = sourceUnitNumber;
+	}
 }

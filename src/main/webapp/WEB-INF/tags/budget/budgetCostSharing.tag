@@ -49,6 +49,7 @@
 							<th width="17%"><div align="center">${KualiForm.projectPeriodLabel}</div></th>
 							<th width="17%"><div align="center">Percentage</div></th>
 							<th width="29%"><div align="center">Source Account</div></th>
+							<th width="29%"><div align="center">Source Unit</div></th>
 							<th width="17%"><div align="center">Amount</div></th>					
 							<th width="15%"><div align="center">Actions</div></th>	
 						</tr>
@@ -67,7 +68,12 @@
 			        		</div></td>
 			        		<td class="infoline"><div align="center">
 			        			<kul:htmlControlAttribute property="newBudgetCostShare.shareAmount" attributeEntry="${budgetCostShareAttributes.shareAmount}" styleClass="amount" />
-			        		</div></td>	        		
+			        		</div></td>
+                            <td class="infoline"><div align="center">
+                                <kul:htmlControlAttribute property="newBudgetCostShare.sourceUnitNumber" attributeEntry="${budgetCostShareAttributes.sourceUnitNumber}" />
+                                <kul:lookup boClassName="org.kuali.kra.bo.Unit" fieldConversions="unitNumber:newBudgetCostShare.sourceUnitNumber,unitName:newBudgetCostShare.sourceUnit.unitName" anchor="${tabKey}" />
+                                <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="newBudgetCostShare.sourceUnitNumber" anchor="${tabKey}" />
+                            </div></td>	        		
 			                <td class="infoline">
 			            		<div align=center>
 			            			<html:image property="methodToCall.addCostShare" src='${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif' styleClass="tinybutton addButton"/>
@@ -92,6 +98,9 @@
 			        			</div></td>
 			            		
 			            		<td><div align="center">
+			            		    <kul:htmlControlAttribute property="document.budget.budgetCostShare[${status.index}].sourceUnitNumber" attributeEntry="${budgetCostShareAttributes.sourceUnitNumber}" />
+                                    <kul:lookup boClassName="org.kuali.kra.bo.Unit" fieldConversions="unitNumber:document.budget.budgetCostShare[${status.index}].sourceUnitNumber,unitName:document.budget.budgetCostShare[${status.index}].sourceUnit.unitName" anchor="${tabKey}" />
+                                    <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="document.budget.budgetCostShare[${status.index}].sourceUnitNumber" anchor="${tabKey}" />
 			            			<kul:htmlControlAttribute property="document.budget.budgetCostShare[${status.index}].shareAmount" attributeEntry="${budgetCostShareAttributes.shareAmount}" styleClass="amount" />
 			        			</div></td>
 			        				        			

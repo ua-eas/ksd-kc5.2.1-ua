@@ -23,6 +23,7 @@
         <ref bean="BudgetCostShare-shareAmount" />
         <ref bean="BudgetCostShare-sharePercentage" />
         <ref bean="BudgetCostShare-sourceAccount" />
+        <ref bean="BudgetCostShare-sourceUnitNumber" />
       </list>
     </property>
   </bean>
@@ -105,6 +106,26 @@
     <property name="description" value="Share Percentage" />
   </bean>
   <bean id="BudgetCostShare-sourceAccount" parent="KraAttributeReferenceDummy-sourceAccount" >
+  </bean>
+  
+  <bean id="BudgetCostShare-sourceUnitNumber" parent="BudgetCostShare-sourceUnitNumber-parentBean" />
+  <bean id="BudgetCostShare-sourceUnitNumber-parentBean" abstract="true" parent="AttributeDefinition">
+    <property name="name" value="sourceUnitNumber" />
+    <property name="forceUppercase" value="false" />
+    <property name="label" value="Source Unit" />
+    <property name="shortLabel" value="Source Unit" />
+    <property name="maxLength" value="8" />
+    <property name="validationPattern" >
+      <bean parent="AnyCharacterValidationPattern"
+            p:allowWhitespace="true" />
+    </property>
+    <property name="required" value="false" />
+    <property name="control" >
+      <bean parent="TextControlDefinition"
+            p:size="8" />
+    </property>
+    <property name="summary" value="Source Unit" />
+    <property name="description" value="Source Unit" />
   </bean>
   
 </beans>

@@ -189,6 +189,9 @@ public final class KeyConstants {
     public static final String ERROR_NARRATIVE_USER_RIGHT_NO_PERMISSION="error.narrative.no.permission";
     public static final String ERROR_PERMISSION_VIEWER_ONLY_KEY = "error.viewer.only";
     
+    //Budget Cost Share
+    public static final String ERROR_BUDGET_DISTRIBUTION_SOURCE_UNIT_INVALID = "error.budget.distribution.sourceUnitInvalid";
+    
     // Authorization
     public static final String AUTHORIZATION_VIOLATION = "error.authorization.violation";
     
