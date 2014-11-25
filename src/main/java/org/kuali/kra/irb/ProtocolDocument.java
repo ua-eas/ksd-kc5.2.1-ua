@@ -88,7 +88,7 @@ public class ProtocolDocument extends ProtocolDocumentBase {
     private static final String APPROVED_COMMENT = "Approved";
     @SuppressWarnings("unused")
     private static final String DISAPPROVED_COMMENT = "Disapproved";
-    private static final String listOfStatiiEligibleForMerging = ProtocolStatus.SUBMITTED_TO_IRB + " " + ProtocolStatus.SPECIFIC_MINOR_REVISIONS_REQUIRED + " " + 
+    private static final String listOfStatesisEligibleForMerging = ProtocolStatus.SUBMITTED_TO_IRB + " " + ProtocolStatus.SPECIFIC_MINOR_REVISIONS_REQUIRED + " " + 
                                                                  ProtocolStatus.DEFERRED + " " + ProtocolStatus.SUBSTANTIVE_REVISIONS_REQUIRED + " " +  
                                                                  ProtocolStatus.AMENDMENT_IN_PROGRESS + " " + ProtocolStatus.RENEWAL_IN_PROGRESS + " " + 
                                                                  ProtocolStatus.SUSPENDED_BY_PI + " " + ProtocolStatus.DELETED + " " + ProtocolStatus.WITHDRAWN;
@@ -293,7 +293,7 @@ public class ProtocolDocument extends ProtocolDocumentBase {
         }
         
     private boolean isEligibleForMerging(String status, Protocol otherProtocol) {
-        return listOfStatiiEligibleForMerging.contains(status) && !StringUtils.equals(this.getProtocol().getProtocolNumber(), otherProtocol.getProtocolNumber());
+        return listOfStatesisEligibleForMerging.contains(status) && !StringUtils.equals(this.getProtocol().getProtocolNumber(), otherProtocol.getProtocolNumber());
     }
 
     /*
@@ -317,16 +317,28 @@ public class ProtocolDocument extends ProtocolDocumentBase {
         return KraServiceLocator.getService(ProtocolFinderDao.class);
     }
 
+    /**
+     * Finds and returns the approval action in the protocol's action list. 
+     * It assumes that there can be only one approve action in the list, and thus it returns the first one found.
+     * @return approvalAction - if any found, otherwise null.
+     */
     private ProtocolActionBase getLastApprovalAction() {
-        ProtocolActionBase result = null;
         for (ProtocolActionBase action: getProtocol().getProtocolActions()) {
-            if (ProtocolActionType.APPROVED.equals(action.getProtocolActionTypeCode()) ||
-                ProtocolActionType.EXPEDITE_APPROVAL.equals(action.getProtocolActionTypeCode()) ||
-                ProtocolActionType.GRANT_EXEMPTION.equals(action.getProtocolActionTypeCode().equals(ProtocolActionType.APPROVED))) {
-                result = action;
+            String protocolActionTypeCode = action.getProtocolActionTypeCode();
+            if (ProtocolActionType.APPROVED.equals(protocolActionTypeCode) ||
+                ProtocolActionType.EXPEDITE_APPROVAL.equals(protocolActionTypeCode) ||
+                ProtocolActionType.RESPONSE_APPROVAL.equals(protocolActionTypeCode) ||
+                ProtocolActionType.GRANT_EXEMPTION.equals(protocolActionTypeCode)) {
+                if ( LOG.isDebugEnabled() ){
+                    LOG.debug("Protocol:"+getProtocol().getProtocolNumber()+" getLastApprovalAction():"+protocolActionTypeCode);
+                }
+                return action;
             }
         }
-        return result;
+        if ( LOG.isDebugEnabled() ){
+            LOG.debug("Protocol:"+getProtocol().getProtocolNumber()+" getLastApprovalAction(): NULL!!!!");
+        }
+        return null;
     }
 
     /**
