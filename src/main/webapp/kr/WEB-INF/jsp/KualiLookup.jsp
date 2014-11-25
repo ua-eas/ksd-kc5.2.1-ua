@@ -235,7 +235,7 @@ Suppresses the Create New button on the top right corner-->
 									<display:column class="infocell" media="html" title="Return Value">${row.returnUrl}</display:column>
 								</c:when>
 								<c:otherwise>
-									<display:column class="infocell" media="html" title="Blank">&nbsp;</display:column>
+									<display:column class="infocell" media="html" title="Return Value">&nbsp;</display:column>
 								</c:otherwise>
  		                   </c:choose>
  		                </c:if>
