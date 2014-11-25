@@ -16,6 +16,8 @@
 package org.kuali.kra.protocol;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.ResearchAreaBase;
@@ -23,6 +25,7 @@ import org.kuali.kra.bo.RolePersons;
 import org.kuali.kra.common.notification.service.KcNotificationService;
 import org.kuali.kra.document.ResearchDocumentBase;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.ProtocolDocument;
 import org.kuali.kra.krms.KcKrmsConstants;
 import org.kuali.kra.krms.KrmsRulesContext;
 import org.kuali.kra.protocol.actions.ProtocolActionBase;
@@ -58,7 +61,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class ProtocolDocumentBase extends ResearchDocumentBase implements Copyable, SessionDocument, KrmsRulesContext {
-
+    private static final Log LOG = LogFactory.getLog(ProtocolDocumentBase.class);
+    
     private static final String AMENDMENT_KEY = "A";
     private static final String RENEWAL_KEY = "R";
     @SuppressWarnings("unused")
@@ -213,7 +217,7 @@ public abstract class ProtocolDocumentBase extends ResearchDocumentBase implemen
                 }
             }
             catch (Exception e) {
-
+                LOG.error("Exception when merging protocol amendment:", e);
             }
         }
         else if (isDisapproved(statusChangeEvent)) { 
@@ -226,8 +230,8 @@ public abstract class ProtocolDocumentBase extends ResearchDocumentBase implemen
                 performVersioningOperationsOnProtocolAfterDisapproval();
             }
             catch (Exception e) {
-                // TODO Need to figure out what to do if the versioning throws exceptions
-                e.printStackTrace();
+                //TODO Need to figure out what to do if the versioning throws exceptions
+                LOG.error("Exception when versioning protocol after disapproval:", e);
             }
         } else if (isRecall(statusChangeEvent)) {
             getProtocolGenericActionService().recall(getProtocol());
