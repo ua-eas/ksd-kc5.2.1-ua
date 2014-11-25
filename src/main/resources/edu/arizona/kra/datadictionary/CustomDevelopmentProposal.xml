@@ -1,0 +1,111 @@
+<!-- /* * Copyright 2005-2014 The Kuali Foundation * * Licensed under the 
+	Educational Community License, Version 2.0 (the "License"); * you may not 
+	use this file except in compliance with the License. * You may obtain a copy 
+	of the License at * * http://www.osedu.org/licenses/ECL-2.0 * * Unless required 
+	by applicable law or agreed to in writing, software * distributeand under the 
+	License is distributed on an "AS IS" BASIS, * WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. * See the License for the specific 
+	language governing permissions and * limitations under the License. */ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="DevelopmentProposal" parent="DevelopmentProposal-parentBean">
+		<property name="attributes">
+			<list>
+				<ref bean="DevelopmentProposal-proposalNumber" />
+				<ref bean="DevelopmentProposal-title" />
+				<ref bean="DevelopmentProposal-sponsorCode" />
+				<ref bean="DevelopmentProposal-sponsor.sponsorName" />
+				<ref bean="DevelopmentProposal-requestedStartDateInitial" />
+				<ref bean="DevelopmentProposal-requestedEndDateInitial" />
+				<ref bean="DevelopmentProposal-activityTypeCode" />
+				<ref bean="DevelopmentProposal-ownedByUnitNumber" />
+				<ref bean="DevelopmentProposal-ownedByUnitNumberRestricted" />
+				<ref bean="DevelopmentProposal-ownedByUnit.unitName" />
+				<ref bean="DevelopmentProposal-proposalTypeCode" />
+				<ref bean="DevelopmentProposal-proposalType.description" />
+				<ref bean="DevelopmentProposal-currentAwardNumber" />
+				<ref bean="DevelopmentProposal-continuedFrom" />
+				<ref bean="DevelopmentProposal-deadlineDate" />
+				<ref bean="DevelopmentProposal-deadlineTime" />
+				<ref bean="DevelopmentProposal-deadlineType" />
+				<ref bean="DevelopmentProposal-primeSponsorCode" />
+				<ref bean="DevelopmentProposal-nsfCode" />
+				<ref bean="DevelopmentProposal-agencyDivisionCode" />
+				<ref bean="DevelopmentProposal-programAnnouncementTitle" />
+				<ref bean="DevelopmentProposal-noticeOfOpportunityCode" />
+				<ref bean="DevelopmentProposal-cfdaNumber" />
+				<ref bean="DevelopmentProposal-programAnnouncementNumber" />
+				<ref bean="DevelopmentProposal-sponsorProposalNumber" />
+				<ref bean="DevelopmentProposal-subcontracts" />
+				<ref bean="DevelopmentProposal-agencyProgramCode" />
+				<ref bean="DevelopmentProposal-mailBy" />
+				<ref bean="DevelopmentProposal-mailType" />
+				<ref bean="DevelopmentProposal-mailAccountNumber" />
+				<ref bean="DevelopmentProposal-numberOfCopies" />
+				<ref bean="DevelopmentProposal-mailingAddressId" />
+				<ref bean="DevelopmentProposal-mailDescription" />
+				<ref bean="DevelopmentProposal-proposalStateTypeCode" />
+				<ref bean="DevelopmentProposal-proposalState.description" />
+				<ref bean="DevelopmentProposal-versionNumber" />
+				<ref bean="DevelopmentProposal-hierarchyBudgetType" />
+				<ref bean="DevelopmentProposal-hierarchyStatus" />
+				<ref bean="DevelopmentProposal-hierarchyStatusName" />
+				<ref bean="DevelopmentProposal-principalInvestigatorName" />
+				<ref bean="DevelopmentProposal-proposalPersons.fullName" />
+				<ref bean="DevelopmentProposal-proposalDocument.documentNumber" />
+				<ref bean="DevelopmentProposal-anticipatedAwardTypeCode" />
+				<ref bean="DevelopmentProposal-budgetStatus" />
+				<ref bean="DevelopmentProposal-proposalNumberForGG" />
+				<ref bean="DevelopmentProposal-opportunityIdForGG" />
+				<ref bean="DevelopmentProposal-agencyRoutingIdentifier" />
+				<ref bean="DevelopmentProposal-prevGrantsGovTrackingID" />
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- Attribute Definitions -->
+	<bean id="DevelopmentProposal-proposalPersons.fullName" parent="DevelopmentProposal-proposalPersons.fullName-parentBean" />
+	<bean id="DevelopmentProposal-proposalPersons.fullName-parentBean" abstract="true" parent="AttributeDefinition" >
+		<property name="name" value="proposalPersons.fullName" />
+		<property name="forceUppercase" value="false" /> 
+		<property name="label" value="Proposal Person Full Name" />
+		<property name="shortLabel" value="Proposal Person" />
+		<property name="maxLength" value="60" />
+		<property name="validationPattern">
+			<bean p:allowWhitespace="true" parent="AnyCharacterValidationPattern" /> 
+		</property>
+		<property name="control" >
+			<bean p:size="30" parent="TextControlDefinition" />
+		</property>
+		<property name="summary" value="Proposal Person" /> 
+		<property name="description" value="Proposal Person" /> 
+	</bean>
+	
+	<!-- Business Object Lookup Definition -->
+	<bean id="DevelopmentProposal-lookupDefinition" parent="DevelopmentProposal-lookupDefinition-parentBean">
+		<property name="lookupFields">
+			<list>
+				<bean parent="FieldDefinition" p:attributeName="proposalNumber"	p:noLookup="true" />
+				<bean parent="FieldDefinition" p:attributeName="proposalTypeCode" />
+				<bean parent="FieldDefinition" p:attributeName="proposalStateTypeCode" />
+				<bean parent="FieldDefinition" p:attributeName="title" />
+				<bean parent="FieldDefinition" p:attributeName="proposalPersons.fullName" />
+				<bean parent="FieldDefinition" p:attributeName="deadlineDate" />
+				<bean parent="FieldDefinition" p:attributeName="sponsorCode" />
+				<bean parent="FieldDefinition" p:attributeName="sponsor.sponsorName" />
+				<bean parent="FieldDefinition" p:attributeName="ownedByUnitNumber" />
+				<bean parent="FieldDefinition" p:attributeName="ownedByUnit.unitName" />
+				<bean parent="FieldDefinition" p:attributeName="currentAwardNumber" />
+				<bean parent="FieldDefinition" p:attributeName="opportunityIdForGG" />
+				<bean parent="FieldDefinition" p:attributeName="hierarchyStatus" />
+				<bean parent="FieldDefinition" p:attributeName="proposalDocument.documentNumber" />
+				
+			</list>
+		</property>
+	</bean>
+</beans>
+  
