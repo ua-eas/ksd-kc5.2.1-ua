@@ -237,6 +237,7 @@
             </table>
         <table cellpadding="4" cellspacing="0" summary="" id="protocol-attachment-table">
         <tbody>
+        <c:set var="activeDisplayIndex" value="0"/>
 		<c:forEach var="attachmentProtocol" items="${filteredAttachmentProtocols}" varStatus="itrStatus">
         
           <!--  Display logic to show the correct attribute being sorted on in the attachment header -->
@@ -257,10 +258,10 @@
           	
 		  <c:choose>
 		    <c:when test="${attachmentProtocol.active}">
-		      <tr id="protocol-attachment-row-${itrStatus.index}" class="fake-class-level-1">
+		      <tr id="protocol-attachment-row-${activeDisplayIndex}" class="fake-class-level-1">
 		        <td>
 		             <c:set var="modify" value="${KualiForm.notesAttachmentsHelper.modifyAttachments and attachmentProtocol.documentStatusCode != '3' and (not KualiForm.document.protocolList[0].renewalWithoutAmendment or attachmentProtocol.documentStatusCode != '2')}" />
-						<kul:innerTabRightAligned tabTitleRightAligned="${attachmentProtocol.sourceProtocolAmendRenewalNumber}" tabTitle="${attachmentProtocol.type.description} - ${descDisplay} - ${updateUserDisplay} (${lastUpdateDisplay})" parentTab="Protocol Attachments(${size})" defaultOpen="false" tabErrorKey="document.protocolList[0].attachmentProtocols[${itrStatus.index}]*,document.protocolList[0].attachmentProtocols[${itrStatus.index}]*" useCurrentTabIndexAsKey="true" tabAuditKey="document.protocolList[0].attachmentProtocols[${itrStatus.index}]*" auditCluster="NoteAndAttachmentAuditErrors">
+						<kul:innerTabRightAligned id="#amend-renew-num-${activeDisplayIndex}" tabTitleRightAligned="${attachmentProtocol.sourceProtocolAmendRenewalNumber}" tabTitle="${attachmentProtocol.type.description} - ${descDisplay} - ${updateUserDisplay} (${lastUpdateDisplay})" parentTab="Protocol Attachments(${size})" defaultOpen="false" tabErrorKey="document.protocolList[0].attachmentProtocols[${itrStatus.index}]*,document.protocolList[0].attachmentProtocols[${itrStatus.index}]*" useCurrentTabIndexAsKey="true" tabAuditKey="document.protocolList[0].attachmentProtocols[${itrStatus.index}]*" auditCluster="NoteAndAttachmentAuditErrors">
 				<div class="innerTab-container" align="left">
             		<table class=tab cellpadding=0 cellspacing="0" summary="">
 						<tr>
@@ -270,7 +271,7 @@
 			         			</div>
 			         		</th>
 			         		<td align="left" valign="middle" colspan="3">
-			                	<div align="left" id="attachment-type-${itrStatus.index}">
+			                	<div align="left" id="attachment-type-${activeDisplayIndex}">
 			                		<kul:htmlControlAttribute property="document.protocolList[0].attachmentProtocols[${itrStatus.index}].typeCode" attributeEntry="${protocolAttachmentProtocolAttributes['typeCode']}" readOnly="true" readOnlyAlternateDisplay ="${attachmentProtocol.type.description}" />
 				            	</div>
 							</td>
@@ -304,7 +305,7 @@
 			         			</div>
 			         		</th>
 			         		<td align="left" valign="middle">
-			                	<div align="left" id="updated-by-${itrStatus.index}">
+			                	<div align="left" id="updated-by-${activeDisplayIndex}">
 			                		<kul:htmlControlAttribute property="document.protocolList[0].attachmentProtocols[${itrStatus.index}].updateUserFullName" attributeEntry="${protocolAttachmentProtocolAttributes.updateUser}" readOnly="true"/>
 				            	</div>
 							</td>
@@ -326,7 +327,7 @@
 			         			</div>
 			         		</th>
 			         		<td align="left" valign="middle">
-			                	<div align="left" id="last-updated-${itrStatus.index}">
+			                	<div align="left" id="last-updated-${activeDisplayIndex}">
 			                	 	     <kul:htmlControlAttribute property="document.protocolList[0].attachmentProtocols[${itrStatus.index}].updateTimestamp" attributeEntry="${protocolAttachmentProtocolAttributes.updateTimestamp}" readOnly="true"/>  
 				            	</div>
 							</td>
@@ -358,7 +359,7 @@
 								</div>
 							</th>
 			         		<td align="left" valign="middle">
-			                	<div align="left" id="row-description-${itrStatus.index}">
+			                	<div align="left" id="row-description-${activeDisplayIndex}">
 			                		<kul:htmlControlAttribute property="document.protocolList[0].attachmentProtocols[${itrStatus.index}].description" attributeEntry="${protocolAttachmentProtocolAttributes.description}" readOnly="${!modify}"/>
 				            	</div>
 							</td>
@@ -456,6 +457,7 @@
 		    </kul:innerTabRightAligned>
 		        </td>
 		      </tr>
+		      <c:set var="activeDisplayIndex" value="${activeDisplayIndex+1}"/>
 		    </c:when>
 		    <c:otherwise>
 		      <html:hidden property="document.protocolList[0].attachmentProtocols[${itrStatus.index}].typeCode" value="${KualiForm.document.protocolList[0].attachmentProtocols[itrStatus.index].typeCode}" />
