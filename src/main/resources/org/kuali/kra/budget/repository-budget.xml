@@ -381,11 +381,9 @@
 		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
 		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP"/>
 		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR"/>
-		<!--		
-		<reference-descriptor name="budget" class-ref="org.kuali.kra.budget.core.Budget" auto-retrieve="true" auto-update="none" auto-delete="none"> 
-			<foreignkey field-ref="budgetId"/> 
-		</reference-descriptor>
-		-->
+        <reference-descriptor name="sourceUnit" class-ref="org.kuali.kra.bo.Unit" auto-retrieve="true" auto-update="none" auto-delete="none">
+          <foreignkey field-ref="sourceUnitNumber" />
+        </reference-descriptor>
 		<field-descriptor name="hierarchyProposalNumber" column="HIERARCHY_PROPOSAL_NUMBER" jdbc-type="VARCHAR" />
 		<field-descriptor name="hiddenInHierarchy" column="HIDE_IN_HIERARCHY" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion" />
 	</class-descriptor>

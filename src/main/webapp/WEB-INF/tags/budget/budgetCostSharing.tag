@@ -67,13 +67,13 @@
 			        			<kul:htmlControlAttribute property="newBudgetCostShare.sourceAccount" attributeEntry="${budgetCostShareAttributes.sourceAccount}" />
 			        		</div></td>
 			        		<td class="infoline"><div align="center">
-			        			<kul:htmlControlAttribute property="newBudgetCostShare.shareAmount" attributeEntry="${budgetCostShareAttributes.shareAmount}" styleClass="amount" />
-			        		</div></td>
-                            <td class="infoline"><div align="center">
                                 <kul:htmlControlAttribute property="newBudgetCostShare.sourceUnitNumber" attributeEntry="${budgetCostShareAttributes.sourceUnitNumber}" />
                                 <kul:lookup boClassName="org.kuali.kra.bo.Unit" fieldConversions="unitNumber:newBudgetCostShare.sourceUnitNumber,unitName:newBudgetCostShare.sourceUnit.unitName" anchor="${tabKey}" />
                                 <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="newBudgetCostShare.sourceUnitNumber" anchor="${tabKey}" />
-                            </div></td>	        		
+                            </div></td>
+			        		<td class="infoline"><div align="center">
+			        			<kul:htmlControlAttribute property="newBudgetCostShare.shareAmount" attributeEntry="${budgetCostShareAttributes.shareAmount}" styleClass="amount" />
+			        		</div></td>	        		
 			                <td class="infoline">
 			            		<div align=center>
 			            			<html:image property="methodToCall.addCostShare" src='${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif' styleClass="tinybutton addButton"/>
@@ -96,14 +96,26 @@
 			            		<td><div align="center">
 			        				<kul:htmlControlAttribute property="document.budget.budgetCostShare[${status.index}].sourceAccount" attributeEntry="${budgetCostShareAttributes.sourceAccount}" />
 			        			</div></td>
-			            		
 			            		<td><div align="center">
 			            		    <kul:htmlControlAttribute property="document.budget.budgetCostShare[${status.index}].sourceUnitNumber" attributeEntry="${budgetCostShareAttributes.sourceUnitNumber}" />
                                     <kul:lookup boClassName="org.kuali.kra.bo.Unit" fieldConversions="unitNumber:document.budget.budgetCostShare[${status.index}].sourceUnitNumber,unitName:document.budget.budgetCostShare[${status.index}].sourceUnit.unitName" anchor="${tabKey}" />
                                     <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="document.budget.budgetCostShare[${status.index}].sourceUnitNumber" anchor="${tabKey}" />
-			            			<kul:htmlControlAttribute property="document.budget.budgetCostShare[${status.index}].shareAmount" attributeEntry="${budgetCostShareAttributes.shareAmount}" styleClass="amount" />
+			            			<div id="unitName.div" >
+                                        <c:if test="${!empty budgetCostShare.sourceUnitNumber}">
+                                            <c:choose>
+                                                <c:when test="${empty budgetCostShare.sourceUnit}">
+                                                    <span style='color: red;'>not found</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:out value="${budgetCostShare.sourceUnit.unitName}" />
+                                                </c:otherwise>  
+                                            </c:choose>                        
+                                        </c:if>
+                                    </div>  
 			        			</div></td>
-			        				        			
+			        			<td><div align="center">
+                                    <kul:htmlControlAttribute property="document.budget.budgetCostShare[${status.index}].shareAmount" attributeEntry="${budgetCostShareAttributes.shareAmount}" styleClass="amount" />
+                                </div></td>			
 			            		<td>
 			            			<div align=center>
 			            				<c:if test="${!viewOnly and fn:length(KualiForm.document.budget.budgetCostShares) > 0}">
