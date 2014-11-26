@@ -179,6 +179,7 @@ table.tab td.tabtable1-left-colspan img
 #workarea td.tabtable1-left-colspan,
 #workarea td.tabtable1-mid1 {
     background-image: none;
+    padding-left: 20px;
 }
 #workarea table.tab td.tabtable1-mid,
 #workarea table.tab td.tabtable2-mid {
