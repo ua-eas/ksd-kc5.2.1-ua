@@ -178,7 +178,7 @@ public class UnitHierarchyProvider implements HierarchyProvider {
 	                    if (costShares != null && costShares.size() > 0) {
 	                        for (BudgetCostShare costShare : costShares) {
 	                        	//If there is a third party cost share unit, it's unit administrators need to be added
-                                proposalUnits.add(costShare.getSourceUnit());
+                                proposalUnits.add(costShare.getSourceUnitNumber());
 	                        }
 	                    }
 	                    break;
