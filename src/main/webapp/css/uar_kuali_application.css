@@ -74,6 +74,17 @@ body {
 	background-color: #ffffff;
 }
 
+/* some global style helpers */
+.gradient-top {
+	background: rgba(237,237,237,1);
+	background: -moz-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 50%, rgba(255,255,255,1) 100%);
+	background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(237,237,237,1)), color-stop(50%, rgba(246,246,246,1)), color-stop(100%, rgba(255,255,255,1)));
+	background: -webkit-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 50%, rgba(255,255,255,1) 100%);
+	background: -o-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 50%, rgba(255,255,255,1) 100%);
+	background: -ms-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 50%, rgba(255,255,255,1) 100%);
+	background: linear-gradient(to bottom, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 50%, rgba(255,255,255,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#ffffff', GradientType=0 );
+}
 
 div.backdoor {
     display: none;
@@ -84,6 +95,7 @@ div#headerarea-small {
     background-image: none;
     height: 81px;
     border-bottom: none;
+    background-color: #FFF;
 }
 #headerarea h1,
 #headerarea-small h1 {
@@ -96,13 +108,13 @@ div#headerarea-small {
 #headerarea div.headerbox {
     right: 20px;
 	font-size: .8em;
-	top: 10px;
+	top: 5px;
 }
 .horz-links-bkgrnd {
     background-color: #e4e4e4;
     border: none;
     padding-top: .5em;
-    height: 32px;
+    height: 31px;
 }
 #tabs dt {
     background-image: none;
@@ -125,9 +137,8 @@ div#headerarea-small {
 #tabs dt.licurrent {
     background-image: none;
     background-color: #FFF;
-    border-top: 1px solid #DDD;
-    border-left: 1px solid #DDD;
-    border-right: 1px solid #DDD;
+    border: none;
+    border-radius: 10px 10px 0px 0px;
 }
 #tabs dl.tabul {
     height: 33px;
@@ -151,12 +162,15 @@ div#horz-links {}
 
 /* workarea tabs */
 #workarea table.tab {
-    border: 1px solid #BDBDBD;
+    /* border: 1px solid #BDBDBD; */
     margin-top: 5px;
 }
 #workarea table.tab td.tabtable1-left {
     background-image: none;
     padding-left: 20px;
+    border-radius: 5px 0px 0px 0px;
+    /* border-top: 1px solid #222; */
+    /* border-left: 1px solid; */
 }
 table.tab td.tabtable1-left img,
 table.tab td.tabtable1-right img,
@@ -176,15 +190,25 @@ table.tab td.tabtable1-left-colspan img
 #workarea table.tab td {
     background-color: #D8D8D8;
 }
+#workarea td.tabtable1-mid1 img {
+	display: none;
+}
 #workarea td.tabtable1-left-colspan,
 #workarea td.tabtable1-mid1 {
     background-image: none;
 }
 #workarea table.tab td.tabtable1-mid,
 #workarea table.tab td.tabtable2-mid {
-    width: 75%;
+    /* width: 75%; */
     text-align: right;
     padding-right: 15px;
+    border-radius: 0px 0px 0px 0px;
+}
+
+#workarea table.tab td.tabtable1-right,
+#workarea table.tab td.tabtable2-right {
+	border-radius: 0px 5px 0px 0px;
+	background-color: rgba(240, 239, 239, 1);
 }
 
 #workarea h2 {
@@ -202,6 +226,12 @@ table.tab td.tabtable1-left-colspan img
 div#workarea {
     font-size: .8em;
 }
+/*this is an ugly hack for when they have 2 div with the 
+  id of workarea */
+div#workarea div#workarea {
+    font-size: 100%;
+}
+
 #workarea table.b3 {
     background-image: none;
 }
@@ -232,6 +262,76 @@ img.br3 {
 
 div.msg-excol {
 	padding: 0;
+}
+
+/* Media queries to resize tabs */
+@media (max-width: 1600px) {
+  #tabs input {
+  	padding: .2em .5em;
+  
+  	height: 22px;
+  }
+  #tabs dl.tabul {
+	height: 22px;
+  }
+  .horz-links-bkgrnd {
+  	height: 22px;
+  }
+  #tabs dl.tabul dt.licurrent {
+	border-radius: 5px 5px 0px 0px;
+  }
+}
+
+@media (max-width: 1400px) {
+  #tabs {
+  	float: left;
+  	clear: both;
+  }
+  #tabs dl.tabul dt {
+    display: none;
+    float: left;
+    clear: left;
+    width: 275px;
+    background-color: #fff;
+    border: 1px solid #e4e4e4;
+  }
+  #tabs dl.tabul dt.licurrent {
+    display: block;
+    border-bottom: none;
+    border-radius: 0px;
+  }
+  #tabs dl.tabul dt.licurrent::after {
+  	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+    content: "\e631";
+    display: block;
+    float: right;
+    margin-top: -23px;
+    margin-right: 10px;
+  }
+  #tabs dl.tabul:hover > dt {
+    display: block;
+  }
+  #tabs input {
+  	width: 100%;
+  	text-align: left;
+  	padding-left: 20px;
+  	padding: .5em 1em;
+  	height: 31px;
+  }
+  .horz-links-bkgrnd {
+  	height: 31px;
+  }
 }
 
 /* Lookup screen styles */
@@ -282,4 +382,41 @@ form[name="ActionListForm"] {
 
 tr th.grid {
 	vertical-align: middle;
+}
+
+/* Custom Styles for the PropDev Key Personnel */
+
+td.annotate-t {
+    background-image: none;
+}
+
+td.annotate-t img {
+    display: none;
+}
+
+.annotate-container,
+div.annotate-container {
+	border: none;
+	background-image: none;
+}
+
+td.annotate-b {
+    background-image: none;
+}
+
+td.annotate-b img {
+    display: none;
+}
+
+div#addPersonDiv,
+div#budgetPersonnelSelectBudgetPeriod {
+    border: 1px solid #BDBDBD;
+    border-radius: 10px;
+    padding: 1em;
+    margin-top: 5px;
+}
+
+/* fix for questionnaire content in firefox */
+div.questionnaireContent {
+    clear: left;
 }
