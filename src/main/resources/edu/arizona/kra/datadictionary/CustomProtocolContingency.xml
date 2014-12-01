@@ -27,7 +27,7 @@
                 <bean p:attributeName="description" parent="FieldDefinition" p:maxLength="-1"/>
             </list>
         </property>
-    </bean
+    </bean>
     
     <bean id="ProtocolContingency-description" parent="ProtocolContingency-description-parentBean">
   	  <property name="maxLength" value="2500"/>
