@@ -2152,3 +2152,4 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
     }
 
 }
+

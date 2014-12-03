@@ -77,14 +77,14 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
     // an indicator of whether this file has been changed/replaced or not.  This is if documentstatus is 1 or 3.  
     // if it is changed, then the updateuser and updatetimestamp of this record will be updated.  
     protected boolean changed = false;
-    
-    //unique attachment id so attachments added to amendment and renewals can be distinguished from the ones in the base protocol
-    private String versioningId;
 
     //UofA: adding sourceProtocolAmendRenewalNumber to the attachments
     private String sourceProtocolAmendRenewalNumber;
     private String sourceProtocolNumber;
-    
+        
+    //unique attachment id so attachments added to amendment and renewals can be distinguished from the ones in the base protocol
+    private String versioningId;
+
     /**
      * empty ctor to satisfy JavaBean convention.
      */
@@ -256,11 +256,11 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         //this.getProtocol().refreshReferenceObject("attachmentProtocols");  
 
         for (ProtocolAttachmentProtocolBase attachment : this.getProtocol().getAttachmentProtocols()) {
+
             if (attachment.getDocumentId().equals(this.getDocumentId()) &&
                     StringUtils.equals(attachment.getVersioningId(), this.getVersioningId())) {
 
                 this.versions.add(attachment);
-            
             }
         }
         if (this.versions.size() == 1) {
@@ -495,14 +495,6 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
             this.createTimestamp = createTimestamp;
         }
     }
-    
-    public String getVersioningId() {
-        return versioningId;
-    }
-
-    public void setVersioningId(String versioningId) {
-        this.versioningId = versioningId;
-    }
 
     /**
      * Returns the source protocol number for when this attachment was last added in.
@@ -557,6 +549,14 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         sourceProtocolNumber = null;
         sourceProtocolAmendRenewalNumber = null;
     }
+    
+    public String getVersioningId() {
+        return versioningId;
+    }
+
+    public void setVersioningId(String versioningId) {
+        this.versioningId = versioningId;
+    }
 
     @Override
     protected void prePersist() {
@@ -565,5 +565,4 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
             setCreateTimestamp(((DateTimeService) KraServiceLocator.getService(Constants.DATE_TIME_SERVICE_NAME)).getCurrentTimestamp());
         }
     }
-
 }

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright 2005-2014 The Kuali Foundation.
+Copyright 2005-2014 The Kuali Foundation.
 
-    Licensed under the Educational Community License, Version 1.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Licensed under the Educational Community License, Version 1.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-    http://www.opensource.org/licenses/ecl1.php
+http://www.opensource.org/licenses/ecl1.php
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-       xmlns:p="http://www.springframework.org/schema/p" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:beans="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -36,34 +36,33 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<bean id="irbModuleConfiguration" parent="irbModuleConfiguration-parentBean">
-		<property name="dataDictionaryPackages">
-			<list merge="true">
-				<value>edu/arizona/kra/datadictionary</value>
-			</list>
-		</property>
-	</bean>
+    <bean id="irbModuleConfiguration" parent="irbModuleConfiguration-parentBean">
+        <property name="dataDictionaryPackages">
+            <list merge="true">
+                <value>edu/arizona/kra/datadictionary</value>
+            </list>
+        </property>
+    </bean>
 
-	<bean id="reviewCommentsService" class="edu.arizona.kra.irb.actions.reviewcomments.CustomReviewCommentsServiceImpl">
-		<property name="businessObjectService" ref="businessObjectService" />
-		<property name="committeeService" ref="committeeService" />
-		<property name="protocolFinderDao" ref="protocolFinderDao" />
-		<property name="roleService" ref="roleService" />
-		<property name="dateTimeService" ref="dateTimeService" />
-		<property name="parameterService" ref="parameterService" />
-		<property name="kcPersonService" ref="kcPersonService" />
-	</bean>
+    <bean id="reviewCommentsService" class="edu.arizona.kra.irb.actions.reviewcomments.CustomReviewCommentsServiceImpl">
+        <property name="businessObjectService" ref="businessObjectService" />
+        <property name="committeeService" ref="committeeService" />
+        <property name="protocolFinderDao" ref="protocolFinderDao" />
+        <property name="roleService" ref="roleService" />
+        <property name="dateTimeService" ref="dateTimeService" />
+        <property name="parameterService" ref="parameterService" />
+        <property name="kcPersonService" ref="kcPersonService" />
+    </bean>
 
     <bean id="protocolAssociateWorkflowSearchLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
         <property name="lookupableHelperService">
             <ref bean="protocolAssociateWorkflowSearchLookupableHelperService" />
-        </property>         
+        </property>
     </bean>
- 
-    <bean id="protocolAssociateWorkflowSearchLookupableHelperService" class="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowSearchLookupableHelperServiceImpl" 
-        scope="prototype" parent="parentLookupableHelperService">
+    <bean id="protocolAssociateWorkflowSearchLookupableHelperService" class="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowSearchLookupableHelperServiceImpl"
+          scope="prototype" parent="parentLookupableHelperService">
         <property name="dataAccessObject">
-        	<ref bean="protocolAssociateWorkflowSearchDao" />
+            <ref bean="protocolAssociateWorkflowSearchDao" />
         </property>
         <property name="kcPersonService">
             <ref bean="kcPersonService" />
@@ -80,7 +79,22 @@
         <property name="dataDictionaryService">
             <ref bean="dataDictionaryService" />
         </property>
-    </bean> 
+    </bean>
+
+    <bean id="protocolXmlStream" class="edu.arizona.kra.irb.actions.print.CustomProtocolXmlStream" parent="printBaseXmlStream">
+        <property name="irbPrintXmlUtilService">
+            <ref bean="irbPrintXmlUtilService" />
+        </property>
+        <property name="kcPersonService">
+            <ref bean="kcPersonService" />
+        </property>
+        <property name="scheduleXmlStream">
+            <ref bean="scheduleXmlStream" />
+        </property>
+        <property name="committeeXmlStream">
+            <ref bean="committeeXmlStream" />
+        </property>
+    </bean>
 
     <bean id="protocolCopyService" class="edu.arizona.kra.irb.actions.copy.CustomProtocolCopyServiceImpl">
         <property name="documentService" ref="documentService" />

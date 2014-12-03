@@ -961,26 +961,26 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="AttachmentProtocol">
-  	<xs:complexType>
-  	  <xs:sequence>
-	    <xs:element name="AttachmentType" type="xs:string" />
-	    <xs:element name="AttachmentStatus" type="xs:string" />
-	    <xs:element name="AttachmentUploadUser" type="xs:string" />
-	    <xs:element name="AttachmentUploadUserFullName" type="xs:string" />
-	    <xs:element name="AttachmentUpdateTimestamp" type="xs:date" />
-	    <xs:element name="AttachmentComments" type="xs:string" minOccurs="0" />
-	    <xs:element name="AttachmentFilename" type="xs:string" />
-	    <xs:element name="AttachmentDescription" type="xs:string" />
-	    <xs:element name="AttachmentCreateTimestamp" type="xs:date" />
-	    <xs:element name="AttachmentVersion" type="xs:integer" />
-	    <xs:element name="AttachmentProtocolNumber">
+    <xs:complexType>
+      <xs:sequence>
+	<xs:element name="AttachmentType" type="xs:string" />
+	<xs:element name="AttachmentStatus" type="xs:string" />
+        <xs:element name="AttachmentUploadUser" type="xs:string" />
+        <xs:element name="AttachmentUploadUserFullName" type="xs:string" />
+        <xs:element name="AttachmentUpdateTimestamp" type="xs:date" />
+        <xs:element name="AttachmentComments" type="xs:string" minOccurs="0" />
+        <xs:element name="AttachmentFilename" type="xs:string" />
+        <xs:element name="AttachmentDescription" type="xs:string" />
+        <xs:element name="AttachmentCreateTimestamp" type="xs:date" />
+        <xs:element name="AttachmentVersion" type="xs:integer" />
+        <xs:element name="AttachmentProtocolNumber">
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:maxLength value="20" />
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-  	  </xs:sequence>
-  	</xs:complexType>
+      </xs:sequence>
+    </xs:complexType>
   </xs:element>
 </xs:schema>

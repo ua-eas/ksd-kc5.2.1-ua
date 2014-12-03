@@ -116,7 +116,6 @@ import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1679,7 +1678,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
         ProtocolForm protocolForm = (ProtocolForm) form;
         if(getProtocolActionRequestService().isOpenProtocolForAdminCorrectionAuthorized(protocolForm)) {
-	    ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
+            ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
             if(!(protocolDocument.getProtocol().isAmendment() || 
             		protocolDocument.getProtocol().isRenewal() || 
             		protocolDocument.getProtocol().isRenewalWithoutAmendment())){
