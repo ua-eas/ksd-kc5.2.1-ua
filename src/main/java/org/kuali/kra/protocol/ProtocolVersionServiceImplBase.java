@@ -24,6 +24,7 @@ import java.util.Map;
 import org.kuali.kra.bo.CoeusSubModule;
 import org.kuali.kra.bo.DocumentNextvalue;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentPersonnelBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
@@ -222,16 +223,32 @@ public abstract class ProtocolVersionServiceImplBase implements ProtocolVersionS
         }
     }
 
+  
     /*
-     * seems that deepcopy is not really create new instance for copied obj.  this is really confusing
+     * UAR-840: Due to lazy loading, collections are not populated in the protocol before versioning, and because of null Ids OJB thinks we're
+     * trying to delete stuff from the DB. The current workaround is access the first object on all the collections on a protocol 
+     * before versioning it
+     *  
+     * @param protocol
      */
     protected void materializeCollections(ProtocolBase protocol) {
         checkCollection(protocol.getAttachmentProtocols());
         checkCollection(protocol.getProtocolLocations());
         checkCollection(protocol.getProtocolAmendRenewals());
+        checkCollection(protocol.getProtocolResearchAreas());
+        checkCollection(protocol.getProtocolActions());
+        checkCollection(protocol.getProtocolSubmissions());
+        checkCollection(protocol.getSpecialReviews());
+        
         for (ProtocolPersonBase person : protocol.getProtocolPersons()) {
             checkCollection(person.getAttachmentPersonnels());
             checkCollection(person.getProtocolUnits());
+        }
+        
+        if ( protocol instanceof Protocol){
+            Protocol irbProtocol = (Protocol) protocol;
+            checkCollection( irbProtocol.getProtocolRiskLevels());
+            checkCollection( irbProtocol.getProtocolParticipants());
         }
         
     }
