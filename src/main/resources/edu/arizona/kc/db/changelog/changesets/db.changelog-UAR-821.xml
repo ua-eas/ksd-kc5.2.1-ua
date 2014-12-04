@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+ 
+    <changeSet id="UAR-821-1" author="Josh Shaloo">
+        <comment>
+        	Removing users that are not in EDS. This causes copy problems for proposals.
+        </comment>
+        <sql>
+			delete 
+			  from UNIT_ADMINISTRATOR 
+			  where PERSON_ID = '10000000035';
+		</sql>
+		<rollback>
+			insert into UNIT_ADMINISTRATOR (UNIT_NUMBER,PERSON_ID,UNIT_ADMINISTRATOR_TYPE_CODE,UPDATE_TIMESTAMP,UPDATE_USER,VER_NBR,OBJ_ID) values ('000001','10000000035','2',to_date('19-JAN-10','DD-MON-RR'),'KRADBA',1,'7D879F94880FDB2AE0404F8189D84864');
+			insert into UNIT_ADMINISTRATOR (UNIT_NUMBER,PERSON_ID,UNIT_ADMINISTRATOR_TYPE_CODE,UPDATE_TIMESTAMP,UPDATE_USER,VER_NBR,OBJ_ID) values ('000001','10000000035','6',to_date('19-JAN-10','DD-MON-RR'),'KRADBA',1,'7D879F94880FDB2AE0404F8189D84864');
+		</rollback>
+    </changeSet>
+</databaseChangeLog>
