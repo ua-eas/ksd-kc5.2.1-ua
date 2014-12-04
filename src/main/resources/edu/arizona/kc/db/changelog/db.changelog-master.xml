@@ -6,7 +6,7 @@
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"> 
 
   <!-- Here we will include all changesets in the proper order -->
-  <!-- include file="changesets/db.changelog-UAR-###.xml" --->
+  <!-- include file="changesets/db.changelog-UAR-###.xml" -->
   
   <include file="changesets/db.changelog-UAR-821.xml" />
 
