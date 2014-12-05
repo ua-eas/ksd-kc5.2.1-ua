@@ -1748,4 +1748,15 @@
 		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="true" />
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
 	</class-descriptor>		
+	
+	<class-descriptor class="edu.arizona.kra.bo.AcademicAndSummerStarts" table="ACADEMIC_AND_SUMMER_STARTS">
+		<field-descriptor name="schoolYear" column="SCHOOL_YEAR" jdbc-type="INTEGER" primarykey="true" />
+		<field-descriptor name="academicPeriodStart" column="ACADEMIC_PERIOD_START" jdbc-type="DATE" />
+		<field-descriptor name="summerPeriodStart" column="SUMMER_PERIOD_START" jdbc-type="DATE" />
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+	</class-descriptor>
+	
 </descriptor-repository>

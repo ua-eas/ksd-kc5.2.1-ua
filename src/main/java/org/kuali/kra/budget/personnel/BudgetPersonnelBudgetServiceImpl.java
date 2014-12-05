@@ -54,7 +54,11 @@ public class BudgetPersonnelBudgetServiceImpl implements BudgetPersonnelBudgetSe
      * @see org.kuali.kra.budget.personnel.BudgetPersonnelBudgetService#addBudgetPersonnelDetails(org.kuali.kra.budget.nonpersonnel.BudgetLineItem, org.kuali.kra.budget.personnel.BudgetPersonnelDetails)
      */
     public void addBudgetPersonnelDetails(BudgetDocument budgetDocument, BudgetPeriod budgetPeriod, BudgetLineItem budgetLineItem, BudgetPersonnelDetails newBudgetPersonnelDetails) {
-        try {
+        
+    	java.sql.Date startDate = newBudgetPersonnelDetails.getStartDate();
+    	java.sql.Date endDate = newBudgetPersonnelDetails.getEndDate();
+    	
+    	try {
             ConvertUtils.register(new SqlDateConverter(null), java.sql.Date.class);
             ConvertUtils.register(new SqlTimestampConverter(null), java.sql.Timestamp.class);
             BeanUtils.copyProperties(newBudgetPersonnelDetails,(BudgetLineItemBase)budgetLineItem);
@@ -78,6 +82,14 @@ public class BudgetPersonnelBudgetServiceImpl implements BudgetPersonnelBudgetSe
         newBudgetPersonnelDetails.setSequenceNumber(budgetDocument.getHackedDocumentNextValue(Constants.BUDGET_PERSON_LINE_SEQUENCE_NUMBER));
         //budgetCalculationService.populateCalculatedAmount(budget, newBudgetPersonnelDetails);
         newBudgetPersonnelDetails.refreshNonUpdateableReferences();
+        
+        if (startDate != null) {
+        	newBudgetPersonnelDetails.setStartDate(startDate);
+        }
+        if (endDate != null) {
+        	newBudgetPersonnelDetails.setEndDate(endDate);
+        }
+        
         budgetLineItem.getBudgetPersonnelDetailsList().add(newBudgetPersonnelDetails);
     }
 
