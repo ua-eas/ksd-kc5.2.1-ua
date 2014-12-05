@@ -2,14 +2,20 @@
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 <c:set var="extraButtons" value="${KualiForm.extraActionsButtons}" scope="request" />
 <c:set var="readOnly" value="${not KualiForm.editingMode['modifyProposal']}" scope="request" />
+<c:set var="showRejectionConfirmation" value="${KualiForm.showRejectionConfirmation}" scope="request" />
 <kra:section permission="submitToSponsor">
 </kra:section>
 <link rel="stylesheet" href="css/jquery/new_kuali.css" type="text/css" />
 <link type="text/css" href="css/jquery/questionnaire.css" rel="stylesheet">
 <kul:documentPage showDocumentInfo="true" htmlFormAction="proposalDevelopmentApproverView"
-	documentTypeName="ProposalDevelopmentDocument" renderMultipart="false" showTabButtons="true"
+	documentTypeName="ProposalDevelopmentDocument" renderMultipart="true" showTabButtons="true"
 	auditCount="0" headerDispatch="${KualiForm.headerDispatch}" headerTabActive="approverView">
 
+	<c:choose>
+		<c:when test="${showRejectionConfirmation}">
+			<kra-pd:proposalDevelopmentRejection />
+		</c:when>
+		<c:otherwise>
 
 	<div id="workarea">
 		<c:set var="isTopPanel" value="true" />
@@ -164,4 +170,6 @@
 		var kualiForm = document.forms['KualiForm'];
 		var kualiElements = kualiForm.elements;
 	</SCRIPT>
+		</c:otherwise>
+	</c:choose>
 </kul:documentPage>
