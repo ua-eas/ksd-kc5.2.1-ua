@@ -19,7 +19,7 @@
 <%@ attribute name="budgetRate" description="Budget proposal and la rates" required="true"%>
 <%@ attribute name="rateClassType" description="rate class type code" required="true"%>
 <%@ attribute name="styleClass" description="style class to validate applicable rate " required="true"%>
-
+<%@ attribute name="finalBudgetProposalRateClassCode" description="Final Budget Rate Class Code" required="true"%>
 <c:set var="budgetRatesAttributes" value="${DataDictionary.BudgetRate.attributes}" />
 <c:set var="action" value="budgetRates" />
 <bean:define id="irateClassType" name="KualiForm" property="${budgetRate}.rateClass.rateClassType" />
@@ -29,8 +29,8 @@
 <bean:define id="fandaRateType" name="KualiForm" property="${budgetRate}.rateType.description" />
 
 <%--<bean:define id="finalBudgetProposalRateClassCode" name="KualiForm" property="document.finalBudgetForThisProposal.rateClass.rateClassCode" /> --%>
-<%-- <bean:define id="finalBudgetProposalRateClassCode" name="KualiForm" property="document.finalrateClassCode" />--%>
-<c:set var="finalBudgetProposalRateClassCode" value="${KualiForm.document.finalrateClassCode }"/>
+<%-- <bean:define id="finalBudgetProposalRateClassCode" name="KualiForm" property="document.finalrateClassCode" /> --%>
+<%-- <c:set var="finalBudgetProposalRateClassCode" value="${KualiForm.document.finalrateClassCode}"/> --%>
 
 
 <c:if test="${irateClassType == 'O' && displayRow == 'Yes' && finalBudgetProposalRateClassCode == irateClassCode }">

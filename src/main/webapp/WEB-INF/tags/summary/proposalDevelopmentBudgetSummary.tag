@@ -187,6 +187,7 @@
 								<c:set var="rowIndex" value="1" />
 								<bean:define id="budgetRates" name="KualiForm"
 									property="budgetToSummarize.budgetRates" />
+								<c:set var="finalBudgetProposalRateClassCode" value="${KualiForm.document.finalrateClassCode}"/>
 								<c:forEach items="${budgetRates}" var="proposalRates"
 									varStatus="status">
 									<c:set var="budgetRate"
@@ -199,7 +200,7 @@
 									</c:if>
 									<kra-summary:proposalDevelopmentBudgetRates
 										budgetRate="${budgetRate}" rateClassType="${rateClassType}"
-										styleClass="${styleClass}" />
+										styleClass="${styleClass}" finalBudgetProposalRateClassCode="${finalBudgetProposalRateClassCode}"/>
 								</c:forEach>
 					
 							</c:if>
