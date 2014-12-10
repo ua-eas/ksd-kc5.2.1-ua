@@ -35,10 +35,10 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 public class UnitHierarchyProvider implements HierarchyProvider {
 
 	   private static final Log LOG = LogFactory.getLog(UnitHierarchyProvider.class);
-	   private static final String UNIT_NUMBER_ELEMENT_NAME = "homeUnit";
+	   private static final String UNIT_NUMBER_ELEMENT_NAME = "unitNumber";
 	   private static final String DOC_NUMBER_ELEMENT_NAME = "documentNumber";
 	   private static final String DOC_NUMBER_DB_COLUMN_NAME = "document_number";
-	   private static final String PROPOSAL_PERSON_CLASS_NAME = "org.kuali.kra.proposaldevelopment.bo.ProposalPerson";
+	   private static final String PROPOSAL_PERSON_UNIT_CLASS_NAME = "org.kuali.kra.proposaldevelopment.bo.ProposalPersonUnit";
 	    
 
 	    private UnitService unitService;
@@ -140,11 +140,11 @@ public class UnitHierarchyProvider implements HierarchyProvider {
 	    private List<String> retrieveProposalUnitNumbers(RouteContext context) {
             Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
             List<String> proposalUnits = new ArrayList<String>();
-            Collection<Element> proposalPersonElements = XmlHelper.findElements(document.getRootElement(), PROPOSAL_PERSON_CLASS_NAME);
-            if (proposalPersonElements.size() > 0) {
-                for (Element proposalPersonElement : proposalPersonElements) {
-                    if (proposalPersonElement != null) {
-                        String unitNumber = proposalPersonElement.getChildText(UNIT_NUMBER_ELEMENT_NAME);
+            Collection<Element> proposalPersonUnitElements = XmlHelper.findElements(document.getRootElement(), PROPOSAL_PERSON_UNIT_CLASS_NAME);
+            if (proposalPersonUnitElements.size() > 0) {
+                for (Element proposalPersonUnitElement : proposalPersonUnitElements) {
+                    if (proposalPersonUnitElement != null) {
+                        String unitNumber = proposalPersonUnitElement.getChildText(UNIT_NUMBER_ELEMENT_NAME);
                         if (!proposalUnits.contains(unitNumber)) {
                             proposalUnits.add(unitNumber);
                         }

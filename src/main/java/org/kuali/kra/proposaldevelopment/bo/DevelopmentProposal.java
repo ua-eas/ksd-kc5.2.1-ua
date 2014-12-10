@@ -238,6 +238,8 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
     private String agencyRoutingIdentifier;
     
     private String prevGrantsGovTrackingID;
+    
+    private List<ProposalPersonUnit> proposalPersonUnits;
  
 
     /**
@@ -1167,13 +1169,13 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
     @Override
     public List buildListOfDeletionAwareLists() {
         List managedLists = super.buildListOfDeletionAwareLists();
-        List<ProposalPersonUnit> units = new ArrayList<ProposalPersonUnit>();
+        proposalPersonUnits = new ArrayList<ProposalPersonUnit>();
         List<ProposalPersonDegree> degrees = new ArrayList<ProposalPersonDegree>();
         for (ProposalPerson person : getProposalPersons()) {
-            units.addAll(person.getUnits());
+            proposalPersonUnits.addAll(person.getUnits());
             degrees.addAll(person.getProposalPersonDegrees());
         }
-        managedLists.add(units);
+        managedLists.add(proposalPersonUnits);
         managedLists.add(degrees);
         managedLists.add(getProposalSites());
         List<CongressionalDistrict> congressionalDistricts = new ArrayList<CongressionalDistrict>();
@@ -2338,6 +2340,14 @@ public void setPrevGrantsGovTrackingID(String prevGrantsGovTrackingID) {
      */
     public void setS2sUserAttachedForms(List<S2sUserAttachedForm> s2sUserAttachedForms) {
         this.s2sUserAttachedForms = s2sUserAttachedForms;
+    }
+    
+    public List<ProposalPersonUnit> getProposalPersonUnits(){
+    	return proposalPersonUnits;
+    }
+    
+    public void setProposalPersonUnits(List<ProposalPersonUnit> proposalPersonUnits){
+    	this.proposalPersonUnits = proposalPersonUnits;
     }
 
 }
