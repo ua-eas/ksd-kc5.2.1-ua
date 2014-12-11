@@ -192,7 +192,7 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
 		else {
 			dateRange.setAppointment(SpecialDateRange.Appointment.ACADEMIC);
 		}			
-		Calendar calIndex = new GregorianCalendar(calBudgetPeriodStartDate.get(Calendar.YEAR), calBudgetPeriodStartDate.get(Calendar.MONTH), calBudgetPeriodStartDate.get(Calendar.DAY_OF_MONTH));
+		Calendar calIndex = getNewCalendarObject(calBudgetPeriodStartDate,0,0,0);
 		while(true) {
 			if(areCalendarDatesEqual(calIndex, calLastAcademicDay)) {
 				dateRange.setEnd(new Date(calLastAcademicDay.getTime().getTime()));
@@ -200,10 +200,9 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
 				if(personAppointment == SpecialDateRange.Appointment.ACADEMIC){
 					acadOrSummerPeriods.add(dateRange);
 				}
-				calLastAcademicDay.add(Calendar.YEAR, 1);
-				calIndex.add(Calendar.DAY_OF_MONTH, 1);
 				dateRange = new SpecialDateRange();
-				dateRange.setStart(new Date(calIndex.getTime().getTime()));
+				Calendar calFirstSummerDay = getNewCalendarObject(calLastAcademicDay,0,0,1);
+				dateRange.setStart(new Date(calFirstSummerDay.getTime().getTime()));
 				dateRange.setAppointment(SpecialDateRange.Appointment.SUMMER);
 			}
 			//compare with academic start
@@ -213,17 +212,15 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
 				if(personAppointment == SpecialDateRange.Appointment.SUMMER){
 					acadOrSummerPeriods.add(dateRange);
 				}
-				calLastSummerDay.add(Calendar.YEAR, 1);
-				calLastAcademicDay.add(Calendar.YEAR, 1);
-				calIndex.add(Calendar.DAY_OF_MONTH, 1);
 				dateRange = new SpecialDateRange();
 				dateRange.setAppointment(SpecialDateRange.Appointment.ACADEMIC);
-				dateRange.setStart(new Date(calIndex.getTime().getTime()));
+				Calendar calFirstAcademicDay = getNewCalendarObject(calLastSummerDay,0,0,1);
+				dateRange.setStart(new Date(calFirstAcademicDay.getTime().getTime()));
 			}
 			if(areCalendarDatesEqual(calIndex, calBudgetPeriodEndDate)) {
 				
 				dateRange.setEnd(new Date(calIndex.getTime().getTime()));
-				if(dateRange.getStart().compareTo(dateRange.getEnd()) < 0){
+				if(dateRange.getStart().compareTo(dateRange.getEnd()) < 0) {
 					if(personAppointment == dateRange.getAppointment()){
 						acadOrSummerPeriods.add(dateRange);
 					}
@@ -232,16 +229,25 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
 			}
 			calIndex.add(Calendar.DAY_OF_MONTH, 1);
 			
-			/* AZ KCI-1009 Start */
 			if(calIndex.compareTo(calLastSummerDay) > 0 ){
 				calLastSummerDay.add(Calendar.YEAR, 1);				
 			}
 			if(calIndex.compareTo(calLastAcademicDay) > 0 ){
 				calLastAcademicDay.add(Calendar.YEAR, 1);				
 			}
-			/* AZ KCI-1009 End */				
 		}
 		return acadOrSummerPeriods;
+	}
+	
+	private Calendar getNewCalendarObject(Calendar argCalendar, int year, int month, int day) {
+		Calendar retCalendar = new GregorianCalendar(
+				argCalendar.get(Calendar.YEAR),
+				argCalendar.get(Calendar.MONTH), 
+				argCalendar.get(Calendar.DAY_OF_MONTH));
+		retCalendar.add(Calendar.YEAR, year);
+		retCalendar.add(Calendar.MONTH, month);
+		retCalendar.add(Calendar.DAY_OF_MONTH, day);
+		return retCalendar;
 	}
 
 	/**
@@ -266,18 +272,18 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
 		BudgetLineItem newBudgetLineItem = budgetForm.getNewBudgetLineItems().get( budgetCategoryTypeIndex );
 		BudgetPersonnelDetails budgetPersonDetails = budgetForm.getNewBudgetPersonnelDetails();
 		budgetPersonDetails.setBudgetId( budget.getBudgetId() );
-
+		
 		String appointmentTypeCode = null;
-        ArrayList<SpecialDateRange> acadOrSummerPeriods = new ArrayList<SpecialDateRange>();
-        BusinessObjectService businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
-        if(budgetPersonDetails.getPersonSequenceNumber().intValue() != -1) {
-	        Map queryMap = new HashMap();
+		ArrayList<SpecialDateRange> acadOrSummerPeriods = new ArrayList<SpecialDateRange>();
+		BusinessObjectService businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
+		if(budgetPersonDetails.getPersonSequenceNumber().intValue() != -1) {
+			Map queryMap = new HashMap();
 	        queryMap.put("budgetId", budget.getBudgetId());
 	        queryMap.put("personSequenceNumber", budgetPersonDetails.getPersonSequenceNumber());
 	        //corresponding presentation component budgetPersonnelDetails.tag 	        
 	        BudgetPerson budgetPerson = (BudgetPerson)businessObjectService.findByPrimaryKey(BudgetPerson.class, queryMap);
 	        appointmentTypeCode = budgetPerson.getAppointmentTypeCode();
-	    }
+		}
 
 		budgetPersonDetails.setPeriodTypeCode( this.getParameterService().getParameterValueAsString(
 				BudgetDocument.class, Constants.BUDGET_PERSON_DETAILS_DEFAULT_PERIODTYPE ) );
@@ -323,15 +329,15 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
 			}
 
 			if(budgetPersonDetails.getPersonSequenceNumber().intValue() != -1) {
-	            if(appointmentTypeCode.equalsIgnoreCase(ACADEMIC_APPOINTMENT_TYPE_CODE) || appointmentTypeCode.equalsIgnoreCase(SUMMER_APPOINTMENT_TYPE_CODE)){
+				if(appointmentTypeCode.equalsIgnoreCase(ACADEMIC_APPOINTMENT_TYPE_CODE) || appointmentTypeCode.equalsIgnoreCase(SUMMER_APPOINTMENT_TYPE_CODE)){
 	            	acadOrSummerPeriods = getAcademicOrSummerPeriods(budgetPeriod.getStartDate(), budgetPeriod.getEndDate(), 
 	            			appointmentTypeCode.equalsIgnoreCase(ACADEMIC_APPOINTMENT_TYPE_CODE)
 	            				?SpecialDateRange.Appointment.ACADEMIC:SpecialDateRange.Appointment.SUMMER);
 	            	if(acadOrSummerPeriods.size() == 0){
 	            		return mapping.findForward(Constants.MAPPING_BASIC);
 	            	}
-	            }
-            }
+				}
+			}
 
 			BudgetCategory newBudgetCategory = new BudgetCategory();
 			newBudgetCategory.setBudgetCategoryTypeCode( getSelectedBudgetCategoryType( request ) );
@@ -429,10 +435,9 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
 
 						addBudgetPersonnelDetails( budgetForm, budgetPeriod, newBudgetLineItem, budgetPersonDetails );
 						
-						addAdditionalBudgetPersonnelDetails(appointmentTypeCode, acadOrSummerPeriods, 
-	                    		budgetPersonDetails, budgetForm, budgetPeriod, newBudgetLineItem);
-					}
-					
+						addAdditionalBudgetPersonnelDetails(appointmentTypeCode, acadOrSummerPeriods, budgetPersonDetails, budgetForm, budgetPeriod, newBudgetLineItem);
+						
+					}					
 					setLineItemQuantity( newBudgetLineItem );
 
 					budget.getBudgetPeriod( budgetPeriod.getBudgetPeriod() - 1 ).getBudgetLineItems().add( newBudgetLineItem );
