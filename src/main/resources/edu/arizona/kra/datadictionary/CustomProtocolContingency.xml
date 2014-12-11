@@ -28,9 +28,7 @@
             </list>
         </property>
     </bean>
-    
     <bean id="ProtocolContingency-description" parent="ProtocolContingency-description-parentBean">
   	  <property name="maxLength" value="2500"/>
   	</bean>
-
 </beans>
