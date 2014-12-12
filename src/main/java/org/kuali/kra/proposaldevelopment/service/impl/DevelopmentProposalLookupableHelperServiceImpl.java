@@ -42,7 +42,8 @@ public class DevelopmentProposalLookupableHelperServiceImpl extends KraLookupabl
     private static final long serialVersionUID = 8611232870631352662L;
 
     private KraAuthorizationService kraAuthorizationService;
-    
+ 
+/*    
     @Override
     @SuppressWarnings("unchecked")
     public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
@@ -58,7 +59,7 @@ public class DevelopmentProposalLookupableHelperServiceImpl extends KraLookupabl
 
         return filteredResults;
     }
-    
+ */   
     /**
      * @see org.kuali.kra.lookup.KraLookupableHelperServiceImpl#getCustomActionUrls(org.kuali.rice.krad.bo.BusinessObject, java.util.List)
      */
