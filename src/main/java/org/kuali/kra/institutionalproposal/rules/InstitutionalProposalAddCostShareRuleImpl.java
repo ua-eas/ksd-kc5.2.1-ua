@@ -66,7 +66,7 @@ public class InstitutionalProposalAddCostShareRuleImpl extends CostShareRuleRese
 		// test if commitment amount is entered and valid
 		isValid &= validateAmount( institutionalProposalCostShare.getAmount() );
 
-		isValid &= validateSourceAccount( institutionalProposalCostShare.getSourceAccount() );
+		//isValid &= validateSourceAccount( institutionalProposalCostShare.getSourceAccount() );
 
 		return isValid;
 	}

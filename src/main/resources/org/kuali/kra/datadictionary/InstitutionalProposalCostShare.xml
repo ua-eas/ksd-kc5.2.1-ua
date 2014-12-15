@@ -185,7 +185,7 @@
     </bean>
 
     <bean id="InstitutionalProposalCostShare-sourceAccount" parent="KraAttributeReferenceDummy-sourceAccount" >
-    	<property name="required" value="true" />
+    	<property name="required" value="false" />
     </bean>
 
     <bean id="InstitutionalProposalCostShare-amount" parent="InstitutionalProposalCostShare-amount-parentBean" />
