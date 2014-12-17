@@ -43,6 +43,7 @@ public class UnitPreApproverAttribute extends GenericRoleAttribute {
 		UNIT_ADMIN_ROLE_LIST.add(roleNameBuilder.build());
 	}
 
+
 	public List<String> getQualifiedRoleNames(String roleName,
 			DocumentContent documentContent) {
 		List<String> qualifiedRoleNames = new ArrayList<String>();
@@ -119,7 +120,6 @@ public class UnitPreApproverAttribute extends GenericRoleAttribute {
 		return this.kualiConfigurationService;
 	}
 
-    
 	private String retrieveDocumentUnitNumber(RouteContext context) {
 		Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
 		String ownedByUnitNumber = null;
@@ -133,4 +133,5 @@ public class UnitPreApproverAttribute extends GenericRoleAttribute {
 		}
 		return ownedByUnitNumber;
 	}
+
 }

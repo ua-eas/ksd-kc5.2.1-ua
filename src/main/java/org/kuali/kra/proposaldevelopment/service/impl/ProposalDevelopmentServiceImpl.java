@@ -562,7 +562,7 @@ public class ProposalDevelopmentServiceImpl implements ProposalDevelopmentServic
             for (BudgetCostShare costShare : costShares) {
                 if (!Constants.THIRD_PARTY_UNIT_NO.equals(costShare.getSourceUnit())) {
                     CostShareInfoDO costShareInfo = new CostShareInfoDO();
-                    costShareInfo.setCostShareUnit(costShare.getSourceUnit());
+                    costShareInfo.setCostShareUnit(costShare.getSourceUnitNumber());
                     costShareInfo.setCostShareAmount(costShare.getShareAmount());
                     costShareInfos.add(costShareInfo);
                 }
