@@ -275,12 +275,4 @@ public class ProposalDevelopmentApproverViewAction extends ProposalDevelopmentAc
 	public void setSpecialReviewService( SpecialReviewService specialReviewService ) {
 		this.specialReviewService = specialReviewService;
 	}
-
-	public ActionForward reject( ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response )
-			throws Exception {
-		KualiDocumentFormBase kualiDocumentFormBase = (KualiDocumentFormBase) form;
-
-		( (ProposalDevelopmentForm) form ).setShowRejectionConfirmation( true );
-		return mapping.findForward( MAPPING_BASIC );
-	}
 }
