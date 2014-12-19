@@ -33,6 +33,7 @@ import org.kuali.rice.kns.lookup.HtmlData;
 import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.document.Document;
+import org.kuali.rice.krad.lookup.CollectionIncomplete;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
@@ -104,6 +105,10 @@ public class InstitutionalProposalLookupableHelperServiceImpl extends KraLookupa
         }
 
         List<InstitutionalProposal> filteredResults = filterForPermissions(searchResults);
+        
+        if(searchResults instanceof CollectionIncomplete) {
+        	filteredResults = new CollectionIncomplete<InstitutionalProposal>(filteredResults, ((CollectionIncomplete)searchResults).getActualSizeIfTruncated());
+        }
 
         return filteredResults;
     }
