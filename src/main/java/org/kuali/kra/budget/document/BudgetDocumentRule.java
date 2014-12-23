@@ -466,7 +466,7 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
                 }
             }
         }
-        if (budgetVersionsExists && !finalAndCompleteBudgetVersionFound) {
+        if (!budgetVersionsExists || !finalAndCompleteBudgetVersionFound) {
             auditErrors.add(new AuditError("document.parentBudget.budgetVersionOverview", KeyConstants.AUDIT_ERROR_NO_BUDGETVERSION_COMPLETE_AND_FINAL, Constants.PD_BUDGET_VERSIONS_PAGE + "." + Constants.BUDGET_VERSIONS_PANEL_ANCHOR));
             retval = false;
         }
