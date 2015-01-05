@@ -144,8 +144,8 @@
 				<div class="globalbuttons">${KualiForm.proposalDevelopmentParameters['propSummaryDisclaimerText'].value }</div>
 				<c:if
 					test="${!empty KualiForm.documentActions[Constants.KUALI_ACTION_CAN_APPROVE] and not suppressRoutingControls}">
-					<html:image src="${ConfigProperties.kr.externalizable.images.url}buttonsmall_approve.gif"
-						styleClass="globalbuttons" property="methodToCall.approve" title="approve" alt="approve"
+					<html:image src="${ConfigProperties.kr.externalizable.images.url}buttonsmall_returnForEdit.gif"
+						styleClass="globalbuttons" property="methodToCall.approve" title="Return For Edit" alt="Return For Edit"
 						onclick="resetScrollPosition();" tabindex="${tabindex}" />
 				</c:if>
 				<c:if
