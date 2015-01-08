@@ -221,6 +221,14 @@ public final class KeyConstants {
     public static final String ERROR_GRANTSGOV_FORM_SCHEMA_NOT_FOUND = "error.grantsgov.form.schema.server.down";
     public static final String ERROR_GRANTSGOV_NO_FORM_ELEMENT = "error.grantsgov.no.form.element";
     
+    public static final String GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_EMAIL_PARAMETER = "grantsGovProposalContactAdministratorEmail";
+    public static final String GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_PHONE_PARAMETER = "grantsGovProposalContactAdministratorPhone";
+    public static final String GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_FAX_PARAMETER = "grantsGovProposalContactAdministratorFax";
+    public static final String GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS1_PARAMETER = "grantsGovProposalContactAdministratorAddress1";
+    public static final String GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS2_PARAMETER = "grantsGovProposalContactAdministratorAddress2";
+    public static final String GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS3_PARAMETER = "grantsGovProposalContactAdministratorAddress3";
+    public static final String GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_POSTALCODE_PARAMETER = "grantsGovProposalContactAdministratorPostalCode";
+    
     public static final String ERROR_PRINTING_UNKNOWN = "error.printing.unknown";
     public static final String ERROR_IF_COMPETITION_ID_IS_INVALID="error.s2sopportunity.competitionIdInvalid";
    // Grants.gov System Parameters

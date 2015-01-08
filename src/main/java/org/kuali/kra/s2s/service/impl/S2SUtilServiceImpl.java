@@ -61,6 +61,7 @@ import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.util.ObjectUtils;
 import org.kuali.rice.location.api.country.Country;
 import org.kuali.rice.location.api.country.CountryService;
 import org.kuali.rice.location.api.state.State;
@@ -915,7 +916,7 @@ public class S2SUtilServiceImpl implements S2SUtilService {
         DepartmentalPerson depPerson = new DepartmentalPerson();
         if (isNumber) {
             Unit leadUnit = pdDoc.getDevelopmentProposal().getOwnedByUnit();
-                    if (leadUnit!=null) {
+                    if (leadUnit!= null) {
                         leadUnit.refreshReferenceObject("unitAdministrators");
                         KcPerson unitAdmin = null;
                         for (UnitAdministrator admin : leadUnit.getUnitAdministrators()) {
@@ -926,18 +927,16 @@ public class S2SUtilServiceImpl implements S2SUtilService {
                                 if (unitAdmin.getMiddleName() != null) {
                                     depPerson.setMiddleName(unitAdmin.getMiddleName());
                                 }
-                                depPerson.setEmailAddress(unitAdmin.getEmailAddress());
-                                depPerson.setOfficePhone(unitAdmin.getOfficePhone());
-                                depPerson.setFaxNumber(unitAdmin.getFaxNumber());
+                                
+                                setParameterizedContactInfo(depPerson);
+                                
                                 depPerson.setPrimaryTitle(unitAdmin.getPrimaryTitle());
-                                depPerson.setAddress1(unitAdmin.getAddressLine1());
-                                depPerson.setAddress2(unitAdmin.getAddressLine2());
-                                depPerson.setAddress3(unitAdmin.getAddressLine3());
                                 depPerson.setCity(unitAdmin.getCity());
                                 depPerson.setCounty(unitAdmin.getCounty());
                                 depPerson.setCountryCode(unitAdmin.getCountryCode());
-                                depPerson.setPostalCode(unitAdmin.getPostalCode());
                                 depPerson.setState(unitAdmin.getState());
+                                
+
                                 break;
                             }
                         }
@@ -952,17 +951,13 @@ public class S2SUtilServiceImpl implements S2SUtilService {
                                     if (parentUnitAdmin.getMiddleName() != null) {
                                         depPerson.setMiddleName(parentUnitAdmin.getMiddleName());
                                     }
-                                    depPerson.setEmailAddress(parentUnitAdmin.getEmailAddress());
-                                    depPerson.setOfficePhone(parentUnitAdmin.getOfficePhone());
-                                    depPerson.setFaxNumber(parentUnitAdmin.getFaxNumber());
+
+                                    setParameterizedContactInfo(depPerson);
+
                                     depPerson.setPrimaryTitle(parentUnitAdmin.getPrimaryTitle());
-                                    depPerson.setAddress1(parentUnitAdmin.getAddressLine1());
-                                    depPerson.setAddress2(parentUnitAdmin.getAddressLine2());
-                                    depPerson.setAddress3(parentUnitAdmin.getAddressLine3());
                                     depPerson.setCity(parentUnitAdmin.getCity());
                                     depPerson.setCounty(parentUnitAdmin.getCounty());
                                     depPerson.setCountryCode(parentUnitAdmin.getCountryCode());
-                                    depPerson.setPostalCode(parentUnitAdmin.getPostalCode());
                                     depPerson.setState(parentUnitAdmin.getState());
                                     break;
                                 }
@@ -974,6 +969,59 @@ public class S2SUtilServiceImpl implements S2SUtilService {
         }
         return depPerson;
     }
+    
+    
+    /*
+     * Any porperty set here is already parameterized, so we should not use
+     * the personal contact info, but those in the params.
+     */
+    private void setParameterizedContactInfo(DepartmentalPerson deptPerson) {
+
+    	// Email
+        String administratorEmail = parameterService.getParameterValueAsString(ProposalDevelopmentDocument.class, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_EMAIL_PARAMETER);
+        nullCheck(administratorEmail, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_EMAIL_PARAMETER);
+        deptPerson.setEmailAddress(administratorEmail);                            
+        
+        // Phone
+        String administratorPhone = parameterService.getParameterValueAsString(ProposalDevelopmentDocument.class, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_PHONE_PARAMETER);
+        nullCheck(administratorPhone, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_PHONE_PARAMETER);
+        deptPerson.setOfficePhone(administratorPhone);
+
+        // Fax
+        String administratorFax = parameterService.getParameterValueAsString(ProposalDevelopmentDocument.class, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_FAX_PARAMETER);
+        nullCheck(administratorFax, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_FAX_PARAMETER);
+        deptPerson.setFaxNumber(administratorFax);
+
+        // Address_1
+        String administratorAddress1 = parameterService.getParameterValueAsString(ProposalDevelopmentDocument.class, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS1_PARAMETER);
+        nullCheck(administratorAddress1, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS1_PARAMETER);
+        deptPerson.setAddress1(administratorAddress1);
+
+        // Address_2
+        String administratorAddress2 = parameterService.getParameterValueAsString(ProposalDevelopmentDocument.class, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS2_PARAMETER);
+        nullCheck(administratorAddress2, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS2_PARAMETER);
+        deptPerson.setAddress2(administratorAddress2);                             
+
+        // Address_3
+        String administratorAddress3 = parameterService.getParameterValueAsString(ProposalDevelopmentDocument.class, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS3_PARAMETER);
+        nullCheck(administratorAddress3, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_ADDRESS3_PARAMETER);
+        deptPerson.setAddress3(administratorAddress3);
+
+        // Postal Code
+        String administratorPostalCode = parameterService.getParameterValueAsString(ProposalDevelopmentDocument.class, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_POSTALCODE_PARAMETER);
+        nullCheck(administratorPostalCode, KeyConstants.GRANTSGOV_PROPOSAL_CONTACT_ADMINISTRATOR_POSTALCODE_PARAMETER);
+        deptPerson.setPostalCode(administratorPostalCode);
+
+    }
+    
+    private void nullCheck(Object object, String key) {
+    	if(ObjectUtils.isNull(object)) {
+    		String message = String.format("Error, could not find parameter key: '%s'.", key);
+    		throw new RuntimeException(message);
+    	}
+    }
+    
+    
     public void deleteSystemGeneratedAttachments(ProposalDevelopmentDocument pdDoc) {
         List<Narrative> narratives = pdDoc.getDevelopmentProposal().getNarratives();
         List<Integer> deletedItems = new ArrayList<Integer>();
