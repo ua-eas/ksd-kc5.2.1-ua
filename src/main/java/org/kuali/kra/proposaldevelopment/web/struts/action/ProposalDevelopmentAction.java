@@ -184,6 +184,11 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 				loadDocument( proposalDevelopmentForm );
 				forward = actions( mapping, proposalDevelopmentForm, request, response );
 			}
+			else if ( Constants.MAPPING_PROPOSAL_APPROVER_PAGE.equals( command ) )
+			{
+				loadDocument( proposalDevelopmentForm );
+				forward = approverView( mapping, proposalDevelopmentForm, request, response );
+			}
 			else {
 				forward = super.docHandler( mapping, form, request, response );
 			}
@@ -202,6 +207,10 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 
 		if ( Constants.MAPPING_PROPOSAL_ACTIONS.equals( command ) ) {
 			forward = actions( mapping, proposalDevelopmentForm, request, response );
+		}
+		else if ( Constants.MAPPING_PROPOSAL_APPROVER_PAGE.equals( command ) )
+		{
+			forward = approverView( mapping, proposalDevelopmentForm, request, response );
 		}
 
 		if ( createProposalFromGrantsGov != null && createProposalFromGrantsGov.equals( "true" ) && s2sOpportunity != null ) {

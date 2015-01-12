@@ -130,6 +130,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	 */
 	private static final String MAPPING_PROPOSAL = "proposal";
 	private static final String ROUTING_WARNING_MESSAGE = "Validation Warning Exists.Are you sure want to submit to workflow routing.";
+	private static final String PROPOSAL_APPROVER_VIEW_URL = "proposalDevelopmentApproverView";
 
 	private enum SuperUserAction {
 		SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
@@ -163,6 +164,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	public ActionForward approve( ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response )
 			throws Exception {
 		ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
+		proposalDevelopmentForm.setReturnToActionList( false );
 		ProposalDevelopmentDocument pdDoc = proposalDevelopmentForm.getProposalDevelopmentDocument();
 		WorkflowDocument workflowDoc = proposalDevelopmentForm.getProposalDevelopmentDocument().getDocumentHeader().getWorkflowDocument();
 
@@ -208,6 +210,15 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 		List<ActionForward> acceptedForwards = new ArrayList<ActionForward>();
 		String routeHeaderId = ( (ProposalDevelopmentForm) form ).getDocument().getDocumentNumber();
 		String returnLocation = buildActionUrl( routeHeaderId, Constants.MAPPING_PROPOSAL_ACTIONS, "ProposalDevelopmentDocument" );
+
+		String requestURL = request.getRequestURL().toString();
+		if ( requestURL.contains( PROPOSAL_APPROVER_VIEW_URL ) )
+		{
+			forward = mapping.findForward( Constants.MAPPING_PROPOSAL_APPROVER_PAGE );
+			acceptedForwards.add( forward );
+			returnLocation = buildActionUrl( routeHeaderId, Constants.MAPPING_PROPOSAL_APPROVER_PAGE, "ProposalDevelopmentDocument" );
+		}
+
 		if ( forwardToSubmitToSponsor ) {
 			returnLocation = returnLocation.replace( "proposalDevelopmentProposal", "proposalDevelopmentActions" );
 			returnLocation = returnLocation.replace( "docHandler", "autoSubmitToSponsor" );
