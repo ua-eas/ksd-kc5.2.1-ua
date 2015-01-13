@@ -147,6 +147,7 @@
               <bean parent="WorkflowProperty" p:path="developmentProposalList.title"/>
               <bean parent="WorkflowProperty" p:path="developmentProposalList.sponsor.sponsorCode"/>
               <bean parent="WorkflowProperty" p:path="developmentProposalList.proposalPersons"/>
+              <bean parent="WorkflowProperty" p:path="developmentProposalList.proposalPersons.units"/>
 			 </list>
           </property>
         </bean>
