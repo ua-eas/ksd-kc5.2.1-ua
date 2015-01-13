@@ -1144,12 +1144,14 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
                     newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
                     newDocValue.setValue(customAttributeDocValue.getValue());
                     dest.getCustomDataList().add(newDocValue);
+                    KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
                 } else {
                     CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
                     newDocValue.setDocumentNumber(dest.getDocumentNumber());
                     newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
                     newDocValue.setValue(customAttributeDocument.getCustomAttribute().getDefaultValue());
-                    dest.getCustomDataList().add(newDocValue);                    
+                    dest.getCustomDataList().add(newDocValue);    
+                    KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
                 }
             }
         }
