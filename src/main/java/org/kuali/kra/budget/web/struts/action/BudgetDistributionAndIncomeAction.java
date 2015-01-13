@@ -58,6 +58,23 @@ public class BudgetDistributionAndIncomeAction extends BudgetAction {
     }
 
     /**
+     * Override to reload the budgetCostShares when we save
+     * 
+	 * @see org.kuali.kra.budget.web.struts.action.BudgetAction#save(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
+	@Override
+	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		ActionForward forward = super.save(mapping, form, request, response);
+		
+		BudgetDocument budgetDocument = ((BudgetForm)form).getBudgetDocument();
+		Budget budget = budgetDocument.getBudget();
+		budget.refreshReferenceObject("budgetCostShares");
+		
+		return forward;
+	}
+
+    /**
      * Override to intialize defaults after reload
      * 
      * @see org.kuali.rice.kns.web.struts.action.KualiDocumentActionBase#reload(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
