@@ -155,8 +155,8 @@
 						alt="disapprove" onclick="resetScrollPosition();" tabindex="${tabindex}" />
 				</c:if>
 				<c:if test="${!empty KualiForm.editingMode['rejectProposal'] and not suppressRoutingControls}">
-					<html:image src="${ConfigProperties.kra.externalizable.images.url}buttonsmall_reject.gif"
-						styleClass="globalbuttons" property="methodToCall.reject" title="reject" alt="reject"
+					<html:image src="${ConfigProperties.kra.externalizable.images.url}buttonsmall_returnForEdit.gif"
+						styleClass="globalbuttons" property="methodToCall.reject" title="Return For Edit" alt="Return For Edit"
 						onclick="resetScrollPosition();" tabindex="${tabindex}" />
 				</c:if>
 
