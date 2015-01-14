@@ -421,3 +421,7 @@ div#budgetPersonnelSelectBudgetPeriod {
 div.questionnaireContent {
     clear: left;
 }
+
+div#globalbuttons input[name="methodToCall.sendNotification"] {
+	display: none;
+}
