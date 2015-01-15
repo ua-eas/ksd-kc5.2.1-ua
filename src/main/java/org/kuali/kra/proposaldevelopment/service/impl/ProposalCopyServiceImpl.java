@@ -118,6 +118,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     
     private static final String MODULE_NUMBER = "moduleNumber";
     private static final String PROPOSAL_NUMBER = "proposalNumber";
+    private static final String PROPOSAL_YNQS_GETTER = "getProposalYnqs";
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(ProposalCopyServiceImpl.class);
     private BudgetService<DevelopmentProposal> budgetService;
     private BudgetSummaryService budgetSummaryService;
@@ -354,30 +355,50 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     protected void copyProperties(DevelopmentProposal src, DevelopmentProposal dest, List<DocProperty> properties) throws Exception {
         for (DocProperty property : properties) {
         	String propGetter = property.getter.getName();
-        	if (!StringUtils.equals(propGetter, "getProposalYnqs")) {
-        		Object value = property.getter.invoke(src);
-        		if (value instanceof Serializable) {
-        			// Just to be careful, we don't want the two documents
-        			// referencing the same data.  Each must have its own
-        			// local copies of the data.
-        			value = ObjectUtils.deepCopy((Serializable) value);
-                
-        			// If this is a persistable business object, its version number
-        			// must be reset to null.  The OJB framework is responsible for
-        			// setting the version number for its optimistic locking.  Or in
-        			// other words, since this is a new object, its version number 
-        			// cannot be the same as the original it was copied from.
-                
-        			if (value instanceof PersistableBusinessObjectBase) {
-        				PersistableBusinessObjectBase obj = (PersistableBusinessObjectBase) value;
-        				obj.setVersionNumber(null);
-        			}
-        		}
-        		property.setter.invoke(dest, value);
-        	}	
+        	if (StringUtils.equals(propGetter, PROPOSAL_YNQS_GETTER)) {
+        		copyYNQs( src, dest );
+        	}
+        	else {
+        		copyProperty( src, dest, property );
+        	}
         }
     }
+
+	protected void copyYNQs( DevelopmentProposal src, DevelopmentProposal dest ) {
+		for ( ProposalYnq proposalYnq : src.getProposalYnqs() ) {
+			if ( StringUtils.equals( proposalYnq.getYnq().getStatus(), Constants.STATUS_ACTIVE ) ) {
+				Object newQuestion = ObjectUtils.deepCopy( (Serializable) proposalYnq );
+				if ( newQuestion instanceof ProposalYnq ) {
+					ProposalYnq question = (ProposalYnq) newQuestion;
+					question.setVersionNumber( null );
+					dest.getProposalYnqs().add( question );
+				}
+			}
+		}
+	}
     
+	protected void copyProperty( DevelopmentProposal src, DevelopmentProposal dest, DocProperty property ) throws Exception {
+		Object value = property.getter.invoke( src );
+		if ( value instanceof Serializable ) {
+			// Just to be careful, we don't want the two documents
+			// referencing the same data. Each must have its own
+			// local copies of the data.
+			value = ObjectUtils.deepCopy( (Serializable) value );
+
+			// If this is a persistable business object, its version number
+			// must be reset to null. The OJB framework is responsible for
+			// setting the version number for its optimistic locking. Or in
+			// other words, since this is a new object, its version number
+			// cannot be the same as the original it was copied from.
+
+			if ( value instanceof PersistableBusinessObjectBase ) {
+				PersistableBusinessObjectBase obj = (PersistableBusinessObjectBase) value;
+				obj.setVersionNumber( null );
+			}
+		}
+		property.setter.invoke( dest, value );
+	}
+
     /**
      * Copies the document overview properties.  These properties are the
      * Description, Explanation, and Organization Document Number.  These
@@ -1144,12 +1165,14 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
                     newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
                     newDocValue.setValue(customAttributeDocValue.getValue());
                     dest.getCustomDataList().add(newDocValue);
+                    KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
                 } else {
                     CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
                     newDocValue.setDocumentNumber(dest.getDocumentNumber());
                     newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
                     newDocValue.setValue(customAttributeDocument.getCustomAttribute().getDefaultValue());
-                    dest.getCustomDataList().add(newDocValue);                    
+                    dest.getCustomDataList().add(newDocValue);    
+                    KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
                 }
             }
         }
