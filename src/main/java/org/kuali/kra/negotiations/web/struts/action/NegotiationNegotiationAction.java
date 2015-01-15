@@ -245,6 +245,9 @@ public class NegotiationNegotiationAction extends NegotiationAction {
             throws Exception {
         NegotiationForm negotiationForm = (NegotiationForm) form;
         loadCodeObjects(negotiationForm.getNegotiationDocument().getNegotiation());
+        if(StringUtils.isEmpty(negotiationForm.getNegotiationDocument().getNegotiation().getAssociatedDocumentId())){
+        	save(mapping, negotiationForm, request, response);
+    	}	
         return super.close(mapping, negotiationForm, request, response);
     }
 
