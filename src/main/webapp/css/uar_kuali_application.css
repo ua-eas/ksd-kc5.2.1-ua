@@ -425,3 +425,7 @@ div.questionnaireContent {
 div#globalbuttons input[name="methodToCall.sendNotification"] {
 	display: none;
 }
+
+#tabs input:disabled {
+	display: none;
+}
