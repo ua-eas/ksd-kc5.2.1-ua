@@ -37,6 +37,7 @@
 <c:set var="tabindex" value="0" />
 
 <c:set var="documentTypeName" value="${KualiForm.docTypeName}" />
+<c:set var="terminateInsteadOfDisapprove" value = "${documentTypeName=='ProposalDevelopmentDocument'}" />
 <c:set var="documentEntry" value="${DataDictionary[documentTypeName]}" />
 <c:set var="saveButtonValue" value="save" />
 <c:if test="${not empty saveButtonOverride}">
@@ -104,10 +105,16 @@
 				onclick="resetScrollPosition();" tabindex="${tabindex}" />
 		</c:if>
 		<c:if
-			test="${!empty KualiForm.documentActions[Constants.KUALI_ACTION_CAN_DISAPPROVE] and not suppressRoutingControls}">
+			test="${!empty KualiForm.documentActions[Constants.KUALI_ACTION_CAN_DISAPPROVE] and not suppressRoutingControls and not terminateInsteadOfDisapprove}">
 			<html:image src="${ConfigProperties.kr.externalizable.images.url}buttonsmall_disapprove.gif"
 				styleClass="globalbuttons" property="methodToCall.disapprove" title="disapprove"
 				alt="disapprove" onclick="resetScrollPosition();" tabindex="${tabindex}" />
+		</c:if>
+		<c:if
+			test="${!empty KualiForm.documentActions[Constants.KUALI_ACTION_CAN_DISAPPROVE] and not suppressRoutingControls and terminateInsteadOfDisapprove}">
+			<html:image src="${ConfigProperties.kr.externalizable.images.url}buttonsmall_terminate.gif"
+				styleClass="globalbuttons" property="methodToCall.disapprove" title="terminate"
+				alt="terminate" onclick="resetScrollPosition();" tabindex="${tabindex}" />
 		</c:if>
 		<c:if
 			test="${!empty KualiForm.documentActions[Constants.KUALI_ACTION_CAN_FYI] and not suppressRoutingControls}">
