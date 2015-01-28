@@ -165,6 +165,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			throws Exception {
 		ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
 		proposalDevelopmentForm.setReturnToActionList( false );
+
 		ProposalDevelopmentDocument pdDoc = proposalDevelopmentForm.getProposalDevelopmentDocument();
 		WorkflowDocument workflowDoc = proposalDevelopmentForm.getProposalDevelopmentDocument().getDocumentHeader().getWorkflowDocument();
 
@@ -218,6 +219,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 		}
 		
 		String returnLocation = buildActionUrl( routeHeaderId, actionTab, "ProposalDevelopmentDocument" );
+
 
 		if ( forwardToSubmitToSponsor ) {
 			returnLocation = returnLocation.replace( "proposalDevelopmentProposal", "proposalDevelopmentActions" );
@@ -1610,7 +1612,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			throws Exception {
 		ProposalDevelopmentForm pdForm = (ProposalDevelopmentForm) form;
 		ProposalDevelopmentDocument pdDoc = pdForm.getProposalDevelopmentDocument();
-		ActionForward forward = super.disapprove( mapping, form, request, response );
+		ActionForward forward = super.terminate( mapping, form, request, response );
 		if ( StringUtils.isNotBlank( request.getParameter( KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME ) ) ) {
 			Long instPropId = findInstProposalNumber( pdDoc.getDevelopmentProposal().getProposalNumber() );
 			if ( instPropId != null ) {

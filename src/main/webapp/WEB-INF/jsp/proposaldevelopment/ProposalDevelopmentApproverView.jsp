@@ -150,9 +150,9 @@
 				</c:if>
 				<c:if
 					test="${!empty KualiForm.documentActions[Constants.KUALI_ACTION_CAN_DISAPPROVE] and not suppressRoutingControls}">
-					<html:image src="${ConfigProperties.kr.externalizable.images.url}buttonsmall_disapprove.gif"
-						styleClass="globalbuttons" property="methodToCall.disapprove" title="disapprove"
-						alt="disapprove" onclick="resetScrollPosition();" tabindex="${tabindex}" />
+					<html:image src="${ConfigProperties.kr.externalizable.images.url}buttonsmall_terminate.gif"
+						styleClass="globalbuttons" property="methodToCall.disapprove" title="terminate"
+						alt="terminate" onclick="resetScrollPosition();" tabindex="${tabindex}" />
 				</c:if>
 				<c:if test="${!empty KualiForm.editingMode['rejectProposal'] and not suppressRoutingControls}">
 					<html:image src="${ConfigProperties.kra.externalizable.images.url}buttonsmall_returnForEdit.gif"
