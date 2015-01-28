@@ -709,6 +709,15 @@ public class Budget extends BudgetVersionOverview {
     }
 
     public List<BudgetPerson> getBudgetPersons() {
+    	Collections.sort(budgetPersons, new Comparator<BudgetPerson>() {
+    		@Override
+    		public int compare(final BudgetPerson object1, final BudgetPerson object2) {
+    			if (StringUtils.equalsIgnoreCase(object1.getPersonName(), object2.getPersonName())){
+    				return object1.getJobCode().compareTo(object2.getJobCode());
+    			}
+    			return 0;    			
+    		}    		
+    	});    	
         return budgetPersons;
     }
 
