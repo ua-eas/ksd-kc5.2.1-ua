@@ -209,15 +209,15 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
 		List<ActionForward> acceptedForwards = new ArrayList<ActionForward>();
 		String routeHeaderId = ( (ProposalDevelopmentForm) form ).getDocument().getDocumentNumber();
-		String returnLocation = buildActionUrl( routeHeaderId, Constants.MAPPING_PROPOSAL_ACTIONS, "ProposalDevelopmentDocument" );
-
+		String actionTab = Constants.MAPPING_PROPOSAL_ACTIONS;
 		String requestURL = request.getRequestURL().toString();
-		if ( requestURL.contains( PROPOSAL_APPROVER_VIEW_URL ) )
+		boolean returnToApproverViewPage = requestURL.contains( PROPOSAL_APPROVER_VIEW_URL ) && !forwardToSubmitToSponsor;
+		if ( returnToApproverViewPage )
 		{
-			forward = mapping.findForward( Constants.MAPPING_PROPOSAL_APPROVER_PAGE );
-			acceptedForwards.add( forward );
-			returnLocation = buildActionUrl( routeHeaderId, Constants.MAPPING_PROPOSAL_APPROVER_PAGE, "ProposalDevelopmentDocument" );
+			actionTab = Constants.MAPPING_PROPOSAL_APPROVER_PAGE;
 		}
+		
+		String returnLocation = buildActionUrl( routeHeaderId, actionTab, "ProposalDevelopmentDocument" );
 
 		if ( forwardToSubmitToSponsor ) {
 			returnLocation = returnLocation.replace( "proposalDevelopmentProposal", "proposalDevelopmentActions" );
@@ -236,6 +236,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
 		acceptedForwards.add( mapping.findForward( KRADConstants.MAPPING_PORTAL ) );
 		ActionForward holdingPageForward = mapping.findForward( Constants.MAPPING_HOLDING_PAGE );
+
 		return routeToHoldingPage( acceptedForwards, forward, holdingPageForward, returnLocation );
 	}
 
