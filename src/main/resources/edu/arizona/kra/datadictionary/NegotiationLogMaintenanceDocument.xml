@@ -26,6 +26,7 @@
         <property name="maintainableSections" >
             <list>
                 <ref bean="NegotiationLogMaintenanceDocument-EditNegotiationLog" />
+                <ref bean="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink"/>    
             </list>
         </property>
         <property name="lockingKeys">
@@ -33,7 +34,11 @@
                 <value>negotiationLogId</value>
             </list>
         </property>
-        
+        <property name="webScriptFiles">
+          <list>
+            <value>../dwr/interface/NegotiationMigrationService.js</value>
+          </list>
+        </property>
         <property name="businessRulesClass" value="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLogDocumentRules"/>
         <property name="documentTypeName" value="NegotiationLogMaintenanceDocument" />
         <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase"/>
@@ -48,6 +53,7 @@
         <property name="maintainableItems" >
             <list>
                 <bean parent="MaintainableFieldDefinition" p:unconditionallyReadOnly="true" p:name="negotiationLogId" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:unconditionallyReadOnly="true" p:name="migratedNegotiationId" p:required="false" />
                 <bean parent="MaintainableFieldDefinition" p:name="negotiator.userName" p:required="false" />
                 <bean parent="MaintainableFieldDefinition" p:name="proposalNumber" p:required="false"
                 	p:overrideFieldConversions="proposalNumber:proposalNumber" p:overrideLookupClass="org.kuali.kra.institutionalproposal.home.InstitutionalProposal"/>
@@ -78,4 +84,15 @@
             </list>
         </property>
     </bean>
+    
+    <bean id="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink" parent="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink-parentBean"/>
+      <bean id="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink-parentBean" abstract="true" parent="MaintainableSectionDefinition">
+        <property name="id" value="documentLookup"/>  
+        <property name="title" value="Migrate NegotiationLog"/>
+        <property name="maintainableItems">
+          <list>
+            <bean parent="MaintainableFieldDefinition" p:name="negotiationLogMaintenanceDocumentLookup"/>                            
+          </list>
+        </property>
+      </bean>
 </beans>

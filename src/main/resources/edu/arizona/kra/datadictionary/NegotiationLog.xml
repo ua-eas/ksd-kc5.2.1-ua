@@ -49,6 +49,7 @@
 				<ref bean="NegotiationLog-negotiationComplete" />
 				<ref bean="NegotiationLog-dateClosed" />
 				<ref bean="NegotiationLog-daysOpen" />
+                <ref bean="NegotiationLog-relatedDocument-negotiationLogMaintenanceDocumentLookup"/>
 			</list>
 		</property>	
 	</bean>
@@ -71,7 +72,8 @@
 		<property name="summary" value="Negotiation Log Id"/>
 		<property name="description" value="Negotiation Log Id"/>
 	</bean>
-	
+    
+    	
   <bean id="NegotiationLog-negotiatorPersonId" parent="NegotiationLog-negotiatorPersonId-parentBean" />
   <bean id="NegotiationLog-negotiatorPersonId-parentBean" abstract="true" parent="PersonImpl-principalId">
     <property name="name" value="negotiatorPersonId" />
@@ -427,6 +429,17 @@
         <property name="description" value="Days Open" />
      </bean>
 	
+    <bean id="NegotiationLog-relatedDocument-negotiationLogMaintenanceDocumentLookup" parent="NegotiationLog-relatedDocument-negotiationLogMaintenanceDocumentLookup-parentBean"/>
+    <bean id="NegotiationLog-relatedDocument-negotiationLogMaintenanceDocumentLookup-parentBean" abstract="true" parent="AttributeDefinition">
+        <property name="name" value="negotiationLogMaintenanceDocumentLookup"/>
+        <property name="label" value="Find Negotiation"/>
+        <property name="maxLength" value="1000"/>
+        <property name="required" value="false"/>    
+        <property name="control">
+            <bean parent="LinkControlDefinition" p:styleClass="globalLinks" p:target="_blank" p:hrefText="migrate negotiation log"/>
+        </property>
+    </bean>
+    
 
 	<!-- Business Object Inquiry Definition -->
 	<bean id="NegotiationLog-inquiryDefinition" parent="NegotiationLog-inquiryDefinition-parentBean"/>
@@ -467,9 +480,20 @@
 						</list>
 					</property>
 				</bean>
+                <bean parent="InquirySectionDefinition">
+                     <property name="title" value="Migrate Negotiation Log" />
+                     <property name="defaultOpen" value="false" />
+                     <property name="numberOfColumns" value="1" />
+                     <property name="inquiryFields">
+                          <list>
+                             <bean parent="FieldDefinition" p:attributeName="negotiationLogMaintenanceDocumentLookup" />
+                          </list>
+                     </property>
+                </bean>
 			</list>
 		</property>
 	</bean>
+    
 	
 	<!-- Business Object Lookup Definition -->
 	<bean id="NegotiationLog-lookupDefinition" parent="NegotiationLog-lookupDefinition-parentBean"/>
