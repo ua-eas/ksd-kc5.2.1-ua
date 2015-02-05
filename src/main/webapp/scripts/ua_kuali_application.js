@@ -18,3 +18,33 @@ jQuery( document ).ready(function() {
 	});
 
 });
+
+/*
+ * Load the Lead Unit field based on the Lead Unit passed in.
+ */
+function loadLeadUnitName(unitNumberFieldName, leadUnitNameFieldName ) {
+	var unitNumber = dwr.util.getValue( unitNumberFieldName );
+
+	if (unitNumber=='') {
+		clearRecipients( leadUnitNameFieldName, "" );
+	} else {
+		var dwrReply = {
+			callback:function(data) {
+				if ( data != null ) {
+					if ( leadUnitNameFieldName != null && leadUnitNameFieldName != "" ) {
+						setRecipientValue( leadUnitNameFieldName, data );
+					}
+				} else {
+					if ( leadUnitNameFieldName != null && leadUnitNameFieldName != "" ) {
+						setRecipientValue(  leadUnitNameFieldName, wrapError( "not found" ), true );
+					}
+				}
+			},
+			errorHandler:function( errorMessage ) {
+				window.status = errorMessage;
+				setRecipientValue( leadUnitNameFieldName, wrapError( "not found" ), true );
+			}
+		};
+		UnitService.getUnitName(unitNumber,dwrReply);
+	}
+}
