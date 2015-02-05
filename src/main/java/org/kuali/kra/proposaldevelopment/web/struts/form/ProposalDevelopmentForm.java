@@ -239,6 +239,8 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
     private ProposalDevelopmentCustomDataHelper customDataHelper;
     private String narrativeStatusesChangeKey;
     private NarrativeStatus narrativeStatusesChange;
+    
+    private String leadUnitName;
 
     public ProposalDevelopmentForm() {
         super();
@@ -2111,6 +2113,14 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
      */
     public void setNewS2sUserAttachedForm(S2sUserAttachedForm newS2sUserAttachedForm) {
         this.newS2sUserAttachedForm = newS2sUserAttachedForm;
+    }
+    
+    public void setLeadUnitName( String leadUnitName ) {
+    	this.leadUnitName = leadUnitName;
+    }
+    
+    public String getLeadUnitName() {
+    	return this.leadUnitName;
     }
 
 }
