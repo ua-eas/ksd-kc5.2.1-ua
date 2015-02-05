@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.bo.ScienceKeyword;
+import org.kuali.kra.bo.Unit;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -30,6 +31,7 @@ import org.kuali.kra.proposaldevelopment.service.ProposalDevelopmentService;
 import org.kuali.kra.proposaldevelopment.web.struts.form.CongressionalDistrictHelper;
 import org.kuali.kra.proposaldevelopment.web.struts.form.ProposalDevelopmentForm;
 import org.kuali.kra.service.SponsorService;
+import org.kuali.kra.service.UnitService;
 import org.kuali.kra.web.struts.action.StrutsConfirmation;
 import org.kuali.rice.kns.service.KNSServiceLocator;
 import org.kuali.rice.krad.bo.PersistableBusinessObject;
@@ -38,9 +40,11 @@ import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -141,6 +145,25 @@ public class ProposalDevelopmentProposalAction extends ProposalDevelopmentAction
             // TODO: why do we have to do this?
             ((ProposalDevelopmentForm) form).setPrimeSponsorName(null);
         }
+        
+        /* We also need to populate the Lead Unit name if we have the code. This is only for cases 
+         * where the document has not yet been saved. IE, we are returning from a lookup (like sponsor) 
+         * on the proposal tab before the document is saved. 
+         */
+        String unitNumber = proposalDevelopmentDocument.getDevelopmentProposal().getUnitNumber();
+        if ( StringUtils.isNotEmpty(unitNumber) ) {
+        	Unit unit = getUnitService().getUnit(unitNumber);
+        	if ( ObjectUtils.isNotNull(unit) ) {
+        		((ProposalDevelopmentForm) form).setLeadUnitName(unit.getUnitName());
+        	}
+        	else {
+        		((ProposalDevelopmentForm) form).setLeadUnitName( null );
+        	}
+        }
+        else {
+        	((ProposalDevelopmentForm) form).setLeadUnitName( null );
+        }
+        
 
         if (proposalDevelopmentDocument.getDevelopmentProposal().getProposalPersons().size() > 0)
             sort(proposalDevelopmentDocument.getDevelopmentProposal().getProposalPersons(), new ProposalPersonComparator());
@@ -161,6 +184,10 @@ public class ProposalDevelopmentProposalAction extends ProposalDevelopmentAction
 
     protected SponsorService getSponsorService() {
         return KraServiceLocator.getService(SponsorService.class);
+    }
+    
+    protected UnitService getUnitService() {
+        return KraServiceLocator.getService(UnitService.class);
     }
 
     /**
