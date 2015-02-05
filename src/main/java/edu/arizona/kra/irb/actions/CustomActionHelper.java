@@ -23,10 +23,10 @@ import java.util.List;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.actions.ActionHelper;
 import org.kuali.kra.irb.actions.amendrenew.ProtocolAmendmentBean;
-import org.kuali.kra.irb.actions.correction.AdminCorrectionBean;
 import org.kuali.kra.irb.actions.grantexemption.ProtocolGrantExemptionBean;
 import org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewService;
 import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.irb.actions.correction.AdminCorrectionBean;
 import org.kuali.kra.protocol.actions.ActionHelperBase;
 import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewBase;
 import org.kuali.rice.kew.actiontaken.ActionTakenValue;
@@ -67,11 +67,6 @@ public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
         return new CustomProtocolAmendmentBean((ActionHelper) actionHelper);
     }
     
-    @Override
-    protected AdminCorrectionBean getNewAdminCorrectionBeanInstanceHook(ActionHelperBase actionHelper) {
-        return new CustomAdminCorrectionBean((ActionHelper) actionHelper);
-    }
-
     /**
     * Builds an approval date, defaulting to the approval date from the protocol.
     *
@@ -153,5 +148,9 @@ public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
 		return protocolOnlineReviewService;
 	}
 
+    @Override
+    protected AdminCorrectionBean getNewAdminCorrectionBeanInstanceHook(ActionHelperBase actionHelper) {
+        return new CustomAdminCorrectionBean((ActionHelper) actionHelper);
+    }
 
 }

@@ -327,7 +327,8 @@ public abstract class ActionHelperBase implements Serializable {
     protected ProtocolSubmissionQuestionnaireHelper protocolSubmissionQuestionnaireHelper;
     
     private List<AmendmentSummary> amendmentSummaries;
-    
+
+
     
     /**
      * Constructs an ActionHelperBase.
@@ -373,10 +374,12 @@ public abstract class ActionHelperBase implements Serializable {
 
         protocolManageReviewCommentsBean = buildProtocolGenericActionBean(getProtocolActionTypeCodeForManageReviewCommentsHook(), 
                 Constants.PROTOCOL_MANAGE_REVIEW_COMMENTS_KEY);
+
         ProtocolBase protocol = getProtocol();
+ 	protocol.refreshReferenceObject(PROTOCOL_SUBMISSIONS_ATTR);
         protocol.getProtocolSubmission().refreshReferenceObject("reviewAttachments");
         protocol.refreshReferenceObject(PROTOCOL_ACTIONS_REF_OBJECT_NAME);
-        protocol.refreshReferenceObject(PROTOCOL_SUBMISSIONS_ATTR);
+
         protocolManageReviewCommentsBean.getReviewAttachmentsBean().setReviewAttachments(getProtocol().getProtocolSubmission().getReviewAttachments());
         if (CollectionUtils.isNotEmpty(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments())) {
             protocolManageReviewCommentsBean.getReviewAttachmentsBean().setHideReviewerName(getReviewerCommentsService().setHideReviewerName(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments()));
@@ -2627,6 +2630,7 @@ public abstract class ActionHelperBase implements Serializable {
 
     public void setToAnswerSubmissionQuestionnaire(boolean toAnswerSubmissionQuestionnaire) {
         this.toAnswerSubmissionQuestionnaire = toAnswerSubmissionQuestionnaire;
+
     }
 
 
@@ -2739,6 +2743,7 @@ public abstract class ActionHelperBase implements Serializable {
         
         public AmendmentSummary(ProtocolBase protocol) {
             amendmentType = protocol.isRenewalWithoutAmendment() ? "Renewal" : protocol.isRenewal() ? "Renewal with Amendment" : protocol.isAmendment() ? "Amendment" : "New";
+
             //Why even set these here. They will be set blow in the if/else block.
             //versionNumber = protocol.getProtocolNumber().substring(protocol.getProtocolNumber().length() - 3);
             //versionNumberUrl = buildForwardUrl(protocol.getProtocolDocument().getDocumentNumber());
@@ -2812,3 +2817,4 @@ public abstract class ActionHelperBase implements Serializable {
         return forward;
     }
 }
+

@@ -84,6 +84,7 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         
     //unique attachment id so attachments added to amendment and renewals can be distinguished from the ones in the base protocol
     private String versioningId;
+
     /**
      * empty ctor to satisfy JavaBean convention.
      */
@@ -253,10 +254,12 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         // this is still calling persistenceservice eventually  
         // probably do it in postsave  
         //this.getProtocol().refreshReferenceObject("attachmentProtocols");  
+
         for (ProtocolAttachmentProtocolBase attachment : this.getProtocol().getAttachmentProtocols()) {
 
             if (attachment.getDocumentId().equals(this.getDocumentId()) &&
                     StringUtils.equals(attachment.getVersioningId(), this.getVersioningId())) {
+
                 this.versions.add(attachment);
             }
         }

@@ -59,6 +59,7 @@ import java.text.ParseException;
 import java.util.*;
 
 public class ScheduleXmlStream extends PrintBaseXmlStream {
+
     protected CommitteeMembershipService committeeMembershipService;
     protected KcPersonService kcPersonService;
     protected IrbPrintXmlUtilService irbPrintXmlUtilService;
@@ -77,6 +78,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         xmlObjectList.put("Schedule", scheduleDocument);
         return xmlObjectList;
     }
+
 
 
     protected CommitteeSchedule findCommitteeSchedule(Committee committee, String scheduleId) {
@@ -100,6 +102,7 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
         getIrbPrintXmlUtilService().setMinutes(committeeSchedule, schedule);
         setAttendance(committeeSchedule, schedule);
         committeeSchedule.refreshReferenceObject("protocolSubmissions");
+
         List<org.kuali.kra.irb.actions.submit.ProtocolSubmission> submissions = committeeSchedule.getProtocolSubmissions();
         for (org.kuali.kra.irb.actions.submit.ProtocolSubmission protocolSubmission : submissions) {
         	

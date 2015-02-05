@@ -71,27 +71,13 @@ limitations under the License.
             <ref bean="kraAuthorizationService" />
         </property>
     </bean>
+
     <bean id="protocolAssociateWorkflowSearchDao" parent="platformAwareDao" class="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowSearchDaoOjb">
         <property name="lookupDao">
             <ref bean="lookupDao" />
         </property>
         <property name="dataDictionaryService">
             <ref bean="dataDictionaryService" />
-        </property>
-    </bean>
-
-    <bean id="protocolXmlStream" class="edu.arizona.kra.irb.actions.print.CustomProtocolXmlStream" parent="printBaseXmlStream">
-        <property name="irbPrintXmlUtilService">
-            <ref bean="irbPrintXmlUtilService" />
-        </property>
-        <property name="kcPersonService">
-            <ref bean="kcPersonService" />
-        </property>
-        <property name="scheduleXmlStream">
-            <ref bean="scheduleXmlStream" />
-        </property>
-        <property name="committeeXmlStream">
-            <ref bean="committeeXmlStream" />
         </property>
     </bean>
 
@@ -104,6 +90,7 @@ limitations under the License.
             <ref bean="sequenceAccessorService" />
         </property>
     </bean>
+
 
     <bean id="protocolActionCorrespondenceService" class="edu.arizona.kra.irb.actions.correspondence.IrbProtocolActionCorrespondenceServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
@@ -137,6 +124,21 @@ limitations under the License.
 		<property name="questionnaireAnswerService" ref="questionnaireAnswerService" />
 		<property name="protocolActionService" ref="protocolActionService" />
 		<property name="protocolActionCorrespondenceService" ref="protocolActionCorrespondenceService" />
+	</bean>
+
+	<bean id="protocolXmlStream" class="edu.arizona.kra.irb.actions.print.CustomProtocolXmlStream" parent="printBaseXmlStream">
+		<property name="irbPrintXmlUtilService">
+			<ref bean="irbPrintXmlUtilService" />
+		</property>
+		<property name="kcPersonService">
+			<ref bean="kcPersonService" />
+		</property>
+		<property name="scheduleXmlStream">
+			<ref bean="scheduleXmlStream" />
+		</property>
+		<property name="committeeXmlStream">
+			<ref bean="committeeXmlStream" />
+		</property>
 	</bean>
 
 </beans>

@@ -72,7 +72,7 @@
         <reference-descriptor name="protocolType" class-ref="org.kuali.kra.irb.protocol.ProtocolType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="protocolTypeCode"/>
         </reference-descriptor>
-            
+           
         <collection-descriptor name="protocolRiskLevels" proxy="true" element-class-ref="org.kuali.kra.irb.actions.risklevel.ProtocolRiskLevel" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="protocolId" />
         </collection-descriptor>
@@ -104,6 +104,7 @@
         <collection-descriptor name="notepads" proxy="false" element-class-ref="org.kuali.kra.irb.noteattachment.ProtocolNotepad" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="true" auto-delete="true">
             <inverse-foreignkey field-ref="protocolId" />
         </collection-descriptor>
+
         <collection-descriptor name="protocolActions" proxy="true" element-class-ref="org.kuali.kra.irb.actions.ProtocolAction" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList"  auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="protocolId" />
             <orderby name="updateTimestamp" sort="ASC" />
@@ -804,6 +805,7 @@
         <reference-descriptor name="protocolSubmissionQualifierType" class-ref="org.kuali.kra.irb.actions.submit.ProtocolSubmissionQualifierType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="submissionTypeQualifierCode"/>
         </reference-descriptor>
+
         <reference-descriptor name="committeeSchedule" class-ref="org.kuali.kra.committee.bo.CommitteeSchedule" proxy="true" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="scheduleIdFk"/>
         </reference-descriptor>
@@ -813,6 +815,7 @@
         <reference-descriptor name="protocolReviewType" class-ref="org.kuali.kra.irb.actions.submit.ProtocolReviewType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="protocolReviewTypeCode"/>
         </reference-descriptor>
+
         <reference-descriptor name="committee" class-ref="org.kuali.kra.committee.bo.Committee" proxy="true" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="committeeIdFk"/>
         </reference-descriptor>
@@ -828,6 +831,7 @@
         <collection-descriptor name="expeditedReviewCheckList" element-class-ref="org.kuali.kra.irb.actions.submit.ProtocolExpeditedReviewCheckListItem" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList"  auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="submissionIdFk" />
         </collection-descriptor> 
+
         <collection-descriptor name="protocolOnlineReviews" element-class-ref="org.kuali.kra.irb.onlinereview.ProtocolOnlineReview" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList"  proxy="true" auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="submissionIdFk" />
         </collection-descriptor>
@@ -837,6 +841,7 @@
         <collection-descriptor name="recusers" element-class-ref="org.kuali.kra.meeting.ProtocolVoteRecused" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList"  auto-retrieve="true" auto-update="link" auto-delete="object">
             <inverse-foreignkey field-ref="submissionIdFk" />
         </collection-descriptor>
+
         <collection-descriptor name="committeeScheduleMinutes" element-class-ref="org.kuali.kra.meeting.CommitteeScheduleMinute" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" proxy="true" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <inverse-foreignkey field-ref="submissionIdFk"/>
         </collection-descriptor>
