@@ -220,7 +220,9 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
 	 */
 	@Override
 	public boolean canSave( Document document, Person user ) {
-		return canEdit( document, user );
+		boolean canSave = canEdit( document, user );
+		canSave &= getEditModes( document, user, new HashSet<String>() ).contains( AuthorizationConstants.EditMode.FULL_ENTRY );
+		return canSave;
 	}
 
 	/**
@@ -342,7 +344,8 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
 			}
 			// (prior to routing)
 			WorkflowDocument workflowDocument = document.getDocumentHeader().getWorkflowDocument();
-			if ( canRoute( document ) ) {
+			boolean canRoute = canRoute( document, user );
+			if ( canRoute ) {
 				return true;
 			}
 			// or to a user with an approval action request
@@ -412,6 +415,8 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
 		canRoute =
 				( !( isFinal( document ) || isProcessed( document ) ) &&
 				permService.hasPermission( user.getPrincipalId(), "KC-AWARD", "Submit Award" ) );
+		canRoute &= getEditModes( document, user, new HashSet<String>() ).contains( AuthorizationConstants.EditMode.FULL_ENTRY );
+
 		return canRoute;
 	}
 

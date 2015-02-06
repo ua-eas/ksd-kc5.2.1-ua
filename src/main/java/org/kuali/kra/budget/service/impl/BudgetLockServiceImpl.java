@@ -27,6 +27,7 @@ import org.kuali.rice.krad.document.authorization.PessimisticLock;
 import org.kuali.rice.krad.service.impl.PessimisticLockServiceImpl;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 /**
  * The Budget Lock Service implementation. It derives from the Pessimistic Lock Service in order to customize the lock
@@ -34,6 +35,7 @@ import org.kuali.rice.krad.util.KRADConstants;
  */
 public class BudgetLockServiceImpl extends PessimisticLockServiceImpl implements BudgetLockService {
 
+	private static final String FALSE = "FALSE";
 	private static final String ADD_BUDGET = "addBudget";
 
 	/**
@@ -48,7 +50,8 @@ public class BudgetLockServiceImpl extends PessimisticLockServiceImpl implements
 		// check for entry edit mode
 		for ( Iterator iterator = editMode.entrySet().iterator() ; iterator.hasNext() ; ) {
 			Map.Entry entry = (Map.Entry) iterator.next();
-			if ( isEntryEditMode( entry ) && StringUtils.isNotEmpty( activeLockRegion ) ) {
+			boolean isEntryEditMode = isEntryEditMode( entry );
+			if ( isEntryEditMode ) {
 				return true;
 			}
 		}
@@ -80,11 +83,11 @@ public class BudgetLockServiceImpl extends PessimisticLockServiceImpl implements
 	@SuppressWarnings( "unchecked" )
 	@Override
 	protected boolean isEntryEditMode( Map.Entry entry ) {
-		if ( AuthorizationConstants.EditMode.FULL_ENTRY.equals( entry.getKey() )
-				|| KraAuthorizationConstants.BudgetEditMode.MODIFY_BUDGET.equals( entry.getKey() )
-				|| ADD_BUDGET.equals( entry.getKey() ) ) {
-			String fullEntryEditModeValue = (String) entry.getValue();
-			return ( StringUtils.equalsIgnoreCase( KRADConstants.KUALI_DEFAULT_TRUE_VALUE, fullEntryEditModeValue ) );
+		boolean isEditMode = false;
+		isEditMode |= KraAuthorizationConstants.BudgetEditMode.MODIFY_BUDGET.equals( entry.getKey() );
+		isEditMode |= ADD_BUDGET.equals( entry.getKey() );
+		if ( isEditMode ) {
+			return super.isEntryEditMode( entry );
 		}
 		return false;
 	}
@@ -131,5 +134,18 @@ public class BudgetLockServiceImpl extends PessimisticLockServiceImpl implements
 		}
 
 		return false;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	@Override
+	protected Map getEditModeWithEditableModesRemoved( Map currentEditMode ) {
+		Map editModeMap = super.getEditModeWithEditableModesRemoved( currentEditMode );
+		for ( Iterator iterator = editModeMap.entrySet().iterator() ; iterator.hasNext() ; ) {
+			Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
+			if ( StringUtils.equals( entry.getKey(), ADD_BUDGET ) ) {
+				entry.setValue( FALSE );
+			}
+		}
+		return editModeMap;
 	}
 }

@@ -34,6 +34,9 @@ import org.kuali.rice.krad.util.ObjectUtils;
 
 public class AwardLockServiceImpl extends PessimisticLockServiceImpl implements ProposalLockService {
 
+	private static final String FALSE = "FALSE";
+	private static final String ADD_BUDGET = "addBudget";
+
 	/**
 	 * This method is used to check if the given parameters warrant a new lock to be created for the given user. This
 	 * method utilizes the {@link #isEntryEditMode(java.util.Map.Entry)} method.
@@ -54,7 +57,8 @@ public class AwardLockServiceImpl extends PessimisticLockServiceImpl implements 
 		// check for entry edit mode
 		for ( Iterator iterator = editMode.entrySet().iterator() ; iterator.hasNext() ; ) {
 			Map.Entry entry = (Map.Entry) iterator.next();
-			if ( isEntryEditMode( entry ) && StringUtils.isNotEmpty( activeLockRegion ) ) {
+			boolean isEntryEditMode = isEntryEditMode( entry );
+			if ( isEntryEditMode ) {
 				return true;
 			}
 		}
@@ -74,15 +78,14 @@ public class AwardLockServiceImpl extends PessimisticLockServiceImpl implements 
 	@SuppressWarnings( "unchecked" )
 	@Override
 	protected boolean isEntryEditMode( Map.Entry entry ) {
-		if ( AuthorizationConstants.EditMode.FULL_ENTRY.equals( entry.getKey() )
-				|| KraAuthorizationConstants.ProposalEditMode.ADD_NARRATIVES.equals( entry.getKey() )
-				|| KraAuthorizationConstants.ProposalEditMode.MODIFY_PERMISSIONS.equals( entry.getKey() )
-				|| KraAuthorizationConstants.ProposalEditMode.MODIFY_PROPOSAL.equals( entry.getKey() )
-				|| KraAuthorizationConstants.BudgetEditMode.MODIFY_BUDGET.equals( entry.getKey() )
-				|| "addBudget".equals( entry.getKey() ) ) {
-			String fullEntryEditModeValue = (String) entry.getValue();
-			// return ( (ObjectUtils.isNotNull(fullEntryEditModeValue)) && ("TRUE".equals(fullEntryEditModeValue)) );
-			return ( ( ObjectUtils.isNotNull( fullEntryEditModeValue ) ) && StringUtils.equalsIgnoreCase( KRADConstants.KUALI_DEFAULT_TRUE_VALUE, fullEntryEditModeValue ) );
+		boolean isEditMode = false;
+		isEditMode |= KraAuthorizationConstants.ProposalEditMode.ADD_NARRATIVES.equals( entry.getKey() );
+		isEditMode |= KraAuthorizationConstants.ProposalEditMode.MODIFY_PERMISSIONS.equals( entry.getKey() );
+		isEditMode |= KraAuthorizationConstants.ProposalEditMode.MODIFY_PROPOSAL.equals( entry.getKey() );
+		isEditMode |= KraAuthorizationConstants.BudgetEditMode.MODIFY_BUDGET.equals( entry.getKey() );
+		isEditMode |= ADD_BUDGET.equals( entry.getKey() );
+		if ( isEditMode ) {
+			return super.isEntryEditMode( entry );
 		}
 		return false;
 	}
@@ -90,12 +93,11 @@ public class AwardLockServiceImpl extends PessimisticLockServiceImpl implements 
 	@SuppressWarnings( "unchecked" )
 	@Override
 	protected Map getEditModeWithEditableModesRemoved( Map currentEditMode ) {
-		Map editModeMap = new HashMap();
-		// Map editModeMap = super.getEditModeWithEditableModesRemoved(currentEditMode);
+		Map editModeMap = super.getEditModeWithEditableModesRemoved( currentEditMode );
 		for ( Iterator iterator = editModeMap.entrySet().iterator() ; iterator.hasNext() ; ) {
 			Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
-			if ( StringUtils.equals( entry.getKey(), "addBudget" ) ) {
-				entry.setValue( "FALSE" );
+			if ( StringUtils.equals( entry.getKey(), ADD_BUDGET ) ) {
+				entry.setValue( FALSE );
 			}
 		}
 		return editModeMap;

@@ -292,7 +292,9 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcTransactionalDocume
 
 	@Override
 	public boolean canSave( Document document, Person user ) {
-		return canEdit( document, user );
+		boolean canSave = canEdit( document, user );
+		canSave &= getEditModes( document, user, new HashSet<String>() ).contains( AuthorizationConstants.EditMode.FULL_ENTRY );
+		return canSave;
 	}
 
 	@Override
@@ -308,7 +310,10 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcTransactionalDocume
 
 	@Override
 	public boolean canRoute( Document document, Person user ) {
-		return canExecuteProposalTask( user.getPrincipalId(), (ProposalDevelopmentDocument) document, TaskName.SUBMIT_TO_WORKFLOW ) && canExecuteProposalTask( user.getPrincipalName(), (ProposalDevelopmentDocument) document, TaskName.PROPOSAL_HIERARCHY_CHILD_WORKFLOW_ACTION );
+		boolean canRoute = canExecuteProposalTask( user.getPrincipalId(), (ProposalDevelopmentDocument) document, TaskName.SUBMIT_TO_WORKFLOW );
+		canRoute &= canExecuteProposalTask( user.getPrincipalName(), (ProposalDevelopmentDocument) document, TaskName.PROPOSAL_HIERARCHY_CHILD_WORKFLOW_ACTION );
+		canRoute &= getEditModes( document, user, new HashSet<String>() ).contains( AuthorizationConstants.EditMode.FULL_ENTRY );
+		return canRoute;
 	}
 
 	@Override
@@ -334,7 +339,10 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcTransactionalDocume
 	@Override
 	public boolean canBlanketApprove( Document document, Person user ) {
 		WorkflowDocument workflowDocument = document.getDocumentHeader().getWorkflowDocument();
-		return workflowDocument.isEnroute() && super.canBlanketApprove( document, user ) && canExecuteProposalTask( user.getPrincipalName(), (ProposalDevelopmentDocument) document, TaskName.PROPOSAL_HIERARCHY_CHILD_WORKFLOW_ACTION );
+		boolean canBlanketApprove = workflowDocument.isEnroute();
+		canBlanketApprove &= super.canBlanketApprove( document, user );
+		canBlanketApprove &= canRoute( document, user );
+		return canBlanketApprove;
 	}
 
 	@Override

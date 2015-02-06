@@ -202,7 +202,9 @@ public class BudgetDocumentAuthorizer extends KcTransactionalDocumentAuthorizerB
 	 */
 	@Override
 	public boolean canSave( Document document, Person user ) {
-		return canEdit( document, user );
+		boolean canSave = canEdit( document, user );
+		canSave &= getEditModes( document, user, new HashSet<String>() ).contains( AuthorizationConstants.EditMode.FULL_ENTRY );
+		return canSave;
 	}
 
 	/**
