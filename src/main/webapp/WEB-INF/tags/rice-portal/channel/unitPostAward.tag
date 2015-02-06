@@ -25,6 +25,7 @@
       <portal:portalLink displayTitle="false" title="Award" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.award.home.Award&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true"><img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle"></portal:portalLink>
     </td>
   </tr>
+  <!-- 
   <tr>
     <td nowrap class="disabled-text">Award Report Tracking</td>
     <td>
@@ -32,6 +33,7 @@
       <portal:portalLink displayTitle="false" title="Award Report Tracking" url="${ConfigProperties.application.url}/reportTrackingLookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.award.paymentreports.awardreports.reporting.ReportTracking&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do"><img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle"></portal:portalLink>
     </td>
   </tr>
+   -->
   <tr>
     <td nowrap class="disabled-text">Subawards</td>
     <td>

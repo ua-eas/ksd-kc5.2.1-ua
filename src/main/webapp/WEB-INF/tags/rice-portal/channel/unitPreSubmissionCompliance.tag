@@ -17,6 +17,7 @@
 
 <channel:portalChannelTop channelTitle="Pre-Submission Compliance" />
 <div class="body">
+<!-- 
   <p>
     <strong>Conflict of Interest</strong>
   </p>
@@ -115,10 +116,12 @@
       
     </tr>  
   </table>
+   -->
   <p>
     <strong>Protocols</strong>
   </p>
   <table border="0" cellpadding="2" cellspacing="0">
+  <!-- 
    <tr>
     <td nowrap class="disabled-text">Animals</td>
     <td style="padding-left: 10px"/>
@@ -131,6 +134,7 @@
       </portal:portalLink>
     </td>
   </tr>
+   -->
   <tr>
     <td nowrap class="disabled-text">Human Participants</td>
     <td style="padding-left: 10px"/>

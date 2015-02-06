@@ -27,6 +27,7 @@
             <img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle"></portal:portalLink>
     </td>
   </tr>
+  <!-- 
   <tr>
     <td nowrap class="">Proposal Log</td>
     <td>
@@ -34,7 +35,7 @@
         <portal:portalLink displayTitle="false" title="Proposal Log" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.institutionalproposal.proposallog.ProposalLog&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true"><img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle"></portal:portalLink>
     </td>
   </tr>
-
+  -->
   <tr>
     <td nowrap class="">Institutional Proposal</td>
     <td>

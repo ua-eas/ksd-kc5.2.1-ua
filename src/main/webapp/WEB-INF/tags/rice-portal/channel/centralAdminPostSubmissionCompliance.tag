@@ -27,6 +27,7 @@
           <img src="static/images/searchicon.gif" alt="lookup" width="16" height="16" border="0" align="absmiddle"></portal:portalLink>
     </td>
    </tr>
+   <!-- 
    <tr> 
     <td nowrap class="">IACUC Committee</td>
     <td>  
@@ -36,6 +37,7 @@
           <img src="static/images/searchicon.gif" alt="lookup" width="16" height="16" border="0" align="absmiddle"></portal:portalLink>
     </td>
   </tr>
+   -->
   <tr>
     <td nowrap class="disabled-text">Protocol Submissions</td>
     <td>
@@ -45,6 +47,7 @@
       </portal:portalLink>
     </td>
   </tr>
+  <!-- 
   <tr>
     <td nowrap class="disabled-text">IACUC Submissions</td>
     <td>
@@ -54,6 +57,7 @@
       </portal:portalLink>
     </td>
   </tr>
+  -->
   <tr>
     <td nowrap class="disabled-text">IRB Schedules</td>
     <td>
@@ -62,6 +66,7 @@
           <img src="static/images/searchicon.gif" alt="lookup" width="16" height="16" border="0" align="absmiddle"></portal:portalLink>          
     </td>
   </tr>
+  <!-- 
   <tr>
     <td nowrap class="disabled-text">IACUC Schedules</td>
     <td>
@@ -70,6 +75,7 @@
           <img src="static/images/searchicon.gif" alt="lookup" width="16" height="16" border="0" align="absmiddle"></portal:portalLink>
     </td>  		     		
   </tr>
+  -->
   <tr>
     <td nowrap class="disabled-text">HSPP (Admin Use)</td>
     <td>
