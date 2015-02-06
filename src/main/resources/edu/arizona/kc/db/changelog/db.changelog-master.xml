@@ -9,5 +9,6 @@
   <!-- include file="changesets/db.changelog-UAR-###.xml" -->
   
   <include file="changesets/db.changelog-UAR-821.xml" />
+  <include file="changesets/db.changelog-UAR-896.xml" />
 
 </databaseChangeLog>
