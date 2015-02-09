@@ -52,11 +52,7 @@
     <bean id="protocolCustomDataService" class="edu.arizona.kra.protocol.ProtocolCustomDataServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
     </bean> 
-    
-    <bean id="negotiationMigrationService" class="edu.arizona.kra.institutionalproposal.negotiationlog.service.NegotiationLogMigrationServiceImpl">
-        <!-- property name="businessObjectService" ref="businessObjectService" /-->
-    </bean> 
-    
+       
     
      <bean class="org.kuali.rice.core.framework.util.spring.NamedOrderedListBean">
         <property name="name" value="scriptConfigurationFilePaths" />

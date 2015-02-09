@@ -29,8 +29,15 @@ import edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog;
 public interface NegotiationLogMigrationService{
     
     /**
+     * Migrates one individual negotiation log specified by the given negotiationLogId and return the resulting Negotiation object
+     * @param negotiationLogId 
+     * @return
+     */
+    public Negotiation migrateNegotiationLog(String negotiationLogId) throws NegotiationMigrationException;
+    
+    /**
      * Migrates one individual negotiation log and return the resulting Negotiation object
-     * @param nlog 
+     * @param negotiationLog 
      * @return
      */
     public Negotiation migrateNegotiationLog(NegotiationLog nlog) throws NegotiationMigrationException; 
