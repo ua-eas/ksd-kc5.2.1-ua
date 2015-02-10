@@ -132,6 +132,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	private static final String ROUTING_WARNING_MESSAGE = "Validation Warning Exists.Are you sure want to submit to workflow routing.";
 	private static final String PROPOSAL_APPROVER_VIEW_URL = "proposalDevelopmentApproverView";
 
+
 	private enum SuperUserAction {
 		SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
 	}
@@ -165,6 +166,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			throws Exception {
 		ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
 		proposalDevelopmentForm.setReturnToActionList( false );
+
 		ProposalDevelopmentDocument pdDoc = proposalDevelopmentForm.getProposalDevelopmentDocument();
 		WorkflowDocument workflowDoc = proposalDevelopmentForm.getProposalDevelopmentDocument().getDocumentHeader().getWorkflowDocument();
 
@@ -209,6 +211,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
 		List<ActionForward> acceptedForwards = new ArrayList<ActionForward>();
 		String routeHeaderId = ( (ProposalDevelopmentForm) form ).getDocument().getDocumentNumber();
+
 		String actionTab = Constants.MAPPING_PROPOSAL_ACTIONS;
 		String requestURL = request.getRequestURL().toString();
 		boolean returnToApproverViewPage = requestURL.contains( PROPOSAL_APPROVER_VIEW_URL ) && !forwardToSubmitToSponsor;
@@ -236,6 +239,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
 		acceptedForwards.add( mapping.findForward( KRADConstants.MAPPING_PORTAL ) );
 		ActionForward holdingPageForward = mapping.findForward( Constants.MAPPING_HOLDING_PAGE );
+
 
 		return routeToHoldingPage( acceptedForwards, forward, holdingPageForward, returnLocation );
 	}
@@ -1610,7 +1614,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			throws Exception {
 		ProposalDevelopmentForm pdForm = (ProposalDevelopmentForm) form;
 		ProposalDevelopmentDocument pdDoc = pdForm.getProposalDevelopmentDocument();
-		ActionForward forward = super.disapprove( mapping, form, request, response );
+		ActionForward forward = super.terminate( mapping, form, request, response );
+
 		if ( StringUtils.isNotBlank( request.getParameter( KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME ) ) ) {
 			Long instPropId = findInstProposalNumber( pdDoc.getDevelopmentProposal().getProposalNumber() );
 			if ( instPropId != null ) {
