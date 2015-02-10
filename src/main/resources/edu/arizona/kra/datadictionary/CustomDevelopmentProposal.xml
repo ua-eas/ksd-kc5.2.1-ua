@@ -68,6 +68,21 @@
 
 
 	<!-- Attribute Definitions -->
+	<bean id="DevelopmentProposal-deadlineTime" parent="DevelopmentProposal-deadlineTime-parentBean" />
+	<bean id="DevelopmentProposal-deadlineTime-parentBean" abstract="true" parent="AttributeDefinition">
+		<property name="name" value="deadlineTime" />
+		<property name="label" value="Sponsor Deadline Time (Eastern Time)" />
+		<property name="shortLabel" value="Sponsor Deadline Time (Eastern Time)" />
+		<property name="required" value="false" />
+		<property name="maxLength" value="15" />
+		<property name="control">
+			<bean parent="TextControlDefinition" p:size="15" />
+		</property>
+		<property name="summary" value="The Deadline Time of the Proposal" />
+		<property name="description"
+			value="The time in which the proposal is due to the sponsoring agency.  Additional deadlines may be set by the office authorized to submit proposals on behalf of the institution (e.g. sponsored programs, etc.)." />
+	</bean>
+	
 	<bean id="DevelopmentProposal-proposalPersons.fullName" parent="DevelopmentProposal-proposalPersons.fullName-parentBean" />
 	<bean id="DevelopmentProposal-proposalPersons.fullName-parentBean" abstract="true" parent="AttributeDefinition" >
 		<property name="name" value="proposalPersons.fullName" />
