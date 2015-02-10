@@ -421,3 +421,7 @@ div#budgetPersonnelSelectBudgetPeriod {
 div.questionnaireContent {
     clear: left;
 }
+
+#tabs input:disabled {
+	display: none;
+}
