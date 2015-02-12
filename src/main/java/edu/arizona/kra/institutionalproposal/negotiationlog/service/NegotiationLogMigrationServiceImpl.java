@@ -18,8 +18,10 @@ package edu.arizona.kra.institutionalproposal.negotiationlog.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -35,11 +37,11 @@ import org.kuali.kra.negotiations.bo.NegotiationActivityType;
 import org.kuali.kra.negotiations.bo.NegotiationAgreementType;
 import org.kuali.kra.negotiations.bo.NegotiationAssociationType;
 import org.kuali.kra.negotiations.bo.NegotiationLocation;
-import org.kuali.kra.negotiations.bo.NegotiationStatus;
 import org.kuali.kra.negotiations.bo.NegotiationUnassociatedDetail;
 import org.kuali.kra.negotiations.bo.NegotiationsGroupingBase;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.service.NegotiationService;
+import org.kuali.rice.core.framework.persistence.ojb.dao.PlatformAwareDaoBaseOjb;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.UserSessionUtils;
 import org.kuali.rice.krad.service.DataDictionaryService;
@@ -51,12 +53,13 @@ import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 import edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog;
+import edu.arizona.kra.institutionalproposal.negotiationlog.dao.NegotiationLogDao;
 
 /**
  * Custom UofA service with the only purpose to perform the Negotiation Log migration to the new 5.2.1 Negotiation object
  * @author nataliac
  */
-public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrationService{
+public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb implements NegotiationLogMigrationService{
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(NegotiationLogMigrationService.class);
     
     private BusinessObjectService businessObjectService;
@@ -64,18 +67,19 @@ public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrati
     private InstitutionalProposalService institutionalProposalService;
     private DocumentService documentService;
     private DataDictionaryService dataDictionaryService;
+    private NegotiationLogDao negotiationLogDao;
     
+
     private final static String NEGOTIATION_DOCUMENT_TYPE_NAME="NegotiationDocument";
     private final static String DEFAULT_NEGOTIATOR_ID="104125367669"; //krobertson
     private final static Date DEFAULT_DATE = new Date(2000,1,1);
     private final static Date DEFAULT_END_DATE = new Date(3000,1,1);
-    private final static String DEFAULT_AGREEMENT_CODE = "OT";
+    private final static String DEFAULT_AGREEMENT_CODE = "SPS";
     private final static String DEFAULT_ACTIVITY_CODE = "O";    
-    private final static String NO_ASSOCIATION_CODE = "NO";
-    private final static String IP_ASSOCIATION_CODE = "IP";
     private final static String SPS_LOCATION_CODE = "SPS";
     private final static String ORCA_LOCATION_CODE = "ORCA";
     private final static String CRS_LOCATION_CODE = "CRS";
+    private final static int MAX_RESULTS = 100;
     //keeps default objs cached
     private final static Map<String, NegotiationsGroupingBase> defaultNegotiationBOs = new HashMap<String, NegotiationsGroupingBase>();
     
@@ -112,7 +116,7 @@ public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrati
         LOG.debug("Populating new negotiation from the negotiation log.");
         
         //Important Requirement: keep the same negotiation id as the Negotiation Log
-        negotiation.setNegotiationId( negotiationLog.getNegotiationLogId().longValue() );
+        negotiation.setNegotiationId( negotiationLog.getNegotiationLogId().longValue() + 1);
                 
         setNegotiatorDetails(negotiation, negotiationLog);
         
@@ -142,8 +146,74 @@ public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrati
 	 */
     @Override
 	public List<Integer> migrateNegotiationLogs(boolean completeStatus) throws NegotiationMigrationException{
+        ArrayList<String> failedNegLogIds = new ArrayList<String>();
+        ArrayList<String> succededNegLogIds = new ArrayList<String>();
+        LOG.debug("Starting MigrateNegotiationLogs with status complete= "+completeStatus);
+        try {
+            
+            Integer maxLogId = getNegotiationLogDao().findMaxNegotiationLogId();
+            LOG.debug("Max negotiation log id= "+maxLogId);
+            
+            Integer currentLogId = 1;
+            while ( currentLogId <= maxLogId ){
+                List <Integer> negotiationLogsToMigrate = getNegotiationLogDao().findNegotiationLogIds(currentLogId, MAX_RESULTS, completeStatus);
+                if ( !negotiationLogsToMigrate.isEmpty() ){
+                    Iterator negLogIdIterator = negotiationLogsToMigrate.iterator();
+                    while ( negLogIdIterator.hasNext() ){
+                        //TODO delete next log as it removes stuff from the iterator
+                        Integer currentNegotiationLogId = (Integer)negLogIdIterator.next();
+                        LOG.debug("Migrating negotiation log id= "+currentNegotiationLogId);
+                        //TODO uncomment this when we're ready to migrate 
+//                        try {
+//                            migrateNegotiationLog(currentNegotiationLogId.toString());
+//                            succededNegLogIds.add(currentNegotiationLogId.toString());
+//                        } catch (Exception e){
+//                            LOG.debug("Failed migrating negotiation log id="+currentNegotiationLogId+" Exception:"+e.getMessage());
+//                            failedNegLogIds.add( currentNegotiationLogId.toString() );
+//                        }
+                    }
+                }
+                currentLogId +=MAX_RESULTS;
+            }
+            
+        } catch ( Exception e ){
+            e.printStackTrace();
+            LOG.error("Exception when trying to migrate negotiation logs: "+Arrays.toString(e.getStackTrace()));
+            throw new NegotiationMigrationException(e.getMessage());
+        }
+        LOG.debug("Finishing MigrateNegotiationLogs with status complete= "+completeStatus); 
+        LOG.debug("Number of successfully migrated Negotiation Logs="+succededNegLogIds.size());
+        LOG.debug("Number of FAILED migrated Negotiation Logs="+failedNegLogIds.size());
+        LOG.debug("FAILED:\n"+Arrays.toString(failedNegLogIds.toArray()));
         return null;
-	    
+//	    Statement sqlStatement = 
+//	    sqlStatement.setFetchSize(50);
+//	    Character closedFlag = new Character( completeStatus?'Y':'N');
+//	    String searchLodIdSql = "select NEGOTIATION_LOG_ID from negotiation_log where CLOSED_FLAG='"+closedFlag+"' order by NEGOTIATION_LOG_ID";
+//        ResultSet logIdResultSet = null;
+//        try {
+//            logIdResultSet = sqlStatement.executeQuery(searchLodIdSql);
+//            while (logIdResultSet.next()) {
+//                searchAttValue.setSearchableAttributeKey(attributeResultSet.getString("KEY_CD"));
+//                searchAttValue.setupAttributeValue(attributeResultSet, "VAL");
+//                if ( (!org.apache.commons.lang.StringUtils.isEmpty(searchAttValue.getSearchableAttributeKey())) && (searchAttValue.getSearchableAttributeValue() != null) ) {
+//                    DocumentAttribute documentAttribute = searchAttValue.toDocumentAttribute();
+//                    resultBuilder.getDocumentAttributes().add(DocumentAttributeFactory.loadContractIntoBuilder(
+//                            documentAttribute));
+//                }
+//            }
+//        } catch (Exception e){
+//          LOG.debug("Exception caught when retrieving negotiation Ids with status closed="+closedFlag);
+//          LOG.error(e);  
+//        } finally {
+//            if (logIdResultSet != null) {
+//                try {
+//                    logIdResultSet.close();
+//                } catch (Exception e) {
+//                    LOG.warn("Could not close result set.",e);
+//                }
+//            }
+//        }
 	}
 	
 	/**
@@ -212,19 +282,23 @@ public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrati
 	
 	private void setNegotiationDates(Negotiation negotiation, NegotiationLog negotiationLog){
 	    LOG.debug("Start setNegotiationDates");
-	    Date startDate = negotiationLog.getStartDate();
+	    Date startDate = negotiationLog.getDateReceived();
 	    Date endDate = negotiationLog.getDateClosed();
 	    
 	    if ( startDate == null ){
-	        if ( negotiationLog.getDateReceived() == null ){
+	        if ( negotiationLog.getStartDate() == null ){
 	            if ( negotiationLog.getNegotiationStart() == null ){
-	                LOG.debug("Using default start date.");
-	                startDate = DEFAULT_DATE;
+	                if ( negotiationLog.getBackstop() == null ){
+	                    LOG.debug(negotiationLog.getNegotiationLogId()+":Using default start date = "+DEFAULT_DATE);
+	                    startDate = DEFAULT_DATE;
+	                } else {
+	                    startDate = negotiationLog.getBackstop();
+	                }
 	            } else {
 	                startDate = negotiationLog.getNegotiationStart();
 	            }
 	        } else {
-	            startDate = negotiationLog.getDateReceived();
+	            startDate = negotiationLog.getStartDate();
 	        }
 	    }
 	    negotiation.setNegotiationStartDate(startDate);
@@ -252,7 +326,7 @@ public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrati
 	        negotiation.setNegotiationEndDate(endDate);
 	    }
 	    
-	    LOG.debug("Finished setNegotiationDates");
+	    LOG.debug("Finished setNegotiationDates log="+negotiationLog.getNegotiationLogId()+" CLosed="+negotiationLog.getClosed()+" SD="+negotiation.getNegotiationStartDate()+" ED="+ negotiation.getNegotiationEndDate());
 	}
 	
 	
@@ -319,53 +393,24 @@ public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrati
         activity.setLocationId( activity.getLocation().getId() );
         activity.setDescription( buildActivityDescription(negotiationLog));
         
-        if ( negotiationLog.getNegotiationStart()!=null){
-            activity.setStartDate( negotiationLog.getNegotiationStart() );
-        } else if ( negotiationLog.getStartDate() != null ){
-            activity.setStartDate( negotiationLog.getStartDate() );
-        } else {
-            activity.setStartDate( negotiation.getNegotiationStartDate() );
-        }
         //activity cannot start before the negotiation started, make sure they are in sync.
-        if ( activity.getStartDate().before( negotiation.getNegotiationStartDate() )  ){
-            activity.setStartDate(negotiation.getNegotiationStartDate());
-        }
-        
+        activity.setStartDate( negotiation.getNegotiationStartDate() );
         activity.setCreateDate(activity.getStartDate());
         
         
-        if ( negotiationLog.getNegotiationComplete()!=null){
-            activity.setEndDate( negotiationLog.getNegotiationComplete());
-        } else if ( negotiationLog.getDateClosed() != null ){
-            activity.setEndDate( negotiationLog.getDateClosed() );
-        } else if ( negotiationLog.getEndDate() != null ){
-            activity.setEndDate( negotiationLog.getEndDate() );
-        } else if ( negotiation.getNegotiationEndDate() != null){
-            activity.setEndDate( negotiation.getNegotiationEndDate() );
-        }
+        if ( negotiationLog.getClosed() ){
+           //activity cannot end after the negotiation ended, make sure they are in sync.
+           activity.setEndDate( negotiation.getNegotiationEndDate());
+        } 
         
-        //activity cannot end after the negotiation ended, make sure they are in sync.
-        if ( activity.getEndDate() !=null && negotiation.getNegotiationEndDate() != null && activity.getEndDate().after( negotiation.getNegotiationEndDate() )  ){
-            activity.setEndDate(negotiation.getNegotiationEndDate());
-        }
-        
-        if ( negotiationLog.getClosed() && activity.getEndDate() ==null ){
-            //no date was set for the activity end date. setting to default
-            activity.setEndDate(DEFAULT_END_DATE);
-        }
-        
-        if ( negotiationLog.getBackstop()!= null){
-            activity.setFollowupDate( negotiationLog.getBackstop() );
-        }
-        
-        activity.setLastModifiedUsername(negotiation.getNegotiatorUserName());
-        activity.setLastModifiedDate(activity.getEndDate()!=null?activity.getEndDate():activity.getStartDate());
+        activity.setLastModifiedUsername(GlobalVariables.getUserSession().getPrincipalName());
+        activity.setLastModifiedDate(activity.getEndDate()!=null?activity.getEndDate():new Date(System.currentTimeMillis()));
         
         activity.setRestricted(false);
         
         negotiation.getActivities().add(activity);
         
-        LOG.debug("Finished createNegotiationActivity");
+        LOG.debug("Finished createNegotiationActivity log="+negotiationLog.getNegotiationLogId()+" SD="+activity.getStartDate()+" ED="+activity.getEndDate()+" User="+activity.getLastModifiedUsername());
         return null;
     }
     
@@ -563,6 +608,11 @@ public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrati
             activityDescription.append(negotiationLog.getOrcaComments());
             activityDescription.append("\n");
         }
+        //Activity description cannot be empty. Adding default text
+        if ( StringUtils.isEmpty( activityDescription.toString() )){
+            activityDescription.append("Migrated from NegotiationLog#");
+            activityDescription.append(negotiationLog.getNegotiationLogId());
+        }
         return activityDescription.toString();
     }
     
@@ -605,6 +655,15 @@ public class NegotiationLogMigrationServiceImpl implements NegotiationLogMigrati
             dataDictionaryService = (DataDictionaryService) KRADServiceLocatorWeb.getDataDictionaryService();
         }
         return this.dataDictionaryService;
+    }
+    
+    public NegotiationLogDao getNegotiationLogDao() {
+        return negotiationLogDao;
+    }
+
+
+    public void setNegotiationLogDao(NegotiationLogDao negotiationLogDao) {
+        this.negotiationLogDao = negotiationLogDao;
     }
     
 	

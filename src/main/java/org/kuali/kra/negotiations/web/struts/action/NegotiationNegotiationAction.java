@@ -85,13 +85,14 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     
     public ActionForward migrate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         LOG.debug("Starting negotiation log migration");
-        String negotiationLogId = request.getParameter("negotiationLogId");
-        if ( StringUtils.isEmpty(negotiationLogId) )
-            return mapping.findForward(KRADConstants.MAPPING_PORTAL);
-        NegotiationLog oldNegotiationLog = getBusinessObjectService().findBySinglePrimaryKey(NegotiationLog.class, negotiationLogId);
-        LOG.debug("Migrating negotiation log:"+negotiationLogId);
-        Negotiation migratedNegotiation = getNegotiationMigrationService().migrateNegotiationLog(oldNegotiationLog);
-        LOG.debug("Finished migrating negotiation log:"+migratedNegotiation.getNegotiationId());
+        getNegotiationMigrationService().migrateNegotiationLogs(false);
+//        String negotiationLogId = request.getParameter("negotiationLogId");
+//        if ( StringUtils.isEmpty(negotiationLogId) )
+//            return mapping.findForward(KRADConstants.MAPPING_PORTAL);
+//        NegotiationLog oldNegotiationLog = getBusinessObjectService().findBySinglePrimaryKey(NegotiationLog.class, negotiationLogId);
+//        LOG.debug("Migrating negotiation log:"+negotiationLogId);
+//        Negotiation migratedNegotiation = getNegotiationMigrationService().migrateNegotiationLog(oldNegotiationLog);
+//        LOG.debug("Finished migrating negotiation log:"+migratedNegotiation.getNegotiationId());
         return mapping.findForward(KRADConstants.MAPPING_PORTAL);
     }
 
