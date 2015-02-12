@@ -145,7 +145,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
 	 * Returns a list with the Id of the NegotiationLogs that could not be migrated
 	 */
     @Override
-	public List<Integer> migrateNegotiationLogs(boolean completeStatus) throws NegotiationMigrationException{
+	public List<String> migrateNegotiationLogs(boolean completeStatus) throws NegotiationMigrationException{
         ArrayList<String> failedNegLogIds = new ArrayList<String>();
         ArrayList<String> succededNegLogIds = new ArrayList<String>();
         LOG.debug("Starting MigrateNegotiationLogs with status complete= "+completeStatus);
@@ -160,17 +160,15 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
                 if ( !negotiationLogsToMigrate.isEmpty() ){
                     Iterator negLogIdIterator = negotiationLogsToMigrate.iterator();
                     while ( negLogIdIterator.hasNext() ){
-                        //TODO delete next log as it removes stuff from the iterator
                         Integer currentNegotiationLogId = (Integer)negLogIdIterator.next();
                         LOG.debug("Migrating negotiation log id= "+currentNegotiationLogId);
-                        //TODO uncomment this when we're ready to migrate 
-//                        try {
-//                            migrateNegotiationLog(currentNegotiationLogId.toString());
-//                            succededNegLogIds.add(currentNegotiationLogId.toString());
-//                        } catch (Exception e){
-//                            LOG.debug("Failed migrating negotiation log id="+currentNegotiationLogId+" Exception:"+e.getMessage());
-//                            failedNegLogIds.add( currentNegotiationLogId.toString() );
-//                        }
+                        try {
+                            migrateNegotiationLog(currentNegotiationLogId.toString());
+                            succededNegLogIds.add(currentNegotiationLogId.toString());
+                        } catch (Exception e){
+                            LOG.debug("Failed migrating negotiation log id="+currentNegotiationLogId+" Exception:"+e.getMessage());
+                            failedNegLogIds.add( currentNegotiationLogId.toString() );
+                        }
                     }
                 }
                 currentLogId +=MAX_RESULTS;
@@ -185,35 +183,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         LOG.debug("Number of successfully migrated Negotiation Logs="+succededNegLogIds.size());
         LOG.debug("Number of FAILED migrated Negotiation Logs="+failedNegLogIds.size());
         LOG.debug("FAILED:\n"+Arrays.toString(failedNegLogIds.toArray()));
-        return null;
-//	    Statement sqlStatement = 
-//	    sqlStatement.setFetchSize(50);
-//	    Character closedFlag = new Character( completeStatus?'Y':'N');
-//	    String searchLodIdSql = "select NEGOTIATION_LOG_ID from negotiation_log where CLOSED_FLAG='"+closedFlag+"' order by NEGOTIATION_LOG_ID";
-//        ResultSet logIdResultSet = null;
-//        try {
-//            logIdResultSet = sqlStatement.executeQuery(searchLodIdSql);
-//            while (logIdResultSet.next()) {
-//                searchAttValue.setSearchableAttributeKey(attributeResultSet.getString("KEY_CD"));
-//                searchAttValue.setupAttributeValue(attributeResultSet, "VAL");
-//                if ( (!org.apache.commons.lang.StringUtils.isEmpty(searchAttValue.getSearchableAttributeKey())) && (searchAttValue.getSearchableAttributeValue() != null) ) {
-//                    DocumentAttribute documentAttribute = searchAttValue.toDocumentAttribute();
-//                    resultBuilder.getDocumentAttributes().add(DocumentAttributeFactory.loadContractIntoBuilder(
-//                            documentAttribute));
-//                }
-//            }
-//        } catch (Exception e){
-//          LOG.debug("Exception caught when retrieving negotiation Ids with status closed="+closedFlag);
-//          LOG.error(e);  
-//        } finally {
-//            if (logIdResultSet != null) {
-//                try {
-//                    logIdResultSet.close();
-//                } catch (Exception e) {
-//                    LOG.warn("Could not close result set.",e);
-//                }
-//            }
-//        }
+        return failedNegLogIds;
 	}
 	
 	/**

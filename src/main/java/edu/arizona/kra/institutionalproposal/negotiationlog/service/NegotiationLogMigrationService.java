@@ -46,7 +46,7 @@ public interface NegotiationLogMigrationService{
 	 * Migrates all NegotiationLogs that have the specified status - true for opened or false - closed
 	 * Returns a list with the Id of the NegotiationLogs that could not be migrated
 	 */
-	public List<Integer> migrateNegotiationLogs(boolean completeStatus) throws NegotiationMigrationException;
+	public List<String> migrateNegotiationLogs(boolean completeStatus) throws NegotiationMigrationException;
 	
 	
 }
