@@ -52,10 +52,10 @@ public class NegotiationLogDaoOjb extends PlatformAwareDaoBaseOjb implements Neg
         PersistenceBroker pbInstance = getPersistenceBroker(true);
         try {
             stmt = pbInstance.serviceConnectionManager().getConnection().createStatement();
-            int endNegotiationLogId = startNegotiationLogId + maxNumberOfResults;
+            stmt.setMaxRows(maxNumberOfResults);
             char closedFlag = closed?'Y':'N';
-            ResultSet rs = stmt.executeQuery("select NEGOTIATION_LOG_ID from negotiation_log WHERE CLOSED_FLAG='"+closedFlag+"' AND NEGOTIATION_LOG_ID BETWEEN "
-                    +startNegotiationLogId+" AND "+endNegotiationLogId);
+            ResultSet rs = stmt.executeQuery("select NEGOTIATION_LOG_ID from negotiation_log WHERE CLOSED_FLAG='"+closedFlag+"' AND NEGOTIATION_LOG_ID >= "
+                    +startNegotiationLogId+" order by NEGOTIATION_LOG_ID");
             while ( rs.next() ){
                 results.add( rs.getInt(1) );
             }

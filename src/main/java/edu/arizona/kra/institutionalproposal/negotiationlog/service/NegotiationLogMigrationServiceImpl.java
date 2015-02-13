@@ -75,7 +75,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
     private final static Date DEFAULT_DATE = new Date(2000,1,1);
     private final static Date DEFAULT_END_DATE = new Date(3000,1,1);
     private final static String DEFAULT_AGREEMENT_CODE = "SPS";
-    private final static String DEFAULT_ACTIVITY_CODE = "O";    
+    private final static String DEFAULT_ACTIVITY_CODE = "OT";    
     private final static String SPS_LOCATION_CODE = "SPS";
     private final static String ORCA_LOCATION_CODE = "ORCA";
     private final static String CRS_LOCATION_CODE = "CRS";
@@ -97,6 +97,11 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
             throw new NegotiationMigrationException("Cannot find negotiation log:"+negotiationLogId);
         }
         LOG.debug("Found negotiation log:"+negotiationLog.getTitle());
+        Negotiation negotiation = getBusinessObjectService().findBySinglePrimaryKey(Negotiation.class, negotiationLogId);
+        if ( negotiation != null ){
+            LOG.error("Negotiation log:"+negotiationLogId+" has already been migrated....Skipping!");
+            throw new NegotiationMigrationException("Negotiation log:"+negotiationLogId+" has already been migrated....Skipping!");
+        }
         return migrateNegotiationLog(negotiationLog);       
     }
     
@@ -116,7 +121,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         LOG.debug("Populating new negotiation from the negotiation log.");
         
         //Important Requirement: keep the same negotiation id as the Negotiation Log
-        negotiation.setNegotiationId( negotiationLog.getNegotiationLogId().longValue() + 1);
+        negotiation.setNegotiationId( negotiationLog.getNegotiationLogId().longValue());
                 
         setNegotiatorDetails(negotiation, negotiationLog);
         
@@ -155,18 +160,22 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
             LOG.debug("Max negotiation log id= "+maxLogId);
             
             Integer currentLogId = 1;
-            while ( currentLogId <= maxLogId ){
-                List <Integer> negotiationLogsToMigrate = getNegotiationLogDao().findNegotiationLogIds(currentLogId, MAX_RESULTS, completeStatus);
+            Integer lastMigratedId = 1;
+            while ( lastMigratedId < maxLogId ){
+                List <Integer> negotiationLogsToMigrate = getNegotiationLogDao().findNegotiationLogIds(lastMigratedId+1, MAX_RESULTS, completeStatus);
                 if ( !negotiationLogsToMigrate.isEmpty() ){
                     Iterator negLogIdIterator = negotiationLogsToMigrate.iterator();
                     while ( negLogIdIterator.hasNext() ){
                         Integer currentNegotiationLogId = (Integer)negLogIdIterator.next();
                         LOG.debug("Migrating negotiation log id= "+currentNegotiationLogId);
+                        if ( lastMigratedId < currentNegotiationLogId){
+                            lastMigratedId = currentNegotiationLogId;
+                        }
                         try {
                             migrateNegotiationLog(currentNegotiationLogId.toString());
                             succededNegLogIds.add(currentNegotiationLogId.toString());
                         } catch (Exception e){
-                            LOG.debug("Failed migrating negotiation log id="+currentNegotiationLogId+" Exception:"+e.getMessage());
+                            LOG.debug("Failed migrating negotiation log id="+currentNegotiationLogId+" Exception:"+Arrays.toString(e.getStackTrace()));
                             failedNegLogIds.add( currentNegotiationLogId.toString() );
                         }
                     }
@@ -181,6 +190,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         }
         LOG.debug("Finishing MigrateNegotiationLogs with status complete= "+completeStatus); 
         LOG.debug("Number of successfully migrated Negotiation Logs="+succededNegLogIds.size());
+        LOG.debug("SUCCEEDED:\n"+Arrays.toString(succededNegLogIds.toArray()));
         LOG.debug("Number of FAILED migrated Negotiation Logs="+failedNegLogIds.size());
         LOG.debug("FAILED:\n"+Arrays.toString(failedNegLogIds.toArray()));
         return failedNegLogIds;
@@ -203,7 +213,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
     	    doc.getDocumentHeader().setDocumentDescription("Migrated from Negotiation Log "+negotiationLog.getNegotiationLogId());
 	    } catch (WorkflowException e) {
 	        LOG.error("Cannot create new negotiation document/workflow!");
-	        throw new NegotiationMigrationException("Cannot create new negotiation document/workflow! "+e.getMessage());
+	        throw new NegotiationMigrationException("Cannot create new negotiation document/workflow! "+Arrays.toString(e.getStackTrace()));
 	    }
 	    LOG.debug("Finished Creating new NegotiationDocument:"+doc.getDocumentNumber());
 	    return (NegotiationDocument) doc;
@@ -398,7 +408,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
             }
             getDocumentService().completeDocument(negotiation.getNegotiationDocument(), "", new ArrayList<AdHocRouteRecipient>());
         } catch (Exception e){
-            LOG.error("Error when closing Negotiationnegotiation id "+ negotiation.getNegotiationId()+" \n"+e.getMessage());
+            LOG.error("Error when closing Negotiationnegotiation id "+ negotiation.getNegotiationId()+" \n"+Arrays.toString(e.getStackTrace()));
             throw new NegotiationMigrationException( e.getMessage() );
         }
         LOG.debug("Finished closeNegotiation");
@@ -423,7 +433,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
                 getBusinessObjectService().save(negotiation);
             }
         } catch (Exception e){
-            LOG.error("Error when saving migrated negotiation id "+ negotiation.getNegotiationId()+" \n"+e.getMessage());
+            LOG.error("Error when saving migrated negotiation id "+ negotiation.getNegotiationId()+" \n"+Arrays.toString(e.getStackTrace()));
             throw new NegotiationMigrationException( e.getMessage() );
         }
         LOG.debug("Finished saveNegotiation");
