@@ -71,7 +71,7 @@
     <property name="forceUppercase" value="false" />
     <property name="label" value="Description" />
     <property name="shortLabel" value="Description" />
-    <property name="maxLength" value="30" />
+    <property name="maxLength" value="50" />
     <!-- 
     <property name="validationPattern" >
       <bean parent="AnycharacterValidationPattern" />
