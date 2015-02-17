@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
 import org.kuali.kra.negotiations.bo.Negotiation;
@@ -46,12 +47,20 @@ import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.UserSessionUtils;
 import org.kuali.rice.krad.service.DataDictionaryService;
 import org.kuali.rice.krad.bo.AdHocRouteRecipient;
+import org.kuali.rice.krad.bo.PersistableBusinessObject;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.util.GlobalVariables;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import bitronix.tm.TransactionManagerServices;
 import edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog;
 import edu.arizona.kra.institutionalproposal.negotiationlog.dao.NegotiationLogDao;
 
@@ -67,6 +76,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
     private InstitutionalProposalService institutionalProposalService;
     private DocumentService documentService;
     private DataDictionaryService dataDictionaryService;
+    private PlatformTransactionManager transactionManagerService;
     private NegotiationLogDao negotiationLogDao;
     
 
@@ -117,9 +127,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         //create new document and workflow document
         NegotiationDocument negotiationDocument = createDocument( negotiationLog );
         Negotiation negotiation = createNegotiation(negotiationDocument);
-        
-        LOG.debug("Populating new negotiation from the negotiation log.");
-        
+              
         //Important Requirement: keep the same negotiation id as the Negotiation Log
         negotiation.setNegotiationId( negotiationLog.getNegotiationLogId().longValue());
                 
@@ -151,15 +159,21 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
 	 */
     @Override
 	public List<String> migrateNegotiationLogs(boolean completeStatus) throws NegotiationMigrationException{
+        boolean isMigrationEnabled = NegotiationMigrationUtils.isNegotiationMigrationEnabled();
+        LOG.info("MIGRATION ENABLED="+isMigrationEnabled);
+        if ( !isMigrationEnabled ){
+            LOG.error("Negotiation Migration IS NOT ENABLED. Exiting....");
+            throw new NegotiationMigrationException("Negotiation Migration IS NOT ENABLED. Exiting....");
+        }
         ArrayList<String> failedNegLogIds = new ArrayList<String>();
         ArrayList<String> succededNegLogIds = new ArrayList<String>();
-        LOG.debug("Starting MigrateNegotiationLogs with status complete= "+completeStatus);
+        LOG.info("Starting MigrateNegotiationLogs with status complete= "+completeStatus);
+        
         try {
             
             Integer maxLogId = getNegotiationLogDao().findMaxNegotiationLogId();
             LOG.debug("Max negotiation log id= "+maxLogId);
             
-            Integer currentLogId = 1;
             Integer lastMigratedId = 1;
             while ( lastMigratedId < maxLogId ){
                 List <Integer> negotiationLogsToMigrate = getNegotiationLogDao().findNegotiationLogIds(lastMigratedId+1, MAX_RESULTS, completeStatus);
@@ -167,7 +181,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
                     Iterator negLogIdIterator = negotiationLogsToMigrate.iterator();
                     while ( negLogIdIterator.hasNext() ){
                         Integer currentNegotiationLogId = (Integer)negLogIdIterator.next();
-                        LOG.debug("Migrating negotiation log id= "+currentNegotiationLogId);
+                        LOG.info("Migrating negotiation log id= "+currentNegotiationLogId);
                         if ( lastMigratedId < currentNegotiationLogId){
                             lastMigratedId = currentNegotiationLogId;
                         }
@@ -175,31 +189,33 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
                             migrateNegotiationLog(currentNegotiationLogId.toString());
                             succededNegLogIds.add(currentNegotiationLogId.toString());
                         } catch (Exception e){
-                            LOG.debug("Failed migrating negotiation log id="+currentNegotiationLogId+" Exception:"+Arrays.toString(e.getStackTrace()));
+                            LOG.error("Failed migrating negotiation log id="+currentNegotiationLogId+" Exception:"+e.getMessage());
+                            LOG.debug(Arrays.toString(e.getStackTrace()));
                             failedNegLogIds.add( currentNegotiationLogId.toString() );
                         }
                     }
                 }
-                currentLogId +=MAX_RESULTS;
             }
             
         } catch ( Exception e ){
             e.printStackTrace();
-            LOG.error("Exception when trying to migrate negotiation logs: "+Arrays.toString(e.getStackTrace()));
+            LOG.error("Exception when trying to migrate negotiation logs: "+e.getMessage());
+            LOG.debug(Arrays.toString(e.getStackTrace()));
             throw new NegotiationMigrationException(e.getMessage());
         }
-        LOG.debug("Finishing MigrateNegotiationLogs with status complete= "+completeStatus); 
-        LOG.debug("Number of successfully migrated Negotiation Logs="+succededNegLogIds.size());
-        LOG.debug("SUCCEEDED:\n"+Arrays.toString(succededNegLogIds.toArray()));
-        LOG.debug("Number of FAILED migrated Negotiation Logs="+failedNegLogIds.size());
-        LOG.debug("FAILED:\n"+Arrays.toString(failedNegLogIds.toArray()));
+        LOG.warn("Finishing MigrateNegotiationLogs with status complete= "+completeStatus); 
+        LOG.warn("Number of successfully migrated Negotiation Logs="+succededNegLogIds.size());
+        LOG.warn("SUCCEEDED:\n"+Arrays.toString(succededNegLogIds.toArray()));
+        LOG.warn("Number of FAILED migrated Negotiation Logs="+failedNegLogIds.size());
+        LOG.warn("FAILED:\n"+Arrays.toString(failedNegLogIds.toArray()));
+        
         return failedNegLogIds;
 	}
 	
 	/**
 	 * Create new enclosing NegotiationDocument with the associated workflow doc (initiated state)
 	 * Doc description set to 'Migrated from Negotiation Log ###'
-	 * TODO: Figure out which user should own the docs+negotiations? Maybe a dedicated NegotiationUser?7
+	 * TODO: DefaultUser: krobertson. Needs to have negotiation role (#1250) 
 	 * 
 	 * @return
 	 * @throws NegotiationMigrationException
@@ -318,7 +334,6 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
 	private void setNegotiationAgreement(Negotiation negotiation, NegotiationLog negotiationLog){
 	    LOG.debug("Start setNegotiationAgreement");
 	    String agreementTypeCode =  negotiationLog.getNegotiationAgreementType();
-	    // TODO is there additional mapping to be done for existing types?
 	    NegotiationAgreementType agreementType = findNegotiationTypeByCode(NegotiationAgreementType.class, agreementTypeCode, DEFAULT_AGREEMENT_CODE);
 	    negotiation.setNegotiationAgreementType( agreementType );
 	    negotiation.setNegotiationAgreementTypeId( agreementType.getId() );
@@ -342,7 +357,6 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
                 NegotiationAssociationType ipAssociation = findNegotiationTypeByCode(NegotiationAssociationType.class, NegotiationAssociationType.INSTITUATIONAL_PROPOSAL_ASSOCIATION, NegotiationAssociationType.INSTITUATIONAL_PROPOSAL_ASSOCIATION);
                 negotiation.setNegotiationAssociationType( ipAssociation );
                 negotiation.setNegotiationAssociationTypeId( ipAssociation.getId() );
-                //TODO: is this proposal number or proposalid???
                 negotiation.setAssociatedDocument( proposal );
                 negotiation.setAssociatedDocumentId( proposalNumber );
                 LOG.debug("Finished setNegotiationAssociation to IP "+proposalNumber);
@@ -420,23 +434,37 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
      * TODO: Figure out if we need to save separately the associated detail(if any) and the negotiation document + workflow
      * @param negotiation
      */
-    private void saveNegotiation(Negotiation negotiation) throws NegotiationMigrationException{
-        LOG.debug("Start saveNegotiation");
+    @Transactional
+    private void saveNegotiation(final Negotiation negotiation) throws NegotiationMigrationException{
+        LOG.debug("Start saveNegotiation "+negotiation.getNegotiationId());      
         try {
             negotiation.getNegotiationDocument().prepareForSave();
             getDocumentService().saveDocument(negotiation.getNegotiationDocument());
-            getBusinessObjectService().save(negotiation);
-            if ( negotiation.getUnAssociatedDetail() != null ){
-                getBusinessObjectService().save( negotiation.getUnAssociatedDetail() );
-                //now that we have an ID after saving the detail obj, make sure we preserve it in the assocDocId
-                negotiation.setAssociatedDocumentId( negotiation.getUnAssociatedDetail().getNegotiationUnassociatedDetailId().toString());
-                getBusinessObjectService().save(negotiation);
-            }
-        } catch (Exception e){
-            LOG.error("Error when saving migrated negotiation id "+ negotiation.getNegotiationId()+" \n"+Arrays.toString(e.getStackTrace()));
-            throw new NegotiationMigrationException( e.getMessage() );
-        }
-        LOG.debug("Finished saveNegotiation");
+//        }  catch (Exception e){
+//            LOG.error("Error when saving migrated negotiation id "+ negotiation.getNegotiationId()+" \n"+ e.getMessage() +"\nStackTrace:\n"+Arrays.toString(e.getStackTrace()));
+//            throw new NegotiationMigrationException( e.getMessage() );
+//        }
+//        TransactionTemplate template = new TransactionTemplate(getTransactionManagerService());
+//        template.setPropagationBehavior(Propagation.REQUIRES_NEW.value());
+//        template.execute(new TransactionCallback() {
+//            @SuppressWarnings("unchecked")
+//            public Object doInTransaction(TransactionStatus status) {
+//                try {                  
+                    getBusinessObjectService().save(negotiation);
+                    if ( negotiation.getUnAssociatedDetail() != null ){
+                        getBusinessObjectService().save( negotiation.getUnAssociatedDetail() );
+                        //now that we have an ID after saving the detail obj, make sure we preserve it in the assocDocId
+                        negotiation.setAssociatedDocumentId( negotiation.getUnAssociatedDetail().getNegotiationUnassociatedDetailId().toString());
+                        getBusinessObjectService().save(negotiation);
+                    }
+                } catch (Exception e){
+                    LOG.error("Error when saving migrated negotiation id "+ negotiation.getNegotiationId()+" \n"+ e.getMessage() +"\nStackTrace:\n"+Arrays.toString(e.getStackTrace()));
+                    throw new NegotiationMigrationException( e.getMessage() );
+                }
+//                return null;
+//            }
+//        });
+        LOG.debug("Finished saveNegotiation +"+negotiation.getNegotiationId());
     }
 	
     
@@ -646,5 +674,11 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         this.negotiationLogDao = negotiationLogDao;
     }
     
-	
+    protected PlatformTransactionManager getTransactionManagerService() {
+        if (transactionManagerService == null) {
+            transactionManagerService =  (PlatformTransactionManager) KraServiceLocator.getService("transactionManager");
+        }
+        return this.transactionManagerService;
+    }
+    	
 }

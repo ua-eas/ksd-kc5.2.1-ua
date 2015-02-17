@@ -84,7 +84,7 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     }
     
     public ActionForward migrate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        LOG.debug("Starting negotiation log migration");
+        LOG.debug("Starting negotiation log migration action");
         getNegotiationMigrationService().migrateNegotiationLogs(false);
 //        String negotiationLogId = request.getParameter("negotiationLogId");
 //        if ( StringUtils.isEmpty(negotiationLogId) )
