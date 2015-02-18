@@ -26,8 +26,6 @@ import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.document.authorization.PessimisticLock;
 import org.kuali.rice.krad.service.impl.PessimisticLockServiceImpl;
 import org.kuali.rice.krad.util.GlobalVariables;
-import org.kuali.rice.krad.util.KRADConstants;
-import org.kuali.rice.krad.util.ObjectUtils;
 
 /**
  * The Budget Lock Service implementation. It derives from the Pessimistic Lock Service in order to customize the lock
@@ -50,7 +48,7 @@ public class BudgetLockServiceImpl extends PessimisticLockServiceImpl implements
 		// check for entry edit mode
 		for ( Iterator iterator = editMode.entrySet().iterator() ; iterator.hasNext() ; ) {
 			Map.Entry entry = (Map.Entry) iterator.next();
-			boolean isEntryEditMode = isEntryEditMode( entry );
+			boolean isEntryEditMode = isEntryEditMode( entry ) && StringUtils.isNotEmpty( activeLockRegion );
 			if ( isEntryEditMode ) {
 				return true;
 			}
@@ -83,7 +81,7 @@ public class BudgetLockServiceImpl extends PessimisticLockServiceImpl implements
 	@SuppressWarnings( "unchecked" )
 	@Override
 	protected boolean isEntryEditMode( Map.Entry entry ) {
-		boolean isEditMode = false;
+		boolean isEditMode = AuthorizationConstants.EditMode.FULL_ENTRY.equals( entry.getKey() );
 		isEditMode |= KraAuthorizationConstants.BudgetEditMode.MODIFY_BUDGET.equals( entry.getKey() );
 		isEditMode |= ADD_BUDGET.equals( entry.getKey() );
 		if ( isEditMode ) {
@@ -99,21 +97,14 @@ public class BudgetLockServiceImpl extends PessimisticLockServiceImpl implements
 	@SuppressWarnings( "unchecked" )
 	@Override
 	protected PessimisticLock createNewPessimisticLock( Document document, Map editMode, Person user ) {
-		if ( document instanceof BudgetDocument ) {
-			BudgetDocument budgetDocument = (BudgetDocument) document;
-			if ( document.useCustomLockDescriptors() ) {
-				String lockDescriptor = document.getCustomLockDescriptor( user );
-				// establish any locks needed on the parent document
-				this.establishLocks( budgetDocument.getParentDocument(), editMode, user );
-
-				return generateNewLock( document.getDocumentNumber(), lockDescriptor, user );
-			}
-			else {
-				return generateNewLock( document.getDocumentNumber(), user );
-			}
+		BudgetDocument budgetDocument = (BudgetDocument) document;
+		if ( document.useCustomLockDescriptors() ) {
+			String lockDescriptor = document.getCustomLockDescriptor( user );
+			establishLocks( budgetDocument.getParentDocument(), editMode, user );
+			return generateNewLock( document.getDocumentNumber(), lockDescriptor, user );
 		}
 		else {
-			return super.createNewPessimisticLock( document, editMode, user );
+			return generateNewLock( document.getDocumentNumber(), user );
 		}
 	}
 
