@@ -12,13 +12,11 @@
  */
 package org.kuali.kra.proposaldevelopment.service.impl;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
-import org.kuali.kra.budget.versions.BudgetDocumentVersion;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.service.ProposalLockService;
 import org.kuali.rice.kim.api.identity.Person;
@@ -27,8 +25,6 @@ import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.document.authorization.PessimisticLock;
 import org.kuali.rice.krad.service.impl.PessimisticLockServiceImpl;
 import org.kuali.rice.krad.util.GlobalVariables;
-import org.kuali.rice.krad.util.KRADConstants;
-import org.kuali.rice.krad.util.ObjectUtils;
 
 public class ProposalLockServiceImpl extends PessimisticLockServiceImpl implements ProposalLockService {
 
@@ -55,7 +51,7 @@ public class ProposalLockServiceImpl extends PessimisticLockServiceImpl implemen
 		// check for entry edit mode
 		for ( Iterator iterator = editMode.entrySet().iterator() ; iterator.hasNext() ; ) {
 			Map.Entry entry = (Map.Entry) iterator.next();
-			boolean isEntryEditMode = isEntryEditMode( entry );
+			boolean isEntryEditMode = isEntryEditMode( entry ) && StringUtils.isNotEmpty( activeLockRegion );
 			if ( isEntryEditMode ) {
 				return true;
 			}
@@ -76,7 +72,7 @@ public class ProposalLockServiceImpl extends PessimisticLockServiceImpl implemen
 	@SuppressWarnings( "unchecked" )
 	@Override
 	protected boolean isEntryEditMode( Map.Entry entry ) {
-		boolean isEditMode = false;
+		boolean isEditMode = AuthorizationConstants.EditMode.FULL_ENTRY.equals( entry.getKey() );
 		isEditMode |= KraAuthorizationConstants.ProposalEditMode.ADD_NARRATIVES.equals( entry.getKey() );
 		isEditMode |= KraAuthorizationConstants.ProposalEditMode.MODIFY_PERMISSIONS.equals( entry.getKey() );
 		isEditMode |= KraAuthorizationConstants.ProposalEditMode.MODIFY_PROPOSAL.equals( entry.getKey() );
@@ -107,11 +103,7 @@ public class ProposalLockServiceImpl extends PessimisticLockServiceImpl implemen
 		if ( document.useCustomLockDescriptors() ) {
 			String lockDescriptor = document.getCustomLockDescriptor( user );
 			ProposalDevelopmentDocument pdDocument = (ProposalDevelopmentDocument) document;
-			if ( StringUtils.isNotEmpty( lockDescriptor ) && lockDescriptor.contains( KraAuthorizationConstants.LOCK_DESCRIPTOR_BUDGET ) ) {
-				for ( BudgetDocumentVersion budgetOverview : pdDocument.getBudgetDocumentVersions() ) {
-					generateNewLock( budgetOverview.getDocumentNumber(), lockDescriptor, user );
-				}
-			}
+			establishLocks( pdDocument, editMode, user );
 			return generateNewLock( document.getDocumentNumber(), lockDescriptor, user );
 		}
 		else {

@@ -17,13 +17,14 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
+import org.kuali.kra.institutionalproposal.document.InstitutionalProposalDocument;
 import org.kuali.kra.proposaldevelopment.service.ProposalLockService;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kns.authorization.AuthorizationConstants;
 import org.kuali.rice.krad.document.Document;
+import org.kuali.rice.krad.document.authorization.PessimisticLock;
 import org.kuali.rice.krad.service.impl.PessimisticLockServiceImpl;
-import org.kuali.rice.krad.util.KRADConstants;
-import org.kuali.rice.krad.util.ObjectUtils;
+import org.kuali.rice.krad.util.GlobalVariables;
 
 public class InstitutionalProposalLockServiceImpl extends PessimisticLockServiceImpl implements ProposalLockService {
 
@@ -45,18 +46,29 @@ public class InstitutionalProposalLockServiceImpl extends PessimisticLockService
 	@SuppressWarnings( "unchecked" )
 	@Override
 	protected boolean isLockRequiredByUser( Document document, Map editMode, Person user ) {
-		// String activeLockRegion = (String)
-		// GlobalVariables.getUserSession().retrieveObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION);
+		String activeLockRegion = (String) GlobalVariables.getUserSession().retrieveObject( KraAuthorizationConstants.ACTIVE_LOCK_REGION );
 
 		// check for entry edit mode
 		for ( Iterator iterator = editMode.entrySet().iterator() ; iterator.hasNext() ; ) {
 			Map.Entry entry = (Map.Entry) iterator.next();
-			boolean isEntryEditMode = isEntryEditMode( entry );
+			boolean isEntryEditMode = isEntryEditMode( entry ) && StringUtils.isNotEmpty( activeLockRegion );
 			if ( isEntryEditMode ) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	@Override
+	public Map establishLocks( Document document, Map editMode, Person user ) {
+		InstitutionalProposalDocument ipDocument = (InstitutionalProposalDocument) document;
+		for ( PessimisticLock lock : ipDocument.getPessimisticLocks() ) {
+			if ( !lock.isOwnedByUser( user ) && StringUtils.equals( ipDocument.getCustomLockDescriptor( user ), lock.getLockDescriptor() ) ) {
+				return getEditModeWithEditableModesRemoved( editMode );
+			}
+		}
+		return super.establishLocks( document, editMode, user );
 	}
 
 	/**
@@ -72,7 +84,7 @@ public class InstitutionalProposalLockServiceImpl extends PessimisticLockService
 	@SuppressWarnings( "unchecked" )
 	@Override
 	protected boolean isEntryEditMode( Map.Entry entry ) {
-		boolean isEditMode = false;
+		boolean isEditMode = AuthorizationConstants.EditMode.FULL_ENTRY.equals( entry.getKey() );
 		isEditMode |= KraAuthorizationConstants.ProposalEditMode.ADD_NARRATIVES.equals( entry.getKey() );
 		isEditMode |= KraAuthorizationConstants.ProposalEditMode.MODIFY_PERMISSIONS.equals( entry.getKey() );
 		isEditMode |= KraAuthorizationConstants.ProposalEditMode.MODIFY_PROPOSAL.equals( entry.getKey() );
@@ -97,21 +109,17 @@ public class InstitutionalProposalLockServiceImpl extends PessimisticLockService
 		return editModeMap;
 	}
 
-	// @SuppressWarnings("unchecked")
-	// @Override
-	// protected PessimisticLock createNewPessimisticLock(Document document, Map editMode, Person user) {
-	// if (useCustomLockDescriptors()) {
-	// String lockDescriptor = getCustomLockDescriptor(document, editMode, user);
-	// AwardDocument pdDocument = (AwardDocument) document;
-	// if(StringUtils.isNotEmpty(lockDescriptor) &&
-	// lockDescriptor.contains(KraAuthorizationConstants.LOCK_DESCRIPTOR_BUDGET)) {
-	// for(BudgetDocumentVersion budgetOverview: pdDocument.getBudgetDocumentVersions()) {
-	// generateNewLock(budgetOverview.getDocumentNumber(), lockDescriptor, user);
-	// }
-	// }
-	// return generateNewLock(document.getDocumentNumber(), lockDescriptor, user);
-	// } else {
-	// return generateNewLock(document.getDocumentNumber(), user);
-	// }
-	// }
+	@SuppressWarnings( "unchecked" )
+	@Override
+	protected PessimisticLock createNewPessimisticLock( Document document, Map editMode, Person user ) {
+		InstitutionalProposalDocument ipDocument = (InstitutionalProposalDocument) document;
+		if ( document.useCustomLockDescriptors() ) {
+			String lockDescriptor = document.getCustomLockDescriptor( user );
+			establishLocks( ipDocument, editMode, user );
+			return generateNewLock( document.getDocumentNumber(), lockDescriptor, user );
+		}
+		else {
+			return generateNewLock( document.getDocumentNumber(), user );
+		}
+	}
 }

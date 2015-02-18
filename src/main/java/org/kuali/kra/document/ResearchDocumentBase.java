@@ -256,7 +256,7 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
 
 	@Override
 	public boolean useCustomLockDescriptors() {
-		return false;
+		return true;
 	}
 
 	/*
