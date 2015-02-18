@@ -62,6 +62,13 @@ public class CustomAttributeServiceImpl implements CustomAttributeService {
             }
 
             if (customAttributeDocument.isActive() || customAttributeExists) {
+            	for (int i = 0; i < customDataList.size(); i++) {
+            		if (customDataList.size() != 0 && customAttributeDocument.getCustomAttributeId().toString().equals(customDataList.get(i).getCustomAttributeId().toString())) {
+            			String customDataValue = customDataList.get(i).getValue();
+            			customAttributeDocument.getCustomAttribute().setValue(customDataValue);
+            			break;
+            		}
+            	}
                 customAttributeDocuments.put(customAttributeDocument.getCustomAttributeId().toString(), customAttributeDocument);
             }
         }
