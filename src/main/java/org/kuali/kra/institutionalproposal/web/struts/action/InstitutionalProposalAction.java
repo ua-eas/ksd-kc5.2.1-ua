@@ -41,6 +41,7 @@ import org.kuali.kra.service.SponsorService;
 import org.kuali.kra.service.UnitAuthorizationService;
 import org.kuali.kra.web.struts.action.AuditActionHelper;
 import org.kuali.kra.web.struts.action.KraTransactionalDocumentActionBase;
+import org.kuali.kra.web.struts.form.KraTransactionalDocumentFormBase;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kim.api.identity.Person;
@@ -99,6 +100,11 @@ public class InstitutionalProposalAction extends KraTransactionalDocumentActionB
             Set<String> documentActions =  documentPresentationController.getDocumentActions(document);
             documentActions = documentAuthorizer.getDocumentActions(document, user, documentActions);
 
+            //this call will put the ActiveLockRegion in the session and will fix creating pessimisic locks
+            if ( formBase instanceof KraTransactionalDocumentFormBase ){
+                ((KraTransactionalDocumentFormBase) formBase).setupLockRegions();     
+            }
+            
             if (getDataDictionaryService().getDataDictionary().getDocumentEntry(document.getClass().getName()).getUsePessimisticLocking()) {
                 documentActions = getPessimisticLockService().getDocumentActions(document, user, documentActions);
             }
