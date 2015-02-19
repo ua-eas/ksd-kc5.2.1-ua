@@ -341,7 +341,7 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcTransactionalDocume
 		WorkflowDocument workflowDocument = document.getDocumentHeader().getWorkflowDocument();
 		boolean canBlanketApprove = workflowDocument.isEnroute();
 		canBlanketApprove &= super.canBlanketApprove( document, user );
-		canBlanketApprove &= canRoute( document, user );
+		canBlanketApprove &= canExecuteProposalTask( user.getPrincipalName(), (ProposalDevelopmentDocument) document, TaskName.PROPOSAL_HIERARCHY_CHILD_WORKFLOW_ACTION );
 		return canBlanketApprove;
 	}
 
