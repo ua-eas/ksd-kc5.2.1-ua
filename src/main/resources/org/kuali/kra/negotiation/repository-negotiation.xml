@@ -43,6 +43,7 @@
         <field-descriptor name="negotiationEndDate" column="NEGOTIATION_END_DATE" jdbc-type="DATE" />
         <field-descriptor name="anticipatedAwardDate" column="ANTICIPATED_AWARD_DATE" jdbc-type="DATE" />
         <field-descriptor name="documentFolder" column="DOCUMENT_FOLDER" jdbc-type="VARCHAR" />
+        <field-descriptor name="accountId" column="ACCOUNT_ID" jdbc-type="VARCHAR" />
         <field-descriptor name="associatedDocumentId" column="ASSOCIATED_DOCUMENT_ID" jdbc-type="VARCHAR" />
         <field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
         <field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />

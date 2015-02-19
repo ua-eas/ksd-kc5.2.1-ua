@@ -57,6 +57,7 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
 	private Date anticipatedAwardDate;
 	private String documentFolder;
 	private String allAttachments;
+	private String accountId;
 
 	// transient
 	private String negotiatorUserName;
@@ -437,4 +438,13 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
 	public void addNotification( NegotiationNotification negotiationNotification ) {
 		getNegotiationNotifications().add( negotiationNotification );
 	}
+
+	public String getAccountId() {
+		return accountId;
+	}
+
+	public void setAccountId( String accountId ) {
+		this.accountId = accountId;
+	}
+
 }

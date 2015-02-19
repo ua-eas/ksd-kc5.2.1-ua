@@ -85,8 +85,12 @@
             </tr>  
             <tr>
 		        <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${negotiationAttributes.documentFolder}" /></div></th>
-                <td colspan="3">
+                <td colspan="1">
                 	<kul:htmlControlAttribute property="document.negotiationList[0].documentFolder" attributeEntry="${negotiationAttributes.documentFolder}" readOnly="${readOnly}"/>
+                </td>
+		        <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${negotiationAttributes.accountId}" /></div></th>
+		        <td colspan="1">
+                	<kul:htmlControlAttribute property="document.negotiationList[0].accountId" attributeEntry="${negotiationAttributes.accountId}" readOnly="${readOnly}"/>
                 </td>
             </tr>  
             
