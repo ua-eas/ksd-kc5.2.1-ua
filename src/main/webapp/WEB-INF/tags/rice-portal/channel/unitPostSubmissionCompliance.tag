@@ -57,7 +57,7 @@
       </portal:portalLink>
     </td>
   </tr>
-  -->
+   -->
   <tr>
     <td nowrap class="disabled-text">IRB Schedules</td>
     <td>
@@ -75,16 +75,7 @@
           <img src="static/images/searchicon.gif" alt="lookup" width="16" height="16" border="0" align="absmiddle"></portal:portalLink>
     </td>  		     		
   </tr>
-  -->
-  <tr>
-    <td nowrap class="disabled-text">HSPP (Admin Use)</td>
-    <td>
-      <img src="static/images/pixel_clear.gif" alt="add" width="16" height="16" border="0" align="absmiddle">
-      <portal:portalLink displayTitle="false" title="Associate Workflow" url="${ConfigProperties.application.url}/associateWorkflow.do">
-          <img src="static/images/searchicon.gif" alt="lookup" width="16" height="16" border="0" align="absmiddle">
-      </portal:portalLink>
-    </td>
-  </tr>
+   -->
   </table>
 </div>
 <channel:portalChannelBottom />
