@@ -23,6 +23,9 @@
     <li><portal:portalLink displayTitle="true" title="Negotiation Association Type" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.negotiations.bo.NegotiationAssociationType&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
     <li><portal:portalLink displayTitle="true" title="Negotiation Location" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.negotiations.bo.NegotiationLocation&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
     <li><portal:portalLink displayTitle="true" title="Negotiation Status" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.negotiations.bo.NegotiationStatus&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
+    <c:if test="${negfn:isNegotiationMigrationEnabled()}">
+        <li><portal:portalLink displayTitle="true" title="Negotiation Migration" url="${ConfigProperties.application.url}/portal.do?channelTitle=Migrate%20Negotiation%20Log&channelUrl=${ConfigProperties.application.url}/negotiationNegotiation.do?methodToCall=migrate" /></li>
+    </c:if>
   </ul>
 </div>
 <channel:portalChannelBottom />

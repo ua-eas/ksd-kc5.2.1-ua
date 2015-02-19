@@ -27,6 +27,7 @@ This is where application specific (kra) tag includes would go.
 <%@ taglib tagdir="/WEB-INF/tags/timeandmoney" prefix="kra-timeandmoney"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="kra"%>
 <%@ taglib uri="/WEB-INF/tlds/kra-func.tld" prefix="krafn"%>
+<%@ taglib uri="/WEB-INF/tlds/neg-func.tld" prefix="negfn"%>
 <%@ taglib tagdir="/WEB-INF/tags/irb" prefix="kra-irb"%>
 <%@ taglib tagdir="/WEB-INF/tags/committee" prefix="kra-committee"%>
 <%@ taglib tagdir="/WEB-INF/tags/permissions" prefix="kra-permissions"%>

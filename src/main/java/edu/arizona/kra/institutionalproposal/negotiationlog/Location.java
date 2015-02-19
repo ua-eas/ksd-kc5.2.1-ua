@@ -1,4 +1,4 @@
-package edu.arizona.kra.institutionalproposal.negotiation;
+package edu.arizona.kra.institutionalproposal.negotiationlog;
 
 public enum Location {
 

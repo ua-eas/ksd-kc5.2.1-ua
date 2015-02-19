@@ -263,5 +263,14 @@
             </list>
         </property>
     </bean>
+    
+    <bean id="negotiationMigrationService" class="edu.arizona.kra.institutionalproposal.negotiationlog.service.NegotiationLogMigrationServiceImpl">
+        <property name="businessObjectService" ref="businessObjectService" />
+        <property name="negotiationService" ref="negotiationService" />
+        <property name="institutionalProposalService" ref="institutionalProposalService" />
+        <property name="negotiationLogDao" ref="negotiationLogDao" />
+    </bean> 
+    
+    <bean id="negotiationLogDao" parent="platformAwareDao" class="edu.arizona.kra.institutionalproposal.negotiationlog.dao.impl.NegotiationLogDaoOjb" />
 
 </beans>

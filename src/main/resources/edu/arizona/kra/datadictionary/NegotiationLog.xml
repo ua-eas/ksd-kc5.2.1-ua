@@ -3,7 +3,7 @@
 
 	<bean id="NegotiationLog" parent="NegotiationLog-parentBean"/>
 	<bean abstract="true" id="NegotiationLog-parentBean" parent="BusinessObjectEntry">
-		<property name="businessObjectClass" value="edu.arizona.kra.institutionalproposal.negotiation.NegotiationLog"/>
+		<property name="businessObjectClass" value="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog"/>
 		<property name="objectLabel" value="Negotiation Log"/>
 		<property name="inquiryDefinition">
 			<ref bean="NegotiationLog-inquiryDefinition"/>
@@ -49,6 +49,7 @@
 				<ref bean="NegotiationLog-negotiationComplete" />
 				<ref bean="NegotiationLog-dateClosed" />
 				<ref bean="NegotiationLog-daysOpen" />
+                <ref bean="NegotiationLog-relatedDocument-negotiationLogMaintenanceDocumentLookup"/>
 			</list>
 		</property>	
 	</bean>
@@ -226,7 +227,7 @@
    	 	<property name="required" value="false"/>
     	<property name="control">
       		<bean parent="SelectControlDefinition" 
-      			p:valuesFinderClass="edu.arizona.kra.institutionalproposal.negotiation.AgreementTypeValuesFinder" 
+      			p:valuesFinderClass="edu.arizona.kra.institutionalproposal.negotiationlog.AgreementTypeValuesFinder" 
       			p:includeKeyInLabel="false"
       			p:includeBlankRow="false" />
     	</property>
@@ -320,7 +321,7 @@
 		</property>
 		<property name="control" >
 			<bean parent="RadioControlDefinition"
-            	p:valuesFinderClass="edu.arizona.kra.institutionalproposal.negotiation.LocationValuesFinder"
+            	p:valuesFinderClass="edu.arizona.kra.institutionalproposal.negotiationlog.LocationValuesFinder"
             	p:includeKeyInLabel="false" />
 		</property>
 		<property name="summary" value="Location" />
@@ -427,6 +428,17 @@
         <property name="description" value="Days Open" />
      </bean>
 	
+    <bean id="NegotiationLog-relatedDocument-negotiationLogMaintenanceDocumentLookup" parent="NegotiationLog-relatedDocument-negotiationLogMaintenanceDocumentLookup-parentBean"/>
+    <bean id="NegotiationLog-relatedDocument-negotiationLogMaintenanceDocumentLookup-parentBean" abstract="true" parent="AttributeDefinition">
+        <property name="name" value="negotiationLogMaintenanceDocumentLookup"/>
+        <property name="label" value="Find Negotiation"/>
+        <property name="maxLength" value="1000"/>
+        <property name="required" value="false"/>    
+        <property name="control">
+            <bean parent="LinkControlDefinition" p:styleClass="globalLinks" p:target="_blank" p:hrefText="migrate negotiation log"/>
+        </property>
+    </bean>
+    
 
 	<!-- Business Object Inquiry Definition -->
 	<bean id="NegotiationLog-inquiryDefinition" parent="NegotiationLog-inquiryDefinition-parentBean"/>
@@ -467,6 +479,16 @@
 						</list>
 					</property>
 				</bean>
+                <bean parent="InquirySectionDefinition">
+                     <property name="title" value="Migrate Negotiation Log" />
+                     <property name="defaultOpen" value="false" />
+                     <property name="numberOfColumns" value="1" />
+                     <property name="inquiryFields">
+                          <list>
+                             <bean parent="FieldDefinition" p:attributeName="negotiationLogMaintenanceDocumentLookup" />
+                          </list>
+                     </property>
+                </bean>
 			</list>
 		</property>
 	</bean>

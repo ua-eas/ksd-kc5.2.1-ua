@@ -1,10 +1,10 @@
-package edu.arizona.kra.institutionalproposal.negotiation;
+package edu.arizona.kra.institutionalproposal.negotiationlog;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.rules.ErrorReporter;
 import org.kuali.kra.rules.KraMaintenanceDocumentRuleBase;
 import org.kuali.rice.kns.document.MaintenanceDocument;
-import org.kuali.rice.kns.util.GlobalVariables;
+import org.kuali.rice.krad.util.GlobalVariables;
 
 public class NegotiationLogDocumentRules extends KraMaintenanceDocumentRuleBase {
 

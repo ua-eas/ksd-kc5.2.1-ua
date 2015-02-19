@@ -1,22 +1,22 @@
-package edu.arizona.kra.institutionalproposal.negotiation;
+package edu.arizona.kra.institutionalproposal.negotiationlog;
 
 import java.sql.Date;
 import java.util.LinkedHashMap;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.home.AwardType;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
-import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
-import org.kuali.rice.kns.util.KualiDecimal;
+import org.kuali.rice.core.api.util.type.KualiDecimal;
 
 public class NegotiationLog extends KraPersistableBusinessObjectBase {
 
 	private static final long serialVersionUID = -4465299922061420069L;
 	private Integer negotiationLogId;
+	
+	private Integer migratedNegotiationId;
 
 	private String negotiatorPersonId;
 	private String negotiatorName;
@@ -47,11 +47,13 @@ public class NegotiationLog extends KraPersistableBusinessObjectBase {
     private Date dateClosed;
     private Long daysOpen;
     
+    private String negotiationLogMaintenanceDocumentLookup;
+    
     private Unit leadUnit;
 	private Sponsor sponsor;
 	private AwardType awardType;
     
-	@Override
+	
 	protected LinkedHashMap toStringMapper() {
 		LinkedHashMap hashMap = new LinkedHashMap();
         hashMap.put("negotiationLogId", negotiationLogId);
@@ -67,6 +69,17 @@ public class NegotiationLog extends KraPersistableBusinessObjectBase {
 	public void setNegotiationLogId(Integer negotiationLogId) {
 		this.negotiationLogId = negotiationLogId;
 	}
+	
+	public Integer getMigratedNegotiationId() {
+	    if (migratedNegotiationId==null){
+	        migratedNegotiationId = new Integer(0);
+	    }
+        return migratedNegotiationId;
+    }
+
+    public void setMigratedNegotiationId(Integer migratedNegotiationId) {
+        this.migratedNegotiationId = migratedNegotiationId;
+    }
 
 	public String getNegotiatorPersonId() {
 		return negotiatorPersonId;
@@ -348,5 +361,22 @@ public class NegotiationLog extends KraPersistableBusinessObjectBase {
 	
 	public void setDaysOpen(Long daysOpen) {
 		this.daysOpen = daysOpen;
+	}
+	
+	/**
+	 * Generate link for calling the negotiation log migration service
+	 * @return
+	 */
+	public String getNegotiationLogMaintenanceDocumentLookup() {
+	    if ( this.getNegotiationLogId() == null)
+	        return "";
+	    //Properties params = new Properties();
+	    //params.put(KRADConstants.RETURN_LOCATION_PARAMETER, "portal.do");
+        //params.put(KRADConstants.BUSINESS_OBJECT_CLASS_ATTRIBUTE, getDocumentTypeName());
+        //params.put(KRADConstants.RETURN_LOCATION_PARAMETER, getReturnLocation());
+        //params.put("negotiationLogId", this.getNegotiationLogId().toString());
+        //return "http://localhost:8080/kc-dev/negotiationNegotiation.do?methodToCall=migrate&amp;negotiationLogId="+this.getNegotiationLogId().toString();
+	    //ConfigProperties.application.url
+	    return "http://localhost:8080/kc-dev/portal.do?channelTitle=Migrate%20Negotiation%20Log&channelUrl=http://127.0.0.1:8080/kc-dev/negotiationNegotiation.do?methodToCall=migrate&amp;negotiationLogId="+this.getNegotiationLogId().toString();
 	}
 }

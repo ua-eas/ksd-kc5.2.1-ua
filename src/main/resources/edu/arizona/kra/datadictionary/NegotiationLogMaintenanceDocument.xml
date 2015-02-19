@@ -21,11 +21,12 @@
 
     <bean id="NegotiationLogMaintenanceDocument" parent="NegotiationLogMaintenanceDocument-parentBean" />
     <bean id="NegotiationLogMaintenanceDocument-parentBean" abstract="true" parent="MaintenanceDocumentEntry">
-        <property name="businessObjectClass" value="edu.arizona.kra.institutionalproposal.negotiation.NegotiationLog" />
-        <property name="maintainableClass" value="edu.arizona.kra.institutionalproposal.negotiation.NegotiationLogMaintainableImpl"/>
+        <property name="businessObjectClass" value="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog" />
+        <property name="maintainableClass" value="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLogMaintainableImpl"/>
         <property name="maintainableSections" >
             <list>
                 <ref bean="NegotiationLogMaintenanceDocument-EditNegotiationLog" />
+                <ref bean="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink"/>    
             </list>
         </property>
         <property name="lockingKeys">
@@ -34,7 +35,7 @@
             </list>
         </property>
         
-        <property name="businessRulesClass" value="edu.arizona.kra.institutionalproposal.negotiation.NegotiationLogDocumentRules"/>
+        <property name="businessRulesClass" value="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLogDocumentRules"/>
         <property name="documentTypeName" value="NegotiationLogMaintenanceDocument" />
         <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase"/>
     </bean>
@@ -48,12 +49,11 @@
         <property name="maintainableItems" >
             <list>
                 <bean parent="MaintainableFieldDefinition" p:unconditionallyReadOnly="true" p:name="negotiationLogId" p:required="false" />
-                <bean parent="MaintainableFieldDefinition" p:name="negotiator.userName" p:required="false" 
-                	p:overrideFieldConversions="principalId:negotiatorPersonId" p:overrideLookupClass="org.kuali.rice.kim.bo.Person"/>
+                <bean parent="MaintainableFieldDefinition" p:unconditionallyReadOnly="true" p:name="migratedNegotiationId" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="negotiator.userName" p:required="false" />
                 <bean parent="MaintainableFieldDefinition" p:name="proposalNumber" p:required="false"
                 	p:overrideFieldConversions="proposalNumber:proposalNumber" p:overrideLookupClass="org.kuali.kra.institutionalproposal.home.InstitutionalProposal"/>
-                <bean parent="MaintainableFieldDefinition" p:name="principalInvestigator.userName" p:required="true" 
-                	p:overrideFieldConversions="principalId:piPersonId" p:overrideLookupClass="org.kuali.rice.kim.bo.Person"/>
+                <bean parent="MaintainableFieldDefinition" p:name="principalInvestigator.userName" p:required="false"/>
                 <bean parent="MaintainableFieldDefinition" p:name="unitNumber" p:required="true" />
                 <bean parent="MaintainableFieldDefinition" p:name="account" p:required="false" />
                 <bean parent="MaintainableFieldDefinition" p:name="sponsorCode" p:required="true" />
@@ -80,4 +80,15 @@
             </list>
         </property>
     </bean>
+    
+    <bean id="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink" parent="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink-parentBean"/>
+      <bean id="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink-parentBean" abstract="true" parent="MaintainableSectionDefinition">
+        <property name="id" value="documentLookup"/>  
+        <property name="title" value="Migrate NegotiationLog"/>
+        <property name="maintainableItems">
+          <list>
+            <bean parent="MaintainableFieldDefinition" p:name="negotiationLogMaintenanceDocumentLookup"/>                            
+          </list>
+        </property>
+      </bean>
 </beans>

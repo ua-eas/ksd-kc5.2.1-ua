@@ -1,8 +1,8 @@
-package edu.arizona.kra.institutionalproposal.negotiation;
+package edu.arizona.kra.institutionalproposal.negotiationlog;
 
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.maintenance.KraMaintainableImpl;
-import org.kuali.rice.kns.service.SequenceAccessorService;
+import org.kuali.rice.krad.service.SequenceAccessorService;
 
 public class NegotiationLogMaintainableImpl extends KraMaintainableImpl {
 	
