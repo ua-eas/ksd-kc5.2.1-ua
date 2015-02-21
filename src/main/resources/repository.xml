@@ -1759,4 +1759,55 @@
     	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
 	</class-descriptor>
 	
+	<class-descriptor class="edu.arizona.kra.global.unit.create.UnitAdministratorCreateGlobal" table="UNIT_ADMIN_CREATE_GBL_T">
+       <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" primarykey="true" />
+       <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+       <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+       <collection-descriptor name="unitAdminTypeAndPersonGlobalDetails" element-class-ref="edu.arizona.kra.global.unit.create.UnitAdminTypeAndPersonGlobalDetail" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object" proxy="true">
+           <orderby name="personId" sort="ASC" />
+           <orderby name="unitAdministratorTypeCode" sort="ASC" />
+           <inverse-foreignkey field-ref="documentNumber" />
+       </collection-descriptor>
+       <collection-descriptor name="unitGlobalDetails" element-class-ref="edu.arizona.kra.global.unit.create.UnitGlobalDetail" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object" proxy="true">
+           <orderby name="unitNumber" sort="ASC" />
+           <inverse-foreignkey field-ref="documentNumber" />
+       </collection-descriptor>
+    </class-descriptor>
+    
+    <class-descriptor class="edu.arizona.kra.global.unit.create.UnitGlobalDetail" table="UNIT_GBL_DTL_T">
+       <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" primarykey="true" locking="false" />
+       <field-descriptor name="unitNumber" column="UNIT_NUMBER" jdbc-type="VARCHAR" primarykey="true" />
+       <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+       <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    </class-descriptor>
+    
+    <class-descriptor class="edu.arizona.kra.global.unit.create.UnitAdminTypeAndPersonGlobalDetail" table="UNT_ADMN_TYP_PRSN_GBL_DTL_T">
+       <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" primarykey="true" locking="false" />
+       <field-descriptor name="personId" column="PERSON_ID" jdbc-type="VARCHAR" primarykey="true" />
+       <field-descriptor name="unitAdministratorTypeCode" column="UNIT_ADMINISTRATOR_TYPE_CODE" jdbc-type="VARCHAR" primarykey="true" />
+       <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+       <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    </class-descriptor>
+    
+    <class-descriptor class="edu.arizona.kra.global.unit.delete.UnitAdministratorDeleteGlobal" table="UNIT_ADMIN_DELETE_GBL_T">
+       <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" primarykey="true" />
+       <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+       <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+       <collection-descriptor name="unitAdministratorGlobalDetails" element-class-ref="edu.arizona.kra.global.unit.delete.UnitAdministratorGlobalDetail" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object" proxy="true">
+           <orderby name="personId" sort="ASC" />
+           <orderby name="unitAdministratorTypeCode" sort="ASC" />
+           <orderby name="unitNumber" sort="ASC" />
+           <inverse-foreignkey field-ref="documentNumber" />
+       </collection-descriptor>
+    </class-descriptor>
+    
+    <class-descriptor class="edu.arizona.kra.global.unit.delete.UnitAdministratorGlobalDetail" table="UNIT_ADMIN_GBL_DTL_T">
+       <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" primarykey="true" locking="false" />
+       <field-descriptor name="personId" column="PERSON_ID" jdbc-type="VARCHAR" primarykey="true" />
+       <field-descriptor name="unitAdministratorTypeCode" column="UNIT_ADMINISTRATOR_TYPE_CODE" jdbc-type="VARCHAR" primarykey="true" />
+       <field-descriptor name="unitNumber" column="UNIT_NUMBER" jdbc-type="VARCHAR" primarykey="true" />
+       <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+       <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    </class-descriptor>
+
 </descriptor-repository>
