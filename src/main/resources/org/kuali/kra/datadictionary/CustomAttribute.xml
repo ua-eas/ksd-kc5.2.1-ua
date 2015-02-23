@@ -141,12 +141,12 @@
 		<property name="forceUppercase" value="false" />
 		<property name="label" value="Label" />
 		<property name="shortLabel" value="Label" />
-		<property name="maxLength" value="30" />
+		<property name="maxLength" value="100" />
 		<property name="validationPattern">
 			<bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
 		</property>
 		<property name="control">
-			<bean parent="TextControlDefinition" p:size="30" />
+			<bean parent="TextControlDefinition" p:size="100" />
 		</property>
 		<property name="summary" value="Label" />
 		<property name="description" value="Label" />
