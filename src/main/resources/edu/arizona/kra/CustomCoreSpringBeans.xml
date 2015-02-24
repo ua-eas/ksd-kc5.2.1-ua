@@ -52,5 +52,11 @@
     <bean id="protocolCustomDataService" class="edu.arizona.kra.protocol.ProtocolCustomDataServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
     </bean> 
+       
+    
+     <bean class="org.kuali.rice.core.framework.util.spring.NamedOrderedListBean">
+        <property name="name" value="scriptConfigurationFilePaths" />
+        <property name="listItem" value="classpath:edu/arizona/kra/dwr-negotiation.xml" />
+     </bean>
      
 </beans>

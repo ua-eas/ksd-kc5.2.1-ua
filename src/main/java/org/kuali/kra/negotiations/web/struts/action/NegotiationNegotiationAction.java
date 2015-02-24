@@ -22,22 +22,32 @@ import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.bo.AttachmentFile;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.negotiations.bo.*;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.notifications.NegotiationCloseNotificationContext;
 import org.kuali.kra.negotiations.notifications.NegotiationNotification;
 import org.kuali.kra.negotiations.printing.NegotiationActivityPrintType;
+import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.negotiations.web.struts.form.NegotiationForm;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.web.struts.action.StrutsConfirmation;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kns.question.ConfirmationQuestion;
+import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
+import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.service.KRADServiceLocator;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 
+import edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog;
+import edu.arizona.kra.institutionalproposal.negotiationlog.service.NegotiationLogMigrationService;
+import edu.arizona.kra.institutionalproposal.negotiationlog.service.NegotiationMigrationException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,7 +61,9 @@ import static org.kuali.rice.krad.util.KRADConstants.QUESTION_CLICKED_BUTTON;
  * This class handles the home screen for negotiations.
  */
 public class NegotiationNegotiationAction extends NegotiationAction {
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(NegotiationLogMigrationService.class);
 
+    private NegotiationLogMigrationService negotiationMigrationService;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
@@ -69,6 +81,19 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     
     public ActionForward negotiation(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         return mapping.findForward(Constants.NEGOTIATION_HOME_PAGE);
+    }
+    
+    public ActionForward migrate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        LOG.debug("Starting negotiation log migration action");
+        getNegotiationMigrationService().migrateNegotiationLogs(false);
+//        String negotiationLogId = request.getParameter("negotiationLogId");
+//        if ( StringUtils.isEmpty(negotiationLogId) )
+//            return mapping.findForward(KRADConstants.MAPPING_PORTAL);
+//        NegotiationLog oldNegotiationLog = getBusinessObjectService().findBySinglePrimaryKey(NegotiationLog.class, negotiationLogId);
+//        LOG.debug("Migrating negotiation log:"+negotiationLogId);
+//        Negotiation migratedNegotiation = getNegotiationMigrationService().migrateNegotiationLog(oldNegotiationLog);
+//        LOG.debug("Finished migrating negotiation log:"+migratedNegotiation.getNegotiationId());
+        return mapping.findForward(KRADConstants.MAPPING_PORTAL);
     }
 
     /**
@@ -245,9 +270,6 @@ public class NegotiationNegotiationAction extends NegotiationAction {
             throws Exception {
         NegotiationForm negotiationForm = (NegotiationForm) form;
         loadCodeObjects(negotiationForm.getNegotiationDocument().getNegotiation());
-        if(StringUtils.isEmpty(negotiationForm.getNegotiationDocument().getNegotiation().getAssociatedDocumentId())){
-        	save(mapping, negotiationForm, request, response);
-    	}	
         return super.close(mapping, negotiationForm, request, response);
     }
 
@@ -545,4 +567,13 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     public ActionForward returnToPortal(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         return mapping.findForward(KRADConstants.MAPPING_PORTAL);
     }
+    
+    
+    protected NegotiationLogMigrationService getNegotiationMigrationService() {
+        if (negotiationMigrationService == null) {
+            negotiationMigrationService = KraServiceLocator.getService("negotiationMigrationService");
+        }
+        return this.negotiationMigrationService;
+    }
 }
+

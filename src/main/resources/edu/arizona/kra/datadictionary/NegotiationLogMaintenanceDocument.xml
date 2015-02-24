@@ -1,0 +1,98 @@
+<!--
+ Copyright 2005-2010 The Kuali Foundation
+
+ Licensed under the Educational Community License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.osedu.org/licenses/ECL-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="NegotiationLogMaintenanceDocument" parent="NegotiationLogMaintenanceDocument-parentBean" />
+    <bean id="NegotiationLogMaintenanceDocument-parentBean" abstract="true" parent="MaintenanceDocumentEntry">
+        <property name="businessObjectClass" value="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog" />
+        <property name="maintainableClass" value="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLogMaintainableImpl"/>
+        <property name="maintainableSections" >
+            <list>
+                <ref bean="NegotiationLogMaintenanceDocument-EditNegotiationLog" />
+                <ref bean="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink"/>    
+            </list>
+        </property>
+        <property name="lockingKeys">
+            <list>
+                <value>negotiationLogId</value>
+            </list>
+        </property>
+        <property name="webScriptFiles">
+          <list>
+            <value>../dwr/interface/NegotiationMigrationService.js</value>
+          </list>
+        </property>
+        <property name="businessRulesClass" value="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLogDocumentRules"/>
+        <property name="documentTypeName" value="NegotiationLogMaintenanceDocument" />
+        <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase"/>
+    </bean>
+
+    <!-- Maintenance Section Definitions -->
+    
+    <bean id="NegotiationLogMaintenanceDocument-EditNegotiationLog" parent="NegotiationLogMaintenanceDocument-EditNegotiationLog-parentBean" />
+    <bean id="NegotiationLogMaintenanceDocument-EditNegotiationLog-parentBean" abstract="true" parent="MaintainableSectionDefinition">
+        <property name="id" value="Edit Negotiation Log" />
+        <property name="title" value="Edit Negotiation Log" />
+        <property name="maintainableItems" >
+            <list>
+                <bean parent="MaintainableFieldDefinition" p:unconditionallyReadOnly="true" p:name="negotiationLogId" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:unconditionallyReadOnly="true" p:name="migratedNegotiationId" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="negotiator.userName" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="proposalNumber" p:required="false"
+                	p:overrideFieldConversions="proposalNumber:proposalNumber" p:overrideLookupClass="org.kuali.kra.institutionalproposal.home.InstitutionalProposal"/>
+                <bean parent="MaintainableFieldDefinition" p:name="principalInvestigator.userName" p:required="false"/>
+                <bean parent="MaintainableFieldDefinition" p:name="unitNumber" p:required="true" />
+                <bean parent="MaintainableFieldDefinition" p:name="account" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="sponsorCode" p:required="true" />
+                <bean parent="MaintainableFieldDefinition" p:name="sponsorName" p:required="false" p:unconditionallyReadOnly="true"/>
+                <bean parent="MaintainableFieldDefinition" p:name="negotiationAgreementType" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="awardTypeCode" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="sponsorAwardNumber" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="modificationNumber" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="title" p:required="true" />
+                <bean parent="MaintainableFieldDefinition" p:name="amount" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="startDate" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="endDate" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="backstop" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="location" p:required="true" />
+                <bean parent="MaintainableFieldDefinition" p:name="spsPreawardComments" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="orcaComments" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="dateReceived" p:required="false" />
+				<bean parent="MaintainableFieldDefinition" p:name="negotiationStart" p:required="false" />
+				<bean parent="MaintainableFieldDefinition" p:name="negotiationComplete" p:required="false" />
+				<bean parent="MaintainableFieldDefinition" p:name="dateClosed" p:required="false" />
+				<bean parent="MaintainableFieldDefinition" p:name="daysOpen" p:required="false" p:unconditionallyReadOnly="true"/>
+                <bean parent="MaintainableFieldDefinition" p:name="closed" p:required="false" />
+                <bean parent="MaintainableFieldDefinition" p:name="versionNumber" />
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink" parent="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink-parentBean"/>
+      <bean id="NegotiationLogMaintenanceDocument-ViewRelatedDocumentLink-parentBean" abstract="true" parent="MaintainableSectionDefinition">
+        <property name="id" value="documentLookup"/>  
+        <property name="title" value="Migrate NegotiationLog"/>
+        <property name="maintainableItems">
+          <list>
+            <bean parent="MaintainableFieldDefinition" p:name="negotiationLogMaintenanceDocumentLookup"/>                            
+          </list>
+        </property>
+      </bean>
+</beans>
