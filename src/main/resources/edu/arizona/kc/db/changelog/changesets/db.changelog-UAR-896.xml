@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+ 
+    <changeSet id="UAR-896-1" author="Josh Shaloo">
+        <comment>
+        	Update the workflow definition for PD Document to use the custom KCAuthorizer for canRecall 
+        </comment>
+        <sql>
+			update KREW_DOC_TYP_T 
+				set AUTHORIZER = 'org.kuali.kra.proposaldevelopment.document.authorization.ProposalDevelopmentWorkflowDocumentAuthorizer' 
+					where  DOC_TYP_NM LIKE '%ProposalDevelopmentDocument%' 
+					and CUR_IND = 1;
+		</sql>
+		<rollback>
+			update KREW_DOC_TYP_T 
+				set AUTHORIZER = NULL 
+					where  DOC_TYP_NM LIKE '%ProposalDevelopmentDocument%' 
+					and CUR_IND = 1;		
+		</rollback>
+    </changeSet>
+</databaseChangeLog>
