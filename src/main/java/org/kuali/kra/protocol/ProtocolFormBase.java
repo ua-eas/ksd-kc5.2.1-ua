@@ -110,6 +110,8 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
  
     private boolean showNotificationEditor = false;  // yep, it's a hack
     
+    private boolean initialized;
+    
     public ProtocolFormBase() throws Exception {
         super();
         initialize();
@@ -123,19 +125,25 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
      * @throws Exception 
      */
     public void initialize() throws Exception {
-        setProtocolHelper(createNewProtocolHelperInstanceHook(this));
-        setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
-        setPermissionsHelper(createNewPermissionsHelperInstanceHook(this));        
-        setCustomDataHelper(createNewCustomDataHelperInstanceHook(this)); 
-        setSpecialReviewHelper(createNewSpecialReviewHelperInstanceHook(this));
-        setActionHelper(createNewActionHelperInstanceHook(this));
-        setQuestionnaireHelper(createNewQuestionnaireHelperInstanceHook(this));        
-        setNotesAttachmentsHelper(createNewNotesAttachmentsHelperInstanceHook(this));   
-        this.notesAttachmentsHelper.prepareView();        
-        setNewProtocolReferenceBean(createNewProtocolReferenceBeanInstance());
-        setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
-        setNotificationHelper(getNotificationHelperHook());
-        setMedusaBean(new MedusaBean());
+    	
+    	if (!isInitialized()) {
+    		setProtocolHelper(createNewProtocolHelperInstanceHook(this));
+            setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
+            setPermissionsHelper(createNewPermissionsHelperInstanceHook(this));        
+            setCustomDataHelper(createNewCustomDataHelperInstanceHook(this)); 
+            setSpecialReviewHelper(createNewSpecialReviewHelperInstanceHook(this));
+            setActionHelper(createNewActionHelperInstanceHook(this));
+            setQuestionnaireHelper(createNewQuestionnaireHelperInstanceHook(this));        
+            setNotesAttachmentsHelper(createNewNotesAttachmentsHelperInstanceHook(this));   
+            this.notesAttachmentsHelper.prepareView();        
+            setNewProtocolReferenceBean(createNewProtocolReferenceBeanInstance());
+            setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
+            setNotificationHelper(getNotificationHelperHook());
+            setMedusaBean(new MedusaBean());
+            
+            setInitialized(true);
+    	}
+        
     }
        
   
@@ -484,6 +492,14 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
             status = this.getDocument().getDocumentHeader().getWorkflowDocument().getStatus();
         }
         return StringUtils.equals(status.getCode(), DocumentStatus.SAVED.getCode());
+    }
+    
+    private boolean isInitialized() {
+    	return this.initialized;
+    }
+    
+    private void setInitialized(boolean newValue) {
+    	this.initialized = newValue;
     }
     
 }
