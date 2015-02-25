@@ -106,7 +106,7 @@ public class NegotiationActivity extends KraPersistableBusinessObjectBase {
             } else {
                 end = endDate.getTime();
             }
-            return (((end - start) / MILLISECS_PER_DAY) + 1) + "";
+            return new Long((end - start) / MILLISECS_PER_DAY).intValue()+" ";
         }
     }
 
