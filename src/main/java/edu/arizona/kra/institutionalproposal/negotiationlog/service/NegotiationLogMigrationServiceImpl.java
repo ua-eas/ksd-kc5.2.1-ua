@@ -388,7 +388,8 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         }
         else if (negotiation.getNegotiationStartDate().after( negotiationLog.getNegotiationStart() ) ) {
             activity.setStartDate( negotiation.getNegotiationStartDate() );
-        } 
+        }
+        activity.setCreateDate( activity.getStartDate() );
         
         if ( negotiationLog.getClosed() ){
            //activity cannot end after the negotiation ended, make sure they are in sync.
