@@ -45,22 +45,16 @@ import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.rice.core.framework.persistence.ojb.dao.PlatformAwareDaoBaseOjb;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.UserSessionUtils;
-import org.kuali.rice.krad.service.DataDictionaryService;
 import org.kuali.rice.krad.bo.AdHocRouteRecipient;
-import org.kuali.rice.krad.bo.PersistableBusinessObject;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.service.DataDictionaryService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import bitronix.tm.TransactionManagerServices;
 import edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog;
 import edu.arizona.kra.institutionalproposal.negotiationlog.dao.NegotiationLogDao;
 
@@ -388,9 +382,14 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         activity.setDescription( buildActivityDescription(negotiationLog));
         
         //activity cannot start before the negotiation started, make sure they are in sync.
-        activity.setStartDate( negotiation.getNegotiationStartDate() );
-        activity.setCreateDate(activity.getStartDate());
-        
+        activity.setStartDate( negotiationLog.getNegotiationStart());
+        if ( negotiationLog.getNegotiationStart() == null ){
+            activity.setStartDate( negotiation.getNegotiationStartDate() );
+        }
+        else if (negotiation.getNegotiationStartDate().after( negotiationLog.getNegotiationStart() ) ) {
+            activity.setStartDate( negotiation.getNegotiationStartDate() );
+        }
+        activity.setCreateDate( activity.getStartDate() );
         
         if ( negotiationLog.getClosed() ){
            //activity cannot end after the negotiation ended, make sure they are in sync.
