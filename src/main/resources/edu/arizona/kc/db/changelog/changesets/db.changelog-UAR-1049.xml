@@ -10,11 +10,11 @@
 		</comment>
 		<sql>
 			ALTER TABLE negotiation
-				ADD (account_id VARCHAR2 (7));
+				ADD (nego_account_id VARCHAR2 (7));
 		</sql>
 		<rollback>
 			ALTER TABLE negotiation
-				DROP (account_id);
+				DROP (nego_account_id);
 		</rollback>
 	</changeSet>
 </databaseChangeLog>
