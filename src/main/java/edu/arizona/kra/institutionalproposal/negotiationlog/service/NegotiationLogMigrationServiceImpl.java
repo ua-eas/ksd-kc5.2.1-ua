@@ -124,6 +124,8 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
               
         //Important Requirement: keep the same negotiation id as the Negotiation Log
         negotiation.setNegotiationId( negotiationLog.getNegotiationLogId().longValue());
+        negotiation.setAccountId( negotiationLog.getAccount());
+
                 
         setNegotiatorDetails(negotiation, negotiationLog);
         
