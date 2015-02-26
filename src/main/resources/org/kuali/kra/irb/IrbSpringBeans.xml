@@ -122,10 +122,15 @@
         </property>        
     </bean> 
         
+    <bean id="protocolAttachmentProtocolDao" parent="platformAwareDao"
+		class="edu.arizona.kra.irb.noteattachment.dao.ojb.ProtocolAttachmentProtocolDaoOjb">
+	</bean>
+        
     <bean id="protocolAttachmentService" class="org.kuali.kra.irb.noteattachment.ProtocolAttachmentServiceImpl">
         <constructor-arg index="0" ref="businessObjectService"/>
         <constructor-arg index="1" ref="protocolDao"/>
-        <property name = "personService" ref = "personService"/>
+        <property name="personService" ref="personService"/>
+        <property name="protocolAttachmentProtocolDao" ref="protocolAttachmentProtocolDao" />
     </bean>
 
 

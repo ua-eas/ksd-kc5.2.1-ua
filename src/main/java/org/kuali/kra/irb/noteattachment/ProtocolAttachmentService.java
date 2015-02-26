@@ -15,10 +15,26 @@
  */
 package org.kuali.kra.irb.noteattachment;
 
+import org.kuali.kra.bo.AttachmentFile;
+import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentBase;
+
 
 /**
  * Contains the methods used for Protocol Notes and Attachments.
  */
 public interface ProtocolAttachmentService extends org.kuali.kra.protocol.noteattachment.ProtocolAttachmentService {
-
+	/**
+     * Gets the file name for the related {@link ProtocolAttachmentBase ProtocolAttachmentBase}.
+     * 
+     * @param attachment the attachment.
+     * @throws IllegalArgumentException if the attachment or attachment's new file is null
+     */
+    public String getAttachmentFileName(ProtocolAttachmentBase attachment);
+    /**
+     * Gets the source protocol (attachment, renewal, main) that this attachment was last updated in. {@link ProtocolAttachmentBase ProtocolAttachmentBase}.
+     * 
+     * @param attachment the attachment.
+     * @throws IllegalArgumentException if the attachment or attachment's new file is null
+     */
+    public String getSourceProtocolNumber(ProtocolAttachmentBase attachment);
 }

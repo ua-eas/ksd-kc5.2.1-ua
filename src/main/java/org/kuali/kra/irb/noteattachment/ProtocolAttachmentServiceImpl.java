@@ -23,6 +23,8 @@ import org.kuali.kra.protocol.noteattachment.*;
 import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
+import edu.arizona.kra.irb.noteattachment.dao.ProtocolAttachmentProtocolDao;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +32,8 @@ import java.util.Collections;
 
 /** Implementation of {@link ProtocolAttachmentService ProtocolNoteAndAttachmentService}. */
 public class ProtocolAttachmentServiceImpl extends ProtocolAttachmentServiceImplBase implements ProtocolAttachmentService {
+	
+	private ProtocolAttachmentProtocolDao protocolAttachmentProtocolDao;
 
     public ProtocolAttachmentServiceImpl(BusinessObjectService boService, ProtocolDao protocolDao) {
         super(boService, protocolDao);
@@ -90,4 +94,24 @@ public class ProtocolAttachmentServiceImpl extends ProtocolAttachmentServiceImpl
     public Class<? extends ProtocolAttachmentPersonnelBase> getProtocolAttachmentPersonnelClassHook() {
         return ProtocolAttachmentPersonnel.class;
     }
+    
+    public void setProtocolAttachmentProtocolDao(ProtocolAttachmentProtocolDao protocolAttachmentProtocolDao) {
+    	this.protocolAttachmentProtocolDao = protocolAttachmentProtocolDao;
+    }
+    
+    protected ProtocolAttachmentProtocolDao getProtocolAttachmentProtocolDao() {
+    	return this.protocolAttachmentProtocolDao;
+    }
+
+	@Override
+	public String getAttachmentFileName(ProtocolAttachmentBase attachment) {
+		ProtocolAttachmentProtocolDao protocolAttachmentProtocolDao = getProtocolAttachmentProtocolDao();
+		return protocolAttachmentProtocolDao.getFileName(attachment);
+	}
+
+	@Override
+	public String getSourceProtocolNumber(ProtocolAttachmentBase attachment) {
+		ProtocolAttachmentProtocolDao protocolAttachmentProtocolDao = getProtocolAttachmentProtocolDao();
+		return protocolAttachmentProtocolDao.getSourceProtocolNumber(attachment);
+	}
 }
