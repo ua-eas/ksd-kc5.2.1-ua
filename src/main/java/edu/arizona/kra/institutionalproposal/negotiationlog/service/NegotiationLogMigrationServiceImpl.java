@@ -440,7 +440,16 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         LOG.debug("Start saveNegotiation "+negotiation.getNegotiationId());      
         try {
             negotiation.getNegotiationDocument().prepareForSave();
-            getDocumentService().saveDocument(negotiation.getNegotiationDocument());
+            
+            NegotiationDocument negotiationDocument = negotiation.getNegotiationDocument();
+            
+            if ( negotiationDocument.getDocumentHeader().getWorkflowDocument().isInitiated() 
+                    || negotiationDocument.getDocumentHeader().getWorkflowDocument().isSaved()) {
+                negotiationDocument = (NegotiationDocument) getDocumentService().routeDocument(negotiationDocument, "Route To Final", new ArrayList());
+            }
+            
+            getDocumentService().saveDocument(negotiationDocument);
+            
 //        }  catch (Exception e){
 //            LOG.error("Error when saving migrated negotiation id "+ negotiation.getNegotiationId()+" \n"+ e.getMessage() +"\nStackTrace:\n"+Arrays.toString(e.getStackTrace()));
 //            throw new NegotiationMigrationException( e.getMessage() );
