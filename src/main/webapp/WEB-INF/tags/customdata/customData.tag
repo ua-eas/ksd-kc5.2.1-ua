@@ -78,12 +78,23 @@
 					
 				<c:choose>
                 	<c:when test="${readOnly}">
-                		<c:out value="${customAttributeValue}" />
+                		<c:choose>
+                            <c:when test="${customAttributeDocument.customAttribute.customAttributeDataType.description == 'Boolean'}">
+                                <input type="radio" class="Custom Data answer QanswerYesNo" name="${customAttributeId}" value="Y" 
+                                    ${customAttributeValue == 'Y' ? "checked='true'" : ''} disabled="true" />Yes
+                                <input type="radio" class="Custom Data answer QanswerYesNo" name="${customAttributeId}" value="N" 
+                                    ${customAttributeValue == 'N' ? "checked='true'" : ''} disabled="true" />No
+                            </c:when>           
+                            <c:otherwise>
+                				<c:out value="${customAttributeValue}" />
+                            </c:otherwise>
+                        </c:choose>
                 	</c:when>
                 	<c:otherwise>
                 		${kfunc:registerEditableProperty(KualiForm, customAttributeId)}
-                		<input size="60" id="${customAttributeId}" type="text" name="${customAttributeId}" value='${customAttributeValue}' style="${customAttributeErrorStyle}"/>
-
+                        <c:if test="${customAttributeDocument.customAttribute.customAttributeDataType.description != 'Boolean'}">
+                			<input size="60" id="${customAttributeId}" type="text" name="${customAttributeId}" value='${customAttributeValue}' style="${customAttributeErrorStyle}"/>
+                        </c:if> 
 						<c:if test="${not empty customAttributeDocument.customAttribute.lookupClass}">
 						 <c:choose>
 						   <c:when test="${customAttributeDocument.customAttribute.lookupClass eq 'org.kuali.kra.bo.ArgValueLookup'}">
@@ -113,6 +124,15 @@
 					             );
 					        </script>
 						</c:if>
+                        
+                        <c:if test="${customAttributeDocument.customAttribute.customAttributeDataType.description == 'Boolean'}">
+
+                            <input type="radio" class="Custom Data answer QanswerYesNo" name="${customAttributeId}" value="Y" 
+                                ${customAttributeValue == 'Y' ? "checked='true'" : ''} />Yes
+                            <input type="radio" class="Custom Data answer QanswerYesNo" name="${customAttributeId}" value="N" 
+                                ${customAttributeValue == 'N' ? "checked='true'" : ''} />No  
+                        </c:if> 
+                        
 						</c:otherwise>
 					</c:choose>
 				</td>
