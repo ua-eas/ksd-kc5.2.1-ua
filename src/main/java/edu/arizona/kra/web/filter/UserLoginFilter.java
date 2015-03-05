@@ -1,6 +1,7 @@
 package edu.arizona.kra.web.filter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.UUID;
 
 import javax.servlet.FilterChain;
@@ -21,10 +22,13 @@ import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.KewApiConstants;
+import org.kuali.rice.kim.api.KimConstants;
 import org.kuali.rice.kim.api.identity.AuthenticationService;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.principal.Principal;
+import org.kuali.rice.kim.api.permission.PermissionService;
 import org.kuali.rice.kim.api.services.KimApiServiceLocator;
+import org.kuali.rice.kns.util.KNSConstants;
 import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.exception.AuthenticationException;
 import org.kuali.rice.krad.util.KRADConstants;
@@ -54,6 +58,7 @@ public class UserLoginFilter extends org.kuali.rice.krad.web.filter.UserLoginFil
 	private IdentityService identityService;
 	private ConfigurationService kualiConfigurationService;
 	private ParameterService parameterService;
+	private PermissionService permissionService;
 	
 
 
@@ -151,20 +156,61 @@ public class UserLoginFilter extends org.kuali.rice.krad.web.filter.UserLoginFil
 	 * capabilities are valid.
 	 */
 	private void establishBackdoorUser(HttpServletRequest request) {
-		final String backdoor = request.getParameter(KRADConstants.BACKDOOR_PARAMETER);
-		if (StringUtils.isNotBlank(backdoor)) {
-			if (!getKualiConfigurationService().getPropertyValueAsString(
-					KRADConstants.PROD_ENVIRONMENT_CODE_KEY).equalsIgnoreCase(getKualiConfigurationService().getPropertyValueAsString(KRADConstants.ENVIRONMENT_KEY))) {
-				if (getParameterService().getParameterValueAsBoolean(KRADConstants.KUALI_RICE_WORKFLOW_NAMESPACE, KRADConstants.DetailTypes.BACKDOOR_DETAIL_TYPE,KewApiConstants.SHOW_BACK_DOOR_LOGIN_IND)) {
-					try {
-						KRADUtils.getUserSessionFromRequest(request).setBackdoorUser(backdoor);
-					} catch (RiceRuntimeException re) {
-						// Ignore so BackdoorAction can redirect to invalid_backdoor_portal
-					}
-				}
-			}
-		}
-	}
+        final String backdoor = request.getParameter(KRADConstants.BACKDOOR_PARAMETER);
+        if (StringUtils.isNotBlank(backdoor)) {
+        	
+        	boolean isNotPrd = !getKualiConfigurationService().getPropertyValueAsString( KRADConstants.PROD_ENVIRONMENT_CODE_KEY )
+                    .equalsIgnoreCase( getKualiConfigurationService().getPropertyValueAsString( KRADConstants.ENVIRONMENT_KEY ) );
+        	
+            if ( isNotPrd ) {
+            	
+            	boolean backdoorIsEnabled = getParameterService().getParameterValueAsBoolean( 
+            			KRADConstants.KUALI_RICE_WORKFLOW_NAMESPACE,
+                        KRADConstants.DetailTypes.BACKDOOR_DETAIL_TYPE, 
+                        KewApiConstants.SHOW_BACK_DOOR_LOGIN_IND 
+                );
+            	
+                if ( backdoorIsEnabled ) {
+                	
+                	String principalName = ((AuthenticationService) GlobalResourceLoader.getResourceLoader().getService(
+                            new QName("kimAuthenticationService"))).getPrincipalName(request);
+                	
+                	Principal principal = getIdentityService().getPrincipalByPrincipalName(principalName);
+                	
+                	boolean userIsAuthorizedToBackdoor = isAuthorizedToBackDoorLogin(principal.getPrincipalId());
+                	
+                	if ( userIsAuthorizedToBackdoor ) {
+                		try {
+                            KRADUtils.getUserSessionFromRequest(request).setBackdoorUser(backdoor);
+                        } catch (RiceRuntimeException re) {
+                            //Ignore so BackdoorAction can redirect to invalid_backdoor_portal
+                        }
+                	}
+                	else {
+                		throw new AuthenticationException(
+                                "You cannot use the backdoor log in, because you are not authorized to impersonate users.\nThe user id provided was: "
+                                        + principalName + ".\n");
+                	}
+                }
+            }
+        }
+    }
+	
+	/**
+     * checks if the passed in principalId is authorized to use backdoor log in.
+     */
+    private boolean isAuthorizedToBackDoorLogin(String principalId) {
+        return getPermissionService().isAuthorized(principalId, KRADConstants.KUALI_RICE_SYSTEM_NAMESPACE,
+                KimConstants.PermissionNames.BACKDOOR_LOG_IN, Collections.singletonMap("principalId", principalId));
+    }
+    
+    private PermissionService getPermissionService() {
+        if (this.permissionService == null) {
+            this.permissionService = KimApiServiceLocator.getPermissionService();
+        }
+
+        return this.permissionService;
+    }
 
 
 	private void addToMDC(HttpServletRequest request) {
