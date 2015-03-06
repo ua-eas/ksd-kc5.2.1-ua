@@ -60,6 +60,8 @@ public class UserLoginFilter extends org.kuali.rice.krad.web.filter.UserLoginFil
 	private ParameterService parameterService;
 	private PermissionService permissionService;
 	
+	public static final String BACKDOOR_LOG_IN = "Use Backdoor Log In Kuali Portal";
+	
 
 
 	@Override
@@ -201,7 +203,7 @@ public class UserLoginFilter extends org.kuali.rice.krad.web.filter.UserLoginFil
      */
     private boolean isAuthorizedToBackDoorLogin(String principalId) {
         return getPermissionService().isAuthorized(principalId, KRADConstants.KUALI_RICE_SYSTEM_NAMESPACE,
-                KimConstants.PermissionNames.BACKDOOR_LOG_IN, Collections.singletonMap("principalId", principalId));
+        		BACKDOOR_LOG_IN, Collections.singletonMap("principalId", principalId));
     }
     
     private PermissionService getPermissionService() {
