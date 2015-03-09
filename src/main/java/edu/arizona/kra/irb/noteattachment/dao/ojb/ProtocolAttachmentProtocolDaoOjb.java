@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.ojb.broker.query.Criteria;
 import org.apache.ojb.broker.query.QueryFactory;
 import org.apache.ojb.broker.query.ReportQueryByCriteria;
@@ -60,8 +61,36 @@ public class ProtocolAttachmentProtocolDaoOjb extends PlatformAwareDaoBaseOjb im
 		return sourceProtocolNumber;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.arizona.kra.irb.noteattachment.dao.ProtocolAttachmentProtocolDao#getFileName(org.kuali.kra.protocol.noteattachment.ProtocolAttachmentBase)
+	 */
 	@Override
 	public String getFileName( ProtocolAttachmentBase protocolAttachment ) {
+		
+		/* First try to get the file name stored in the ATTACHMENT_FILE table. If that does not exist, the file
+		 * has not yet been saved. We can just get the file name from the file object associated with this 
+		 * protocolAttachment. 
+		 * 
+		 * We try to pull from the DB first rather than load the entire file object for performance reasons.
+		 * We should only load the file contents in the glob only when absolutely neccisary. 
+		 */
+		
+		String fileName = getFileNameFromDB(protocolAttachment);
+		
+		if ( StringUtils.isBlank(fileName) ) {
+			fileName = protocolAttachment.getFile().getName();
+		}
+		
+		return fileName;
+	}
+	
+	/**
+	 * Trys to get the file name from the ATTACHMENT_FILE table using an OJB query.
+	 * 
+	 * @param protocolAttachment
+	 * @return fileName
+	 */
+	private String getFileNameFromDB( ProtocolAttachmentBase protocolAttachment ) {
 		Long fileId = protocolAttachment.getFileId();
 		String fileName = "";
 		
