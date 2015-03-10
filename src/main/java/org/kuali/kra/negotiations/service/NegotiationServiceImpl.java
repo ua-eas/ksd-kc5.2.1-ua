@@ -294,17 +294,21 @@ public class NegotiationServiceImpl implements NegotiationService {
         List<NegotiationActivityHistoryLineBean> beansToReturn = new ArrayList<NegotiationActivityHistoryLineBean>();
         for (NegotiationActivityHistoryLineBean bean : beans) {
             if (StringUtils.equals(previousLocation, bean.getLocation())) {
-                if (isDateBetween(bean.getStartDate(), previousStartDate, previousEndDate)
-                        && isDateBetween(bean.getEndDate(), previousStartDate, previousEndDate)) {
-                    //current date range lies within the previous date range
-                    setBeanStuff(bean, null, null, "0 Days");
-                    //leave previous alone
-                } else if (isDateBetween(bean.getStartDate(), previousStartDate, previousEndDate) 
-                        && bean.getEndDate().after(previousEndDate)) {
-                    //current date range starts within the previous range, but finishes past it.
-                    Date previousEndDatePlusOneDay = new Date(previousEndDate.getTime() + NegotiationActivity.MILLISECS_PER_DAY);                    
-                    previousEndDate = bean.getEndDate();
-                    setBeanStuff(bean, previousEndDatePlusOneDay, bean.getEndDate(), NegotiationActivity.getNumberOfDays(previousEndDatePlusOneDay, bean.getEndDate()));
+                if (isDateBetween(bean.getStartDate(), previousStartDate, previousEndDate)){
+                     if ( isDateBetween(bean.getEndDate(), previousStartDate, previousEndDate)){
+                        //current date range lies within the previous date range
+                        setBeanStuff(bean, null, null, "0");
+                        //leave previous alone
+                    } else if ( bean.getEndDate()!= null && bean.getEndDate().after(previousEndDate)) {
+                        //current date range starts within the previous range, but finishes past it.
+                        Date previousEndDatePlusOneDay = new Date(previousEndDate.getTime() + NegotiationActivity.MILLISECS_PER_DAY);                    
+                        previousEndDate = bean.getEndDate();
+                        setBeanStuff(bean, previousEndDatePlusOneDay, bean.getEndDate(), NegotiationActivity.getNumberOfDays(previousEndDatePlusOneDay, bean.getEndDate()));
+                    } else {
+                        previousStartDate = bean.getStartDate();
+                        previousEndDate = bean.getEndDate();
+                        setBeanStuff(bean, bean.getStartDate(), bean.getEndDate(), NegotiationActivity.getNumberOfDays(bean.getStartDate(), bean.getEndDate()));
+                    }
                 } else {
                     //completely separate range.
                     previousStartDate = bean.getStartDate();
