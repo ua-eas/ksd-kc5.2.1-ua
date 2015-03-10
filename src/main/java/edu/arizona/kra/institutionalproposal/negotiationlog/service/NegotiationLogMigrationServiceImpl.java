@@ -125,7 +125,6 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         //Important Requirement: keep the same negotiation id as the Negotiation Log
         negotiation.setNegotiationId( negotiationLog.getNegotiationLogId().longValue());
         negotiation.setAccountId( negotiationLog.getAccount());
-
                 
         setNegotiatorDetails(negotiation, negotiationLog);
         
@@ -149,12 +148,12 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
     }
     
     
-	/**
-	 * Migrates all NegotiationLogs that have the specified status - true for opened or false - closed
-	 * Returns a list with the Id of the NegotiationLogs that could not be migrated
-	 */
+    /**
+     * Migrates all NegotiationLogs that have the specified status - true for opened or false - closed
+     * Returns a list with the Id of the NegotiationLogs that could not be migrated
+     */
     @Override
-	public List<String> migrateNegotiationLogs(boolean completeStatus) throws NegotiationMigrationException{
+    public List<String> migrateNegotiationLogs(boolean completeStatus) throws NegotiationMigrationException{
         boolean isMigrationEnabled = NegotiationMigrationUtils.isNegotiationMigrationEnabled();
         LOG.info("MIGRATION ENABLED="+isMigrationEnabled);
         if ( !isMigrationEnabled ){
@@ -206,38 +205,38 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         LOG.warn("FAILED:\n"+Arrays.toString(failedNegLogIds.toArray()));
         
         return failedNegLogIds;
-	}
-	
-	/**
-	 * Create new enclosing NegotiationDocument with the associated workflow doc (initiated state)
-	 * Doc description set to 'Migrated from Negotiation Log ###'
-	 * TODO: DefaultUser: krobertson. Needs to have negotiation role (#1250) 
-	 * 
-	 * @return
-	 * @throws NegotiationMigrationException
-	 */
-	private NegotiationDocument createDocument(NegotiationLog negotiationLog) throws NegotiationMigrationException {
-	    LOG.debug("Creating new NegotiationDocument");
-	    Document doc;
-	    try {
-    	    doc = getDocumentService().getNewDocument(getDataDictionaryService().getDocumentClassByTypeName(NEGOTIATION_DOCUMENT_TYPE_NAME));
-    	    UserSessionUtils.addWorkflowDocument(GlobalVariables.getUserSession(), doc.getDocumentHeader().getWorkflowDocument());
-    	    doc.getDocumentHeader().setDocumentDescription("Migrated from Negotiation Log "+negotiationLog.getNegotiationLogId());
-	    } catch (WorkflowException e) {
-	        LOG.error("Cannot create new negotiation document/workflow!");
-	        throw new NegotiationMigrationException("Cannot create new negotiation document/workflow! "+Arrays.toString(e.getStackTrace()));
-	    }
-	    LOG.debug("Finished Creating new NegotiationDocument:"+doc.getDocumentNumber());
-	    return (NegotiationDocument) doc;
-	}
-	
-	
-	/**
-	 * Create a new and empty Negotiation object with the Status=in progress with the correct links to its associated NegotiationDocument
-	 * @param negotiationDocument
-	 * @return
-	 */
-	private Negotiation createNegotiation(NegotiationDocument negotiationDocument) {
+    }
+    
+    /**
+     * Create new enclosing NegotiationDocument with the associated workflow doc (initiated state)
+     * Doc description set to 'Migrated from Negotiation Log ###'
+     * TODO: DefaultUser: krobertson. Needs to have negotiation role (#1250) 
+     * 
+     * @return
+     * @throws NegotiationMigrationException
+     */
+    private NegotiationDocument createDocument(NegotiationLog negotiationLog) throws NegotiationMigrationException {
+        LOG.debug("Creating new NegotiationDocument");
+        Document doc;
+        try {
+            doc = getDocumentService().getNewDocument(getDataDictionaryService().getDocumentClassByTypeName(NEGOTIATION_DOCUMENT_TYPE_NAME));
+            UserSessionUtils.addWorkflowDocument(GlobalVariables.getUserSession(), doc.getDocumentHeader().getWorkflowDocument());
+            doc.getDocumentHeader().setDocumentDescription("Migrated from Negotiation Log "+negotiationLog.getNegotiationLogId());
+        } catch (WorkflowException e) {
+            LOG.error("Cannot create new negotiation document/workflow!");
+            throw new NegotiationMigrationException("Cannot create new negotiation document/workflow! "+Arrays.toString(e.getStackTrace()));
+        }
+        LOG.debug("Finished Creating new NegotiationDocument:"+doc.getDocumentNumber());
+        return (NegotiationDocument) doc;
+    }
+    
+    
+    /**
+     * Create a new and empty Negotiation object with the Status=in progress with the correct links to its associated NegotiationDocument
+     * @param negotiationDocument
+     * @return
+     */
+    private Negotiation createNegotiation(NegotiationDocument negotiationDocument) {
         LOG.debug("Creating new Negotiation");
         Negotiation negotiation = negotiationDocument.getNegotiation();
         negotiation.setNegotiationStatus(
@@ -248,92 +247,92 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         LOG.debug("Finished Creating new Negotiation:"+negotiation.getNegotiationDocument().getDocumentNumber());
         return negotiation;
     }
-	
-	
-	/**
-	 * Sets the negotiator id, full name or default values if the negotiation log does not have a correct personId
-	 * @param negotiation
-	 * @param negotiationLog
-	 */
-	private void setNegotiatorDetails(Negotiation negotiation, NegotiationLog negotiationLog){
-	    LOG.debug("setNegotiatorDetails personId="+negotiationLog.getNegotiatorPersonId());
-	    KcPerson negotiator = negotiationLog.getNegotiator();
-	    if ( StringUtils.isEmpty( negotiationLog.getNegotiatorPersonId() ) || negotiator == null ){
-	        LOG.debug("setNegotiatorDetails personId is NULL, using the the default negotiator.");
-	        negotiator = KcPerson.fromPersonId( DEFAULT_NEGOTIATOR_ID );
-	    } 
-	    
-	    LOG.debug("Negotiator = "+negotiator.getFullName());
-	    negotiation.setNegotiatorPersonId( negotiator.getPersonId() );
-	    negotiation.setNegotiatorName( negotiator.getFullName() );
-	    negotiation.setNegotiatorUserName( negotiator.getUserName() );
-	    
-	    LOG.debug("Finished setNegotiatorDetails");
-	}
-	
-	
-	private void setNegotiationDates(Negotiation negotiation, NegotiationLog negotiationLog){
-	    LOG.debug("Start setNegotiationDates");
-	    Date startDate = negotiationLog.getDateReceived();
-	    Date endDate = negotiationLog.getDateClosed();
-	    
-	    if ( startDate == null ){
-	        if ( negotiationLog.getStartDate() == null ){
-	            if ( negotiationLog.getNegotiationStart() == null ){
-	                if ( negotiationLog.getBackstop() == null ){
-	                    LOG.debug(negotiationLog.getNegotiationLogId()+":Using default start date = "+DEFAULT_DATE);
-	                    startDate = DEFAULT_DATE;
-	                } else {
-	                    startDate = negotiationLog.getBackstop();
-	                }
-	            } else {
-	                startDate = negotiationLog.getNegotiationStart();
-	            }
-	        } else {
-	            startDate = negotiationLog.getStartDate();
-	        }
-	    }
-	    negotiation.setNegotiationStartDate(startDate);
-	    
-	    if (negotiationLog.getClosed()){
-	        if ( endDate == null ){
-	            if ( negotiationLog.getEndDate() == null ){
-	                if ( negotiationLog.getNegotiationComplete() == null ){
-	                    if ( negotiationLog.getUpdateTimestamp()==null ){
-	                        LOG.debug("Using default end date.");
-	                        endDate = DEFAULT_END_DATE;
-	                    }
-	                    else {
-	                        endDate = new Date(negotiationLog.getUpdateTimestamp().getTime());
-	                    }
-	                }
-	                else {
-	                    endDate = negotiationLog.getNegotiationComplete();
-	                }
-	            } else {
-	                endDate = negotiationLog.getEndDate();
-	            }
-	            
-	        }
-	        negotiation.setNegotiationEndDate(endDate);
-	    }
-	    
-	    LOG.debug("Finished setNegotiationDates log="+negotiationLog.getNegotiationLogId()+" CLosed="+negotiationLog.getClosed()+" SD="+negotiation.getNegotiationStartDate()+" ED="+ negotiation.getNegotiationEndDate());
-	}
-	
-	
-	/**
-	 * Sets the negotiation agreement type accordingly
-	 * @param negotiation
-	 * @param negotiationLog
-	 */
-	private void setNegotiationAgreement(Negotiation negotiation, NegotiationLog negotiationLog){
-	    LOG.debug("Start setNegotiationAgreement");
-	    String agreementTypeCode =  negotiationLog.getNegotiationAgreementType();
-	    NegotiationAgreementType agreementType = findNegotiationTypeByCode(NegotiationAgreementType.class, agreementTypeCode, DEFAULT_AGREEMENT_CODE);
-	    negotiation.setNegotiationAgreementType( agreementType );
-	    negotiation.setNegotiationAgreementTypeId( agreementType.getId() );
-	    LOG.debug("Finished setNegotiationAgreement");
+    
+    
+    /**
+     * Sets the negotiator id, full name or default values if the negotiation log does not have a correct personId
+     * @param negotiation
+     * @param negotiationLog
+     */
+    private void setNegotiatorDetails(Negotiation negotiation, NegotiationLog negotiationLog){
+        LOG.debug("setNegotiatorDetails personId="+negotiationLog.getNegotiatorPersonId());
+        KcPerson negotiator = negotiationLog.getNegotiator();
+        if ( StringUtils.isEmpty( negotiationLog.getNegotiatorPersonId() ) || negotiator == null ){
+            LOG.debug("setNegotiatorDetails personId is NULL, using the the default negotiator.");
+            negotiator = KcPerson.fromPersonId( DEFAULT_NEGOTIATOR_ID );
+        } 
+        
+        LOG.debug("Negotiator = "+negotiator.getFullName());
+        negotiation.setNegotiatorPersonId( negotiator.getPersonId() );
+        negotiation.setNegotiatorName( negotiator.getFullName() );
+        negotiation.setNegotiatorUserName( negotiator.getUserName() );
+        
+        LOG.debug("Finished setNegotiatorDetails");
+    }
+    
+    
+    private void setNegotiationDates(Negotiation negotiation, NegotiationLog negotiationLog){
+        LOG.debug("Start setNegotiationDates");
+        Date startDate = negotiationLog.getDateReceived();
+        Date endDate = negotiationLog.getDateClosed();
+        
+        if ( startDate == null ){
+            if ( negotiationLog.getStartDate() == null ){
+                if ( negotiationLog.getNegotiationStart() == null ){
+                    if ( negotiationLog.getBackstop() == null ){
+                        LOG.debug(negotiationLog.getNegotiationLogId()+":Using default start date = "+DEFAULT_DATE);
+                        startDate = DEFAULT_DATE;
+                    } else {
+                        startDate = negotiationLog.getBackstop();
+                    }
+                } else {
+                    startDate = negotiationLog.getNegotiationStart();
+                }
+            } else {
+                startDate = negotiationLog.getStartDate();
+            }
+        }
+        negotiation.setNegotiationStartDate(startDate);
+        
+        if (negotiationLog.getClosed()){
+            if ( endDate == null ){
+                if ( negotiationLog.getEndDate() == null ){
+                    if ( negotiationLog.getNegotiationComplete() == null ){
+                        if ( negotiationLog.getUpdateTimestamp()==null ){
+                            LOG.debug("Using default end date.");
+                            endDate = DEFAULT_END_DATE;
+                        }
+                        else {
+                            endDate = new Date(negotiationLog.getUpdateTimestamp().getTime());
+                        }
+                    }
+                    else {
+                        endDate = negotiationLog.getNegotiationComplete();
+                    }
+                } else {
+                    endDate = negotiationLog.getEndDate();
+                }
+                
+            }
+            negotiation.setNegotiationEndDate(endDate);
+        }
+        
+        LOG.debug("Finished setNegotiationDates log="+negotiationLog.getNegotiationLogId()+" CLosed="+negotiationLog.getClosed()+" SD="+negotiation.getNegotiationStartDate()+" ED="+ negotiation.getNegotiationEndDate());
+    }
+    
+    
+    /**
+     * Sets the negotiation agreement type accordingly
+     * @param negotiation
+     * @param negotiationLog
+     */
+    private void setNegotiationAgreement(Negotiation negotiation, NegotiationLog negotiationLog){
+        LOG.debug("Start setNegotiationAgreement");
+        String agreementTypeCode =  negotiationLog.getNegotiationAgreementType();
+        NegotiationAgreementType agreementType = findNegotiationTypeByCode(NegotiationAgreementType.class, agreementTypeCode, DEFAULT_AGREEMENT_CODE);
+        negotiation.setNegotiationAgreementType( agreementType );
+        negotiation.setNegotiationAgreementTypeId( agreementType.getId() );
+        LOG.debug("Finished setNegotiationAgreement");
     }
     
     /**
@@ -476,7 +475,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
 //        });
         LOG.debug("Finished saveNegotiation +"+negotiation.getNegotiationId());
     }
-	
+    
     
     /**
      * Finds the NegotiationsGroupingBase type of object depending on the provided code, or returns the default one, if none found.
@@ -635,7 +634,7 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
     }
     
     
-	protected BusinessObjectService getBusinessObjectService() {
+    protected BusinessObjectService getBusinessObjectService() {
         return businessObjectService;
     }
 
@@ -690,5 +689,6 @@ public class NegotiationLogMigrationServiceImpl extends PlatformAwareDaoBaseOjb 
         }
         return this.transactionManagerService;
     }
-    	
+        
 }
+

@@ -74,7 +74,7 @@ public class NegotiationActivity extends KraPersistableBusinessObjectBase {
     private transient boolean updated;
 
     public NegotiationActivity() {
-        restricted = Boolean.FALSE;
+	restricted = Boolean.FALSE;
         attachments = new ArrayList<NegotiationActivityAttachment>();
         newAttachment = new NegotiationActivityAttachment();
     }
@@ -314,3 +314,4 @@ public class NegotiationActivity extends KraPersistableBusinessObjectBase {
         this.newAttachment = newAttachment;
     }
 }
+
