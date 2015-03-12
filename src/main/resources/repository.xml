@@ -1759,7 +1759,50 @@
     	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
 	</class-descriptor>
 	
-	<class-descriptor class="edu.arizona.kra.global.unit.create.UnitAdministratorCreateGlobal" table="UNIT_ADMIN_CREATE_GBL_T">
+  <class-descriptor class="edu.arizona.kra.institutionalproposal.negotiationlog.NegotiationLog" table="NEGOTIATION_LOG">
+        <field-descriptor name="negotiationLogId" column="NEGOTIATION_LOG_ID" jdbc-type="INTEGER" primarykey="true" autoincrement="true" sequence-name="NEGOTIATION_LOG_SEQ" />
+        <field-descriptor name="negotiatorPersonId" column="NEGOTIATOR_ID" jdbc-type="VARCHAR" />
+        <field-descriptor name="negotiatorName" column="NEGOTIATOR_NAME" jdbc-type="VARCHAR" />
+        <field-descriptor name="closed" column="CLOSED_FLAG" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+        <field-descriptor name="proposalNumber" column="PROPOSAL_NUMBER" jdbc-type="VARCHAR" />
+        <field-descriptor name="piPersonId" column="PI_ID" jdbc-type="VARCHAR" />
+        <field-descriptor name="piName" column="PI_NAME" jdbc-type="VARCHAR" />
+        <field-descriptor name="unitNumber" column="UNIT_NUMBER" jdbc-type="VARCHAR" />
+        <field-descriptor name="account" column="ACCOUNT" jdbc-type="VARCHAR" />
+        <field-descriptor name="sponsorCode" column="SPONSOR_CODE" jdbc-type="CHAR" />
+        <field-descriptor name="negotiationAgreementType" column="AGREEMENT_TYPE_CODE" jdbc-type="VARCHAR" />
+        <field-descriptor name="awardTypeCode" column="AWARD_TYPE_CODE" jdbc-type="INTEGER" />
+        <field-descriptor name="sponsorAwardNumber" column="SPONSOR_AWARD_NUMBER" jdbc-type="VARCHAR" />
+        <field-descriptor name="modificationNumber" column="MODIFICATION_NUMBER" jdbc-type="VARCHAR" />
+        <field-descriptor name="title" column="TITLE" jdbc-type="VARCHAR" />
+        <field-descriptor name="amount" column="AMOUNT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
+        <field-descriptor name="startDate" column="START_DATE" jdbc-type="DATE" />
+        <field-descriptor name="endDate" column="END_DATE" jdbc-type="DATE" />
+        <field-descriptor name="backstop" column="BACKSTOP" jdbc-type="DATE" />
+        <field-descriptor name="location" column="LOCATION" jdbc-type="VARCHAR" />
+        <field-descriptor name="spsPreawardComments" column="SPS_PREAWARD_COMMENTS" jdbc-type="VARCHAR" />
+        <field-descriptor name="orcaComments" column="ORCA_COMMENTS" jdbc-type="VARCHAR" />
+        <field-descriptor name="dateReceived" column="DATE_RECEIVED" jdbc-type="DATE" />
+        <field-descriptor name="negotiationStart" column="NEGOTIATION_START" jdbc-type="DATE" />
+        <field-descriptor name="negotiationComplete" column="NEGOTIATION_COMPLETE" jdbc-type="DATE" />
+        <field-descriptor name="dateClosed" column="DATE_CLOSED" jdbc-type="DATE" />
+        <field-descriptor name="daysOpen" column="DAYS_OPEN" jdbc-type="BIGINT" />
+        <field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+        <field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+        <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+        <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+        <reference-descriptor name="leadUnit" class-ref="org.kuali.kra.bo.Unit" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+            <foreignkey field-ref="unitNumber"/>
+        </reference-descriptor>
+        <reference-descriptor name="sponsor" class-ref="org.kuali.kra.bo.Sponsor" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+            <foreignkey field-ref="sponsorCode" />
+        </reference-descriptor>
+        <reference-descriptor name="awardType" class-ref="org.kuali.kra.award.home.AwardType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+            <foreignkey field-ref="awardTypeCode" />
+        </reference-descriptor>
+    </class-descriptor>
+	
+    <class-descriptor class="edu.arizona.kra.global.unit.create.UnitAdministratorCreateGlobal" table="UNIT_ADMIN_CREATE_GBL_T">
        <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" primarykey="true" />
        <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
        <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
