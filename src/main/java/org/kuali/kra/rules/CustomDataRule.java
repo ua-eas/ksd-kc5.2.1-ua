@@ -99,9 +99,10 @@ public class CustomDataRule extends ResearchDocumentRuleBase implements Business
                     rulePassed &= validateAttributeFormat(customAttribute, errorKey, event);
                 }
             }
+            // Adding customAttribute.getName() so that AuditMapSorter can sort by name, and still have the label display, see UAR-1122
             if (event.isValidateRequiredFields() && customAttributeDocument.isRequired() && StringUtils.isBlank(customAttribute.getValue())) {
                 event.reportError(customAttribute, errorKey, RiceKeyConstants.ERROR_REQUIRED, 
-                        customAttribute.getLabel(),customAttribute.getValue(), getValidFormat(customAttribute.getCustomAttributeDataType().getDescription()));
+                        customAttribute.getLabel(),customAttribute.getValue(), customAttribute.getName(), getValidFormat(customAttribute.getCustomAttributeDataType().getDescription()));
                  rulePassed = false;
             }
             
