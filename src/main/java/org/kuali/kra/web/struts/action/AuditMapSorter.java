@@ -38,7 +38,7 @@ final class AuditMapSorter {
             = new LinkedHashMap<String, Comparator<AuditError>>();
         
         tempComparators.put(".*ynq.*", YNQuestionByNumber.Q_NUM_ZERO_POSITION);
-        tempComparators.put("", NameComparator.CUSTOM_DATA_NAME_ZERO_POSITION);
+        tempComparators.put("CustomDataInternalUseOnlyErrors|CustomDataProjectInformationErrors", NameComparator.CUSTOM_DATA_NAME_ZERO_POSITION);
         DEFAULT_PATTERN_COMPARATOR_MAP = Collections.unmodifiableMap(tempComparators);
     }
     
@@ -137,7 +137,7 @@ final class AuditMapSorter {
         public static final Comparator<AuditError> Q_NUM_ZERO_POSITION = new YNQuestionByNumber(0);
         
         private static final long serialVersionUID = 7978642168434892454L;
-        
+
         private final int questionNumberParamPosition;
         
         /**
@@ -206,18 +206,21 @@ final class AuditMapSorter {
      * This Comparator is not consistent with {@link AuditError#equals(Object) AuditError#equals(Object)}.
      * </p>
      */
-    public class NameComparator implements Comparator<AuditError>, Serializable {
-        /** convenience instance that looks for the custom data name in the zero position. */
+    @SuppressWarnings("deprecation")
+	public static class NameComparator implements Comparator<AuditError>, Serializable {
+		private static final long serialVersionUID = -344690414371745849L;
+
+		/** convenience instance that looks for the custom data name in the zero position. */
         public static final Comparator<AuditError> CUSTOM_DATA_NAME_ZERO_POSITION = new NameComparator(0);
-        
+
         private final int customDataNameParamPosition;
-    
+
         public NameComparator(final int customDataNameParamPosition) {
-            
+
             if (customDataNameParamPosition < 0) {
                 throw new IllegalArgumentException(customDataNameParamPosition + " is < 0");
             }
-            
+
             this.customDataNameParamPosition = customDataNameParamPosition;
         }
         
