@@ -101,7 +101,7 @@ public class CustomDataRule extends ResearchDocumentRuleBase implements Business
             }
             if (event.isValidateRequiredFields() && customAttributeDocument.isRequired() && StringUtils.isBlank(customAttribute.getValue())) {
                 event.reportError(customAttribute, errorKey, RiceKeyConstants.ERROR_REQUIRED, 
-                        customAttribute.getLabel(),customAttribute.getValue(), getValidFormat(customAttribute.getCustomAttributeDataType().getDescription()));
+                        customAttribute.getLabel(),customAttribute.getValue(), customAttribute.getName(), getValidFormat(customAttribute.getCustomAttributeDataType().getDescription()));
                  rulePassed = false;
             }
             

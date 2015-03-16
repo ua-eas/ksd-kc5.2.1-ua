@@ -38,6 +38,7 @@ final class AuditMapSorter {
             = new LinkedHashMap<String, Comparator<AuditError>>();
         
         tempComparators.put(".*ynq.*", YNQuestionByNumber.Q_NUM_ZERO_POSITION);
+        tempComparators.put("CustomDataInternalUseOnlyErrors|CustomDataProjectInformationErrors", NameComparator.CUSTOM_DATA_NAME);
         DEFAULT_PATTERN_COMPARATOR_MAP = Collections.unmodifiableMap(tempComparators);
     }
     
@@ -196,5 +197,63 @@ final class AuditMapSorter {
             return null;
         }
     }
+     
+    /**
+     * A Comparator that sorts error messages in alphabetical order by CustomAttribute#getName().
+     * (formerly, the default sort was by label.)
+     *  
+     * <p>
+     * This Comparator is not consistent with {@link AuditError#equals(Object) AuditError#equals(Object)}.
+     * </p>
+     */
+	public static class NameComparator implements Comparator<AuditError>, Serializable {
+		private static final long serialVersionUID = -1510429700681392631L;
+
+		/** convenience instance that looks for the custom data name in the zero position. */
+        public static final Comparator<AuditError> CUSTOM_DATA_NAME = new NameComparator();
         
+        // This "3" is pulling the "name" from the CustomAttribute#getName() whose "name"
+        // value is being added by CustomDataRule#processRules(...).  This is so that the
+        // name field can be used as a sort key, and still have the label display in the UI.
+        private static final int NAME_INDEX = 2;
+    
+        public NameComparator() {
+        	//
+        }
+        
+        /**
+         * This method returns the custom data name from the parameter array (ex: array[0]).
+         * @param array the parameter array holding the custom data name.  It can be null.
+         * @return returns custom data name.
+         * If array is null or custom data name  is null this method will return null.
+         * (i.e. (array[customDataNameParamPosition] == null || array == null) then returns null)
+         */
+        private String getCustomDataName(String[] array) {
+            if (ArrayUtils.getLength(array) > NAME_INDEX) {
+                return array[NAME_INDEX];
+            }
+            return null;
+        }
+        
+        @Override
+        public int compare(AuditError o1, AuditError o2) {
+            try
+            {
+                String name1 = getCustomDataName(o1.getParams());//o1.getMessageKey();
+                String name2 = getCustomDataName(o2.getParams());//o2.getMessageKey();
+                if (name1 == null)
+                {
+                    name1 = "";
+                }
+                if (name2 == null)
+                {
+                    name2 = "";
+                }
+                return name1.compareTo(name2);  
+            }
+            catch (Exception e){}
+            return 0;
+        }
+    }
+    
 }
