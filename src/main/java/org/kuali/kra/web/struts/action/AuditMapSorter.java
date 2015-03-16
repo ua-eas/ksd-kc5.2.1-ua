@@ -218,10 +218,10 @@ final class AuditMapSorter {
 		/** convenience instance that looks for the custom data name in the zero position. */
         public static final Comparator<AuditError> CUSTOM_DATA_NAME = new NameComparator();
         
-		// This "3" is pulling the "name" from the CustomAttribute#getName() whose "name"
+		// This "2" is pulling the "name" from the CustomAttribute#getName() whose "name"
         // value is being added by CustomDataRule#processRules(...).  This is so that the
         // name field can be used as a sort key, and still have the label display in the UI.
-        private static final int NAME_INDEX = 3;
+        private static final int NAME_INDEX = 2;
 
         public NameComparator() {
         	//
@@ -235,7 +235,7 @@ final class AuditMapSorter {
          * (i.e. (array[customDataNameParamPosition] == null || array == null) then returns null)
          */
         private String getCustomDataName(String[] array) {
-            if (ArrayUtils.getLength(array) < NAME_INDEX + 1) {
+            if (ArrayUtils.getLength(array) > NAME_INDEX) {
                 return array[NAME_INDEX];
             }
             return null;
