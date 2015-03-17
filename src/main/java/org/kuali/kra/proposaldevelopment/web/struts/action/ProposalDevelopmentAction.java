@@ -1167,7 +1167,8 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 			proposalPersonQuestionnaireHelpers.add( helper );
 		}
 		pdform.setProposalPersonQuestionnaireHelpers( proposalPersonQuestionnaireHelpers );
-
+		pdform.getCustomDataHelper().prepareCustomData();
+		
 		pdform.getProposalDevelopmentParameters().put( PROPOSAL_SUMMARY_INDICATOR, this.getParameterService().getParameter( Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, PROPOSAL_SUMMARY_INDICATOR ) );
 		pdform.getProposalDevelopmentParameters().put( BUDGET_SUMMARY_INDICATOR, this.getParameterService().getParameter( Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, BUDGET_SUMMARY_INDICATOR ) );
 		pdform.getProposalDevelopmentParameters().put( KEY_PERSONNEL_INDICATOR, this.getParameterService().getParameter( Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, KEY_PERSONNEL_INDICATOR ) );

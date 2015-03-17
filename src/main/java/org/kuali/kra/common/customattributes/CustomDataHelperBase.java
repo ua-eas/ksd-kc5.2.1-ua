@@ -108,7 +108,7 @@ public abstract class CustomDataHelperBase<T extends DocumentCustomData> impleme
             customAttributeGroups.put(groupName, customAttributeDocumentList);
         }
         customAttributeDocumentList.add(customAttributeDocument.getValue());
-        Collections.sort(customAttributeDocumentList, new LabelComparator() ); 
+        Collections.sort(customAttributeDocumentList, new NameComparator() ); 
     }
 
     protected boolean isMatch(T documentCustomData, Entry<String, CustomAttributeDocument> customAttributeDocumentEntry) {
@@ -137,7 +137,7 @@ public abstract class CustomDataHelperBase<T extends DocumentCustomData> impleme
                 
             }
             customAttributeDocumentList.add(getCustomAttributeDocuments().get(customAttributeDocumentEntry.getValue().getCustomAttributeId().toString()));
-            Collections.sort(customAttributeDocumentList, new LabelComparator());
+            Collections.sort(customAttributeDocumentList, new NameComparator());
         }
     }
     
@@ -235,25 +235,25 @@ public abstract class CustomDataHelperBase<T extends DocumentCustomData> impleme
     /**
      * Sorts custom data attributes by label for alphabetical order on custom data panels.
      */
-    public class LabelComparator implements Comparator
+    public class NameComparator implements Comparator
     {    
-        public LabelComparator(){}
+        public NameComparator(){}
         
         public int compare(Object cad1, Object cad2 )
         {    
             try
             {
-                String label1 = ((CustomAttributeDocument)cad1).getCustomAttribute().getLabel();
-                String label2 = ((CustomAttributeDocument)cad2).getCustomAttribute().getLabel();
-                if (label1 == null)
+                String name1 = ((CustomAttributeDocument)cad1).getCustomAttribute().getName();
+                String name2 = ((CustomAttributeDocument)cad2).getCustomAttribute().getName();
+                if (name1 == null)
                 {
-                    label1 = "";
+                	name1 = "";
                 }
-                if (label2 == null)
+                if (name2 == null)
                 {
-                    label2 = "";
+                	name2 = "";
                 }
-                return label1.compareTo(label2);  
+                return name1.compareTo(name2);  
             }
             catch (Exception e)
             {
