@@ -41,11 +41,8 @@
     <bean id="UnitAdminTypeAndPersonGlobalDetail-personId" parent="UnitAdminTypeAndPersonGlobalDetail-personId-parentBean" />
     <bean id="UnitAdminTypeAndPersonGlobalDetail-personId-parentBean" abstract="true" parent="KcPerson-personId-parentBean">
         <property name="name" value="personId" />
-        <property name="label" value="KC Person" />
-        <property name="shortLabel" value="KC Person ID" />
-        <property name="required" value="true" />
-        <property name="validationPattern" >
-            <bean parent="AnyCharacterValidationPattern" />
+        <property name="control">
+            <ref bean="HiddenControl" />
         </property>
     </bean>
 
