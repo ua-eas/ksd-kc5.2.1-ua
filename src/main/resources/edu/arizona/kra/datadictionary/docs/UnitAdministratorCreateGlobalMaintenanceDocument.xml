@@ -6,6 +6,7 @@
     <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase"/>
     <property name="documentTypeName" value="UnitAdministratorCreateGlobalMaintenanceDocument"/>
     <property name="maintainableClass" value="edu.arizona.kra.global.unit.create.UnitAdminCreateGlobalMaintainableImpl"/>
+    <property name="businessRulesClass" value="edu.arizona.kra.global.unit.create.UnitAdministratorCreateGlobalRule"/>
     <property name="allowsRecordDeletion" value="true" />
     <property name="maintainableSections">
       <list>
@@ -42,6 +43,7 @@
             </property>
             <property name="maintainableFields">
                <list>
+                    <bean parent="MaintainableFieldDefinition" p:name="personId" p:template="personId"/>
                     <bean parent="MaintainableFieldDefinition" p:name="person.userName" p:required="true" p:template="person.userName" />
                     <bean parent="MaintainableFieldDefinition" p:name="unitAdministratorTypeCode" p:required="true" p:template="unitAdministratorTypeCode" />
                 </list>

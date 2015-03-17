@@ -1103,6 +1103,10 @@ public final class KeyConstants {
     public static final String S2S_USER_ATTACHED_FORM_WRONG_FILE_TYPE = "error.s2s.userattachedform.wrong.filetype";
     public static final String S2S_USER_ATTACHED_FORM_NOT_VALID = "error.s2s.userattachedform.invalid";
     public static final String S2S_USER_ATTACHED_FORM_NOT_PDF = "error.s2s.userattachedform.not.pdf";
+    
+    // UnitAdministrator Global Create/Delete errors
+    public static final String ERROR_UNIT_ADMIN_DUPLICATE = "error.unit.admin.global.create.duplicate";
+    public static final String ERROR_UNIT_ADMIN_NONEXISTENT = "error.unit.admin.global.delete.nonexistent";
 
     /**
      * private utility class ctor.
