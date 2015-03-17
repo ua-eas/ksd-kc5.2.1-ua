@@ -6,6 +6,7 @@
     <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase"/>
     <property name="documentTypeName" value="UnitAdministratorCreateGlobalMaintenanceDocument"/>
     <property name="maintainableClass" value="edu.arizona.kra.global.unit.create.UnitAdminCreateGlobalMaintainableImpl"/>
+    <property name="businessRulesClass" value="edu.arizona.kra.global.unit.create.UnitAdministratorCreateGlobalRule"/>
     <property name="allowsRecordDeletion" value="true" />
     <property name="maintainableSections">
       <list>

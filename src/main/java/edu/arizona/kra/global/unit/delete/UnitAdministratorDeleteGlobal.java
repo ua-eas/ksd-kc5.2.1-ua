@@ -79,7 +79,7 @@ public class UnitAdministratorDeleteGlobal extends PersistableBusinessObjectBase
 	}
 
 
-	private List<Map<String, Object>> getAllUnitAdministratorPrimaryKeys() {
+	protected List<Map<String, Object>> getAllUnitAdministratorPrimaryKeys() {
 		List<Map<String, Object>> primaryKeysList = new ArrayList<Map<String, Object>>();
 		for(GlobalBusinessObjectDetail adminDetail : getUnitAdministratorGlobalDetails()) {
 			UnitAdministratorGlobalDetail unitAdminDetail = (UnitAdministratorGlobalDetail)adminDetail;
