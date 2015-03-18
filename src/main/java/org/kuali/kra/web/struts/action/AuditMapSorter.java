@@ -38,7 +38,7 @@ final class AuditMapSorter {
             = new LinkedHashMap<String, Comparator<AuditError>>();
         
         tempComparators.put(".*ynq.*", YNQuestionByNumber.Q_NUM_ZERO_POSITION);
-        tempComparators.put("CustomDataInternalUseOnlyErrors|CustomDataProjectInformationErrors", NameComparator.CUSTOM_DATA_NAME);
+        tempComparators.put("CustomData.*", NameComparator.CUSTOM_DATA_NAME);
         DEFAULT_PATTERN_COMPARATOR_MAP = Collections.unmodifiableMap(tempComparators);
     }
     
