@@ -39,7 +39,7 @@
     <!-- Attribute Definitions -->
     
     <bean id="UnitAdminTypeAndPersonGlobalDetail-personId" parent="UnitAdminTypeAndPersonGlobalDetail-personId-parentBean" />
-    <bean id="UnitAdminTypeAndPersonGlobalDetail-personId-parentBean" abstract="true" parent="KcPerson-personId-parentBean">
+    <bean id="UnitAdminTypeAndPersonGlobalDetail-personId-parentBean" abstract="true" parent="PersonImpl-principalId">
         <property name="name" value="personId" />
         <property name="control">
             <ref bean="HiddenControl" />
