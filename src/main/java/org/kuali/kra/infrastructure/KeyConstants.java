@@ -1107,6 +1107,9 @@ public final class KeyConstants {
     // UnitAdministrator Global Create/Delete errors
     public static final String ERROR_UNIT_ADMIN_DUPLICATE = "error.unit.admin.global.create.duplicate";
     public static final String ERROR_UNIT_ADMIN_NONEXISTENT = "error.unit.admin.global.delete.nonexistent";
+    public static final String ERROR_UNIT_ADMIN_PERSON_ID = "error.unit.admin.person.id.nonexistent";
+    public static final String ERROR_UNIT_ADMIN_TYPE_CODE = "error.unit.admin.type.code.nonexistent";
+    public static final String ERROR_UNIT_NUMBER = "error.unit.number.nonexistent";
 
     /**
      * private utility class ctor.
