@@ -378,7 +378,7 @@
 			           			   <c:if test="${attachmentProtocol.documentStatusCode == '3'}">
 			           			      <font color="red">Deleted -&nbsp;</font>
 			           			   </c:if>
-			              			<kra:fileicon attachment="${attachmentProtocol.file}"/>${attachmentProtocol.file.name}
+			              			${attachmentProtocol.attachmentFileName}
 			           			</div>
 			           			
 			           			<%-- this assumes that the versions collection is sorted descending by sequence number --%>

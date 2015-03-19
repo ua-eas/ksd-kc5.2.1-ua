@@ -18,9 +18,11 @@ package org.kuali.kra.protocol.noteattachment;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
+import org.kuali.kra.irb.noteattachment.ProtocolAttachmentService;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -81,6 +84,7 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
     //UofA: adding sourceProtocolAmendRenewalNumber to the attachments
     private String sourceProtocolAmendRenewalNumber;
     private String sourceProtocolNumber;
+    private transient ProtocolAttachmentService protocolAttachmentService;
         
     //unique attachment id so attachments added to amendment and renewals can be distinguished from the ones in the base protocol
     private String versioningId;
@@ -497,22 +501,9 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
      * Returns the source protocol number for when this attachment was last added in.
      */
     public String getSourceProtocolNumber() {
+    	ProtocolAttachmentService protocolAttachmentService = getProtocolAttachmentService();
         if (sourceProtocolNumber == null) {
-            if (getFileId() != null) {
-                // find the protocol number for this attachment's most recent attachment/modification
-                // by retrieving all attachments with the same fileId and ordering them by id
-                Map param = new HashMap();
-                param.put("fileId", getFileId());
-                BusinessObjectService businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
-                List<ProtocolAttachmentProtocol> protocolAttachmentProtocols = 
-                        (List<ProtocolAttachmentProtocol>) businessObjectService.findMatchingOrderBy(ProtocolAttachmentProtocol.class, param, "id", true);
-                ProtocolAttachmentProtocol protocolAttachmentProtocol = protocolAttachmentProtocols.get(0);
-                sourceProtocolNumber = protocolAttachmentProtocol.getProtocolNumber();
-            }
-            // Null FileId means attachment newly added and is not in the database yet
-            else {
-                sourceProtocolNumber = getProtocolNumber();
-            }
+        	sourceProtocolNumber = protocolAttachmentService.getSourceProtocolNumber(this);
         }
         // avoid further lookups when this field is accessed and NPEs
         if (sourceProtocolNumber == null) {
@@ -561,5 +552,17 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         if (getCreateTimestamp() == null) {
             setCreateTimestamp(((DateTimeService) KraServiceLocator.getService(Constants.DATE_TIME_SERVICE_NAME)).getCurrentTimestamp());
         }
+    }
+    
+    public String getAttachmentFileName() {
+    	ProtocolAttachmentService protocolAttachmentService = getProtocolAttachmentService();
+    	return protocolAttachmentService.getAttachmentFileName(this);
+    }
+    
+    protected ProtocolAttachmentService getProtocolAttachmentService() {
+    	if (ObjectUtils.isNull(this.protocolAttachmentService)) {
+    		this.protocolAttachmentService = KraServiceLocator.getService(ProtocolAttachmentService.class);
+    	}
+    	return this.protocolAttachmentService;
     }
 }
