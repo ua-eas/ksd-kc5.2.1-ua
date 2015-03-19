@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+ 
+    <changeSet id="UAR-481-1" author="Natalia Costea Ibanez">
+        <comment>
+        	Adding new custom data for Y/N radio button.
+        </comment>
+        <sql>
+			INSERT INTO CUSTOM_ATTRIBUTE_DATA_TYPE (DATA_TYPE_CODE,DESCRIPTION,UPDATE_USER,UPDATE_TIMESTAMP,OBJ_ID,VER_NBR) 
+                VALUES ('4','Boolean','KRADEV',SYSDATE,SYS_GUID(),1);
+		</sql>
+		<rollback>
+			DELETE FROM CUSTOM_ATTRIBUTE_DATA_TYPE WHERE DESCRIPTION='Boolean';
+		</rollback>
+    </changeSet>
+</databaseChangeLog>
