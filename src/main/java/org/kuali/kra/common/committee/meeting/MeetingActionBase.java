@@ -15,6 +15,15 @@
  */
 package org.kuali.kra.common.committee.meeting;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -37,10 +46,6 @@ import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
 
 /**
  * 
@@ -155,7 +160,7 @@ public abstract class MeetingActionBase extends KualiAction {
             throws Exception {
 
         CommitteeScheduleBase committeeSchedule = ((MeetingFormBase) form).getMeetingHelper().getCommitteeSchedule();
-        if (isValidToSave(((MeetingFormBase) form).getMeetingHelper())) {
+        if ( !((MeetingFormBase) form).isReadOnly() && isValidToSave(((MeetingFormBase) form).getMeetingHelper()) ) {
             ((MeetingFormBase) form).getMeetingHelper().populateAttendancePreSave();
             getMeetingService().saveMeetingDetails(committeeSchedule, ((MeetingFormBase) form).getMeetingHelper().getDeletedBos());
             ((MeetingFormBase) form).getMeetingHelper().initDeletedList();

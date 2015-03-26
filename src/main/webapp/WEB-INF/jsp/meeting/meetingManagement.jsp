@@ -232,6 +232,9 @@ jQuery(function(){
 						infoTitle="Other informational messages:"/>
             </div>          
 		
+        <html:hidden property="meetingHelper.committeeSchedule.id" />
+        <kul:errors displayRemaining="true" />
+
         </html:form>
         <div id="formComplete"></div> 
       </div>

@@ -15,14 +15,16 @@
  */
 package org.kuali.kra.common.committee.meeting;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.rice.kim.api.KimConstants;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
 import org.kuali.rice.krad.document.Document;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
+import org.kuali.rice.krad.util.GlobalVariables;
 
 /**
  * 
@@ -96,10 +98,23 @@ public abstract class MeetingFormBase extends KualiForm {
      */
     @Override
     public void populate(HttpServletRequest request) {
+        checkAnotherSessionScheduleEdited(request);
         super.populate(request);
         populateFalseCheckboxes(request);
     }
 
+	private void checkAnotherSessionScheduleEdited( HttpServletRequest request )
+	{
+		if ( this.getMeetingHelper() != null && this.getMeetingHelper().getCommitteeSchedule() != null && this.getMeetingHelper().getCommitteeSchedule().getId() != null ) {
+			String sessionScheduleId = Long.toString( this.getMeetingHelper().getCommitteeSchedule().getId() );
+			String requestScheduleId = request.getParameter( "meetingHelper.committeeSchedule.id" );
+			if ( requestScheduleId != null && !sessionScheduleId.equals( requestScheduleId ) ) {
+				GlobalVariables.getMessageMap().putError( "meetingHelper.committeeSchedule.id", "error.schedule.multipleTabs", "" );
+				setReadOnly( true );
+			}
+		}
+	}
+    
     /**
      * Uses the "checkboxToReset" parameter to find checkboxes which had not been
      * populated in the request and attempts to populate them

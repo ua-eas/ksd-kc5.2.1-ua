@@ -163,6 +163,10 @@
     <td class="column-right"><img src="static/images/pixel_clear.gif" alt="" width="20" height="20"></td>
   </tr>
 </table>
+
+<html:hidden property="meetingHelper.committeeSchedule.id" />
+<kul:errors displayRemaining="true" />
+
 </html:form>
 <div id="formComplete"></div> 
 </body>
