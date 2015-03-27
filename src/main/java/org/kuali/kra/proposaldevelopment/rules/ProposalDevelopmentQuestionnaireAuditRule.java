@@ -15,6 +15,11 @@
  */
 package org.kuali.kra.proposaldevelopment.rules;
 
+import static org.kuali.kra.infrastructure.Constants.AUDIT_ERRORS;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -30,11 +35,7 @@ import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.DocumentAuditRule;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.kuali.kra.infrastructure.Constants.AUDIT_ERRORS;
-
+@SuppressWarnings( "deprecation" )
 public class ProposalDevelopmentQuestionnaireAuditRule extends ResearchDocumentRuleBase implements DocumentAuditRule {
 
     private static final String PROPOSAL_QUESTIONNAIRE_KEY="questionnaireHelper.answerHeaders[%s].answers[0].answer";
@@ -53,7 +54,7 @@ public class ProposalDevelopmentQuestionnaireAuditRule extends ResearchDocumentR
             if (!answerHeader.getCompleted()) {
                 for(QuestionnaireUsage questionnaireUsage : usages){
                     String questionnaireId = questionnaireUsage.getQuestionnaire().getQuestionnaireId();
-                    if (questionnaireId.equalsIgnoreCase(answerHeader.getQuestionnaire().getQuestionnaireId())){
+                    if (questionnaireUsage.isMandatory() && questionnaireId.equalsIgnoreCase(answerHeader.getQuestionnaire().getQuestionnaireId())){
                         valid = false;
                         getProposalS2sAuditErrorsByGroup("questionnaireHelper",questionnaireUsage.getQuestionnaireLabel(),i).add(
                             new AuditError(String.format(PROPOSAL_QUESTIONNAIRE_KEY, i, "complete"), KeyConstants.ERROR_QUESTIONNAIRE_NOT_COMPLETE,
