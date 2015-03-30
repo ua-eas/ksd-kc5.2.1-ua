@@ -927,7 +927,6 @@
         <property name="label" value="Lead Unit Name" />
         <property name="shortLabel" value="Unit Name" />
     </bean>
-    
 	<bean id="InstitutionalProposal-lookupUnit.unitNumber" parent="InstitutionalProposal-lookupUnit.unitNumber-parentBean" />
     <bean id="InstitutionalProposal-lookupUnit.unitNumber-parentBean" abstract="true" parent="Unit-unitNumber">
         <property name="name" value="lookupUnit.unitNumber" />
@@ -943,7 +942,6 @@
         <property name="shortLabel" value="Unit Name" />
         <property name="required" value="false" />    
     </bean>
-
     <bean id="InstitutionalProposal-projectPersons.fullName" parent="InstitutionalProposal-projectPersons.fullName-parentBean" />
     <bean id="InstitutionalProposal-projectPersons.fullName-parentBean" abstract="true" parent="KcPerson-fullName">
         <property name="name" value="projectPersons.fullName" />
@@ -1023,16 +1021,16 @@
                     p:attributeName="currentAccountNumber" />
                 <bean parent="FieldDefinition"
                     p:attributeName="title" />
+                <!-- 
                 <bean parent="FieldDefinition" p:useShortLabel="true"
                     p:attributeName="lookupUnit.unitNumber" />
                 <bean parent="FieldDefinition" p:noLookup="true" p:noDirectInquiry="true" p:useShortLabel="true"
                     p:attributeName="lookupUnit.unitName" />
-                <!-- 
+                --> 
                 <bean parent="FieldDefinition" p:useShortLabel="true"
                     p:attributeName="leadUnit.unitNumber" />
                 <bean parent="FieldDefinition" p:noLookup="true" p:noDirectInquiry="true" p:useShortLabel="true"
-                    p:attributeName="leadUnit.unitName" />
-                -->
+                    p:attributeName="leadUnit.unitName" />             
                 <bean parent="FieldDefinition" p:useShortLabel="true" p:noDirectInquiry="true"
                     p:attributeName="projectPersons.fullName" />
                 <bean parent="FieldDefinition"
