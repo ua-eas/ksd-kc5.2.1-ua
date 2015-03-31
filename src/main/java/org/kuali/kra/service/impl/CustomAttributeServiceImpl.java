@@ -15,10 +15,19 @@
  */
 package org.kuali.kra.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.ArgValueLookup;
 import org.kuali.kra.bo.CustomAttributeDataType;
+import org.kuali.kra.bo.CustomAttributeDocValue;
 import org.kuali.kra.bo.CustomAttributeDocument;
 import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.infrastructure.Constants;
@@ -32,18 +41,38 @@ import org.kuali.rice.kns.service.BusinessObjectDictionaryService;
 import org.kuali.rice.kns.service.DataDictionaryService;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
-import java.util.*;
-
 /**
  * This class provides the implementation of the Custom Attribute Service.
  * It provides service methods related to custom attributes.
  */
+@SuppressWarnings( { "deprecation", "unchecked", "rawtypes" } )
 public class CustomAttributeServiceImpl implements CustomAttributeService {
 
     private static final String ARGVALUELOOKUPE_CLASS = "org.kuali.kra.bo.ArgValueLookup";
     private BusinessObjectService businessObjectService;
 
     @Override
+    public Map<String, CustomAttributeDocument> getDefaultCustomAttributeDocuments(String documentNumber, String documentTypeCode, List<? extends DocumentCustomData> customDataList) {
+        Map<String, CustomAttributeDocument> allCustomAttributeDocuments = getDefaultCustomAttributeDocuments( documentTypeCode, customDataList );
+        Map<String, String> fieldValues = new HashMap<String, String>();
+        fieldValues.put( "documentNumber", documentNumber );
+        List<CustomAttributeDocValue> docValues = (List<CustomAttributeDocValue>) getBusinessObjectService().findMatching( CustomAttributeDocValue.class, fieldValues );
+        if ( docValues.size() > 0 ) {
+            Map<String, CustomAttributeDocument> customAttributeDocuments = new HashMap<String, CustomAttributeDocument>();
+            for ( CustomAttributeDocValue docValue : docValues ) {
+                for ( Entry<String, CustomAttributeDocument> entry : allCustomAttributeDocuments.entrySet() ) {
+                    long entryId =  entry.getValue().getCustomAttributeId();
+                    long docValueId = (long) docValue.getCustomAttributeId();
+                    if ( entryId == docValueId ) {
+                        customAttributeDocuments.put( entry.getKey(), entry.getValue() );
+                    }
+                }
+            }
+            return customAttributeDocuments;
+        }
+        return allCustomAttributeDocuments;
+    }
+
     public Map<String, CustomAttributeDocument> getDefaultCustomAttributeDocuments(String documentTypeCode, List<? extends DocumentCustomData> customDataList) {
         Map<String, CustomAttributeDocument> customAttributeDocuments = new HashMap<String, CustomAttributeDocument>();
         Map<String, String> queryMap = new HashMap<String, String>();

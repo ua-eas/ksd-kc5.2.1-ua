@@ -28,11 +28,12 @@ public interface CustomAttributeService {
      * This method returns a Map of Custom Attribute Documents where the key is the
      * customAttributeId.
      *
-     * @param documentTypeCode document type to get custom attributes for
      * @param documentNumber document number for this document
+     * @param documentTypeCode document type to get custom attributes for
+     * @param customDataList custom attribute data for this document
      * @return a List of custom attribute documents for this document
      */
-    public Map<String, CustomAttributeDocument> getDefaultCustomAttributeDocuments(String documentTypeCode, List<? extends DocumentCustomData> customDataList);
+    public Map<String, CustomAttributeDocument> getDefaultCustomAttributeDocuments(String documentNumber, String documentTypeCode, List<? extends DocumentCustomData> customDataList);
     
     /**
      * 
@@ -59,6 +60,7 @@ public interface CustomAttributeService {
      * @return
      * @throws Exception
      */
+    @SuppressWarnings( "rawtypes" )
     public List getLookupReturns(String lookupClass) throws Exception ;
     
     /**
@@ -69,4 +71,5 @@ public interface CustomAttributeService {
      * @throws Exception
      */
     public String getLookupReturnsForAjaxCall(String lookupClass) throws Exception ;
+
 }
