@@ -1507,7 +1507,19 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
      * @param creditTypes a <code>{@link Collection}</code> of credit types
      */
     public void setInvestigatorCreditTypes(Collection<InvestigatorCreditType> creditTypes) {
-        investigatorCreditTypes = creditTypes;
+    	if(creditTypes == null)
+    		investigatorCreditTypes = creditTypes;
+    	else
+    	{
+	    	ArrayList<InvestigatorCreditType> list = new ArrayList<InvestigatorCreditType>(creditTypes);
+	    	Collections.sort(list, new Comparator<InvestigatorCreditType>(){
+	
+				@Override
+				public int compare(InvestigatorCreditType o1, InvestigatorCreditType o2) {
+					return o1.getDescription().compareTo(o2.getDescription());
+				}});
+	        investigatorCreditTypes = list;
+    	}
     }
 
     /**
