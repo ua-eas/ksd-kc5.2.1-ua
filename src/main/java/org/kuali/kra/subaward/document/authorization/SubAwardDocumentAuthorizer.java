@@ -34,6 +34,11 @@ import org.kuali.rice.krad.document.Document;
 public class SubAwardDocumentAuthorizer
 extends KcTransactionalDocumentAuthorizerBase {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2293865729659632502L;
+
 	/**.
 	 * Thismethod is for getting edit modes
 	 * @param document the Document
@@ -120,6 +125,7 @@ extends KcTransactionalDocumentAuthorizerBase {
         canRoute = 
                 (!(isFinal(document) || isProcessed (document)) && hasPermission(subawardDocument, user, 
                                 PermissionConstants.SUBMIT_SUBAWARD));
+        canRoute &= getEditModes( document, user, new HashSet<String>() ).contains( AuthorizationConstants.EditMode.FULL_ENTRY );
         return canRoute;
     }
     
