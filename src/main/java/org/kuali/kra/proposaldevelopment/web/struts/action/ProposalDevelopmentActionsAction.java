@@ -1825,7 +1825,11 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 		budgetMap.put( "parentDocumentKey", pdDocument.getDocumentNumber() );
 		BudgetChangedData newBudgetChangedData = pdForm.getNewBudgetChangedData();
 		newBudgetChangedData.setProposalNumber( pdDocument.getDevelopmentProposal().getProposalNumber() );
-
+		
+		ProposalDevelopmentService proposalDevelopmentService = KraServiceLocator.getService(ProposalDevelopmentService.class);
+		Object fieldValue = proposalDevelopmentService.getBudgetFieldValueFromDBColumnName(pdDocument.getBudgetDocumentVersions().get(0).getDocumentNumber(), newBudgetChangedData.getColumnName());
+		newBudgetChangedData.setOldDisplayValue(fieldValue.toString());
+		
 		Collection<BudgetDocument> budgetDocuments = boService.findMatching( BudgetDocument.class, budgetMap );
 		for ( BudgetDocument document : budgetDocuments ) {
 			if ( document.getBudget().getFinalVersionFlag() ) {
@@ -1880,6 +1884,10 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 		Map<String, List<BudgetChangedData>> changeHistory = proposalDevelopmentDocument.getDevelopmentProposal()
 				.getBudgetChangeHistory();
 
+//		if (changeHistory.get(newBudgetChangedData.getEditableColumn().getColumnLabel()) != null) {
+//			newBudgetChangedData.setOldDisplayValue(changeHistory.get(newBudgetChangedData.getEditableColumn().getColumnLabel()).get(0).getDisplayValue());
+//		}
+		
 		if ( changeHistory.get( newBudgetChangedData.getEditableColumn().getColumnLabel() ) == null ) {
 			changeHistory.put( newBudgetChangedData.getEditableColumn().getColumnLabel(), new ArrayList<BudgetChangedData>() );
 		}
