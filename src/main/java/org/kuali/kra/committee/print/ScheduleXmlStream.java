@@ -197,6 +197,12 @@ public class ScheduleXmlStream extends PrintBaseXmlStream {
             else {
                 protocolSubmissionDetail.setYesVote(BigInteger.ZERO);
             }
+            if(protocolSubmission.getRecusedCount() != null) {
+            	protocolSubmissionDetail.setRecusedCount(BigInteger.valueOf(protocolSubmission.getRecusedCount()));
+            }
+            else {
+            	protocolSubmissionDetail.setRecusedCount(BigInteger.ZERO);
+            }
             if (protocolSubmission.getNoVoteCount() != null) {
                 protocolSubmissionDetail.setNoVote(BigInteger.valueOf(protocolSubmission.getNoVoteCount()));
             }

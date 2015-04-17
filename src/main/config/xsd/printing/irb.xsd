@@ -824,6 +824,7 @@
         <xs:element minOccurs="0" name="YesVote" type="xs:integer" />
         <xs:element minOccurs="0" name="NoVote" type="xs:integer" />
         <xs:element minOccurs="0" name="AbstainerCount" type="xs:integer" />
+        <xs:element minOccurs="0" name="RecusedCount" type="xs:integer" />
         <xs:element minOccurs="0" name="VotingComments">
           <xs:simpleType>
             <xs:restriction base="xs:string">
