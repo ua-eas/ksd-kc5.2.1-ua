@@ -48,6 +48,8 @@ public class BudgetVersionOverview extends KraPersistableBusinessObjectBase impl
     private String documentNumber;
 
     private String documentDescription;
+    
+    private String budgetJustification;
 
     private BudgetDecimal costSharingAmount;
 
@@ -113,6 +115,14 @@ public class BudgetVersionOverview extends KraPersistableBusinessObjectBase impl
         this.costSharingAmount = costSharingAmount;
     }
 
+    public String getBudgetJustification() {
+		return budgetJustification;
+	}
+
+	public void setBudgetJustification(String budgetJustification) {
+		this.budgetJustification = budgetJustification;
+	}
+	
     public boolean isFinalVersionFlag() {
         return finalVersionFlag;
     }

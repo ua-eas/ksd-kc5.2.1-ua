@@ -25,6 +25,7 @@ import org.kuali.kra.bo.SponsorFormTemplate;
 import org.kuali.kra.bo.SponsorFormTemplateList;
 import org.kuali.kra.budget.core.Budget;
 import org.kuali.kra.budget.document.BudgetDocument;
+import org.kuali.kra.budget.nonpersonnel.BudgetJustificationWrapper;
 import org.kuali.kra.budget.versions.BudgetDocumentVersion;
 import org.kuali.kra.budget.versions.BudgetVersionOverview;
 import org.kuali.kra.common.specialreview.rule.event.SaveSpecialReviewLinkEvent;
@@ -101,6 +102,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
@@ -1825,6 +1827,14 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 		budgetMap.put( "parentDocumentKey", pdDocument.getDocumentNumber() );
 		BudgetChangedData newBudgetChangedData = pdForm.getNewBudgetChangedData();
 		newBudgetChangedData.setProposalNumber( pdDocument.getDevelopmentProposal().getProposalNumber() );
+		
+		// added to set the old display value as the "original value" in the Budget Change History table
+		ProposalDevelopmentService proposalDevelopmentService = KraServiceLocator.getService(ProposalDevelopmentService.class);
+		Object fieldValue = proposalDevelopmentService.getBudgetFieldValueFromDBColumnName(pdDocument.getBudgetDocumentVersions().get(0).getDocumentNumber(), newBudgetChangedData.getColumnName());
+				
+		if (fieldValue != null) {
+			newBudgetChangedData.setOldDisplayValue(fieldValue.toString());
+		}
 
 		Collection<BudgetDocument> budgetDocuments = boService.findMatching( BudgetDocument.class, budgetMap );
 		for ( BudgetDocument document : budgetDocuments ) {
@@ -1865,6 +1875,17 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			ObjectUtils.setObjectProperty( budgetVersionWrapper, proposalAttributeToPersist, newBudgetChangedData.getChangedValue() );
 			ObjectUtils.setObjectProperty( budgetDocument.getBudget(), proposalAttributeToPersist,
 					newBudgetChangedData.getChangedValue() );
+			
+			// budgetJustification information is stored in the database as an XML document.  Needed to convert the
+			// changed value for this column to XML in order for it to be visible in the budget document.
+			if ("budgetJustification".equals(columnToAttributesMap.get(newBudgetChangedData.getColumnName()))) {
+				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+				java.sql.Date updateDate = new java.sql.Date(newBudgetChangedData.getUpdateTimestamp().getTime());
+				sdf.format(updateDate);
+				BudgetJustificationWrapper budgetJustification = new BudgetJustificationWrapper(updateDate, newBudgetChangedData.getUpdateUser(), newBudgetChangedData.getChangedValue());
+				budgetVersionWrapper.setBudgetJustification( budgetJustification.toString() );
+			}
+			
 			boService.save( budgetVersionWrapper );
 			budgetDocument.setVersionNumber( budgetVersionWrapper.getVersionNumber() );
 			pdForm.setNewBudgetChangedData( new BudgetChangedData() );

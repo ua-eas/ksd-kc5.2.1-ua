@@ -55,6 +55,7 @@
     <property name="shortLabel" value="Cost Sharing Amount"/>
     <property name="summary" value="Cost Sharing Amount"/>
     <property name="description" value="Cost Sharing Amount"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-endDate" parent="Budget-endDate-parentBean"/>
 
@@ -64,6 +65,7 @@
     <property name="shortLabel" value="Project End Dt"/>
     <property name="summary" value="Project End Date"/>
     <property name="description" value="Project End Date"/>
+    <property name="required" value="true"/>
   </bean>
   <bean id="Budget-finalVersionFlag" parent="Budget-finalVersionFlag-parentBean"/>
 
@@ -73,6 +75,7 @@
     <property name="shortLabel" value="Final"/>
     <property name="summary" value="Final Version Flag"/>
     <property name="description" value="Final Version Flag"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-modularBudgetFlag" parent="Budget-modularBudgetFlag-parentBean"/>
 
@@ -82,6 +85,7 @@
     <property name="shortLabel" value="Modular Budget?"/>
     <property name="summary" value="Modular Budget Flag"/>
     <property name="description" value="Modular Budget Flag"/>
+    <property name="required" value="true"/>
   </bean>
 
   <bean id="Budget-submitCostSharingFlag" parent="Budget-submitCostSharingFlag-parentBean"/>
@@ -92,6 +96,7 @@
     <property name="shortLabel" value="Submit Cost Sharing?"/>
     <property name="summary" value="Submit Cost Sharing"/>
     <property name="description" value="Submit Cost Sharing Flag"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-ohRateClassCode" parent="Budget-ohRateClassCode-parentBean"/>
 
@@ -101,6 +106,7 @@
     <property name="label" value="F&amp;A Rate Type"/>
     <property name="shortLabel" value="F&amp;A Rate Type"/>
     <property name="maxLength" value="3"/>
+    <property name="required" value="true"/>
     <property name="validationPattern">
       <bean parent="NumericValidationPattern"/>
     </property>
@@ -118,6 +124,7 @@
     <property name="label" value="F&amp;A Rate Type"/>
     <property name="shortLabel" value="F&amp;A Rate Type"/>
     <property name="maxLength" value="3"/>
+    <property name="required" value="false"/>
     <property name="validationPattern">
       <bean parent="NumericValidationPattern"/>
     </property>
@@ -135,6 +142,7 @@
     <property name="shortLabel" value="Residual Funds"/>
     <property name="summary" value="Residual Funds"/>
     <property name="description" value="Residual Funds"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-startDate" parent="Budget-startDate-parentBean"/>
 
@@ -144,6 +152,7 @@
     <property name="shortLabel" value="Project Start Date"/>
     <property name="summary" value="Project Start Date"/>
     <property name="description" value="Project Start Date"/>
+    <property name="required" value="true"/>
   </bean>
   <bean id="Budget-totalCost" parent="Budget-totalCost-parentBean"/>
 
@@ -153,6 +162,7 @@
     <property name="shortLabel" value="Total Cost"/>
     <property name="summary" value="Total Cost"/>
     <property name="description" value="Total Cost"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-totalCostLimit" parent="Budget-totalCostLimit-parentBean"/>
 
@@ -162,6 +172,7 @@
     <property name="shortLabel" value="Total Cost Limit"/>
     <property name="summary" value="Total Cost Limit"/>
     <property name="description" value="Total Cost Limit"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-totalDirectCostLimit" parent="Budget-totalDirectCostLimit-parentBean"/>
 
@@ -171,6 +182,7 @@
     <property name="shortLabel" value="Total Direct Cost Limit"/>
     <property name="summary" value="Total Direct Cost Limit"/>
     <property name="description" value="Total Direct Cost Limit"/>
+    <property name="required" value="false"/>
   </bean>
 
   <bean id="Budget-totalDirectCost" parent="Budget-totalDirectCost-parentBean"/>
@@ -181,6 +193,7 @@
     <property name="shortLabel" value="Direct Cost"/>
     <property name="summary" value="Total Direct Cost"/>
     <property name="description" value="Total Direct Cost"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-totalIndirectCost" parent="Budget-totalIndirectCost-parentBean"/>
 
@@ -190,6 +203,7 @@
     <property name="shortLabel" value="F &amp; A"/>
     <property name="summary" value="Total Indirect Cost"/>
     <property name="description" value="Total Indirect Cost"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-underrecoveryAmount" parent="Budget-underrecoveryAmount-parentBean"/>
 
@@ -199,6 +213,7 @@
     <property name="shortLabel" value="Underrecovery Amount"/>
     <property name="summary" value="Underrecovery Amount"/>
     <property name="description" value="Underrecovery Amount"/>
+    <property name="required" value="false"/>
   </bean>
   <bean id="Budget-urRateClassCode" parent="Budget-urRateClassCode-parentBean"/>
 
@@ -208,6 +223,7 @@
     <property name="label" value="Unrecovered F &amp; A Rate Type"/>
     <property name="shortLabel" value="Unrecovered F &amp; A Rate Type"/>
     <property name="maxLength" value="3"/>
+    <property name="required" value="true"/>
     <property name="validationPattern">
       <bean parent="NumericValidationPattern"/>
     </property>
@@ -261,6 +277,7 @@
     <property name="label" value="Budget Version Number"/>
     <property name="shortLabel" value="Version #"/>
     <property name="maxLength" value="3"/>
+    <property name="required" value="false"/>
     <property name="validationPattern">
       <bean parent="NumericValidationPattern"/>
     </property>
@@ -278,6 +295,7 @@
     <property name="label" value="On/Off Campus"/>
     <property name="shortLabel" value="On/Off Campus"/>
     <property name="maxLength" value="3"/>
+    <property name="required" value="true"/>
     <property name="validationPattern">
       <bean parent="AlphaNumericValidationPattern"/>
     </property>
@@ -290,7 +308,7 @@
   <bean id="Budget-versionNumber" parent="Budget-versionNumber-parentBean"/>
 
   <bean id="Budget-versionNumber-parentBean" abstract="true" parent="AttributeReferenceDummy-versionNumber">
-  
+  	<property name="required" value="false"/>  
   </bean>
   
   <bean id="Budget-workflowAttributes" parent="Budget-workflowAttributes-parentBean"/>
