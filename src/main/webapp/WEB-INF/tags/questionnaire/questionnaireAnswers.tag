@@ -42,9 +42,11 @@
     <c:choose>
     <c:when test="${bean.answerHeaders[answerHeaderIndex].completed && bean.answerHeaders[answerHeaderIndex].hasVisibleQuestion}">
      	<c:set var="tabTitle" value="${bean.headerLabels[answerHeaderIndex]} (Complete) ${inactivate}" />
+     	<c:set var="defaultOpen" value="true" />
     </c:when>
     <c:when test="${bean.answerHeaders[answerHeaderIndex].hasVisibleQuestion}">
      	<c:set var="tabTitle" value="${bean.headerLabels[answerHeaderIndex]} (Incomplete) ${inactivate}" />
+     	<c:set var="defaultOpen" value="true" />
     </c:when>
     <c:otherwise>
 			<c:set var="tabTitle" value="${bean.headerLabels[answerHeaderIndex]} ${inactivate}" />    
