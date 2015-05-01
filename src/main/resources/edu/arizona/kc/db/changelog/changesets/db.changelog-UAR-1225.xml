@@ -7,6 +7,18 @@
 
     <changeSet id="UAR-1225-1" author="sskinner">
         <comment>
+            Make BLOB's optional in order to migrate files to DocuWare.
+        </comment>
+        <sql>
+            alter table ATTACHMENT_FILE modify(FILE_DATA null);
+        </sql>
+        <rollback>
+            alter table ATTACHMENT_FILE modify(FILE_DATA not null);
+        </rollback>
+    </changeSet>
+
+    <changeSet id="UAR-1225-2" author="sskinner">
+        <comment>
             Adding table to join KC pk with new DocuWare GUID for attachment files.
         </comment>
         <sql>
