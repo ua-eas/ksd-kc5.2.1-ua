@@ -212,7 +212,7 @@
 								<div align="right">
 									$
 									<kul:htmlControlAttribute
-										property="document.budgetDocumentVersions[0].budgetVersionOverviews[0].costSharingAmount"
+										property="document.budgetDocumentVersions[${status.index}].budgetVersionOverviews[0].costSharingAmount"
 										attributeEntry="${budgetAttributes.costSharingAmount}"
 										readOnly="true" />
 								</div>
@@ -221,7 +221,7 @@
 								<div align="right">
 									$
 									<kul:htmlControlAttribute
-										property="document.budgetDocumentVersions[0].budgetVersionOverviews[0].underrecoveryAmount"
+										property="document.budgetDocumentVersions[${status.index}].budgetVersionOverviews[0].underrecoveryAmount"
 										attributeEntry="${budgetAttributes.underrecoveryAmount}"
 										readOnly="true" />
 								</div>
@@ -322,7 +322,7 @@
 									<div align="right">
 										$
 										<kul:htmlControlAttribute
-											property="document.budgetDocumentVersions[0].budgetVersionOverviews[0].costSharingAmount"
+											property="document.budgetDocumentVersions[${status.index}].budgetVersionOverviews[0].costSharingAmount"
 											attributeEntry="${budgetAttributes.costSharingAmount}"
 											readOnly="true" />
 									</div>
@@ -331,7 +331,7 @@
 									<div align="right">
 										$
 										<kul:htmlControlAttribute
-											property="document.budgetDocumentVersions[0].budgetVersionOverviews[0].underrecoveryAmount"
+											property="document.budgetDocumentVersions[${status.index}].budgetVersionOverviews[0].underrecoveryAmount"
 											attributeEntry="${budgetAttributes.underrecoveryAmount}"
 											readOnly="true" />
 									</div>
