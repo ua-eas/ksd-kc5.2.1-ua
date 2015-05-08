@@ -164,10 +164,11 @@ public class TimeAndMoneyAction extends KraTransactionalDocumentActionBase {
                 currentAnticipatedIndirect = currentAnticipatedIndirect.subtract(penTran.getAnticipatedIndirectAmount());
             }
         }
-        if(!awardHierarchyNode.getObligatedTotalDirect().equals(currentObligatedDirect) ||
-                !awardHierarchyNode.getObligatedTotalIndirect().equals(currentObligatedIndirect) ||
-                !awardHierarchyNode.getAnticipatedTotalDirect().equals(currentAnticipatedDirect) ||
-                !awardHierarchyNode.getAnticipatedTotalIndirect().equals(currentAnticipatedIndirect)){
+        if(timeAndMoneyForm.getTimeAndMoneyDocument().getPendingTransactions().size() == 0
+                && (!awardHierarchyNode.getObligatedTotalDirect().equals(currentObligatedDirect)
+                || !awardHierarchyNode.getObligatedTotalIndirect().equals(currentObligatedIndirect)
+                || !awardHierarchyNode.getAnticipatedTotalDirect().equals(currentAnticipatedDirect)
+                || !awardHierarchyNode.getAnticipatedTotalIndirect().equals(currentAnticipatedIndirect))){
             KualiDecimal obligatedChangeDirect = awardHierarchyNode.getObligatedTotalDirect().subtract(currentObligatedDirect);
             KualiDecimal obligatedChangeIndirect = awardHierarchyNode.getObligatedTotalIndirect().subtract(currentObligatedIndirect);
             KualiDecimal anticipatedChangeDirect = awardHierarchyNode.getAnticipatedTotalDirect().subtract(currentAnticipatedDirect);
@@ -239,7 +240,7 @@ public class TimeAndMoneyAction extends KraTransactionalDocumentActionBase {
     private boolean createAndValidateDisabledViewTransaction(TimeAndMoneyForm timeAndMoneyForm, AwardAmountInfo aai, Award award,
                                                              TimeAndMoneyDocument timeAndMoneyDocument, AwardHierarchyNode ahn, List<TransactionDetail> moneyTransactionDetailItems) {
         boolean result = false; // assume no change to totals
-        AwardHierarchyNode awardHierarchyNode = timeAndMoneyForm.getAwardHierarchyNodeItems().get(1);
+        AwardHierarchyNode awardHierarchyNode = timeAndMoneyForm.getAwardHierarchyNodeItems().get(timeAndMoneyForm.getAwardHierarchyNodeItems().size() - 1);
         transactionRuleImpl = new TransactionRuleImpl();
         PendingTransaction pendingTransaction = new PendingTransaction();
         pendingTransaction.setComments("Single Node Money Transaction");
@@ -257,10 +258,20 @@ public class TimeAndMoneyAction extends KraTransactionalDocumentActionBase {
                 currentAnticipated = currentAnticipated.subtract(penTran.getAnticipatedAmount());
             }
         }
-        if(!awardHierarchyNode.getAmountObligatedToDate().equals(currentObligated)
-                || !awardHierarchyNode.getAnticipatedTotalAmount().equals(currentAnticipated)){
+        
+        /*
+            The award hierarchy node loaded is for the current view and is not
+            the updated total. We need to somehow compare to latest total. If
+            transactions are present, typically, this total is right so SNT do
+            not need to occur. Hence checking for empty pending transactions
+         */
+        if(timeAndMoneyForm.getTimeAndMoneyDocument().getPendingTransactions().size() == 0
+                && (!awardHierarchyNode.getAmountObligatedToDate().equals(currentObligated)
+                || !awardHierarchyNode.getAnticipatedTotalAmount().equals(currentAnticipated))){
+
             KualiDecimal obligatedChange = awardHierarchyNode.getAmountObligatedToDate().subtract(currentObligated);
             KualiDecimal anticipatedChange = awardHierarchyNode.getAnticipatedTotalAmount().subtract(currentAnticipated);
+
             if(transactionRuleImpl.processParameterDisabledRules(awardHierarchyNode, aai, timeAndMoneyDocument)){
                 List<Award> awardItems = new ArrayList<Award>();
                 awardItems.add(award);
