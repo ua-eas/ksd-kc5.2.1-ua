@@ -62,21 +62,19 @@ SubAwardAction implements AuditModeAction {
     public ActionForward blanketApprove(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
         throws Exception {
         ActionForward forward = super.blanketApprove(mapping, form, request, response);
-        if (forward == null) {
-            return routeSubAwardToHoldingPage(mapping, (SubAwardForm) form);
-        } else {
-            return forward;
-        }
+		if ( forward == null || forward.getRedirect() == false ) {
+			return routeSubAwardToHoldingPage( mapping, (SubAwardForm) form );
+		}
+		return forward;
     }
     @Override
     public ActionForward route(ActionMapping mapping, ActionForm form,
     HttpServletRequest request, HttpServletResponse response) throws Exception {
         ActionForward forward = super.route(mapping, form, request, response);
-        if (forward == null) {
-            return routeSubAwardToHoldingPage(mapping, (SubAwardForm) form);
-        } else {
-            return forward;
-        }
+		if ( forward == null || forward.getRedirect() == false ) {
+			return routeSubAwardToHoldingPage( mapping, (SubAwardForm) form );
+		}
+		return forward;
     }
 
     @Override
