@@ -23,7 +23,7 @@
 	showTabButtons="true"
 	auditCount="0"
   	headerDispatch="${KualiForm.headerDispatch}"
-  	headerTabActive="actions">
+  	headerTabActive="institutionalProposalActions">
   	
   	<div align="right"><kul:help documentTypeName="${KualiForm.documentTypeName}" pageName="Institutional Proposal Actions" /></div>
 
