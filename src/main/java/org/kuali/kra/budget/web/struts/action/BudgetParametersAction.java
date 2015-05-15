@@ -553,24 +553,23 @@ public class BudgetParametersAction extends BudgetAction {
      * @param budget
      */
     private void updateTotalCost(Budget budget) {
-        if (budget.getTotalDirectCost() == null || budget.getTotalDirectCost() == BudgetDecimal.ZERO) {
-        	BudgetDecimal totalDirectCost = BudgetDecimal.ZERO;
-        	BudgetDecimal totalIndirectCost = BudgetDecimal.ZERO;
-        	BudgetDecimal totalCost = BudgetDecimal.ZERO;
-        	for (BudgetPeriod budgetPeriod : budget.getBudgetPeriods()) {
-        		if (budgetPeriod.getTotalDirectCost().isGreaterThan(BudgetDecimal.ZERO)
-        				|| budgetPeriod.getTotalIndirectCost().isGreaterThan(BudgetDecimal.ZERO)) {
-        			budgetPeriod.setTotalCost(budgetPeriod.getTotalDirectCost().add(budgetPeriod.getTotalIndirectCost()));
-        		}
-        		totalDirectCost = totalDirectCost.add(budgetPeriod.getTotalDirectCost());
-        		totalIndirectCost = totalIndirectCost.add(budgetPeriod.getTotalIndirectCost());
-        		totalCost = totalCost.add(budgetPeriod.getTotalCost());
-        	}
-        	budget.setTotalDirectCost(totalDirectCost);
-        	budget.setTotalIndirectCost(totalIndirectCost);
-        	budget.setTotalCost(totalCost);
-        }
-    }
+		BudgetDecimal totalDirectCost = BudgetDecimal.ZERO;
+		BudgetDecimal totalIndirectCost = BudgetDecimal.ZERO;
+		BudgetDecimal totalCost = BudgetDecimal.ZERO;
+		for ( BudgetPeriod budgetPeriod : budget.getBudgetPeriods() ) {
+			if ( budgetPeriod.getTotalDirectCost().isGreaterThan( BudgetDecimal.ZERO ) || budgetPeriod.getTotalIndirectCost().isGreaterThan( BudgetDecimal.ZERO ) ) {
+				budgetPeriod.setTotalCost( budgetPeriod.getTotalDirectCost().add( budgetPeriod.getTotalIndirectCost() ) );
+			}
+			totalDirectCost = totalDirectCost.add( budgetPeriod.getTotalDirectCost() );
+			totalIndirectCost = totalIndirectCost.add( budgetPeriod.getTotalIndirectCost() );
+			totalCost = totalCost.add( budgetPeriod.getTotalCost() );
+		}
+		if ( budget.getTotalDirectCost() == null || budget.getTotalDirectCost() == BudgetDecimal.ZERO ) {
+			budget.setTotalDirectCost( totalDirectCost );
+		}
+		budget.setTotalIndirectCost( totalIndirectCost );
+		budget.setTotalCost( totalCost );
+	}
 
     private void updateThisBudgetVersion(BudgetDocument budgetDocument) {
         Budget budget = budgetDocument.getBudget();
