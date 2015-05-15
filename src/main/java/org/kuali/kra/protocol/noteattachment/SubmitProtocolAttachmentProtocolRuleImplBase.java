@@ -40,7 +40,7 @@ public abstract class SubmitProtocolAttachmentProtocolRuleImplBase {
         }
         boolean valid = true;
         
-        final List<ProtocolAttachmentProtocolBase> attachments = document.getProtocol().getAttachmentProtocols();
+        final List<ProtocolAttachmentProtocolBase> attachments = document.getProtocol().getFilteredAttachmentProtocols();
         
         for (int i = 0; i < attachments.size(); i++) {
             final ProtocolAttachmentProtocolBase attachment = attachments.get(i);
