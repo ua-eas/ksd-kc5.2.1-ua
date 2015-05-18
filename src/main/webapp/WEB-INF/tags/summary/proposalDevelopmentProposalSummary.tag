@@ -236,7 +236,7 @@
 								</div>
 							</td>
 							<td>
-								<div align=left>${KualiForm.document.budgetDocumentVersions[0].budgetVersionOverviews[0].rateClass.description}&nbsp;</div>
+								<div align=left>${KualiForm.document.budgetDocumentVersions[status.index].budgetVersionOverviews[0].rateClass.description}&nbsp;</div>
 							</td>
 						</tr>
 
