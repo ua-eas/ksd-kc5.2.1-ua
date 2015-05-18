@@ -15,6 +15,19 @@
  */
 package org.kuali.kra.budget.web.struts.action;
 
+import static org.kuali.kra.infrastructure.KeyConstants.QUESTION_RECALCULATE_BUDGET_CONFIRMATION;
+import static org.kuali.kra.infrastructure.KraServiceLocator.getService;
+import static org.kuali.rice.krad.util.KRADConstants.QUESTION_INST_ATTRIBUTE_NAME;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -50,14 +63,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.MessageMap;
 import org.springframework.util.AutoPopulatingList;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-
-import static org.kuali.kra.infrastructure.KeyConstants.QUESTION_RECALCULATE_BUDGET_CONFIRMATION;
-import static org.kuali.kra.infrastructure.KraServiceLocator.getService;
-import static org.kuali.rice.krad.util.KRADConstants.QUESTION_INST_ATTRIBUTE_NAME;
-
+@SuppressWarnings( { "deprecation", "rawtypes", "unchecked" } )
 public class BudgetParametersAction extends BudgetAction {
     private static final String CONFIRM_RECALCULATE_BUDGET_KEY = "calculateAllPeriods";
     private static final String CONFIRM_SAVE_BUDGET_KEY = "saveAfterQuestion";
@@ -565,7 +571,9 @@ public class BudgetParametersAction extends BudgetAction {
             totalIndirectCost = totalIndirectCost.add(budgetPeriod.getTotalIndirectCost());
             totalCost = totalCost.add(budgetPeriod.getTotalCost());
         }
-        budget.setTotalDirectCost(totalDirectCost);
+		if ( budget.getTotalDirectCost() == null || budget.getTotalDirectCost() == BudgetDecimal.ZERO ) {
+			budget.setTotalDirectCost( totalDirectCost );
+		}
         budget.setTotalIndirectCost(totalIndirectCost);
         budget.setTotalCost(totalCost);
 
@@ -735,7 +743,6 @@ public class BudgetParametersAction extends BudgetAction {
         if (budgetForm.getLookupResultsBOClassName() != null && budgetForm.getLookupResultsSequenceNumber() != null) {
             String lookupResultsSequenceNumber = budgetForm.getLookupResultsSequenceNumber();
             
-            @SuppressWarnings("unchecked")
             Class<BusinessObject> lookupResultsBOClass = (Class<BusinessObject>) Class.forName(budgetForm.getLookupResultsBOClassName());
             
             Collection<BusinessObject> rawValues = KraServiceLocator.getService(LookupResultsService.class)
