@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+ 
+    <changeSet id="UAR-1329" author="Natalia Costea Ibanez">
+        <comment>
+        	Protocol Document Type - add REGENERATE_ACTION_REQUESTS_ON_CHANGE=false policy to both active document types (docTypId=77092 and 4403690).
+        </comment>
+        <sql>
+			insert into krew_doc_typ_plcy_reln_t (DOC_TYP_ID, DOC_PLCY_NM, PLCY_NM, VER_NBR, OBJ_ID)
+            values ('77092','REGENERATE_ACTION_REQUESTS_ON_CHANGE', 0, 2, SYS_GUID());
+            
+            insert into krew_doc_typ_plcy_reln_t (DOC_TYP_ID, DOC_PLCY_NM, PLCY_NM, VER_NBR, OBJ_ID)
+            values ('440360','REGENERATE_ACTION_REQUESTS_ON_CHANGE', 0, 1, SYS_GUID());
+            
+		</sql>
+		<rollback>
+			delete from krew_doc_typ_plcy_reln_t where DOC_PLCY_NM='REGENERATE_ACTION_REQUESTS_ON_CHANGE';
+		</rollback>
+    </changeSet>
+</databaseChangeLog>
