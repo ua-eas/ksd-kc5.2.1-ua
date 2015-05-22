@@ -164,9 +164,6 @@
 			                <td align="left" valign="middle" class="infoline">
 			                	<div align="center"><c:out value="${proposalChangedData.comments}" />&nbsp;</div>
 			                </td>
-							 <td align="left" valign="middle" class="infoline">
-			                	<div align="left">&nbsp;</div>
-			                </td>	
 		   				</tr>
 	        		</c:forEach>
 	        	</c:forEach>

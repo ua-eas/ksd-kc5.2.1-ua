@@ -327,6 +327,7 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
             KraServiceLocator.getService(ProposalStatusService.class).loadBudgetStatus(this.getDevelopmentProposal());
     
             getDevelopmentProposal().updateProposalChangeHistory();
+            getDevelopmentProposal().updateBudgetChangeHistory();
             
         }
     }

@@ -172,9 +172,6 @@
 			                <td align="left" valign="middle" class="infoline">
 			                	<div align="center"><c:out value="${budgetChangedData.comments}" />&nbsp;</div>
 			                </td>
-							 <td align="left" valign="middle" class="infoline">
-			                	<div align="left">&nbsp;</div>
-			                </td>	
 		   				</tr>
 	        		</c:forEach>
 	        	</c:forEach>
