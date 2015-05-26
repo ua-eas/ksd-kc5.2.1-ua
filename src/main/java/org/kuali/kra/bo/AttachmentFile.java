@@ -15,13 +15,15 @@
  */
 package org.kuali.kra.bo;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 import org.apache.struts.upload.FormFile;
 import org.kuali.kra.SeparateAssociate;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.service.KcAttachmentService;
 
-import java.io.IOException;
-import java.util.Arrays;
+import edu.arizona.kra.dao.ProtocolAttachmentDao;
 
 /**
  * Represents a Protocol Attachment File.
@@ -43,6 +45,9 @@ public class AttachmentFile extends SeparateAssociate implements KcAttachment {
     private String type;
 
     private byte[] data;
+
+	private static transient ProtocolAttachmentDao attachmentDao;
+
 
     /**
      * empty ctor to satisfy JavaBean convention.
@@ -146,13 +151,38 @@ public class AttachmentFile extends SeparateAssociate implements KcAttachment {
         this.type = type;
     }
 
-    /**
-     * Gets the Protocol Attachment File data.
-     * @return the Protocol Attachment File data
-     */
-    public byte[] getData() {
-        return (this.data == null) ? null : this.data.clone();
-    }
+	/** Begin IU Customization: UITSRA-2597 - Don't keep data around... don't want it stored in session */
+	public byte[] getData() {
+		if ( data != null ) {
+			return data;
+		}
+		return getProtocolAttachmentDao().getAttachmentData( id );
+	}
+
+	@Override
+	protected void postPersist() {
+		if ( data != null ) {
+			getProtocolAttachmentDao().saveAttachmentData( id, data );
+			data = null;
+		}
+	}
+
+	@Override
+	protected void postUpdate() {
+		if ( data != null ) {
+			getProtocolAttachmentDao().saveAttachmentData( id, data );
+			data = null;
+		}
+	}
+
+	private static ProtocolAttachmentDao getProtocolAttachmentDao() {
+		if ( attachmentDao == null ) {
+			attachmentDao = KraServiceLocator.getService( ProtocolAttachmentDao.class );
+		}
+		return attachmentDao;
+	}
+
+	/** End IU Customization */
 
     /**
      * Sets the Protocol Attachment File data.
@@ -167,7 +197,7 @@ public class AttachmentFile extends SeparateAssociate implements KcAttachment {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + Arrays.hashCode(this.getData());
+		result = prime * result + Arrays.hashCode( new byte[] {} );
         result = prime * result + ((this.getName() == null) ? 0 : this.getName().hashCode());
         result = prime * result + ((this.getType() == null) ? 0 : this.getType().hashCode());
         return result;

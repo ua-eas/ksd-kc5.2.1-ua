@@ -667,7 +667,7 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
         return protocolLocations;
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List buildListOfDeletionAwareLists() {
         List managedLists = super.buildListOfDeletionAwareLists();
@@ -1499,7 +1499,8 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
     protected abstract Class<? extends ProtocolAttachmentProtocolBase> getProtocolAttachmentProtocolClassHook();
     
 
-    protected void mergeNotepads(ProtocolBase amendment) {
+    @SuppressWarnings( "unchecked" )
+	protected void mergeNotepads(ProtocolBase amendment) {
         List <ProtocolNotepadBase> notepads = new ArrayList<ProtocolNotepadBase>();
         if (amendment.getNotepads() != null) {
             for (ProtocolNotepadBase notepad : (List<ProtocolNotepadBase>) deepCopy(amendment.getNotepads())) {
@@ -1629,7 +1630,7 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
                 attachmentSummary.setFileName(attachment.getFile().getName());
                 attachmentSummary.setAttachmentType("Protocol: " + attachment.getType().getDescription());
                 attachmentSummary.setDescription(attachment.getDescription());
-                attachmentSummary.setDataLength(attachment.getFile().getData() == null ? 0 : attachment.getFile().getData().length);
+//				attachmentSummary.setDataLength( attachment.getFile().getData() == null ? 0 : attachment.getFile().getData().length );
                 attachmentSummary.setUpdateTimestamp(attachment.getUpdateTimestamp());
                 attachmentSummary.setUpdateUser(attachment.getUpdateUser());
                 protocolSummary.add(attachmentSummary);
@@ -1643,7 +1644,7 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
                 attachmentSummary.setFileName(attachment.getFile().getName());
                 attachmentSummary.setAttachmentType(person.getPersonName() + ": " + attachment.getType().getDescription());
                 attachmentSummary.setDescription(attachment.getDescription());
-                attachmentSummary.setDataLength(attachment.getFile().getData() == null ? 0 : attachment.getFile().getData().length);
+//				attachmentSummary.setDataLength( attachment.getFile().getData() == null ? 0 : attachment.getFile().getData().length );
                 attachmentSummary.setUpdateTimestamp(attachment.getUpdateTimestamp());
                 attachmentSummary.setUpdateUser(attachment.getUpdateUser());                
                 protocolSummary.add(attachmentSummary);

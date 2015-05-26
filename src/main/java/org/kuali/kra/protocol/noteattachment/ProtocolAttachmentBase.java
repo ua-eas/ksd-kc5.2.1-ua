@@ -250,9 +250,10 @@ public abstract class ProtocolAttachmentBase extends ProtocolAssociateBase imple
             if (other.file != null) {
                 return false;
             }
-        } else if (!isSameFile(this.file, other.file)) {
-            return false;
-        }
+		}
+		// else if (!isSameFile(this.file, other.file)) {
+		// return false;
+		// }
         if (this.fileId == null) {
             if (other.fileId != null) {
                 return false;
@@ -274,7 +275,8 @@ public abstract class ProtocolAttachmentBase extends ProtocolAssociateBase imple
      * file1.equals(file2) may have issue with getclass() comparison. sometimes class may be AttachmentFile
      * some maybe Attachment$EnhancerCGLIB.  so retest equal with following for now.
      */
-    private boolean isSameFile(AttachmentFile obj, AttachmentFile other) {
+    @SuppressWarnings( "unused" )
+	private boolean isSameFile(AttachmentFile obj, AttachmentFile other) {
         if (!Arrays.equals(obj.getData(), other.getData())) {
             return false;
         } else {
