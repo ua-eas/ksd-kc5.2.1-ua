@@ -21,9 +21,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.kuali.kra.award.commitments.FandaRateType;
 import org.kuali.kra.budget.BudgetDecimal;
 import org.kuali.kra.budget.calculator.query.And;
@@ -51,6 +54,9 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.coreservice.api.parameter.Parameter;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 
@@ -61,7 +67,12 @@ import org.kuali.rice.krad.service.BusinessObjectService;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractBudgetCalculator {
+    private static final Logger LOG = Logger.getLogger(AbstractBudgetCalculator.class);
     private static final String UNDER_REECOVERY_RATE_TYPE_CODE = "1";
+    private static final String PARM_NAMSPACE_CODE = "KC-B";
+    private static final String PARM_COMPONENT_CODE = "ALL";
+    private static final String PARM_NAME = "budgetRateTypesToApplyFandA";
+
     private BusinessObjectService businessObjectService;
     private DateTimeService dateTimeService;
     protected Budget budget;
@@ -73,6 +84,7 @@ public abstract class AbstractBudgetCalculator {
     private QueryList<BudgetRate> underrecoveryRates;
     private QueryList<BudgetRate> inflationRates;
     private BudgetCalculationService budgetCalcultionService;
+    private ParameterService parameterService;
 
 
     /**
@@ -858,6 +870,9 @@ public abstract class AbstractBudgetCalculator {
         validCeQMap.put("costElement", budgetLineItem.getCostElement());
         budgetLineItem.getCostElementBO().refreshReferenceObject("validCeRateTypes");
 
+        // Sort these so calculations line up correctly
+        sortValidCeRateTypes(budgetLineItem.getCostElementBO().getValidCeRateTypes());
+
         setInflationRateOnLineItem(budgetLineItem);
 
         setValidCeRateTypeCalculatedAmounts(budgetLineItem);
@@ -1013,6 +1028,84 @@ public abstract class AbstractBudgetCalculator {
 
     protected BudgetRatesService getBudgetRateService() {
         return KraServiceLocator.getService(BudgetRatesService.class);
+    }
+
+
+    /*
+     * Get parameter to decide how list should be sorted. This is important
+     * for order-of-operations further down in processing.
+     * 
+     * This parameter has the form:
+     * "rateClassCode1,rateTypeCode1;rateClassCode2,rateTypeCode2;rateClassCode3,rateTypeCode3"
+     * 
+     * Each entry is semicolon delimited, and each value in an entry is comma separated.
+     */
+    private void sortValidCeRateTypes(List<ValidCeRateType> validCeRateTypes) {
+
+        if(validCeRateTypes == null || validCeRateTypes.size() == 0){
+            return;
+        }
+
+        // Pull the raw parameter
+        Parameter param = getParameterService().getParameter(PARM_NAMSPACE_CODE, PARM_COMPONENT_CODE, PARM_NAME);
+        if(param == null){
+            LOG.warn("parameterService returned null for parameter name: " + PARM_NAME);
+            return;
+        }
+
+        // Split each entry
+        String paramAsString = param.getValue();
+        String[] entries = paramAsString.split(";");
+        if(entries == null || entries.length == 0){
+            LOG.warn("Empty value in '" + PARM_NAME + "' from parameterService.");
+            return;
+        }
+
+        // Go through each entry
+        for(String entry : entries){
+
+            if(StringUtils.isBlank(entry)){
+                LOG.warn("Empty string parsed in budgetRateTypesToApplyFandA from parameterService.");
+                continue;
+            }
+
+            String[] values = entry.split(",");
+            if(values == null || values.length != 2){
+                LOG.warn(PARM_NAME + " entry malformed: " + entry);
+                continue;
+            }
+
+            String rateClassCode = values[0];
+            String rateTypeCode = values[1];
+
+            // Split out passed in list to high/low priority lists based on parameter matching
+            List<ValidCeRateType> higherPriorityRateTypes = new LinkedList<ValidCeRateType>();
+            List<ValidCeRateType> lowerPriorityRateTypes = new LinkedList<ValidCeRateType>();
+            for(ValidCeRateType validCeRateType : validCeRateTypes){
+                if(StringUtils.equals(validCeRateType.getRateClassCode(), rateClassCode) && StringUtils.equals(validCeRateType.getRateTypeCode(), rateTypeCode)){
+                    // This matches what is encoded in the parameter, keep it as higher priority
+                    higherPriorityRateTypes.add(validCeRateType);
+                }else{
+                    // Not a match, lower priority
+                    lowerPriorityRateTypes.add(validCeRateType);
+                }
+            }
+
+            // This will place the higher priority types at the start of the list,
+            // and the lower priority appended after that. Sort complete.
+            validCeRateTypes.clear();
+            validCeRateTypes.addAll(higherPriorityRateTypes);
+            validCeRateTypes.addAll(lowerPriorityRateTypes);
+
+        }
+    }
+
+
+    private ParameterService getParameterService() {
+        if(this.parameterService == null){
+            this.parameterService = CoreFrameworkServiceLocator.getParameterService();
+        }
+        return this.parameterService;
     }
 
 }

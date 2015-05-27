@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+ 
+    <changeSet id="UAR-1249-1" author="sskinner">
+        <comment>
+            Add key pairs from RATE_CLASS table so that budget calculations prioritize these entries to be processed first in order-of-operations. 
+        </comment>
+        <sql>
+            insert into KRCR_PARM_T
+            (APPL_ID, NMSPC_CD, CMPNT_CD,
+            PARM_NM, VER_NBR, PARM_TYP_CD,
+            VAL,
+            PARM_DESC_TXT,
+            EVAL_OPRTR_CD, OBJ_ID)
+            values('KC', 'KC-B', 'All',
+                   'budgetRateTypesToApplyFandA', '1', 'CONFG',
+                   '92,10',
+                   'Rate Class Code and Rate Class Type pairs that will take precedence in order-of-operations during budget computation. These map to entries in the RATE_TYPE table that contain an asterisk in their description. The form of this value is: "rateClassCode1,rateTypeCode1;rateClassCode2,rateTypeCode2;rateClassCode3,rateTypeCode3"',
+                   'A', sys_guid());
+        </sql>
+        <rollback>
+            delete from KRCR_PARM_T
+                where APPL_ID = 'KC'
+                and NMSPC_CD = 'KC-B'
+                and CMPNT_CD = 'All'
+                and PARM_NM = 'budgetRateTypesToApplyFandA';
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
