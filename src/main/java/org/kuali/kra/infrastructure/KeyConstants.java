@@ -1110,6 +1110,7 @@ public final class KeyConstants {
     public static final String ERROR_UNIT_ADMIN_PERSON_ID = "error.unit.admin.person.id.nonexistent";
     public static final String ERROR_UNIT_ADMIN_TYPE_CODE = "error.unit.admin.type.code.nonexistent";
     public static final String ERROR_UNIT_NUMBER = "error.unit.number.nonexistent";
+    public static final String ERROR_UNIT_ADMIN_NO_DETAILS = "error.unit.admin.global.no.details";
 
     /**
      * private utility class ctor.
