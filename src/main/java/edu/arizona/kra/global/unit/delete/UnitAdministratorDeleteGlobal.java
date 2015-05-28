@@ -159,4 +159,11 @@ public class UnitAdministratorDeleteGlobal extends PersistableBusinessObjectBase
 		return super.getVersionNumber();
 	}
 
+	@SuppressWarnings( { "unchecked", "rawtypes" } )
+	@Override
+	public List buildListOfDeletionAwareLists() {
+		List managedLists = super.buildListOfDeletionAwareLists();
+		managedLists.add( this.unitAdministratorGlobalDetails );
+		return managedLists;
+	}
 }
