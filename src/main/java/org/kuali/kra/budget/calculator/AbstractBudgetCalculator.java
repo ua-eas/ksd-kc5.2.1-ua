@@ -70,7 +70,7 @@ public abstract class AbstractBudgetCalculator {
     private static final Logger LOG = Logger.getLogger(AbstractBudgetCalculator.class);
     private static final String UNDER_REECOVERY_RATE_TYPE_CODE = "1";
     private static final String PARM_NAMSPACE_CODE = "KC-B";
-    private static final String PARM_COMPONENT_CODE = "ALL";
+    private static final String PARM_COMPONENT_CODE = "All";
     private static final String PARM_NAME = "budgetRateTypesToApplyFandA";
 
     private BusinessObjectService businessObjectService;
