@@ -132,14 +132,14 @@
     <property name="forceUppercase" value="false" />
     <property name="label" value="Acronym" />
     <property name="shortLabel" value="Acronym" />
-    <property name="maxLength" value="10" />
+    <property name="maxLength" value="30" />
     <property name="validationPattern" >
       <bean parent="AnyCharacterValidationPattern"
             p:allowWhitespace="true" />
     </property>
     <property name="control" >
       <bean parent="TextControlDefinition"
-            p:size="10" />
+            p:size="30" />
     </property>
     <property name="summary" value="Acronym" />
     <property name="description" value="Acronym" />
