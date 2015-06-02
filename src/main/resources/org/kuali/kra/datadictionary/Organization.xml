@@ -137,7 +137,7 @@
     <property name="forceUppercase" value="false"/>
     <property name="label" value="Address"/>
     <property name="shortLabel" value="Address"/>
-    <property name="maxLength" value="60"/>
+    <property name="maxLength" value="200"/>
     <property name="validationPattern">
       <bean p:allowWhitespace="true" parent="AnyCharacterValidationPattern"/>
     </property>
@@ -604,7 +604,7 @@
     <property name="forceUppercase" value="false"/>
     <property name="label" value="Organization Name"/>
     <property name="shortLabel" value="Organization Name"/>
-    <property name="maxLength" value="60"/>
+    <property name="maxLength" value="200"/>
     <property name="validationPattern">
       <bean p:allowWhitespace="true" parent="AnyCharacterValidationPattern"/>
     </property>
