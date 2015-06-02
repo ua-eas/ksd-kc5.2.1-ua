@@ -455,6 +455,7 @@ public abstract class ProtocolActionBase extends ProtocolAssociateBase {
         this.createUser = createUser;
     }
 
+//TODO: UAR-1375 this is where the field can be changed.
     public Timestamp getCreateTimestamp() {
         return (createTimestamp == null) ? getUpdateTimestamp() : createTimestamp;
     }
