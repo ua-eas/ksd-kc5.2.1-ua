@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="UAR-1380" author="Mark Moen">
+		<comment>
+			Increasing the max length of Organization Name and Address from 60 to 200 characters.
+		</comment>
+		<sql>
+			ALTER TABLE ORGANIZATION MODIFY (organization_name VARCHAR2(200 BYTE));
+			ALTER TABLE ORGANIZATION MODIFY (address VARCHAR2(200 BYTE));
+		</sql>
+		<rollback>
+			ALTER TABLE ORGANIZATION MODIFY (organization_name VARCHAR2(60 BYTE));
+			ALTER TABLE ORGANIZATION MODIFY (address VARCHAR2(60 BYTE));
+		</rollback>
+	</changeSet>
+</databaseChangeLog>
