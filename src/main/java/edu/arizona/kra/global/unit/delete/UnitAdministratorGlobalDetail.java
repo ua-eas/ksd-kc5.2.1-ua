@@ -45,7 +45,11 @@ public class UnitAdministratorGlobalDetail extends GlobalBusinessObjectDetailBas
 	
 	
 	public KcPerson getPerson() {
-		if(person == null && personId != null) {
+		if(personId != null) {
+			//Same person, avoid retrieving it
+			if (person != null && personId.equals(person.getPersonId())) {
+				return person;
+			}
 			person = getKcPersonService().getKcPersonByPersonId(personId);
 		}
         return person;
