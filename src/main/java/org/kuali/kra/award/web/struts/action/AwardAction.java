@@ -84,6 +84,7 @@ import org.kuali.kra.service.SponsorService;
 import org.kuali.kra.service.TimeAndMoneyExistenceService;
 import org.kuali.kra.service.UnitAuthorizationService;
 import org.kuali.kra.service.VersionHistoryService;
+import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.kra.timeandmoney.AwardHierarchyNode;
 import org.kuali.kra.timeandmoney.document.TimeAndMoneyDocument;
@@ -1825,7 +1826,12 @@ public class AwardAction extends BudgetParentActionBase {
      * @param award
      */
     protected void setSubAwardDetails(Award award){
-        award.setSubAwardList(getSubAwardService().getLinkedSubAwards(award));
+		List<SubAward> subAwardsForAllAwardVersions = new ArrayList<SubAward>();
+		List<Award> awardVersions = getAwardService().findAwardsForAwardNumber( award.getAwardNumber() );
+		for ( Award currentAward : awardVersions ) {
+			subAwardsForAllAwardVersions.addAll( getSubAwardService().getLinkedSubAwards( currentAward ) );
+		}
+		award.setSubAwardList( subAwardsForAllAwardVersions );
     }
 
     protected KcNotificationService getNotificationService() {
