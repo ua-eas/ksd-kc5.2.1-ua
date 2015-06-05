@@ -15,6 +15,14 @@
  */
 package org.kuali.kra.service.impl;
 
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.kuali.kra.SequenceOwner;
 import org.kuali.kra.bo.versioning.VersionHistory;
@@ -23,9 +31,7 @@ import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.ObjectUtils;
 
-import java.sql.Date;
-import java.util.*;
-
+@SuppressWarnings( { "rawtypes", "unchecked" } )
 public class VersionHistoryServiceImpl implements VersionHistoryService {
     public static final String VERSION_STATUS_FIELD = "statusForOjb";
     public static final String SEQUENCE_OWNER_CLASS_NAME_FIELD = "sequenceOwnerClassName";
@@ -75,7 +81,8 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         }
     }
     
-    protected VersionHistory getVersionHistory(Class klass, String versionName, Integer sequenceNumber) {
+
+	public VersionHistory getVersionHistory( Class<? extends SequenceOwner> klass, String versionName, Integer sequenceNumber ) {
         Map<String, Object> fieldValues = new HashMap<String, Object>();
         fieldValues.put(SEQUENCE_OWNER_CLASS_NAME_FIELD, klass.getName());
         fieldValues.put(SEQUENCE_OWNER_REFERENCE_VERSION_NAME, versionName);     
@@ -91,7 +98,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     /**
      * @see org.kuali.kra.service.VersionHistoryService#findActiveVersion(java.lang.Class, java.lang.String)
      */
-    @SuppressWarnings("unchecked")
     public VersionHistory findActiveVersion(Class<? extends SequenceOwner> klass, String versionName) {
         List<VersionHistory> histories = new ArrayList<VersionHistory>(bos.findMatching(VersionHistory.class, buildFieldValueMapForActiveVersionHistory(klass, versionName)));
         
@@ -108,7 +114,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     /**
      * @see org.kuali.kra.service.VersionHistoryService#loadVersionHistory(java.lang.Class, java.lang.String)
      */
-    @SuppressWarnings("unchecked")
     public List<VersionHistory> loadVersionHistory(Class<? extends SequenceOwner> klass, String versionName) {
         List<VersionHistory> histories = findVersionHistory(klass, versionName);
         if(histories.size() > 0) {
@@ -135,7 +140,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         return bos;
     }
 
-    @SuppressWarnings("unchecked")
     public VersionHistory findPendingVersion(Class<? extends SequenceOwner> klass, String versionName, String sequenceNumber) {
         VersionHistory pendingVersionHistory = null;
         
@@ -153,7 +157,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         return pendingVersionHistory;
     }
     
-    @SuppressWarnings("unchecked")
     public VersionHistory findPendingVersion(Class<? extends SequenceOwner> klass, String versionName) {
         VersionHistory pendingVersionHistory = null;
         
@@ -177,7 +180,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
      * @param versionName
      * @return
      */
-    @SuppressWarnings("unchecked")
     protected Map<String, Object> buildFieldValueMapForActiveVersionHistory(Class<? extends SequenceOwner> klass, String versionName) {
         Map<String, Object> fieldValues = new HashMap<String, Object>();
         fieldValues.put(SEQUENCE_OWNER_CLASS_NAME_FIELD, klass.getName());
@@ -209,7 +211,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     }
     
     @Deprecated
-    @SuppressWarnings("unchecked")
     protected Map<Integer, SequenceOwner<? extends SequenceOwner<?>>> findSequenceOwners(Class klass, String versionField, String versionName) {
         Map<String, Object> fieldValues = new HashMap<String, Object>();
         fieldValues.put(versionField, versionName);

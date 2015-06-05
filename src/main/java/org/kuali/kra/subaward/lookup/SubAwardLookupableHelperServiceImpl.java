@@ -15,9 +15,18 @@
  */
 package org.kuali.kra.subaward.lookup;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.versioning.VersionHistory;
+import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
 import org.kuali.kra.service.ServiceHelper;
 import org.kuali.kra.service.VersionHistoryService;
@@ -34,15 +43,15 @@ import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
 
-import java.util.*;
-
 /**
  * This class is for SubAwardLookupableHelperServiceImpl
  * for lookup searches...
  */
+@SuppressWarnings( { "deprecation", "unchecked", "rawtypes" } )
 public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServiceImpl {
 
-    private static final String AWARD_NUMBER = "awardNumber";
+	private static final long serialVersionUID = -985414963870962388L;
+	private static final String AWARD_NUMBER = "awardNumber";
     private static final String ORGANIZATION_NAME = "organizationName";
     private static final String REQUISITIONER_USER_NAME="requisitionerUserName";
     private VersionHistoryService versionHistoryService; 
@@ -78,7 +87,6 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
      *
      */
     @Override
-    @SuppressWarnings("unchecked")
     public List<HtmlData> getCustomActionUrls(
     BusinessObject businessObject, List pkNames) {
         List<HtmlData> htmlDataList =
@@ -169,24 +177,26 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
       protected List<SubAward> filterForActiveSubAwards(
               Collection<SubAward> collectionByQuery, String awardNumber,
               String subrecipientName, String requisitionerUserName, String statusCode) throws WorkflowException {
-          Set<String> subAwardCodes = new TreeSet<String>();
+		Map<Integer, Integer> subAwardCodes = new HashMap<Integer, Integer>();
           List<Integer> subAwardCodeList = new ArrayList<Integer>();
-          List<String> subAwardCodeSortedList = new ArrayList<String>();
-          for (SubAward subAward: collectionByQuery) {
-              subAwardCodes.add(subAward.getSubAwardCode());
-          }
-          for (String subAwardCode: subAwardCodes) {
-              subAwardCodeList.add(Integer.parseInt(subAwardCode));
+		for ( SubAward subAward : collectionByQuery ) {
+			int key = Integer.parseInt( subAward.getSubAwardCode() );
+			if ( subAwardCodes.containsKey( key ) ) {
+				if ( subAward.getSequenceNumber() > subAwardCodes.get( key ) ) {
+					subAwardCodes.put( key, subAward.getSequenceNumber() );
+				}
+			}
+			else
+				subAwardCodes.put( key, subAward.getSequenceNumber() );
+		}
+		for ( Integer subAwardCode : subAwardCodes.keySet() ) {
+			subAwardCodeList.add( subAwardCode );
           }
           Collections.sort(subAwardCodeList);
-          for (Integer subAward: subAwardCodeList) {
-              subAwardCodeSortedList.add(Integer.toString(subAward));
-          }
           List<SubAward> activeSubAwards = new ArrayList<SubAward>();
-          for (String versionName: subAwardCodeSortedList) {
-              VersionHistory versionHistory = versionHistoryService.
-              findActiveVersion(SubAward.class, versionName);
-              if (versionHistory != null) {
+		for ( Integer versionName : subAwardCodeList ) {
+			VersionHistory versionHistory = versionHistoryService.getVersionHistory( SubAward.class, versionName.toString(), subAwardCodes.get( versionName ) );
+			if ( versionHistory != null && VersionStatus.ACTIVE.equals( versionHistory.getStatus() ) ) {
                   SubAward activeSubAward =
                       (SubAward) versionHistory.getSequenceOwner();
                   if (activeSubAward != null) {

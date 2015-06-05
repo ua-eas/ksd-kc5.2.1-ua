@@ -15,12 +15,13 @@
  */
 package org.kuali.kra.service;
 
+import java.util.List;
+
 import org.kuali.kra.SequenceOwner;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 
-import java.util.List;
-
+@SuppressWarnings( "rawtypes" )
 public interface VersionHistoryService {
 
     /**
@@ -93,4 +94,14 @@ public interface VersionHistoryService {
      * @return
      */
     VersionHistory getActiveOrNewestVersion(Class<? extends SequenceOwner> klass, String versionName);
+    
+	/**
+	 * Find the VersionHistory for a given SequenceOwner type, version name and sequence number
+	 * 
+	 * @param klass
+	 * @param versionName
+	 * @param sequenceNumber
+	 * @return
+	 */
+	VersionHistory getVersionHistory( Class<? extends SequenceOwner> klass, String versionName, Integer sequenceNumber );
 }
