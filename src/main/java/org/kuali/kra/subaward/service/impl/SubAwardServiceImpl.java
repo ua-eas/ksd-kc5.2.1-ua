@@ -15,6 +15,15 @@
  */
 package org.kuali.kra.subaward.service.impl;
 
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.kuali.kra.award.home.Award;
@@ -38,12 +47,10 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
 
-import java.sql.Date;
-import java.util.*;
-
 /**
  * This class is service impl for subAward...
  */
+@SuppressWarnings( "deprecation" )
 public class SubAwardServiceImpl implements SubAwardService {
 
 
@@ -325,7 +332,7 @@ public class SubAwardServiceImpl implements SubAwardService {
     @Override
     public List<SubAward> getLinkedSubAwards(Award award) {
         Map<String, Object> values = new HashMap<String, Object>();
-        values.put("awardId", award.getAwardId());
+		values.put( "award.awardNumber", award.getAwardNumber() );
         Collection<SubAwardFundingSource> subAwardFundingSources = businessObjectService.findMatching(SubAwardFundingSource.class, values);
         Set<String> subAwardSet = new TreeSet<String>();
         for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){

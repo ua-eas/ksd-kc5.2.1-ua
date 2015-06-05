@@ -15,6 +15,18 @@
  */
 package org.kuali.kra.award.web.struts.action;
 
+import static org.apache.commons.lang.StringUtils.replace;
+import static org.kuali.rice.krad.util.KRADConstants.CONFIRMATION_QUESTION;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -24,7 +36,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
-import org.kuali.kra.award.*;
+import org.kuali.kra.award.AwardAmountInfoService;
+import org.kuali.kra.award.AwardForm;
+import org.kuali.kra.award.AwardLockService;
+import org.kuali.kra.award.AwardNumberService;
+import org.kuali.kra.award.AwardTemplateSyncScope;
+import org.kuali.kra.award.AwardTemplateSyncService;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchy;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchyBean;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchyService;
@@ -48,15 +65,25 @@ import org.kuali.kra.award.paymentreports.awardreports.AwardReportTerm;
 import org.kuali.kra.award.paymentreports.awardreports.AwardReportTermRecipient;
 import org.kuali.kra.award.paymentreports.awardreports.reporting.service.ReportTrackingService;
 import org.kuali.kra.award.paymentreports.closeout.CloseoutReportTypeValuesFinder;
-import org.kuali.kra.award.timeandmoney.AwardDirectFandADistribution;
 import org.kuali.kra.award.version.service.AwardVersionService;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.budget.web.struts.action.BudgetParentActionBase;
 import org.kuali.kra.common.notification.service.KcNotificationService;
-import org.kuali.kra.infrastructure.*;
+import org.kuali.kra.infrastructure.AwardPermissionConstants;
+import org.kuali.kra.infrastructure.AwardRoleConstants;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.krms.service.KrmsRulesExecutionService;
-import org.kuali.kra.service.*;
+import org.kuali.kra.service.AwardDirectFandADistributionService;
+import org.kuali.kra.service.AwardReportsService;
+import org.kuali.kra.service.AwardSponsorTermService;
+import org.kuali.kra.service.KraAuthorizationService;
+import org.kuali.kra.service.SponsorService;
+import org.kuali.kra.service.TimeAndMoneyExistenceService;
+import org.kuali.kra.service.UnitAuthorizationService;
+import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.kra.timeandmoney.AwardHierarchyNode;
 import org.kuali.kra.timeandmoney.document.TimeAndMoneyDocument;
@@ -83,21 +110,19 @@ import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
 import org.kuali.rice.krad.bo.PersistableBusinessObject;
 import org.kuali.rice.krad.rules.rule.event.KualiDocumentEvent;
-import org.kuali.rice.krad.service.*;
+import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.service.DocumentService;
+import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
+import org.kuali.rice.krad.service.KualiRuleService;
+import org.kuali.rice.krad.service.PessimisticLockService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-
-import static org.apache.commons.lang.StringUtils.replace;
-import static org.kuali.rice.krad.util.KRADConstants.CONFIRMATION_QUESTION;
 
 /**
  * 
  * This class represents base Action class for all the Award pages.
  */
+@SuppressWarnings( { "deprecation", "unchecked", "rawtypes", "unused", "static-access" } )
 public class AwardAction extends BudgetParentActionBase {
     protected static final String AWARD_ID_PARAMETER_NAME = "awardId";
     private static final String INITIAL_TRANSACTION_COMMENT = "Initial Time And Money creation transaction";
@@ -641,6 +666,7 @@ public class AwardAction extends BudgetParentActionBase {
         AwardDocument awardDocument = (AwardDocument) awardForm.getDocument();
         setBooleanAwardInMultipleNodeHierarchyOnForm (awardDocument.getAward());
         setBooleanAwardHasTandMOrIsVersioned(awardDocument.getAward());
+		setSubAwardDetails( awardDocument.getAward() );
         AwardAmountInfoService awardAmountInfoService = KraServiceLocator.getService(AwardAmountInfoService.class);
         int index = awardAmountInfoService.fetchIndexOfAwardAmountInfoWithHighestTransactionId(awardDocument.getAward().getAwardAmountInfos());
         
@@ -654,7 +680,6 @@ public class AwardAction extends BudgetParentActionBase {
      * @param awardDocument
      * @param awardForm
      */
-    @SuppressWarnings("unchecked")
     public void setBooleanAwardInMultipleNodeHierarchyOnForm (Award award) {
         Map<String, Object> fieldValues = new HashMap<String, Object>();
         String awardNumber = award.getAwardNumber();
@@ -752,7 +777,6 @@ public class AwardAction extends BudgetParentActionBase {
         }
     }
     
-    @SuppressWarnings({ "deprecation", "unchecked" })
     public ActionForward timeAndMoney(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
         AwardForm awardForm = (AwardForm) form;
         AwardDocument awardDocument = awardForm.getAwardDocument();
@@ -1047,7 +1071,6 @@ public class AwardAction extends BudgetParentActionBase {
         return mapping.findForward(Constants.MAPPING_AWARD_PAYMENT_REPORTS_AND_TERMS_PAGE);
     }
 
-    @SuppressWarnings("unchecked")
     protected void setReportsAndTermsOnAwardForm(AwardForm awardForm) {
         AwardSponsorTermService awardSponsorTermService = getAwardSponsorTermService();
         List<KeyValue> sponsorTermTypes = awardSponsorTermService.retrieveSponsorTermTypesToAwardFormForPanelHeaderDisplay();
@@ -1763,7 +1786,6 @@ public class AwardAction extends BudgetParentActionBase {
      * @see org.kuali.kra.web.struts.action.KraTransactionalDocumentActionBase#populateAuthorizationFields(org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase)
      * If Award Infos or dates have been edited in a T&M document, then we want to suppress the cancel action.
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected void populateAuthorizationFields(KualiDocumentFormBase formBase) {
         super.populateAuthorizationFields(formBase);
