@@ -80,7 +80,7 @@
     <property name="forceUppercase" value="false" />
     <property name="label" value="Organization Name" />
     <property name="shortLabel" value="Organization Name" />
-    <property name="maxLength" value="60" />
+    <property name="maxLength" value="200" />
     <property name="validationPattern" >
       <bean parent="AnyCharacterValidationPattern"
             p:allowWhitespace="true" />
@@ -88,7 +88,7 @@
     <property name="required" value="true" />
     <property name="control" >
       <bean parent="TextControlDefinition"
-            p:size="60" />
+            p:size="100" />
     </property>
     <property name="summary" value="Organization Name" />
     <property name="description" value="Organization Name" />

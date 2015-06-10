@@ -79,7 +79,7 @@
     <property name="forceUppercase" value="false" />
     <property name="label" value="Location Name" />
     <property name="shortLabel" value="Location" />
-    <property name="maxLength" value="60" />
+    <property name="maxLength" value="200" />
     <property name="validationPattern" >
       <bean parent="AnyCharacterValidationPattern"
             p:allowWhitespace="true" />
@@ -87,7 +87,7 @@
     <property name="required" value="false" />
     <property name="control" >
       <bean parent="TextControlDefinition"
-            p:size="60" />
+            p:size="100" />
     </property>
     <property name="summary" value="Location Name" />
     <property name="description" value="The name to display for the Proposal Site; may differ from the name in the rolodex" />
