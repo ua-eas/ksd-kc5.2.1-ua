@@ -463,6 +463,13 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
+                <xs:element minOccurs="0" name="Questionnaires">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" ref="QuestionnaireQuestions" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
                 <xs:element minOccurs="0" name="Attachments">
                     <xs:complexType>
                         <xs:sequence>
@@ -980,6 +987,16 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="QuestionnaireQuestions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="xs:string"  minOccurs="0" name="QuestionID" />
+                <xs:element type="xs:string"  minOccurs="0" name="Question" />
+                <xs:element type="xs:string"  minOccurs="0" name="QuestionnaireAnswerID" />
+                <xs:element type="xs:string"  minOccurs="0" name="Answer" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
