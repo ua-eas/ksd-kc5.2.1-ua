@@ -1,14 +1,20 @@
 package edu.arizona.kra.irb.actions.print;
 
+import java.math.BigInteger;
+import java.util.List;
+
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.actions.print.ProtocolXmlStream;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
+import org.kuali.kra.questionnaire.answer.Answer;
+import org.kuali.kra.questionnaire.answer.AnswerHeader;
+import org.kuali.kra.questionnaire.answer.QuestionnaireAnswerService;
 
 import edu.mit.irb.irbnamespace.AttachmentProtocolDocument.AttachmentProtocol;
 import edu.mit.irb.irbnamespace.ProtocolDocument.Protocol;
 import edu.mit.irb.irbnamespace.ProtocolDocument.Protocol.Attachments;
-
-import java.math.BigInteger;
-import java.util.List;
+import edu.mit.irb.irbnamespace.ProtocolDocument.Protocol.Questionnaires;
+import edu.mit.irb.irbnamespace.QuestionnaireQuestionsDocument.QuestionnaireQuestions;
 
 public class CustomProtocolXmlStream extends ProtocolXmlStream {
 
@@ -33,6 +39,8 @@ public class CustomProtocolXmlStream extends ProtocolXmlStream {
 		
 		addAttachments(protocolInfoBean, protocolType);
 		
+		addQuestionnaires( protocolInfoBean, protocolType );
+
 		return protocolType;
 	}
 	
@@ -64,4 +72,33 @@ public class CustomProtocolXmlStream extends ProtocolXmlStream {
     		}
     	}
     }
+
+	protected void addQuestionnaires( org.kuali.kra.irb.Protocol protocol, Protocol protocolType ) {
+		QuestionnaireAnswerService qas = KraServiceLocator.getService( QuestionnaireAnswerService.class );
+		List<AnswerHeader> questionnaireAnswerHeaders = qas.getAnswerHeadersForProtocol( protocol.getProtocolNumber() );
+		for ( AnswerHeader questionnaireAnswerHeader : questionnaireAnswerHeaders ) {
+			Questionnaires questionnairesType = protocolType.addNewQuestionnaires();
+			for ( Answer questionnaireAnswer : questionnaireAnswerHeader.getAnswers() ) {
+				QuestionnaireQuestions questionnaireQuestionsType = questionnairesType.addNewQuestionnaireQuestions();
+				String questionID = questionnaireAnswer.getQuestion().getQuestionId();
+				String question = questionnaireAnswer.getQuestion().getQuestion();
+				String questionnaireAnswerID = questionnaireAnswer.getId().toString();
+				String answer = questionnaireAnswer.getAnswer();
+				if ( questionID != null ) {
+					questionnaireQuestionsType.setQuestionID( questionID );
+				}
+				if ( question != null ) {
+					questionnaireQuestionsType.setQuestion( question );
+				}
+				if ( questionnaireAnswerID != null ) {
+					questionnaireQuestionsType.setQuestionnaireAnswerID( questionnaireAnswerID );
+				}
+				if ( answer != null ) {
+					questionnaireQuestionsType.setAnswer( answer );
+				}
+			}
+		}
+
+	}
+
 }
