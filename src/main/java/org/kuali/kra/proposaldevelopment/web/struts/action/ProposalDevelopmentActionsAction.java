@@ -134,6 +134,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	private static final String ROUTING_WARNING_MESSAGE = "Validation Warning Exists.Are you sure want to submit to workflow routing.";
 	private static final String PROPOSAL_APPROVER_VIEW_URL = "proposalDevelopmentApproverView";
 
+	private static final String HIERARCHY_REQUEST_NODE = "Hierarchy Request";
 
 
 	private enum SuperUserAction {
@@ -316,21 +317,29 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	}
 
 	private boolean canGenerateMultipleApprovalRequests( RoutingReportCriteria reportCriteria, String loggedInPrincipalId, String currentRouteNodeNames ) throws Exception {
-		int approvalRequestsCount = 0;
 		WorkflowDocumentActionsService info = GlobalResourceLoader.getService( "rice.kew.workflowDocumentActionsService" );
 
 		DocumentDetail results1 = info.executeSimulation( reportCriteria );
 		for ( ActionRequest actionRequest : results1.getActionRequests() ) {
-			// !actionRequest.isRoleRequest() && removed from condition for
-			if ( actionRequest.isPending() && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) &&
-					recipientMatchesUser( actionRequest, loggedInPrincipalId ) && !StringUtils.contains( currentRouteNodeNames, actionRequest.getNodeName() ) ) {
-				approvalRequestsCount += 1;
+			if ( actionRequest.isPending() 
+			        && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) 
+			        && recipientMatchesUser( actionRequest, loggedInPrincipalId ) 
+			        && ( isHierarchyRequestNode(actionRequest.getNodeName()) || !isNodeInCurrentRoute(actionRequest.getNodeName(),currentRouteNodeNames) ) ) {
+				return true;
 			}
 		}
 
-		return ( approvalRequestsCount > 0 );
+		return false;
 	}
+	
+	private boolean isHierarchyRequestNode(String nodeName){     
+        return HIERARCHY_REQUEST_NODE.equals(nodeName);
+    }
 
+	private boolean isNodeInCurrentRoute(String nodeName, String currentRouteNodeNames){     
+        return StringUtils.contains( currentRouteNodeNames, nodeName);
+	}
+	
 	private boolean recipientMatchesUser( ActionRequest actionRequest, String loggedInPrincipalId ) {
 		if ( actionRequest != null && loggedInPrincipalId != null ) {
 			List<ActionRequest> actionRequests = Collections.singletonList( actionRequest );
