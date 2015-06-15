@@ -15,6 +15,20 @@
  */
 package org.kuali.kra.budget.web.struts.action;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
+import static org.kuali.kra.infrastructure.KraServiceLocator.getService;
+import static org.kuali.kra.logging.BufferedLogger.debug;
+import static org.kuali.kra.logging.BufferedLogger.info;
+import static org.kuali.rice.krad.util.KRADConstants.QUESTION_CLICKED_BUTTON;
+import static org.kuali.rice.krad.util.KRADConstants.QUESTION_INST_ATTRIBUTE_NAME;
+
+import java.util.Collection;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
@@ -50,22 +64,10 @@ import org.kuali.rice.kns.authorization.AuthorizationConstants;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.List;
-
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
-import static org.kuali.kra.infrastructure.KraServiceLocator.getService;
-import static org.kuali.kra.logging.BufferedLogger.debug;
-import static org.kuali.kra.logging.BufferedLogger.info;
-import static org.kuali.rice.krad.util.KRADConstants.QUESTION_CLICKED_BUTTON;
-import static org.kuali.rice.krad.util.KRADConstants.QUESTION_INST_ATTRIBUTE_NAME;
-
 /**
  * Struts Action class for requests from the Budget Versions page.
  */
+@SuppressWarnings( { "unchecked", "deprecation", "unused", "rawtypes" } )
 public class BudgetVersionsAction extends BudgetAction {
     private static final String TOGGLE_TAB = "toggleTab";
     private static final String CONFIRM_SYNCH_BUDGET_RATE_BUDGET_DOCUMENT = "confirmSynchBudgetRateForBudgetDocument";
@@ -349,6 +351,7 @@ public class BudgetVersionsAction extends BudgetAction {
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         BudgetForm budgetForm = (BudgetForm) form;
         boolean valid = true;
+        boolean modularValid = true;
         BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
         BudgetParentDocument parentDocument = budgetDocument.getParentDocument();
         Budget budget = budgetDocument.getBudget();
@@ -359,22 +362,25 @@ public class BudgetVersionsAction extends BudgetAction {
         
        try {
                 valid &=getBudgetService().validateBudgetAuditRuleBeforeSaveBudgetVersion(parentDocument);
+                modularValid &= getBudgetService().checkModularBudgetBeforeSave( parentDocument );
         }
         catch (Exception ex) {
                 info("Audit rule check failed ", ex.getStackTrace());
             }
-            if (!valid) {
+            if ( !valid || !modularValid ) {
                 // set up error message to go to validate panel
                 
                 Integer budgetVersionNumber = budgetForm.getFinalBudgetVersion();
                 // ask form for final version number... if it is null, ask current budget document its version number
                 if (budgetVersionNumber == null || budgetVersionNumber.intValue() == -1) {
                     budgetVersionNumber = budget.getBudgetVersionNumber();
-                } 
+                }
+                if ( !valid ) {
                 GlobalVariables
                     .getMessageMap()
                         .putError("document.parentDocument.budgetDocumentVersion["+(budgetVersionNumber.intValue() - 1)+"].budgetVersionOverview.budgetStatus",
                                     KeyConstants.CLEAR_AUDIT_ERRORS_BEFORE_CHANGE_STATUS_TO_COMPLETE);
+                }
             } 
         if (budgetForm.isSaveAfterCopy()) {
             List<BudgetDocumentVersion> overviews = parentDocument.getBudgetDocumentVersions();

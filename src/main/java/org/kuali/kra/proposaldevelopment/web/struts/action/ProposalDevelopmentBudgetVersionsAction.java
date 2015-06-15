@@ -15,6 +15,13 @@
  */
 package org.kuali.kra.proposaldevelopment.web.struts.action;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
@@ -27,6 +34,7 @@ import org.kuali.kra.budget.document.BudgetParentDocument;
 import org.kuali.kra.budget.parameters.BudgetPeriod;
 import org.kuali.kra.budget.rates.BudgetRate;
 import org.kuali.kra.budget.rates.BudgetRatesService;
+import org.kuali.kra.budget.rates.RateClass;
 import org.kuali.kra.budget.versions.BudgetDocumentVersion;
 import org.kuali.kra.budget.versions.BudgetVersionOverview;
 import org.kuali.kra.budget.web.struts.action.BudgetTDCValidator;
@@ -47,15 +55,10 @@ import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 /**
  * Struts Action class for the Proposal Development Budget Versions page
  */
+@SuppressWarnings( { "unchecked", "deprecation", "unused", "rawtypes" } )
 public class ProposalDevelopmentBudgetVersionsAction extends ProposalDevelopmentAction {
     private static final String TOGGLE_TAB = "toggleTab";
     private static final String CONFIRM_SYNCH_BUDGET_RATE = "confirmSynchBudgetRate";
@@ -107,7 +110,6 @@ public class ProposalDevelopmentBudgetVersionsAction extends ProposalDevelopment
         return mapping.findForward(Constants.MAPPING_BASIC); 
     }
     
-    @SuppressWarnings("unchecked")
     private BudgetService getBudgetService() {
         return KraServiceLocator.getService(BudgetService.class);
     }
@@ -260,6 +262,7 @@ public class ProposalDevelopmentBudgetVersionsAction extends ProposalDevelopment
         ProposalDevelopmentDocument pdDoc = pdForm.getProposalDevelopmentDocument();
         // check audit rules. If there is error, then budget can't have complete status
         boolean valid = true;
+        boolean modularValid = true;
 
         if (!(new ProposalHierarcyActionHelper()).checkParentChildStatusMatch(pdDoc)) {
             return mapping.findForward(Constants.MAPPING_BASIC);
@@ -280,14 +283,23 @@ public class ProposalDevelopmentBudgetVersionsAction extends ProposalDevelopment
         // if(pdForm.isAuditActivated()) {
         // A Budget cannot be marked 'Complete' if there are outstanding Audit Errors
         valid &= getBudgetService().validateBudgetAuditRuleBeforeSaveBudgetVersion(pdForm.getProposalDevelopmentDocument());
+        modularValid &= getBudgetService().checkModularBudgetBeforeSave(pdForm.getProposalDevelopmentDocument());
 
-        if (!valid) {
+        if (!valid || !modularValid) {
             // set up error message to go to validate panel
             final int errorBudgetVersion = this.getTentativeFinalBudgetVersion(pdForm);
             if (errorBudgetVersion != -1) {
+                if ( !valid ) {
                 GlobalVariables.getMessageMap().putError(
                         "document.budgetDocumentVersion[" + (errorBudgetVersion - 1) + "].budgetVersionOverview.budgetStatus",
                         KeyConstants.CLEAR_AUDIT_ERRORS_BEFORE_CHANGE_STATUS_TO_COMPLETE);
+                }
+                if ( !modularValid ) {
+                GlobalVariables.getMessageMap().putError(
+                        "document.budgetDocumentVersion[" + (errorBudgetVersion - 1) + "].budgetVersionOverview.budgetStatus",
+                        KeyConstants.CLEAR_MODULAR_ERROR_BEFORE_FINALIZE );
+                }
+
                 for (BudgetDocumentVersion budgetDocumentVersion: pdDoc.getBudgetDocumentVersions()) {
                     BudgetVersionOverview budgetVersion =  budgetDocumentVersion.getBudgetVersionOverview();
 

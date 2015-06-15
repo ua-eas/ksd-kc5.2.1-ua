@@ -15,6 +15,9 @@
  */
 package org.kuali.kra.budget.core;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.kuali.kra.budget.BudgetDecimal;
 import org.kuali.kra.budget.document.BudgetDocument;
 import org.kuali.kra.budget.document.BudgetParentDocument;
@@ -27,9 +30,6 @@ import org.kuali.kra.budget.versions.BudgetVersionOverview;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.s2s.generator.bo.KeyPersonInfo;
 import org.kuali.rice.kew.api.exception.WorkflowException;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Budget Service interface
@@ -165,5 +165,7 @@ public interface BudgetService<T extends BudgetParent>  {
     public BudgetDecimal getBaseSalaryByPeriod(Long budgetId, int budgetPeriod, KeyPersonInfo keyPerson );
     
     public void populateNewBudgetLineItem(BudgetLineItem newBudgetLineItem, BudgetPeriod budgetPeriod);
+
+    public boolean checkModularBudgetBeforeSave(BudgetParentDocument<T> parentDoc) throws Exception;
 
 }

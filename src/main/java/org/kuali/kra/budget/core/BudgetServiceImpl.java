@@ -15,6 +15,20 @@
  */
 package org.kuali.kra.budget.core;
 
+import static org.kuali.kra.logging.BufferedLogger.debug;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +53,11 @@ import org.kuali.kra.budget.rates.BudgetRate;
 import org.kuali.kra.budget.rates.BudgetRatesService;
 import org.kuali.kra.budget.rates.ValidCeRateType;
 import org.kuali.kra.budget.summary.BudgetSummaryService;
-import org.kuali.kra.budget.versions.*;
+import org.kuali.kra.budget.versions.AddBudgetVersionEvent;
+import org.kuali.kra.budget.versions.AddBudgetVersionRule;
+import org.kuali.kra.budget.versions.BudgetDocumentVersion;
+import org.kuali.kra.budget.versions.BudgetVersionOverview;
+import org.kuali.kra.budget.versions.BudgetVersionRule;
 import org.kuali.kra.budget.web.struts.form.BudgetForm;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
@@ -47,6 +65,7 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwardPeriodDetail;
 import org.kuali.kra.proposaldevelopment.budget.modular.BudgetModular;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
+import org.kuali.kra.proposaldevelopment.rules.BudgetModularTotalDirectCostRule;
 import org.kuali.kra.s2s.generator.bo.KeyPersonInfo;
 import org.kuali.kra.service.DeepCopyPostProcessor;
 import org.kuali.kra.service.FiscalYearMonthService;
@@ -68,15 +87,10 @@ import org.kuali.rice.krad.service.PessimisticLockService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
-
-import static org.kuali.kra.logging.BufferedLogger.debug;
-
 /**
  * This class implements methods specified by BudgetDocumentService interface
  */
+@SuppressWarnings( { "unchecked", "deprecation", "rawtypes" } )
 public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<T> {
     
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(BudgetServiceImpl.class);
@@ -225,7 +239,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
      * set its value to the new proposal number.
      * @param object the object
      */
-    @SuppressWarnings("unchecked")
     protected void fixProperty(Object object, String methodName, Class clazz, Object propertyValue, Map<String, Object> objectMap){
         if(ObjectUtils.isNotNull(object)) {
             if (object instanceof PersistableBusinessObject) {
@@ -295,7 +308,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
         return false;
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public Collection<BudgetRate> getSavedBudgetRates(Budget budget) {
         Map<String,Long> qMap = new HashMap<String, Long>();
@@ -310,7 +322,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
         return rates;
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public boolean checkActivityTypeChange(Collection<BudgetRate> allPropRates, String activityTypeCode) {
         if (CollectionUtils.isNotEmpty(allPropRates)) {
@@ -354,7 +365,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public String getActivityTypeForBudget(BudgetDocument<T> budgetDocument) {
         Budget budget = budgetDocument.getBudget();
@@ -388,7 +398,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
 
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<ValidCeJobCode> getApplicableCostElements(Long budgetId, String personSequenceNumber) {
         List<ValidCeJobCode> validCostElements = null;
@@ -412,7 +421,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
         return validCostElements;
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public String getApplicableCostElementsForAjaxCall(Long budgetId,String personSequenceNumber, 
             String budgetCategoryTypeCode) {
@@ -484,7 +492,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Collection<BudgetRate> getSavedProposalRates(BudgetVersionOverview budgetToOpen) {
         Map<String,Long> qMap = new HashMap<String,Long>();
@@ -493,7 +500,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean validateBudgetAuditRule(BudgetParentDocument<T> parentDocument) throws Exception {
         boolean valid = true;
@@ -565,7 +571,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
         return valid;
     }
 
-    @SuppressWarnings("unchecked")
     protected boolean applyAuditRuleForBudgetDocument(BudgetVersionOverview budgetVersion) throws Exception {
         DocumentService documentService = KraServiceLocator.getService(DocumentService.class);
         BudgetDocument<T> budgetDocument = (BudgetDocument<T>) documentService.getByDocumentHeaderId(budgetVersion.getDocumentNumber());
@@ -579,7 +584,6 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
      * @throws IllegalAccessException 
      * @throws FormatException
      */
-    @SuppressWarnings("unchecked")
     @Override
     public BudgetDocument copyBudgetVersion(BudgetDocument budgetDocument, boolean onlyOnePeriod) throws WorkflowException {
         String parentDocumentNumber = budgetDocument.getParentDocument().getDocumentNumber();
@@ -921,6 +925,15 @@ public class BudgetServiceImpl<T extends BudgetParent> implements BudgetService<
 
     protected ParameterService getParameterService() {
         return parameterService;
+    }
+
+    @Override
+    public boolean checkModularBudgetBeforeSave( BudgetParentDocument<T> parentDoc ) throws Exception {
+        boolean valid = true;
+        BudgetModularTotalDirectCostRule tdcRule = new BudgetModularTotalDirectCostRule();
+        final Set<String> warnings = new HashSet<String>();
+        valid &= tdcRule.validateTotalDirectCost( parentDoc, true, warnings );
+        return valid;
     }
 
 }

@@ -1104,6 +1104,8 @@ public final class KeyConstants {
     public static final String S2S_USER_ATTACHED_FORM_NOT_VALID = "error.s2s.userattachedform.invalid";
     public static final String S2S_USER_ATTACHED_FORM_NOT_PDF = "error.s2s.userattachedform.not.pdf";
 
+    public static final String CLEAR_MODULAR_ERROR_BEFORE_FINALIZE = "clear.modular.error.before.finalize";
+
     /**
      * private utility class ctor.
      * @throws UnsupportedOperationException if called.
