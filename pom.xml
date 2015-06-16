@@ -13,7 +13,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <kc.version>5.2.1</kc.version>
-    <rice.version>2.3.6</rice.version>
+    <rice.version>2.3.7</rice.version>
     <servlet.version>2.5</servlet.version>
     <commons-lang.version>2.6</commons-lang.version>
     <spring-context.version>3.2.3.RELEASE</spring-context.version>
