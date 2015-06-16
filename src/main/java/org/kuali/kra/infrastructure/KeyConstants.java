@@ -1111,6 +1111,8 @@ public final class KeyConstants {
     public static final String ERROR_UNIT_ADMIN_TYPE_CODE = "error.unit.admin.type.code.nonexistent";
     public static final String ERROR_UNIT_NUMBER = "error.unit.number.nonexistent";
 
+    public static final String CLEAR_MODULAR_ERROR_BEFORE_FINALIZE = "clear.modular.error.before.finalize";
+
     /**
      * private utility class ctor.
      * @throws UnsupportedOperationException if called.
