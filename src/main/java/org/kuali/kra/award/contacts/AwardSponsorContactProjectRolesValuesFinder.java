@@ -17,7 +17,12 @@ package org.kuali.kra.award.contacts;
 
 import org.kuali.kra.award.home.ContactRole;
 import org.kuali.kra.award.home.ContactType;
+import org.kuali.kra.award.home.ContactUsage;
+import org.kuali.rice.core.api.util.ConcreteKeyValue;
+import org.kuali.rice.core.api.util.KeyValue;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,5 +43,23 @@ public class AwardSponsorContactProjectRolesValuesFinder extends AwardContactsPr
     @Override
     protected Class<? extends ContactRole> getRoleType() {
         return ContactType.class;
+    }
+    
+    @Override
+    protected List<KeyValue> buildKeyValues(Collection<? extends ContactRole> contactRoles) {
+    	
+    	Collection<ContactUsage> contactUsageList = getKeyValuesService().findAll(ContactUsage.class);
+    	
+        List<KeyValue> keyValues = new ArrayList<KeyValue>();
+        addEmptyKeyValuePair(keyValues);
+        for (ContactRole role : contactRoles) {
+        	for (ContactUsage contactUsage : contactUsageList) {
+        		if(contactUsage.getContactTypeCode().equalsIgnoreCase(role.getRoleCode())) {
+        			keyValues.add(new ConcreteKeyValue(role.getRoleCode(), role.getRoleDescription()));
+        			break;
+        		}
+        	}
+        }
+        return keyValues;
     }
 }
