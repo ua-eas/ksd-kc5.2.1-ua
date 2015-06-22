@@ -41,6 +41,7 @@ import org.kuali.kra.printing.Printable;
 import org.kuali.kra.printing.print.AbstractPrint;
 import org.kuali.kra.printing.service.PrintingService;
 import org.kuali.kra.proposaldevelopment.bo.*;
+import org.kuali.kra.proposaldevelopment.budget.bo.BudgetColumnsToAlter;
 import org.kuali.kra.proposaldevelopment.budget.bo.ProposalDevelopmentBudgetExt;
 import org.kuali.kra.proposaldevelopment.budget.service.BudgetPrintService;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
@@ -319,6 +320,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 		if ( KNSGlobalVariables.getAuditErrorMap().isEmpty() )
 			new AuditActionHelper().auditConditionally( proposalDevelopmentForm );
 		proposalDevelopmentForm.setProposalDataOverrideMethodToCalls( this.constructColumnsToAlterLookupMTCs( proposalDevelopmentForm.getProposalDevelopmentDocument().getDevelopmentProposal().getProposalNumber() ) );
+		proposalDevelopmentForm.setBudgetDataOverrideMethodToCalls(this.constructBudgetColumnsToAlterLookupMTCs(proposalDevelopmentForm.getProposalDevelopmentDocument().getDevelopmentProposal().getProposalNumber()));
 		// if (proposalDevelopmentForm.isAuditActivated()) {
 		// if (document != null &&
 		// document.getDevelopmentProposal().getS2sOpportunity() != null ) {
@@ -1054,6 +1056,36 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 				String displayAttributeName = pcta.getLookupReturn();
 				String displayLookupReturnValue = proposalDevelopmentService.getDataOverrideLookupDisplayReturnValue( pcta.getLookupClass() );
 				mtcReturn.add( "methodToCall.performLookup.(!!" + pcta.getLookupClass() + "!!).(((" + displayLookupReturnValue + ":newProposalChangedData.changedValue," + displayAttributeName + ":newProposalChangedData.displayValue))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).anchorProposalDataOverride" );
+			}
+		}
+		return mtcReturn;
+	}
+	
+	/**
+	 * This method produces a list of strings containing the methodToCall to be registered for each of the
+	 * BudgetColumnsToAlter lookup buttons that can be rendered on the Budget Data Override tab. The execute method
+	 * in this class puts this list into the form. The Budget Data Override tag file then calls
+	 * registerEditableProperty on each when rendering the tab.
+	 * 
+	 * @param proposalNumber
+	 *            The proposal number for which we are generating the list for.
+	 * @return Possible editable properties that can be called from the page.
+	 */
+	public List<String> constructBudgetColumnsToAlterLookupMTCs( String proposalNumber ) {
+		Map<String, Object> filterMap = new HashMap<String, Object>();
+		ProposalDevelopmentService proposalDevelopmentService = KraServiceLocator.getService( ProposalDevelopmentService.class );
+		Collection<BudgetColumnsToAlter> budgetColumnsToAlterCollection = ( KraServiceLocator.getService( BusinessObjectService.class ).findMatching( BudgetColumnsToAlter.class, filterMap ) );
+
+		List<String> mtcReturn = new ArrayList<String>();
+
+		for ( BudgetColumnsToAlter bcta : budgetColumnsToAlterCollection ) {
+			if ( bcta.getHasLookup() ) {
+				Map<String, Object> primaryKeys = new HashMap<String, Object>();
+				primaryKeys.put( "columnName", bcta.getColumnName() );
+				Object fieldValue = proposalDevelopmentService.getBudgetFieldValueFromDBColumnName( proposalNumber, bcta.getColumnName());
+				String displayAttributeName = bcta.getLookupReturn();
+				String displayLookupReturnValue = proposalDevelopmentService.getDataOverrideLookupDisplayReturnValue( bcta.getLookupClass() );
+				mtcReturn.add( "methodToCall.performLookup.(!!" + bcta.getLookupClass() + "!!).(((" + displayLookupReturnValue + ":newBudgetChangedData.changedValue," + displayAttributeName + ":newBudgetChangedData.displayValue))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).anchorBudgetDataOverride" );
 			}
 		}
 		return mtcReturn;
