@@ -22,6 +22,7 @@
 <%@ attribute name="printLineIndex" required="true" %>
 <%@ attribute name="answerable" required="false" %>
 
+    <c:set var="questReadOnly" value="${readOnly}"/>
 	    <c:if test="${bean.answerHeaders[answerHeaderIndex].newerVersionPublished and not questReadOnly}">
             <kra-questionnaire:updateQuestionnaireAnswer  answerHeaderIndex="${answerHeaderIndex}" bean = "${bean}" property = "${property}"/>        
         </c:if>
