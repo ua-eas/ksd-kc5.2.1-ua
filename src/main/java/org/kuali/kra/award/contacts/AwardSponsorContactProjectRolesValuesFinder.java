@@ -18,12 +18,17 @@ package org.kuali.kra.award.contacts;
 import org.kuali.kra.award.home.ContactRole;
 import org.kuali.kra.award.home.ContactType;
 import org.kuali.kra.award.home.ContactUsage;
+import org.kuali.kra.bo.CoeusModule;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
 import org.kuali.rice.core.api.util.KeyValue;
+import org.kuali.rice.krad.service.BusinessObjectService;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class finds Award Unit Contact Project Roles.
@@ -48,7 +53,13 @@ public class AwardSponsorContactProjectRolesValuesFinder extends AwardContactsPr
     @Override
     protected List<KeyValue> buildKeyValues(Collection<? extends ContactRole> contactRoles) {
     	
-    	Collection<ContactUsage> contactUsageList = getKeyValuesService().findAll(ContactUsage.class);
+    	 //first find the contact usage objects associated with the award module
+        BusinessObjectService boService = KraServiceLocator.getService(BusinessObjectService.class);
+        Map<String, String> criteriaMap = new HashMap<String, String>();
+        criteriaMap.put("moduleCode", CoeusModule.AWARD_MODULE_CODE);
+        
+        Collection<ContactUsage> contactUsageList = (List<ContactUsage>) boService.findMatching( ContactUsage.class, criteriaMap);
+    	
     	
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
         addEmptyKeyValuePair(keyValues);
