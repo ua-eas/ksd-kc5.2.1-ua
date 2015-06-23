@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="UAR-1444" author="Adam Kost">
+		<comment>
+			Increasing the max length of Organization Name for Subaward, Award, and Proposal Development Budget Subawards from 60 to 200 characters.
+		</comment>
+		<sql>
+			ALTER TABLE BUDGET_SUB_AWARDS MODIFY (ORGANIZATION_NAME VARCHAR2(200 BYTE));
+			ALTER TABLE AWARD_APPROVED_SUBAWARDS MODIFY (ORGANIZATION_NAME VARCHAR2(200 BYTE));
+			ALTER TABLE EPS_PROP_SITES MODIFY (LOCATION_NAME VARCHAR2(200 BYTE));
+		</sql>
+		<rollback>
+			ALTER TABLE BUDGET_SUB_AWARDS MODIFY (ORGANIZATION_NAME VARCHAR2(60 BYTE));
+			ALTER TABLE AWARD_APPROVED_SUBAWARDS MODIFY (ORGANIZATION_NAME VARCHAR2(60 BYTE));
+			ALTER TABLE EPS_PROP_SITES MODIFY (LOCATION_NAME VARCHAR2(60 BYTE));
+		</rollback>
+	</changeSet>
+</databaseChangeLog> 
