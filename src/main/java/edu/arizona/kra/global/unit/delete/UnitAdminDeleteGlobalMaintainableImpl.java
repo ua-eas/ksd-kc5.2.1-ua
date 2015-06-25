@@ -2,8 +2,11 @@ package edu.arizona.kra.global.unit.delete;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.kuali.kra.bo.UnitAdministrator;
+import org.kuali.rice.kim.api.KimConstants;
+import org.kuali.rice.kns.document.MaintenanceDocument;
 import org.kuali.rice.kns.maintenance.KualiGlobalMaintainableImpl;
 import org.kuali.rice.krad.bo.GlobalBusinessObjectDetail;
 import org.kuali.rice.krad.bo.PersistableBusinessObject;
@@ -21,6 +24,22 @@ import edu.arizona.kra.global.unit.UnitAdministratorPrimaryKey;
 public class UnitAdminDeleteGlobalMaintainableImpl extends KualiGlobalMaintainableImpl {
 	private static final long serialVersionUID = -5289542451038756040L;
 	
+	private static final String KIM_PERSON_LOOKUPABLE_REFRESH_CALLER = "kimPersonLookupable";
+	
+	@SuppressWarnings( { "rawtypes", "unchecked" } )
+	@Override
+    public void refresh(String refreshCaller, Map fieldValues, MaintenanceDocument document) {
+        super.refresh(refreshCaller, fieldValues, document);
+        if (KIM_PERSON_LOOKUPABLE_REFRESH_CALLER.equals(refreshCaller)) {
+        	String principalId = (String) fieldValues.get(KimConstants.PrimaryKeyConstants.PRINCIPAL_ID);
+
+            UnitAdministratorGlobalDetail unitAdministratorGlobalDetail = new UnitAdministratorGlobalDetail();
+            unitAdministratorGlobalDetail.setPersonId(principalId);
+
+    		fieldValues.put("unitAdministratorGlobalDetails.personId" , unitAdministratorGlobalDetail.getPersonId());
+    		document.getNewMaintainableObject().populateNewCollectionLines(fieldValues, document, (String) fieldValues.get("methodToCall"));
+        }
+    }
 	
 	/**
 	 * Build a lock key of the form:
