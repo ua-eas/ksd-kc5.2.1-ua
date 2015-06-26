@@ -743,6 +743,7 @@ public class BudgetParametersAction extends BudgetAction {
         BudgetForm budgetForm = (BudgetForm)form;
         if (budgetForm.getLookupResultsBOClassName() != null && budgetForm.getLookupResultsSequenceNumber() != null) {
             String lookupResultsSequenceNumber = budgetForm.getLookupResultsSequenceNumber();
+            
             Class<BusinessObject> lookupResultsBOClass = (Class<BusinessObject>) Class.forName(budgetForm.getLookupResultsBOClassName());
             
             Collection<BusinessObject> rawValues = KraServiceLocator.getService(LookupResultsService.class)

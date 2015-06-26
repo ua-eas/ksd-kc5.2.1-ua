@@ -248,6 +248,9 @@ public class SubAwardAction extends KraTransactionalDocumentActionBase{
         if (new SubAwardDocumentRule().processAddSubAwardBusinessRules(subAward) && new SubAwardDocumentRule().processAddSubAwardTemplateInfoBusinessRules(subAward)) {
             ActionForward forward = super.save(mapping, form, request, response);
             getSubAwardService().updateSubAwardSequenceStatus(subAward, VersionStatus.PENDING);
+	    if (subAwardForm.isAuditActivated()) {
+            	forward = mapping.findForward(Constants.MAPPING_SUBAWARD_ACTION_PAGE);
+    	    }
             return forward;
         } else {
             return mapping.findForward(Constants.MAPPING_BASIC);
