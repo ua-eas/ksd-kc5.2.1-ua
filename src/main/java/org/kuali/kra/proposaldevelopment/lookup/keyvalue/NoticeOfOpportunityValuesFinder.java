@@ -40,7 +40,7 @@ public class NoticeOfOpportunityValuesFinder extends UifKeyValuesFinderBase {
     @Override
     public List<KeyValue> getKeyValues() {
         KeyValuesService keyValuesService = (KeyValuesService) KraServiceLocator.getService("keyValuesService");
-        Collection noticesOfOpportunity = keyValuesService.findAll(NoticeOfOpportunity.class);
+        Collection noticesOfOpportunity = keyValuesService.findAllOrderBy(NoticeOfOpportunity.class, "description", true);
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
         keyValues.add(new ConcreteKeyValue("", "select"));
         for (Iterator iter = noticesOfOpportunity.iterator(); iter.hasNext();) {
