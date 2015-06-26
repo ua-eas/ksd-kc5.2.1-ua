@@ -33,6 +33,7 @@ import org.kuali.kra.rules.ResearchDocumentRuleBase;
 import org.kuali.kra.service.KcAttachmentService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
 
 import java.util.HashMap;
@@ -66,6 +67,8 @@ public class ProposalDevelopmentPersonnelAttachmentRule extends ResearchDocument
         ProposalPersonBiography proposalPersonBiography = addPersonnelAttachmentEvent.getProposalPersonBiography();
         boolean rulePassed = true;
 
+        if (GlobalVariables.getMessageMap().getPropertiesWithErrors().size() > 0) rulePassed = false;
+        
         if(StringUtils.isBlank(proposalPersonBiography.getDocumentTypeCode())){
             rulePassed = false;
             reportError(buildErrorPath(DOCUMENT_TYPE_CODE), ERROR_ATTACHMENT_TYPE_NOT_SELECTED);

@@ -38,6 +38,8 @@ public class NegotiationActivityAttachmentRuleImpl implements NegotiationActivit
     public boolean processAddAttachmentRule(NegotiationActivityAttachmentAddRuleEvent event) {
         boolean result = true;
         
+        if (GlobalVariables.getMessageMap().getPropertiesWithErrors().size() > 0) result = false;
+        
         NegotiationDocument document = (NegotiationDocument) event.getDocument();
         Negotiation negotiation = document.getNegotiation();
         NegotiationActivity activity = event.getActivity();

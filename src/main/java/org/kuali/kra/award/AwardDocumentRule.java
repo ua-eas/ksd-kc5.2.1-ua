@@ -1,8 +1,3 @@
-package org.kuali.kra.award;
-
-public class AwardDocumentRule {
-
-}
 /*
  * Copyright 2005-2014 The Kuali Foundation
  *
@@ -778,6 +773,8 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
      */
     public boolean processsAddAttachmentRule(AddAwardAttachmentEvent event) {
         boolean valid = true;
+        
+        if (GlobalVariables.getMessageMap().getPropertiesWithErrors().size() > 0) valid = false;
         
         if( StringUtils.isBlank(event.getAwardAttachment().getTypeCode() )) {
             valid = false;
