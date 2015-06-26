@@ -44,6 +44,9 @@ public abstract class MeetingFormBase extends KualiForm {
         initialize();
     }
 
+	private static String MEETINGHELPER_COMMITTEESCHEDULE_ID = "meetingHelper.committeeSchedule.id";
+	private static String ERROR_SCHEDULE_MULTIPLETABS = "error.schedule.multipleTabs";
+
     /**
      * This method initialize all form variables
      */
@@ -98,21 +101,33 @@ public abstract class MeetingFormBase extends KualiForm {
      */
     @Override
     public void populate(HttpServletRequest request) {
-        checkAnotherSessionScheduleEdited(request);
-        super.populate(request);
-        populateFalseCheckboxes(request);
+		boolean anotherScheduleOpen = isAnotherScheduleOpen( request );
+		if ( !anotherScheduleOpen ) {
+			super.populate( request );
+			populateFalseCheckboxes( request );
+		}
     }
 
-	private void checkAnotherSessionScheduleEdited( HttpServletRequest request )
-	{
-		if ( this.getMeetingHelper() != null && this.getMeetingHelper().getCommitteeSchedule() != null && this.getMeetingHelper().getCommitteeSchedule().getId() != null ) {
-			String sessionScheduleId = Long.toString( this.getMeetingHelper().getCommitteeSchedule().getId() );
-			String requestScheduleId = request.getParameter( "meetingHelper.committeeSchedule.id" );
-			if ( requestScheduleId != null && !sessionScheduleId.equals( requestScheduleId ) ) {
-				GlobalVariables.getMessageMap().putError( "meetingHelper.committeeSchedule.id", "error.schedule.multipleTabs", "" );
-				setReadOnly( true );
-			}
+	protected boolean isAnotherScheduleOpen( HttpServletRequest request ) {
+		if ( this.getMeetingHelper() == null ) {
+			return false;
 		}
+		if ( this.getMeetingHelper().getCommitteeSchedule() == null ) {
+			return false;
+		}
+		if ( this.getMeetingHelper().getCommitteeSchedule().getId() == null ) {
+			return false;
+		}
+		String sessionScheduleId = Long.toString( this.getMeetingHelper().getCommitteeSchedule().getId() );
+		String requestScheduleId = request.getParameter( MEETINGHELPER_COMMITTEESCHEDULE_ID );
+		boolean sameId = StringUtils.equals( requestScheduleId, sessionScheduleId );
+
+		if ( sameId ) {
+			return false;
+		}
+		GlobalVariables.getMessageMap().putError( MEETINGHELPER_COMMITTEESCHEDULE_ID, ERROR_SCHEDULE_MULTIPLETABS );
+		setReadOnly( true );
+		return true;
 	}
     
     /**
