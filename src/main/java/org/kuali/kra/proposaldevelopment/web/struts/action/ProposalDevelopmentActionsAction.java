@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.bo.FundingSourceType;
 import org.kuali.kra.bo.SpecialReviewType;
+import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.SponsorFormTemplate;
 import org.kuali.kra.bo.SponsorFormTemplateList;
 import org.kuali.kra.budget.core.Budget;
@@ -73,15 +74,21 @@ import org.kuali.kra.service.KraWorkflowService;
 import org.kuali.kra.web.struts.action.AuditActionHelper;
 import org.kuali.kra.web.struts.action.StrutsConfirmation;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
+import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+import org.kuali.rice.kew.actionitem.ActionItem;
+import org.kuali.rice.kew.actionlist.service.ActionListService;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.api.action.ActionRequest;
 import org.kuali.rice.kew.api.action.RoutingReportCriteria;
 import org.kuali.rice.kew.api.action.WorkflowDocumentActionsService;
 import org.kuali.rice.kew.api.document.DocumentDetail;
+import org.kuali.rice.kew.routeheader.DocumentRouteHeaderValue;
+import org.kuali.rice.kew.routeheader.service.RouteHeaderService;
+import org.kuali.rice.kew.service.KEWServiceLocator;
 import org.kuali.rice.kim.api.group.GroupService;
 import org.kuali.rice.kim.api.permission.PermissionService;
 import org.kuali.rice.kim.api.services.KimApiServiceLocator;
@@ -92,6 +99,7 @@ import org.kuali.rice.kns.util.WebUtils;
 import org.kuali.rice.kns.web.struts.action.AuditModeAction;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
+import org.kuali.rice.krad.bo.DocumentHeader;
 import org.kuali.rice.krad.service.*;
 import org.kuali.rice.krad.util.ErrorMessage;
 import org.kuali.rice.krad.util.GlobalVariables;
@@ -100,6 +108,7 @@ import org.kuali.rice.krad.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -417,6 +426,39 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			ObjectUtils.setObjectProperty( pdDocument.getDevelopmentProposal(), proposalAttributeToPersist, newProposalChangedData.getChangedValue() );
 
 			boService.save( proposalWrapper );
+			
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("sponsorCode", proposalWrapper.getSponsorCode());
+			Sponsor sponsor = boService.findByPrimaryKey(Sponsor.class, map );
+			
+			DevelopmentProposal proposal = pdForm.getProposalDevelopmentDocument().getDevelopmentProposal();
+			
+			String docTitle = String.format("%s; Proposal No: %s; PI: %s; Sponsor: %s; Due Date: %s",
+					proposalWrapper.getTitle() != null ? proposalWrapper.getTitle().substring(0, Math.min(proposalWrapper.getTitle().length(), 19)) : "null",
+					proposal.getProposalNumber(),
+					proposal.getPrincipalInvestigatorName(),
+					sponsor.getSponsorName(),
+					proposalWrapper.getDeadlineDate() != null ? KraServiceLocator.getService(DateTimeService.class).toDateString(proposalWrapper.getDeadlineDate()) : "null"); 
+			
+			ActionListService actionListService =  KEWServiceLocator.getActionListService();
+			Collection<ActionItem> actionItems = actionListService.findByDocumentId(proposalWrapper.getDocumentNumber());
+			
+			for(ActionItem actionItem : actionItems) {
+				actionItem.setDocTitle(docTitle);
+				actionListService.saveActionItem(actionItem);
+			}
+			
+			RouteHeaderService routeHeaderService = KEWServiceLocator.getRouteHeaderService();
+			DocumentRouteHeaderValue documentRouteHeaderValue = routeHeaderService.getRouteHeader(proposalWrapper.getDocumentNumber());
+			documentRouteHeaderValue.setDocTitle(docTitle); 
+			routeHeaderService.saveRouteHeader(documentRouteHeaderValue);
+			
+			DocumentHeaderService documentHeaderService = KRADServiceLocatorWeb.getDocumentHeaderService();
+			DocumentHeader documentHeader = documentHeaderService.getDocumentHeaderById(proposalWrapper.getDocumentNumber());
+			documentHeader.setDocumentDescription(docTitle);
+			documentHeaderService.saveDocumentHeader(documentHeader);
+			
+			
 			pdForm.getProposalDevelopmentDocument().setVersionNumber( proposalWrapper.getVersionNumber() );
 
 			pdForm.setNewProposalChangedData( new ProposalChangedData() );
