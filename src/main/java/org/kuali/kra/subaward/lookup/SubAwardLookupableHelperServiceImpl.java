@@ -18,15 +18,15 @@ package org.kuali.kra.subaward.lookup;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.versioning.VersionHistory;
-import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
 import org.kuali.kra.service.ServiceHelper;
 import org.kuali.kra.service.VersionHistoryService;
@@ -177,26 +177,24 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
       protected List<SubAward> filterForActiveSubAwards(
               Collection<SubAward> collectionByQuery, String awardNumber,
               String subrecipientName, String requisitionerUserName, String statusCode) throws WorkflowException {
-		Map<Integer, Integer> subAwardCodes = new HashMap<Integer, Integer>();
+          Set<String> subAwardCodes = new TreeSet<String>();
           List<Integer> subAwardCodeList = new ArrayList<Integer>();
-		for ( SubAward subAward : collectionByQuery ) {
-			int key = Integer.parseInt( subAward.getSubAwardCode() );
-			if ( subAwardCodes.containsKey( key ) ) {
-				if ( subAward.getSequenceNumber() > subAwardCodes.get( key ) ) {
-					subAwardCodes.put( key, subAward.getSequenceNumber() );
-				}
-			}
-			else
-				subAwardCodes.put( key, subAward.getSequenceNumber() );
-		}
-		for ( Integer subAwardCode : subAwardCodes.keySet() ) {
-			subAwardCodeList.add( subAwardCode );
+          List<String> subAwardCodeSortedList = new ArrayList<String>();
+          for (SubAward subAward: collectionByQuery) {
+              subAwardCodes.add(subAward.getSubAwardCode());
+          }
+          for (String subAwardCode: subAwardCodes) {
+              subAwardCodeList.add(Integer.parseInt(subAwardCode));
           }
           Collections.sort(subAwardCodeList);
+          for (Integer subAward: subAwardCodeList) {
+              subAwardCodeSortedList.add(Integer.toString(subAward));
+          }
           List<SubAward> activeSubAwards = new ArrayList<SubAward>();
-		for ( Integer versionName : subAwardCodeList ) {
-			VersionHistory versionHistory = versionHistoryService.getVersionHistory( SubAward.class, versionName.toString(), subAwardCodes.get( versionName ) );
-			if ( versionHistory != null && VersionStatus.ACTIVE.equals( versionHistory.getStatus() ) ) {
+          for (String versionName: subAwardCodeSortedList) {
+              VersionHistory versionHistory = versionHistoryService.
+              findActiveVersion(SubAward.class, versionName);
+              if (versionHistory != null) {
                   SubAward activeSubAward =
                       (SubAward) versionHistory.getSequenceOwner();
                   if (activeSubAward != null) {
