@@ -52,6 +52,7 @@ import org.kuali.rice.krad.util.KRADConstants;
  * This class is for all meeting actions. A couple of methods, which are for text area update, are copied from
  * KraTransactionalDocumentActionBase.
  */
+@SuppressWarnings( { "rawtypes", "deprecation", "unchecked" } )
 public abstract class MeetingActionBase extends KualiAction {
     private static final String CLOSE_QUESTION = "Would you like to save meeting data before close it ?";
 
@@ -73,6 +74,12 @@ public abstract class MeetingActionBase extends KualiAction {
      */
     public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
+
+		MeetingFormBase meetingForm = (MeetingFormBase) form;
+		boolean anotherScheduleOpen = meetingForm.isAnotherScheduleOpen( request );
+		if ( anotherScheduleOpen ) {
+			return mapping.findForward( Constants.MAPPING_BASIC );
+		}
 
         Map<String, String> fieldValues = new HashMap<String, String>();
         fieldValues.put("id", request.getParameter("scheduleId"));
@@ -158,31 +165,30 @@ public abstract class MeetingActionBase extends KualiAction {
      */
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-
-        CommitteeScheduleBase committeeSchedule = ((MeetingFormBase) form).getMeetingHelper().getCommitteeSchedule();
-        if ( !((MeetingFormBase) form).isReadOnly() && isValidToSave(((MeetingFormBase) form).getMeetingHelper()) ) {
-            ((MeetingFormBase) form).getMeetingHelper().populateAttendancePreSave();
-            getMeetingService().saveMeetingDetails(committeeSchedule, ((MeetingFormBase) form).getMeetingHelper().getDeletedBos());
-            ((MeetingFormBase) form).getMeetingHelper().initDeletedList();
-        }
-        return mapping.findForward(Constants.MAPPING_BASIC);
+		MeetingFormBase meetingForm = (MeetingFormBase) form;
+		CommitteeScheduleBase committeeSchedule = meetingForm.getMeetingHelper().getCommitteeSchedule();
+		if ( isValidToSave( meetingForm, request ) ) {
+			meetingForm.getMeetingHelper().populateAttendancePreSave();
+			getMeetingService().saveMeetingDetails( committeeSchedule, meetingForm.getMeetingHelper().getDeletedBos() );
+			meetingForm.getMeetingHelper().initDeletedList();
+		}
+		return mapping.findForward( Constants.MAPPING_BASIC );
     }
-
 
     /*
      * validate required/format of the properties of bo. also validate business rules.
      */
-    private boolean isValidToSave(MeetingHelperBase meetingHelper) {
-
-        GlobalVariables.getMessageMap().addToErrorPath(COMMITTEE_SCHEDULE_ERROR_PATH);
-        getDictionaryValidationService().validateBusinessObject(meetingHelper.getCommitteeSchedule());
-        GlobalVariables.getMessageMap().removeFromErrorPath(COMMITTEE_SCHEDULE_ERROR_PATH);
-        boolean valid = GlobalVariables.getMessageMap().hasNoErrors();
-        valid &= applyRules(new MeetingSaveEvent(Constants.EMPTY_STRING, getCommitteeDocument(meetingHelper.getCommitteeSchedule()
-                .getParentCommittee().getCommitteeDocument().getDocumentHeader().getDocumentNumber()), meetingHelper, ErrorType.HARDERROR));
-        return valid;
-
-    }
+	private boolean isValidToSave( MeetingFormBase meetingForm, HttpServletRequest request ) {
+		MeetingHelperBase meetingHelper = meetingForm.getMeetingHelper();
+		GlobalVariables.getMessageMap().addToErrorPath( COMMITTEE_SCHEDULE_ERROR_PATH );
+		getDictionaryValidationService().validateBusinessObject( meetingHelper.getCommitteeSchedule() );
+		GlobalVariables.getMessageMap().removeFromErrorPath( COMMITTEE_SCHEDULE_ERROR_PATH );
+		boolean valid = GlobalVariables.getMessageMap().hasNoErrors();
+		valid &= applyRules( new MeetingSaveEvent( Constants.EMPTY_STRING, getCommitteeDocument( meetingHelper.getCommitteeSchedule().getParentCommittee().getCommitteeDocument().getDocumentHeader().getDocumentNumber() ), meetingHelper, ErrorType.HARDERROR ) );
+		valid &= !meetingForm.isReadOnly();
+		valid &= !meetingForm.isAnotherScheduleOpen( request );
+		return valid;
+	}
 
     /*
      * This method is to get committeedocument to apply tule. The committeedocument from committeeschedule is null for
@@ -254,34 +260,20 @@ public abstract class MeetingActionBase extends KualiAction {
      * @return
      * @throws Exception
      */
-    public ActionForward close(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
-
-        MeetingFormBase meetingForm = (MeetingFormBase) form;
-        Object question = request.getParameter(KRADConstants.QUESTION_INST_ATTRIBUTE_NAME);
-        if (question == null && meetingForm.getMeetingHelper().canModifySchedule()) {
-            return performQuestionWithoutInput(mapping, form, request, response, CLOSE_QUESTION_ID, CLOSE_QUESTION,
-                    KRADConstants.CONFIRMATION_QUESTION, ((MeetingFormBase) form).getMethodToCall(), "");
-        }
-        else if (meetingForm.getMeetingHelper().canModifySchedule()) {
-            Object buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
-            if ((CLOSE_QUESTION_ID.equals(question)) && ConfirmationQuestion.YES.equals(buttonClicked)) {
-                CommitteeScheduleBase committeeSchedule = meetingForm.getMeetingHelper().getCommitteeSchedule();
-                if (isValidToSave(((MeetingFormBase) form).getMeetingHelper())) {
-                    ((MeetingFormBase) form).getMeetingHelper().populateAttendancePreSave();
-                    getMeetingService().saveMeetingDetails(committeeSchedule,
-                            ((MeetingFormBase) form).getMeetingHelper().getDeletedBos());
-                    ((MeetingFormBase) form).getMeetingHelper().initDeletedList();
-                }
-                else {
-                    return mapping.findForward(Constants.MAPPING_BASIC);
-
-                }
-            }
-        }
-
-        return mapping.findForward(KRADConstants.MAPPING_PORTAL);
-    }
+	public ActionForward close( ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response ) throws Exception {
+		MeetingFormBase meetingForm = (MeetingFormBase) form;
+		Object question = request.getParameter( KRADConstants.QUESTION_INST_ATTRIBUTE_NAME );
+		if ( question == null && meetingForm.getMeetingHelper().canModifySchedule() ) {
+			return performQuestionWithoutInput( mapping, form, request, response, CLOSE_QUESTION_ID, CLOSE_QUESTION, KRADConstants.CONFIRMATION_QUESTION, meetingForm.getMethodToCall(), "" );
+		}
+		else if ( meetingForm.getMeetingHelper().canModifySchedule() ) {
+			Object buttonClicked = request.getParameter( KRADConstants.QUESTION_CLICKED_BUTTON );
+			if ( ( CLOSE_QUESTION_ID.equals( question ) ) && ConfirmationQuestion.YES.equals( buttonClicked ) ) {
+				save( mapping, meetingForm, request, response );
+			}
+		}
+		return mapping.findForward( KRADConstants.MAPPING_PORTAL );
+	}
 
     /**
      * 
@@ -329,20 +321,25 @@ public abstract class MeetingActionBase extends KualiAction {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
+		MeetingFormBase meetingForm = (MeetingFormBase) form;
+		boolean isAnotherScheduleOpen = meetingForm.isAnotherScheduleOpen( request );
+		if ( isAnotherScheduleOpen ) {
+			return mapping.findForward( Constants.MAPPING_BASIC );
+		}
         ActionForward forward = super.execute(mapping, form, request, response);
-        ((MeetingFormBase) form).getMeetingHelper().sortAttendances();
+        meetingForm.getMeetingHelper().sortAttendances();
         // if view protocol is using popup, then need following code
         String command = request.getParameter("command");
         if (StringUtils.isNotBlank(command) && "viewProtocolSubmission".equals(command)) {
             forward = viewProtocolSubmission(mapping, form, request, response);
         }
         
-        ((MeetingFormBase) form).getMeetingHelper().setHideReviewerName(
+        meetingForm.getMeetingHelper().setHideReviewerName(
                 getReviewerCommentsService().setHideReviewerName(
-                        ((MeetingFormBase) form).getMeetingHelper().getCommitteeSchedule().getCommitteeScheduleMinutes()));
+                        meetingForm.getMeetingHelper().getCommitteeSchedule().getCommitteeScheduleMinutes()));
         
         // use the entry type comparator to sort the minutes 
-        Collections.sort(((MeetingFormBase) form).getMeetingHelper().getCommitteeSchedule().getCommitteeScheduleMinutes(), CommitteeScheduleMinuteBase.entryTypeComparator);
+        Collections.sort(meetingForm.getMeetingHelper().getCommitteeSchedule().getCommitteeScheduleMinutes(), CommitteeScheduleMinuteBase.entryTypeComparator);
 
         return forward;
     }
