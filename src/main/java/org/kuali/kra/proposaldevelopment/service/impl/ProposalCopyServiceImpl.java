@@ -51,6 +51,7 @@ import org.kuali.kra.s2s.bo.S2sUserAttachedFormAtt;
 import org.kuali.kra.s2s.bo.S2sUserAttachedFormAttFile;
 import org.kuali.kra.s2s.bo.S2sUserAttachedFormFile;
 import org.kuali.kra.s2s.service.S2SUserAttachedFormService;
+import org.kuali.kra.service.CustomAttributeService;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.UnitService;
 import org.kuali.rice.core.api.datetime.DateTimeService;
@@ -114,6 +115,7 @@ import java.util.*;
  *
  * @author Kuali Research Administration Team (kualidev@oncourse.iu.edu)
  */
+@SuppressWarnings( { "rawtypes", "unused", "unchecked" } )
 public class ProposalCopyServiceImpl implements ProposalCopyService {
     
     private static final String MODULE_NUMBER = "moduleNumber";
@@ -227,6 +229,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
             }
             
             copyCustomData(doc, newDoc);
+            docService.saveDocument(newDoc);
             
             newDocNbr = newDoc.getDocumentNumber();
         }
@@ -636,7 +639,6 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
      * @param proposalNumber the proposal number
      * @param list I assume this is the list of objects that have already been processed.
      */
-    @SuppressWarnings("unchecked")
     protected void fixProposalNumbers(Object object, String proposalNumber, List<Object> list) throws Exception {
         if (object instanceof BusinessObject) {
             if (list.contains(object)) return;
@@ -1149,33 +1151,30 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
      * @param dest
      */
     protected void copyCustomData(ProposalDevelopmentDocument src, ProposalDevelopmentDocument dest) {
-        for (Map.Entry<String, CustomAttributeDocument> entry: src.getCustomAttributeDocuments().entrySet()) {
-            // Find the attribute value
-            CustomAttributeDocument customAttributeDocument = entry.getValue();
-            if(customAttributeDocument.isActive()) {
-                Map<String, Object> primaryKeys = new HashMap<String, Object>();
-                primaryKeys.put(KRADPropertyConstants.DOCUMENT_NUMBER, src.getDocumentNumber());
-                primaryKeys.put(Constants.CUSTOM_ATTRIBUTE_ID, customAttributeDocument.getCustomAttributeId());
-                CustomAttributeDocValue customAttributeDocValue = (CustomAttributeDocValue)businessObjectService.findByPrimaryKey(CustomAttributeDocValue.class, primaryKeys);
-                
-                // Store a new CustomAttributeDocValue using the new document's document number
-                if (customAttributeDocValue != null) {
-                    CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
-                    newDocValue.setDocumentNumber(dest.getDocumentNumber());
-                    newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
-                    newDocValue.setValue(customAttributeDocValue.getValue());
-                    dest.getCustomDataList().add(newDocValue);
-                    KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
-                } else {
-                    CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
-                    newDocValue.setDocumentNumber(dest.getDocumentNumber());
-                    newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
-                    newDocValue.setValue(customAttributeDocument.getCustomAttribute().getDefaultValue());
-                    dest.getCustomDataList().add(newDocValue);    
-                    KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
-                }
-            }
-        }
+		CustomAttributeService customAttributeService = KraServiceLocator.getService( CustomAttributeService.class );
+		Map<String, CustomAttributeDocument> activeCustomAttributeDocuments = customAttributeService.getActiveCustomAttributeDocuments( src.getDocumentTypeCode() );
+		dest.setCustomAttributeDocuments( activeCustomAttributeDocuments );
+		Map<String, CustomAttributeDocument> srcCustomAttributeDocuments = src.getCustomAttributeDocuments();
+		for ( Map.Entry<String, CustomAttributeDocument> entry : activeCustomAttributeDocuments.entrySet() ) {
+			String key = entry.getKey();
+			CustomAttributeDocument customAttributeDocument = srcCustomAttributeDocuments.get( key );
+			if ( customAttributeDocument != null ) {
+				// Get the CustomAttributeDocValue from the source document.
+				Map<String, Object> primaryKeys = new HashMap<String, Object>();
+				primaryKeys.put( KRADPropertyConstants.DOCUMENT_NUMBER, src.getDocumentNumber() );
+				primaryKeys.put( Constants.CUSTOM_ATTRIBUTE_ID, customAttributeDocument.getCustomAttributeId() );
+				CustomAttributeDocValue customAttributeDocValue = (CustomAttributeDocValue) businessObjectService.findByPrimaryKey( CustomAttributeDocValue.class, primaryKeys );
+				// Store a new CustomAttributeDocValue using the new document's document number
+				if ( customAttributeDocValue != null ) {
+					CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
+					newDocValue.setDocumentNumber( dest.getDocumentNumber() );
+					newDocValue.setCustomAttributeId( customAttributeDocument.getCustomAttributeId().longValue() );
+					newDocValue.setValue( customAttributeDocValue.getValue() );
+					KraServiceLocator.getService( BusinessObjectService.class ).save( newDocValue );
+				}
+			}
+		}
+		dest.refreshReferenceObject( "customDataList" );
     }
     
     /**
