@@ -15,6 +15,8 @@
  */
 package org.kuali.kra.protocol.noteattachment;
 
+import org.kuali.rice.krad.util.GlobalVariables;
+
 /**
  * Implementation of {@link AddProtocolAttachmentProtocolRule AddProtocolAttachmentProtocolRule}.
  * @see AddProtocolAttachmentProtocolRule for details
@@ -30,6 +32,7 @@ public abstract class AddProtocolAttachmentProtocolRuleImplBase implements AddPr
         final ProtocolAttachmentProtocolBase newAttachmentProtocol = event.getNewAttachmentProtocol();
         
         boolean valid = this.baseHelper.validPrimitiveFields(newAttachmentProtocol);
+        if (GlobalVariables.getMessageMap().getPropertiesWithErrors().size() > 0) valid = false;
         valid &= this.baseHelper.validTypeForGroup(newAttachmentProtocol);
         valid &= this.baseHelper.validDescriptionWhenRequired(newAttachmentProtocol);
         valid &= this.protocolHelper.validStatus(newAttachmentProtocol);

@@ -162,6 +162,8 @@ AddSubAwardAttachmentRule,SubAwardTemplateInfoRule {
     public boolean processAddSubAwardAmountInfoBusinessRules(SubAwardAmountInfo amountInfo,SubAward subAward) {
         boolean rulePassed = true; 
         
+        if (GlobalVariables.getMessageMap().getPropertiesWithErrors().size() > 0) rulePassed = false;
+        
         GlobalVariables.getMessageMap().addToErrorPath("newSubAwardAmountInfo");
         rulePassed &= getDictionaryValidationService().isBusinessObjectValid(amountInfo); 
         GlobalVariables.getMessageMap().removeFromErrorPath("newSubAwardAmountInfo");
@@ -327,6 +329,8 @@ AddSubAwardAttachmentRule,SubAwardTemplateInfoRule {
      */
     public boolean processsAddSubawardAttachmentRule(AddSubAwardAttachmentEvent event) {
         boolean valid = true;
+        
+        if (GlobalVariables.getMessageMap().getPropertiesWithErrors().size() > 0) valid = false;
         
         if( StringUtils.isBlank(event.getSubAwardAttachments().getSubAwardAttachmentTypeCode())) {
             valid = false;
