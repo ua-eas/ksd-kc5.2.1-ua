@@ -15,8 +15,20 @@
  */
 package org.kuali.kra.rules;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.bo.*;
+import org.kuali.kra.bo.CustomAttribute;
+import org.kuali.kra.bo.CustomAttributeDataType;
+import org.kuali.kra.bo.CustomAttributeDocument;
+import org.kuali.kra.bo.DocumentCustomData;
+import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -27,13 +39,10 @@ import org.kuali.kra.service.CustomAttributeService;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
+import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kns.datadictionary.validation.charlevel.AnyCharacterValidationPattern;
 import org.kuali.rice.kns.datadictionary.validation.charlevel.NumericValidationPattern;
 import org.kuali.rice.krad.datadictionary.validation.ValidationPattern;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.*;
 
 /**
  * Validates the rules for a Custom Attribute save action.
@@ -80,6 +89,9 @@ public class CustomDataRule extends ResearchDocumentRuleBase implements Business
 
             CustomAttribute customAttribute = customAttributeDocument.getCustomAttribute();
             List<? extends DocumentCustomData> customDataList = event.getCustomDataList();
+			if ( isDocEnrouteAndDoesNotContainCustomAttribute( customAttribute.getId(), customDataList, event.getDocument().getDocumentHeader().getWorkflowDocument() ) ) {
+				continue;
+			}
             int index = 0;
             for (DocumentCustomData data : customDataList) {
                 if (data.getCustomAttributeId() == customAttribute.getId().longValue()) {
@@ -110,6 +122,17 @@ public class CustomDataRule extends ResearchDocumentRuleBase implements Business
         return rulePassed;
     }
 
+	protected boolean isDocEnrouteAndDoesNotContainCustomAttribute( Integer customAttributeId, List<? extends DocumentCustomData> customDataList, WorkflowDocument workflowDocument ) {
+		if ( !workflowDocument.isSaved() && !workflowDocument.isInitiated() ) {
+			for ( DocumentCustomData data : customDataList ) {
+				if ( data.getCustomAttributeId().equals( customAttributeId ) ) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 
     /**
      * 
