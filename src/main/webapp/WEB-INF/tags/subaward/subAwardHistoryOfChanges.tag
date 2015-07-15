@@ -21,6 +21,8 @@
 <c:set var="action" value="subAwardFinancial" />
 
 <c:set var="newSubAwardAmountInfo" value="${KualiForm.newSubAwardAmountInfo}" />
+<input id="maxAttachmentSize" type="hidden" value="${KualiForm.maxAttachmentSize}"/>
+<script language="javascript" src="scripts/fileUpload.js"></script>
 
 <kul:tab tabTitle="History of Changes" defaultOpen="true" alwaysOpen="true" transparentBackground="true" tabErrorKey="subAwardAmountInfoErrors,newSubAwardAmountInfo.periodofPerformanceStartDate,newSubAwardAmountInfo.effectiveDate*,newSubAwardAmountInfo.obligatedChange*,newSubAwardAmountInfo.anticipatedChange*,newSubAwardAmountInfo.comments*,document.subAwardList[0].subAwardAmountInfoList*,document.subAwardList[0].modificationId,document.subAwardList[0].totalAnticipatedAmount*,document.subAwardList[0].totalObligatedAmount*" auditCluster="subawardFinancialdAuditErrors" tabAuditKey="document.subAwardList[0].totalAnticipatedAmount*,document.subAwardList[0].totalObligatedAmount*" useRiceAuditMode="true">
 	<div class="tab-container" align="center">
@@ -117,7 +119,8 @@
    				
    				   <td class="infoline">
    				   <c:if test="${readOnly!='true'}">
-                	<html:file property="newSubAwardAmountInfo.newFile"  />
+                	<html:file property="newSubAwardAmountInfo.newFile" onchange="selectFile(this, [0], 'fileSizeTooLarge');"/>
+                	<label id="fileSizeTooLarge" class="changedClearOnReset" style="color: red; visibility: hidden;"></label> 
                 	</c:if>
                 </td>
    				 				
@@ -125,7 +128,7 @@
    					<c:if test="${readOnly!='true'}">
 						<html:image property="methodToCall.addAmountInfo.anchor${tabKey}" 
 						            src='${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif' 
-						            styleClass="tinybutton"/>
+						            styleClass="tinybutton addButton"/>
 					</c:if>
 	                </div>
 	            </td>   				

@@ -19,6 +19,8 @@
 <c:set var="awardAttachmentFormBean" value="${KualiForm.awardAttachmentFormBean}" />
 <c:set var="action" value="awardNotesAndAttachments" />
 <c:set var="attachments" value="${KualiForm.document.awardList[0].awardAttachments}"/>
+<input id="maxAttachmentSize" type="hidden" value="${KualiForm.maxAttachmentSize}"/>
+<script language="javascript" src="scripts/fileUpload.js"></script>
 
 <kul:tab tabTitle="Attachments" tabItemCount="${fn:length(attachments)}" defaultOpen="false" tabErrorKey="awardAttachmentFormBean.newAttachment*,document.awardList[0].awardAttachments*" transparentBackground="false">
 	<div class="tab-container" align="center">
@@ -101,8 +103,9 @@
 	               				<c:set var="textStyle" value="${hasErrors == true ? 'background-color:#FFD5D5' : ''}"/>
 	               			<%-- attachment file error handling logic start--%>
 	              		
-	              			<html:file property="${property}" style="${textStyle}"/>
+	              			<html:file property="${property}" style="${textStyle}" onchange="selectFile(this, [1], 'fileSizeTooLarge');"/>
 	           			</div>
+	           			<label id="fileSizeTooLarge" class="changedClearOnReset" style="color: red; visibility: hidden;"></label>
 					</td>
 					<td align="center" valign="middle" class="infoline">
 						<div align="center">

@@ -55,7 +55,8 @@
 		return properties;
 	}
 </script>
-
+<input id="maxAttachmentSize" type="hidden" value="${KualiForm.maxAttachmentSize}"/>
+<script language="javascript" src="scripts/fileUpload.js"></script>
 
 
 <%-- We used to calculate the # of proposal attachements by fn:length(KualiForm.document.developmentProposalList[0].narratives), but this counts all of them including the 
@@ -119,7 +120,8 @@ internal attachements.  We are just going to loop through the narratives and see
 					</td>
 	          		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${narrativeAttachmentAttributes.fileName}"/></div></th>
 	                <td align="left" valign="middle">
-	                	<html:file property="newNarrative.narrativeFile" styleId="newNarrative.narrativeFile"/>
+	                	<html:file property="newNarrative.narrativeFile" styleId="newNarrative.narrativeFile" onchange="selectFile(this, [0], 'fileSizeTooLarge');"/>
+	                	<label id="fileSizeTooLarge" class="changedClearOnReset" style="color: red; visibility: hidden;"></label>
 					</td>
 	          	</tr>
 

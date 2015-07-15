@@ -81,7 +81,8 @@
 				</td>
                 
                 <td class="infoline">
-                	<html:file property="newPropPersonBio.personnelAttachmentFile" />
+                	<html:file property="newPropPersonBio.personnelAttachmentFile" onchange="selectFile(this, [1], 'fileSizeTooLargePersonnel');"/>
+                	<label id="fileSizeTooLargePersonnel" class="changedClearOnReset" style="color: red; visibility: hidden;"></label> 
                 </td>
 				<td class="infoline">
 					<div align=center>

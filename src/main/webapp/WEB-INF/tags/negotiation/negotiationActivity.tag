@@ -8,6 +8,8 @@
 
 <c:set var="activityAttributes" value="${DataDictionary.NegotiationActivity.attributes}" />
 <c:set var="attachmentAttributes" value="${DataDictionary.NegotiationActivityAttachment.attributes}" />
+<input id="maxAttachmentSize" type="hidden" value="${KualiForm.maxAttachmentSize}"/>
+<script language="javascript" src="scripts/fileUpload.js"></script>
 
 
 <c:if test="${empty tabDivClass}">
@@ -116,7 +118,9 @@
             <c:if test="${!readOnly}">
             <tr>
             	<th><div align="right">Attachments:</div></th>
-            	<th>* File: <html:file property="${activityPath}.newAttachment.newFile"/><kul:checkErrors keyMatch="${activityPath}.newAttachment.newFile" auditMatch="${activityPath}.newAttachment.newFile"/>  
+            	<th>* File: <html:file property="${activityPath}.newAttachment.newFile" onchange="selectFile(this, [0,1], 'fileSizeTooLarge');"/>
+            	<label id="fileSizeTooLarge" class="changedClearOnReset" style="color: red; visibility: hidden;"></label>
+            	<kul:checkErrors keyMatch="${activityPath}.newAttachment.newFile" auditMatch="${activityPath}.newAttachment.newFile"/>  
             		<c:if test="${hasErrors}">
 	 					<kul:fieldShowErrorIcon />
   					</c:if>
@@ -124,7 +128,7 @@
             	<th><kul:htmlAttributeLabel attributeEntry="${attachmentAttributes.description}" useShortLabel="true" /> <kul:htmlControlAttribute property="${activityPath}.newAttachment.description" attributeEntry="${attachmentAttributes.description}" readOnly="${readOnly}"/></th>
             	<th>
             		<html:image property="methodToCall.addAttachment.activityIndex${activityIndex}"
-            			src="${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif" styleClass="${addButtonStyleClass}"
+            			src="${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif" styleClass="${addButtonStyleClass} addButton"
    		  				onclick="return ${fileDescriptionValidationFunctionName}();"/>
    		  				<script language="javascript">
    		  					<!--

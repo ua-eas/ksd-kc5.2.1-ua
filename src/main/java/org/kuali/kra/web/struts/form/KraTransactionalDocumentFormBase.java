@@ -27,6 +27,7 @@ import org.kuali.kra.questionnaire.QuestionableFormInterface;
 import org.kuali.kra.rules.SoftError;
 import org.kuali.rice.kim.api.KimConstants;
 import org.kuali.rice.kns.document.authorization.DocumentAuthorizerBase;
+import org.kuali.rice.kns.util.WebUtils;
 import org.kuali.rice.kns.web.struts.form.KualiTransactionalDocumentFormBase;
 import org.kuali.rice.kns.web.ui.ExtraButton;
 import org.kuali.rice.krad.document.Document;
@@ -58,6 +59,8 @@ public abstract class KraTransactionalDocumentFormBase extends KualiTransactiona
     private Map<String, Boolean> personEditableFields;
     
     private List<String> unitRulesMessages = new ArrayList<String>();
+    
+    private Long maxAttachmentSize;
    
     public String getActionName() {
         return actionName;
@@ -395,4 +398,14 @@ public abstract class KraTransactionalDocumentFormBase extends KualiTransactiona
         }
         return messages;
     }
+    
+    /**
+	* Gets the maximum file upload size in bytes
+	* @return
+	*/
+	@SuppressWarnings("deprecation")
+	public Long getMaxAttachmentSize() {
+		maxAttachmentSize = WebUtils.getMaxUploadSize(this);
+		return maxAttachmentSize;
+	} 
 }

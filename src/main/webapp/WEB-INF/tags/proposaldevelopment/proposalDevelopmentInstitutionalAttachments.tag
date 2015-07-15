@@ -72,7 +72,8 @@
 					</td>
 	                
 	                <td class="infoline">
-	                	<html:file property="newInstituteAttachment.narrativeFile" />
+	                	<html:file property="newInstituteAttachment.narrativeFile" onchange="selectFile(this, [2], 'fileSizeTooLargeInternal');"/>
+	                	<label id="fileSizeTooLargeInternal" class="changedClearOnReset" style="color: red; visibility: hidden;"></label> 
 	                </td>
 					<td class="infoline">
 						<div align=center>
