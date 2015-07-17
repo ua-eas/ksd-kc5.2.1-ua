@@ -1,0 +1,203 @@
+<!--
+ Copyright 2005-2014 The Kuali Foundation
+
+ Licensed under the Educational Community License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.osedu.org/licenses/ECL-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="ValidAwardActionPrint" parent="ValidAwardActionPrint-parentBean" />
+    <bean id="ValidAwardActionPrint-parentBean" abstract="true" parent="BusinessObjectEntry">
+        <property name="businessObjectClass" value="edu.arizona.kra.award.printing.ValidAwardActionPrint" />
+   		<property name="objectLabel" value="Print Generated for Award Action" />
+        <property name="inquiryDefinition" >
+            <ref bean="ValidAwardActionPrint-inquiryDefinition" />
+        </property>
+        <property name="lookupDefinition" >
+            <ref bean="ValidAwardActionPrint-lookupDefinition" />
+        </property>
+        <property name="titleAttribute" value="validAwardActionPrintId" />
+        <property name="attributes" >
+            <list>
+                <ref bean="ValidAwardActionPrint-validAwardActionPrintId" />
+                <ref bean="ValidAwardActionPrint-awardActionTypeCode" />
+                <ref bean="ValidAwardActionPrint-awardPrintTypeCode" />
+                <ref bean="ValidAwardActionPrint-finalFlag" />
+                <ref bean="ValidAwardActionPrint-awardActionType.description" />
+                <ref bean="ValidAwardActionPrint-awardPrintType.description" />
+                <ref bean="ValidAwardActionPrint-versionNumber" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- Attribute Definitions -->
+    
+    <bean id="ValidAwardActionPrint-validAwardActionPrintId" parent="ValidAwardActionPrint-validAwardActionPrintId-parentBean" />
+    <bean id="ValidAwardActionPrint-validAwardActionPrintId-parentBean" abstract="true" parent="AttributeDefinition" >
+        <property name="name" value="validAwardActionPrintId" />
+        <property name="forceUppercase" value="false" />
+        <property name="label" value="Valid Award Action Print Id" />
+        <property name="shortLabel" value="Valid Award Action Print Id" />
+        <property name="maxLength" value="12" />
+        <property name="validationPattern" >
+            <bean parent="NumericValidationPattern" />
+        </property>
+        <property name="control" >
+            <bean parent="TextControlDefinition"
+                p:size="12" />
+        </property>
+        <property name="summary" value="Valid Award Action Print Id" />
+        <property name="description" value="Valid Award Action Print Id" />
+    </bean>
+
+    <bean id="ValidAwardActionPrint-awardActionTypeCode" parent="ValidAwardActionPrint-awardActionTypeCode-parentBean" />
+    <bean id="ValidAwardActionPrint-awardActionTypeCode-parentBean" abstract="true" parent="AttributeDefinition" >
+        <property name="name" value="awardActionTypeCode" />
+        <property name="forceUppercase" value="false" />
+        <property name="label" value="Award Action Type" />
+        <property name="shortLabel" value="Award Action Type" />
+        <property name="maxLength" value="3" />
+        <property name="validationPattern" >
+            <bean parent="AlphaNumericValidationPattern" />
+        </property>
+        <property name="required" value="true" />
+        <property name="control" >
+          <bean parent="SelectControlDefinition"
+                p:businessObjectClass="edu.arizona.kra.award.actions.AwardActionType"
+                p:valuesFinderClass="org.kuali.kra.lookup.keyvalue.ExtendedPersistableBusinessObjectValuesFinder"
+                p:includeKeyInLabel="false"
+                p:includeBlankRow="false"
+                p:keyAttribute="awardActionTypeCode"
+                p:labelAttribute="description" />
+        </property>
+        <property name="summary" value="Award Action Type" />
+        <property name="description" value="Award Action Type" />
+    </bean>
+
+    <bean id="ValidAwardActionPrint-awardPrintTypeCode" parent="ValidAwardActionPrint-awardPrintTypeCode-parentBean" />
+    <bean id="ValidAwardActionPrint-awardPrintTypeCode-parentBean" abstract="true" parent="AttributeDefinition" >
+        <property name="name" value="awardPrintTypeCode" />
+        <property name="forceUppercase" value="false" />
+        <property name="label" value="Award Print Type" />
+        <property name="shortLabel" value="Award Print Type Code" />
+        <property name="maxLength" value="3" />
+        <property name="validationPattern" >
+            <bean parent="AlphaNumericValidationPattern" />
+        </property>
+        <property name="control" >
+          <bean parent="SelectControlDefinition"
+                p:businessObjectClass="edu.arizona.kra.award.printing.AwardPrintType"
+                p:valuesFinderClass="org.kuali.kra.lookup.keyvalue.ExtendedPersistableBusinessObjectValuesFinder"
+                p:includeKeyInLabel="false"
+                p:includeBlankRow="false"
+                p:keyAttribute="awardPrintTypeCode"
+                p:labelAttribute="description" />
+        </property>
+        <property name="summary" value="Award Print Type" />
+        <property name="description" value="Award Print Type" />
+    </bean>
+
+    <bean id="ValidAwardActionPrint-finalFlag" parent="ValidAwardActionPrint-finalFlag-parentBean" />
+    <bean id="ValidAwardActionPrint-finalFlag-parentBean" abstract="true" parent="AttributeReferenceDummy-genericBoolean" >
+        <property name="name" value="finalFlag" />
+        <property name="label" value="Final Flag" />
+        <property name="shortLabel" value="Final Flag" />
+        <property name="summary" value="Final Flag" />
+        <property name="description" value="Final Flag" />
+    </bean>
+
+  <bean id="ValidAwardActionPrint-awardActionType.description" parent="ValidAwardActionPrint-awardActionType.description-parentBean" />
+  <bean id="ValidAwardActionPrint-awardActionType.description-parentBean" abstract="true" parent="AwardActionType-description">
+    <property name="name" value="awardActionType.description" />
+    <property name="label" value="Award Action Type" />
+    <property name="shortLabel" value="Award Action Type" />
+  </bean>
+
+  <bean id="ValidAwardActionPrint-awardPrintType.description" parent="ValidAwardActionPrint-awardPrintType.description-parentBean" />
+  <bean id="ValidAwardActionPrint-awardPrintType.description-parentBean" abstract="true" parent="AwardPrintType-description">
+    <property name="name" value="awardPrintType.description" />
+    <property name="label" value="Award Print Type" />
+    <property name="shortLabel" value="Award Print Type" />
+  </bean>
+
+    <bean id="ValidAwardActionPrint-versionNumber" parent="ValidAwardActionPrint-versionNumber-parentBean" />
+    <bean id="ValidAwardActionPrint-versionNumber-parentBean" abstract="true" parent="AttributeReferenceDummy-versionNumber">
+    </bean>
+
+    <!-- Business Object Inquiry Definition -->
+    <bean id="ValidAwardActionPrint-inquiryDefinition" parent="ValidAwardActionPrint-inquiryDefinition-parentBean" />
+    <bean id="ValidAwardActionPrint-inquiryDefinition-parentBean" abstract="true" parent="InquiryDefinition">
+        <property name="title" value="Valid Award Action Print Id" />
+        <property name="inquirySections" >
+            <list>
+                <bean parent="InquirySectionDefinition">
+                    <property name="title" value="Valid Award Action Print Id" />
+                    <property name="numberOfColumns" value="1" />
+                    <property name="inquiryFields" >
+                        <list>
+                            <bean parent="FieldDefinition"
+                                p:attributeName="validAwardActionPrintId" 
+                                p:forceInquiry="true" />
+                            <bean parent="FieldDefinition"
+                                p:attributeName="awardActionTypeCode" />
+                            <bean parent="FieldDefinition"
+                                p:attributeName="awardPrintTypeCode" />
+                            <bean parent="FieldDefinition"
+                                p:attributeName="finalFlag" />
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Business Object Lookup Definition -->
+    <bean id="ValidAwardActionPrint-lookupDefinition" parent="ValidAwardActionPrint-lookupDefinition-parentBean" />
+    <bean id="ValidAwardActionPrint-lookupDefinition-parentBean" abstract="true" parent="LookupDefinition">
+        <property name="title" value="Print Generated for Award Action Lookup" />
+        <property name="menubar" value="&lt;a href=&quot;index.jsp&quot;&gt;Main&lt;/a&gt;" />
+        <property name="defaultSort" >
+            <bean parent="SortDefinition" >
+        </bean>
+        </property>
+        <property name="lookupFields" >
+            <list>
+                <bean parent="FieldDefinition"
+                    p:attributeName="validAwardActionPrintId" 
+                    p:forceInquiry="true" />
+                <bean parent="FieldDefinition"
+                    p:attributeName="awardActionTypeCode" />
+                <bean parent="FieldDefinition"
+                    p:attributeName="awardPrintTypeCode" />
+                <bean parent="FieldDefinition"
+                    p:attributeName="finalFlag" />
+            </list>
+        </property>
+        <property name="resultFields" >
+            <list>
+                <bean parent="FieldDefinition"
+                    p:attributeName="validAwardActionPrintId" 
+                    p:forceInquiry="true" />
+                <bean parent="FieldDefinition"
+                    p:attributeName="awardActionType.description" />
+                <bean parent="FieldDefinition"
+                    p:attributeName="awardPrintType.description" />
+                <bean parent="FieldDefinition"
+                    p:attributeName="finalFlag" />
+            </list>
+        </property>
+    </bean>
+</beans>
