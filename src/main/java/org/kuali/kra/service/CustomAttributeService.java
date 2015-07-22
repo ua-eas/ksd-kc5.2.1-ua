@@ -24,16 +24,48 @@ import java.util.Map;
 
 public interface CustomAttributeService {
 
+	/**
+	 * This method returns a Map of Custom Attribute Documents associated with a specific document where the key is the
+	 * customAttributeId.
+	 *
+	 * @param documentNumber
+	 *            document number for this document
+	 * @param documentTypeCode
+	 *            document type
+	 * @return a List of custom attribute documents for this document
+	 */
+	public Map<String, CustomAttributeDocument> getCustomAttributeDocuments( String documentNumber, String documentTypeCode );
+
+	/**
+	 * This method returns a Map of currently active Custom Attribute Documents associated with a type of document where
+	 * the key is the customAttributeId.
+	 *
+	 * @param documentTypeCode
+	 *            document type
+	 * @return a List of custom attribute documents for this document
+	 */
+	public Map<String, CustomAttributeDocument> getActiveCustomAttributeDocuments( String documentTypeCode );
+
+	/**
+	 * This method returns a Map of all Custom Attribute Documents associated with a type of document where the key is
+	 * the customAttributeId.
+	 *
+	 * @param documentTypeCode
+	 *            document type
+	 * @return a List of custom attribute documents for this document
+	 */
+	public Map<String, CustomAttributeDocument> getAllCustomAttributeDocuments( String documentTypeCode );
+
     /**
      * This method returns a Map of Custom Attribute Documents where the key is the
      * customAttributeId.
      *
-     * @param documentNumber document number for this document
      * @param documentTypeCode document type to get custom attributes for
-     * @param customDataList custom attribute data for this document
+     * @param documentNumber document number for this document
      * @return a List of custom attribute documents for this document
      */
-    public Map<String, CustomAttributeDocument> getDefaultCustomAttributeDocuments(String documentNumber, String documentTypeCode, List<? extends DocumentCustomData> customDataList);
+    @Deprecated
+    public Map<String, CustomAttributeDocument> getDefaultCustomAttributeDocuments(String documentTypeCode, List<? extends DocumentCustomData> customDataList);
     
     /**
      * 

@@ -130,7 +130,7 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
 	public Map<String, CustomAttributeDocument> getCustomAttributeDocuments() {
 		if ( customAttributeDocuments == null ) {
 			CustomAttributeService customAttributeService = KraServiceLocator.getService( CustomAttributeService.class );
-			customAttributeDocuments = customAttributeService.getDefaultCustomAttributeDocuments( documentNumber, getDocumentTypeCode(), getDocumentCustomData() );
+			customAttributeDocuments = customAttributeService.getCustomAttributeDocuments( documentNumber , getDocumentTypeCode() );
 		}
 		return customAttributeDocuments;
 	}
