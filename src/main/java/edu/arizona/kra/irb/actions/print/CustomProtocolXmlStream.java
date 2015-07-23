@@ -102,11 +102,12 @@ public class CustomProtocolXmlStream extends ProtocolXmlStream {
 		fieldValues.put( MODULE_ITEM_CODE, CoeusModule.IRB_MODULE_CODE );
 		fieldValues.put( MODULE_ITEM_KEY, protocolNumber );
 		List<AnswerHeader> answerHeaders = (List<AnswerHeader>) getBusinessObjectService().findMatching( AnswerHeader.class, fieldValues );
-		if ( answerHeaders == null ) {
+		if ( answerHeaders == null || answerHeaders.isEmpty()) {
 			AnswerHeader ah = new AnswerHeader();
 			ah.setAnswerHeaderId( 0L );
 			List<Answer> answers = new ArrayList<Answer>();
 			ah.setAnswers( answers );
+			return ah;
 		}
 		Collections.sort( answerHeaders, ANSWER_HEADER_SORT );
 		return answerHeaders.get( answerHeaders.size() - 1 );
