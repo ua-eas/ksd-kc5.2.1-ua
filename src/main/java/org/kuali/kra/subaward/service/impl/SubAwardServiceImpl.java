@@ -338,16 +338,26 @@ public class SubAwardServiceImpl implements SubAwardService {
         for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
             subAwardSet.add(subAwardFundingSource.getSubAward().getSubAwardCode());
         }
+        List<SubAward> activeSubAwards = new ArrayList<SubAward>();
         List<SubAward> subAwards = new ArrayList<SubAward>();
+        
         for (String subAwardCode : subAwardSet) {
             VersionHistory activeVersion = getVersionHistoryService().findActiveVersion(SubAward.class, subAwardCode);
             if (activeVersion == null) {
                 VersionHistory pendingVersion = getVersionHistoryService().findPendingVersion(SubAward.class, subAwardCode);
                 if (pendingVersion != null) {
-                    subAwards.add((SubAward) pendingVersion.getSequenceOwner());
+                    activeSubAwards.add((SubAward) pendingVersion.getSequenceOwner());
                 }
             } else {
-                subAwards.add((SubAward) activeVersion.getSequenceOwner());
+                activeSubAwards.add((SubAward) activeVersion.getSequenceOwner());
+            }
+        }
+        //filter the active subawards by the the referenced subaward sequence nbr in the funding source
+        for(SubAward subAward: activeSubAwards){
+            for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
+                if (subAward.getSequenceNumber().equals(subAwardFundingSource.getSequenceNumber())){
+                    subAwards.add(subAward);
+                }
             }
         }
         return subAwards;
