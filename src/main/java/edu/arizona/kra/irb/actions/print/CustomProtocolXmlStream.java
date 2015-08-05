@@ -2,21 +2,17 @@ package edu.arizona.kra.irb.actions.print;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.kuali.kra.bo.CoeusModule;
-import org.kuali.kra.bo.CoeusSubModule;
-import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.actions.print.ProtocolXmlStream;
-import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 import org.kuali.kra.questionnaire.answer.Answer;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
-import org.kuali.kra.questionnaire.answer.QuestionnaireAnswerService;
 
 import edu.mit.irb.irbnamespace.AttachmentProtocolDocument.AttachmentProtocol;
 import edu.mit.irb.irbnamespace.ProtocolDocument.Protocol;
@@ -25,6 +21,10 @@ import edu.mit.irb.irbnamespace.ProtocolDocument.Protocol.Questionnaires;
 import edu.mit.irb.irbnamespace.QuestionnaireQuestionsDocument.QuestionnaireQuestions;
 
 public class CustomProtocolXmlStream extends ProtocolXmlStream {
+    
+    private static final String MODULE_ITEM_CODE = "moduleItemCode";
+    private static final String MODULE_ITEM_KEY = "moduleItemKey";
+
 
 	/* (non-Javadoc)
 	 * @see org.kuali.kra.irb.actions.print.ProtocolXmlStream#getProtocol(org.kuali.kra.irb.Protocol)
@@ -82,55 +82,51 @@ public class CustomProtocolXmlStream extends ProtocolXmlStream {
     }
 
 	protected void addQuestionnaires( org.kuali.kra.irb.Protocol protocol, Protocol protocolType ) {
-		AnswerHeader questionnaireAnswerHeader = getQuestionnaireAnswerHeader( protocol.getProtocolNumber() );
+		List<AnswerHeader> questionnaireAnswerHeaders = getLatestAnswerHeadersForProtocol( protocol.getProtocolNumber() );
+		for (AnswerHeader answerHeader: questionnaireAnswerHeaders){
 		Questionnaires questionnairesType = protocolType.addNewQuestionnaires();
-		for ( Answer questionnaireAnswer : questionnaireAnswerHeader.getAnswers() ) {
-			QuestionnaireQuestions questionnaireQuestionsType = questionnairesType.addNewQuestionnaireQuestions();
-			String questionID = questionnaireAnswer.getQuestion().getQuestionId();
-			String question = questionnaireAnswer.getQuestion().getQuestion();
-			String questionnaireAnswerID = questionnaireAnswer.getId().toString();
-			String answer = questionnaireAnswer.getAnswer();
-			questionnaireQuestionsType.setQuestionID( questionID );
-			questionnaireQuestionsType.setQuestion( question );
-			questionnaireQuestionsType.setQuestionnaireAnswerID( questionnaireAnswerID );
-			questionnaireQuestionsType.setAnswer( answer );
+    		for ( Answer questionnaireAnswer : answerHeader.getAnswers() ) {
+    			QuestionnaireQuestions questionnaireQuestionsType = questionnairesType.addNewQuestionnaireQuestions();
+    			String questionID = questionnaireAnswer.getQuestion().getQuestionId();
+    			String question = questionnaireAnswer.getQuestion().getQuestion();
+    			String questionnaireAnswerID = questionnaireAnswer.getId().toString();
+    			String answer = questionnaireAnswer.getAnswer();
+    			questionnaireQuestionsType.setQuestionID( questionID );
+    			questionnaireQuestionsType.setQuestion( question );
+    			questionnaireQuestionsType.setQuestionnaireAnswerID( questionnaireAnswerID );
+    			questionnaireQuestionsType.setAnswer( answer );
+    		}
 		}
 	}
+	
+	/**
+	 * Returns all the Question Answer Headers for the given protocol number but only the latest version of the answers.
+	 * @param protocolNumber
+	 * @return List<AnswerHeader> - if there are no elements to return, it will return an empty array
+	 */
+	public List<AnswerHeader> getLatestAnswerHeadersForProtocol(String protocolNumber) {
+	    Map<String, Object> fieldValues = new HashMap<String, Object>();
+	    fieldValues.put(MODULE_ITEM_CODE, CoeusModule.IRB_MODULE_CODE);
+	    fieldValues.put(MODULE_ITEM_KEY, protocolNumber);
+	    List<AnswerHeader> allAnswerHeaders = (List<AnswerHeader>) getBusinessObjectService().findMatching(AnswerHeader.class, fieldValues);
+	    List<AnswerHeader> filteredAnswerHeaders = new ArrayList<AnswerHeader>();
+	    //store the answers for the same question ordered by version
+	    TreeMap<Long, AnswerHeader> answerHeaderVersions = new TreeMap<Long, AnswerHeader>();
+	    while ( allAnswerHeaders.size()>0 ){
+	        AnswerHeader currentAnswerHeader = allAnswerHeaders.get(0);
+	        answerHeaderVersions.clear();
 
-	private AnswerHeader getQuestionnaireAnswerHeader( String protocolNumber ) {
-		Map<String, Object> fieldValues = new HashMap<String, Object>();
-		fieldValues.put( MODULE_ITEM_CODE, CoeusModule.IRB_MODULE_CODE );
-		fieldValues.put( MODULE_ITEM_KEY, protocolNumber );
-		List<AnswerHeader> answerHeaders = (List<AnswerHeader>) getBusinessObjectService().findMatching( AnswerHeader.class, fieldValues );
-		if ( answerHeaders == null || answerHeaders.isEmpty()) {
-			AnswerHeader ah = new AnswerHeader();
-			ah.setAnswerHeaderId( 0L );
-			List<Answer> answers = new ArrayList<Answer>();
-			ah.setAnswers( answers );
-			return ah;
-		}
-		Collections.sort( answerHeaders, ANSWER_HEADER_SORT );
-		return answerHeaders.get( answerHeaders.size() - 1 );
+	        for (Iterator<AnswerHeader> iterator = allAnswerHeaders.iterator(); iterator.hasNext();) {
+	            AnswerHeader answerHeader = iterator.next();
+	            if ( currentAnswerHeader.getQuestionnaireRefIdFk().equalsIgnoreCase( answerHeader.getQuestionnaireRefIdFk())) {
+	                answerHeaderVersions.put(answerHeader.getVersionNumber(), answerHeader);
+	                iterator.remove();
+	            }
+	        }
+	        //only return the latest version for the particular answer header
+	        filteredAnswerHeaders.add( answerHeaderVersions.lastEntry().getValue());
+	    }
+	    return filteredAnswerHeaders;
 	}
-
-	private static final String MODULE_ITEM_CODE = "moduleItemCode";
-	private static final String MODULE_ITEM_KEY = "moduleItemKey";
-
-	public static final Comparator<AnswerHeader> ANSWER_HEADER_SORT = new Comparator<AnswerHeader>() {
-		private final Integer BEFORE = -1;
-		private final Integer AFTER = 1;
-		private final Integer SAME = 1;
-
-		@Override
-		public int compare( AnswerHeader arg0, AnswerHeader arg1 ) {
-			if ( arg0.getAnswerHeaderId() < arg1.getAnswerHeaderId() ) {
-				return BEFORE;
-			}
-			if ( arg0.getAnswerHeaderId() > arg1.getAnswerHeaderId() ) {
-				return AFTER;
-			}
-			return SAME;
-		}
-	};
 
 }
