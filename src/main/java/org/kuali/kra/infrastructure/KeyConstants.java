@@ -1113,6 +1113,8 @@ public final class KeyConstants {
     public static final String ERROR_UNIT_ADMIN_NO_DETAILS = "error.unit.admin.global.no.details";
 	public static final String ERROR_UNIT_ADMIN_MULTIPLE_FOR_TYPE_NOT_ALLOWED = "error.unit.admin.multiple.for.type.not.allowed";
 
+    public static final String CLEAR_MODULAR_ERROR_BEFORE_FINALIZE = "clear.modular.error.before.finalize";
+
     /**
      * private utility class ctor.
      * @throws UnsupportedOperationException if called.
