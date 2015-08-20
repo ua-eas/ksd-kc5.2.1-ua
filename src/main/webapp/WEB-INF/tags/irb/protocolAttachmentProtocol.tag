@@ -23,6 +23,8 @@
 <c:set var="action" value="protocolNoteAndAttachment" />
 <c:set var="attachmentProtocols" value="${KualiForm.document.protocolList[0].attachmentProtocols}"/>
 <c:set var="filteredAttachmentProtocols" value="${KualiForm.document.protocolList[0].filteredAttachmentProtocols}"/>
+<input id="maxAttachmentSize" type="hidden" value="${KualiForm.maxAttachmentSize}"/>
+<script language="javascript" src="scripts/fileUpload.js"></script>
 
 <kul:tab tabTitle="Protocol Attachments" tabItemCount="${fn:length(KualiForm.document.protocolList[0].activeAttachmentProtocolsNoDelete)}" defaultOpen="false" tabErrorKey="notesAttachmentsHelper.newAttachmentProtocol.*" transparentBackground="true" tabAuditKey="document.protocolList[0].attachmentProtocols*">
 	<div class="tab-container" align="center">
@@ -172,7 +174,8 @@
 	               				<%-- highlighting does not work in firefox but does in ie... --%>
 	               				<%-- <c:set var="textStyle" value="${hasErrors == true ? 'background-color:#FFD5D5' : ''}"/>--%>
 	               			<%-- attachment file error handling logic start--%>
-	              			<html:file property="${property}" size="50"/>
+	              			<html:file property="${property}" size="50" onchange="selectFile(this, [0], 'fileSizeTooLarge');"/>
+	              			<label id="fileSizeTooLarge" class="changedClearOnReset" style="color: red; visibility: hidden;"></label>
 	               			<c:if test="${hasErrors}">
                     	 		<kul:fieldShowErrorIcon />
                             </c:if>
