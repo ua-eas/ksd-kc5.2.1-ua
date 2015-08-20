@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="UAR-973-1" author="S.G. Skinner">
+        <comment>
+            Adding table to hold Unit AdministratorCreateGlobal records.
+        </comment>
+        <sql>
+            CREATE TABLE UNIT_ADMIN_CREATE_GBL_T
+            (   
+                DOCUMENT_NUMBER VARCHAR2(40 BYTE),
+                VER_NBR NUMBER(8,0) DEFAULT 1, 
+                OBJ_ID VARCHAR2(36 BYTE)
+	         );
+	         ALTER TABLE UNIT_ADMIN_CREATE_GBL_T ADD CONSTRAINT UNIT_ADMIN_CREATE_GBL_P1 PRIMARY KEY (DOCUMENT_NUMBER);
+	         ALTER TABLE UNIT_ADMIN_CREATE_GBL_T MODIFY (VER_NBR NOT NULL ENABLE);
+	         ALTER TABLE UNIT_ADMIN_CREATE_GBL_T MODIFY (OBJ_ID NOT NULL ENABLE);
+        </sql>
+        <rollback>
+            drop table UNIT_ADMIN_CREATE_GBL_T;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="UAR-973-2" author="S.G. Skinner">
+        <comment>
+            Adding table to hold Unit AdministratorDeleteGlobal records.
+        </comment>
+        <sql>
+            CREATE TABLE UNIT_ADMIN_DELETE_GBL_T
+            (   
+                DOCUMENT_NUMBER VARCHAR2(40 BYTE),
+                VER_NBR NUMBER(8,0) DEFAULT 1, 
+                OBJ_ID VARCHAR2(36 BYTE)
+             );
+             ALTER TABLE UNIT_ADMIN_DELETE_GBL_T ADD CONSTRAINT UNIT_ADMIN_DELETE_GBL_P1 PRIMARY KEY (DOCUMENT_NUMBER);
+             ALTER TABLE UNIT_ADMIN_DELETE_GBL_T MODIFY (VER_NBR NOT NULL ENABLE);
+             ALTER TABLE UNIT_ADMIN_DELETE_GBL_T MODIFY (OBJ_ID NOT NULL ENABLE);
+        </sql>
+        <rollback>
+            drop table UNIT_ADMIN_DELETE_GBL_T;
+        </rollback>
+    </changeSet>
+
+	<changeSet id="UAR-973-3" author="S.G. Skinner">
+		<comment>
+            Adding table to hold UnitAdministratorGlobalDetail records.
+        </comment>
+		<sql>
+            CREATE TABLE UNIT_ADMIN_GBL_DTL_T
+            (
+                DOCUMENT_NUMBER VARCHAR2(40 BYTE),
+                PERSON_ID VARCHAR2(40 BYTE) NOT NULL,
+                UNIT_ADMINISTRATOR_TYPE_CODE VARCHAR2(3 BYTE) NOT NULL,
+                UNIT_NUMBER VARCHAR(8 BYTE) NOT NULL,
+                VER_NBR NUMBER(8,0) DEFAULT 1, 
+                OBJ_ID VARCHAR2(36 BYTE)
+            );
+            ALTER TABLE UNIT_ADMIN_GBL_DTL_T ADD CONSTRAINT UNIT_ADMIN_GBL_DTL_P1 PRIMARY KEY (DOCUMENT_NUMBER, PERSON_ID, UNIT_NUMBER, UNIT_ADMINISTRATOR_TYPE_CODE);
+            ALTER TABLE UNIT_ADMIN_GBL_DTL_T MODIFY (DOCUMENT_NUMBER NOT NULL ENABLE);
+            ALTER TABLE UNIT_ADMIN_GBL_DTL_T MODIFY (VER_NBR NOT NULL ENABLE);
+            ALTER TABLE UNIT_ADMIN_GBL_DTL_T MODIFY (OBJ_ID NOT NULL ENABLE);
+            ALTER TABLE UNIT_ADMIN_GBL_DTL_T ADD CONSTRAINT UNIT_ADMIN_GBL_DTL_FK1 FOREIGN KEY (UNIT_ADMINISTRATOR_TYPE_CODE)
+                REFERENCES UNIT_ADMINISTRATOR_TYPE (UNIT_ADMINISTRATOR_TYPE_CODE) ENABLE;
+            ALTER TABLE UNIT_ADMIN_GBL_DTL_T ADD CONSTRAINT UNIT_ADMIN_GBL_DTL_FK2 FOREIGN KEY (UNIT_NUMBER)
+                REFERENCES UNIT (UNIT_NUMBER) ENABLE;
+		</sql>
+		<rollback>
+			DROP TABLE UNIT_ADMIN_GBL_DTL_T;
+		</rollback>
+	</changeSet>
+
+    <changeSet id="UAR-973-4" author="S.G. Skinner">
+        <comment>
+            Adding table to hold PersonAndAdminGlobalDetail records.
+        </comment>
+        <sql>
+            CREATE TABLE UNT_ADMN_TYP_PRSN_GBL_DTL_T
+            (
+                DOCUMENT_NUMBER VARCHAR2(40 BYTE),
+                PERSON_ID VARCHAR2(40 BYTE) NOT NULL,
+                UNIT_ADMINISTRATOR_TYPE_CODE VARCHAR2(3 BYTE) NOT NULL,
+                VER_NBR NUMBER(8,0) DEFAULT 1, 
+                OBJ_ID VARCHAR2(36 BYTE)
+            );
+            ALTER TABLE UNT_ADMN_TYP_PRSN_GBL_DTL_T ADD CONSTRAINT UNT_ADMN_TYP_PRSN_GBL_DTL_P1 PRIMARY KEY (DOCUMENT_NUMBER, PERSON_ID, UNIT_ADMINISTRATOR_TYPE_CODE);
+            ALTER TABLE UNT_ADMN_TYP_PRSN_GBL_DTL_T MODIFY (DOCUMENT_NUMBER NOT NULL ENABLE);
+            ALTER TABLE UNT_ADMN_TYP_PRSN_GBL_DTL_T MODIFY (VER_NBR NOT NULL ENABLE);
+            ALTER TABLE UNT_ADMN_TYP_PRSN_GBL_DTL_T MODIFY (OBJ_ID NOT NULL ENABLE);
+            ALTER TABLE UNT_ADMN_TYP_PRSN_GBL_DTL_T ADD CONSTRAINT UNT_ADMN_TYP_PRSN_GBL_DTL_FK1 FOREIGN KEY (UNIT_ADMINISTRATOR_TYPE_CODE)
+                REFERENCES UNIT_ADMINISTRATOR_TYPE (UNIT_ADMINISTRATOR_TYPE_CODE) ENABLE;
+        </sql>
+        <rollback>
+            DROP TABLE UNT_ADMN_TYP_PRSN_GBL_DTL_T;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="UAR-973-5" author="S.G. Skinner">
+        <comment>
+            Adding table to hold UnitGlobalDetail records.
+        </comment>
+        <sql>
+            CREATE TABLE UNIT_GBL_DTL_T
+            (
+                DOCUMENT_NUMBER VARCHAR2(40 BYTE),
+                UNIT_NUMBER VARCHAR(8 BYTE) NOT NULL,
+                VER_NBR NUMBER(8,0) DEFAULT 1, 
+                OBJ_ID VARCHAR2(36 BYTE)
+            );
+            ALTER TABLE UNIT_GBL_DTL_T ADD CONSTRAINT UNIT_GBL_DTL_T PRIMARY KEY (DOCUMENT_NUMBER, UNIT_NUMBER);
+            ALTER TABLE UNIT_GBL_DTL_T MODIFY (VER_NBR NOT NULL ENABLE);
+            ALTER TABLE UNIT_GBL_DTL_T MODIFY (OBJ_ID NOT NULL ENABLE);
+            ALTER TABLE UNIT_GBL_DTL_T ADD CONSTRAINT UNIT_GBL_DTL_FK1 FOREIGN KEY (UNIT_NUMBER)
+                REFERENCES UNIT (UNIT_NUMBER) ENABLE;
+        </sql>
+        <rollback>
+            DROP TABLE UNIT_GBL_DTL_T;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

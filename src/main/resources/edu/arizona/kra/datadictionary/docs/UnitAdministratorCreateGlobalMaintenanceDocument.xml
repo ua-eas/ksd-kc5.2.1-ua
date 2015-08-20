@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+  <bean id="UnitAdministratorCreateGlobalMaintenanceDocument" parent="UnitAdministratorCreateGlobalMaintenanceDocument-parentBean"/>
+  <bean id="UnitAdministratorCreateGlobalMaintenanceDocument-parentBean" abstract="true" parent="KcMaintenanceDocumentEntry">
+    <property name="businessObjectClass" value="edu.arizona.kra.global.unit.create.UnitAdministratorCreateGlobal"/>
+    <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase"/>
+    <property name="documentTypeName" value="UnitAdministratorCreateGlobalMaintenanceDocument"/>
+    <property name="maintainableClass" value="edu.arizona.kra.global.unit.create.UnitAdminCreateGlobalMaintainableImpl"/>
+    <property name="businessRulesClass" value="edu.arizona.kra.global.unit.create.UnitAdministratorCreateGlobalRule"/>
+    <property name="allowsRecordDeletion" value="true" />
+    <property name="maintainableSections">
+      <list>
+        <ref bean="UnitAdministratorCreateGlobalMaintenanceDocument-CreateUnitAdministratorGlobal"/>
+        <ref bean="UnitAdministratorCreateGlobalMaintenanceDocument-CreateUnitGlobal"/>
+      </list>
+    </property>
+    <property name="lockingKeys">
+      <list>
+        <value>documentNumber</value>
+      </list>
+    </property>
+  </bean>
+
+<!-- Maintenance Section Definitions -->
+
+  <bean id="UnitAdministratorCreateGlobalMaintenanceDocument-CreateUnitAdministratorGlobal" parent="UnitAdministratorCreateGlobalMaintenanceDocument-CreateUnitAdministratorGlobal-parentBean"/>
+  <bean id="UnitAdministratorCreateGlobalMaintenanceDocument-CreateUnitAdministratorGlobal-parentBean" abstract="true" parent="MaintainableSectionDefinition">
+    <property name="id" value="unitAdministratorCreateGlobal"/>
+    <property name="title" value="Create Unit Administrator Global"/>
+    <property name="maintainableItems">
+      <list>
+        <bean parent="MaintainableCollectionDefinition">
+            <property name="name" value="unitAdminTypeAndPersonGlobalDetails"/>
+            <property name="businessObjectClass" value="edu.arizona.kra.global.unit.create.UnitAdminTypeAndPersonGlobalDetail"/>
+            <property name="sourceClassName" value="org.kuali.kra.bo.UnitAdministrator"/>
+            <property name="summaryTitle" value="UnitAdministrator"/>
+            <property name="includeMultipleLookupLine" value="false"/>
+            <property name="summaryFields">
+                <list>
+                  <bean parent="MaintainableFieldDefinition" p:name="person.userName"/>
+                  <bean parent="MaintainableFieldDefinition" p:name="unitAdministratorTypeCode"/>
+                </list>
+            </property>
+            <property name="maintainableFields">
+               <list>
+                    <bean parent="MaintainableFieldDefinition" p:name="personId" p:template="personId"/>
+                    <bean parent="MaintainableFieldDefinition" p:name="person.userName" p:required="true" p:template="person.userName" />
+                    <bean parent="MaintainableFieldDefinition" p:name="unitAdministratorTypeCode" p:required="true" p:template="unitAdministratorTypeCode" />
+                </list>
+            </property>
+            <property name="duplicateIdentificationFields">
+               <list>
+                   <bean parent="MaintainableFieldDefinition" p:name="person.userName"/>
+                   <bean parent="MaintainableFieldDefinition" p:name="unitAdministratorTypeCode"/>
+               </list>
+            </property>
+        </bean>
+      </list>
+    </property>
+  </bean>
+  
+  <bean id="UnitAdministratorCreateGlobalMaintenanceDocument-CreateUnitGlobal" parent="UnitAdministratorCreateGlobalMaintenanceDocument-CreateUnitGlobal-parentBean"/>
+  <bean id="UnitAdministratorCreateGlobalMaintenanceDocument-CreateUnitGlobal-parentBean" abstract="true" parent="MaintainableSectionDefinition">
+    <property name="id" value="unitCreateGlobal"/>
+    <property name="title" value="Create Unit Global"/>
+    <property name="maintainableItems">
+      <list>
+        <bean parent="MaintainableCollectionDefinition">
+            <property name="name" value="unitGlobalDetails"/>
+            <property name="businessObjectClass" value="edu.arizona.kra.global.unit.create.UnitGlobalDetail"/>
+            <property name="sourceClassName" value="org.kuali.kra.bo.Unit"/>
+            <property name="summaryTitle" value="Unit"/>
+            <property name="summaryFields">
+                <list>
+                  <bean parent="MaintainableFieldDefinition" p:name="unitNumber"/>
+                </list>
+              </property>
+            <property name="maintainableFields">
+               <list>
+                    <bean parent="MaintainableFieldDefinition" p:name="unitNumber" p:required="true" p:template="unitNumber"/>
+                </list>
+            </property>
+            <property name="duplicateIdentificationFields">
+               <list>
+                   <bean parent="MaintainableFieldDefinition" p:name="unitNumber"/>
+               </list>
+            </property>
+        </bean>
+      </list>
+    </property>
+  </bean>
+
+</beans>

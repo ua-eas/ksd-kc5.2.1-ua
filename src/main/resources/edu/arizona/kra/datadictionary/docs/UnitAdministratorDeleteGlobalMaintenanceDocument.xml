@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+  <bean id="UnitAdministratorGlobalDeleteMaintenanceDocument" parent="UnitAdministratorGlobalDeleteMaintenanceDocument-parentBean"/>
+  <bean id="UnitAdministratorGlobalDeleteMaintenanceDocument-parentBean" abstract="true" parent="KcMaintenanceDocumentEntry">
+    <property name="businessObjectClass" value="edu.arizona.kra.global.unit.delete.UnitAdministratorDeleteGlobal"/>
+    <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase"/>
+    <property name="documentTypeName" value="UnitAdministratorDeleteGlobalMaintenanceDocument"/>
+    <property name="maintainableClass" value="edu.arizona.kra.global.unit.delete.UnitAdminDeleteGlobalMaintainableImpl"/>
+    <property name="businessRulesClass" value="edu.arizona.kra.global.unit.delete.UnitAdministratorDeleteGlobalRule"/>
+    <property name="allowsRecordDeletion" value="true" />
+    <property name="maintainableSections">
+      <list>
+        <ref bean="UnitAdministratorDeleteGlobalMaintenanceDocument-DeleteUnitAdministratorGlobal"/>
+      </list>
+    </property>
+    <property name="lockingKeys">
+      <list>
+        <value>documentNumber</value>
+      </list>
+    </property>
+  </bean>
+
+<!-- Maintenance Section Definitions -->
+
+  <bean id="UnitAdministratorDeleteGlobalMaintenanceDocument-DeleteUnitAdministratorGlobal" parent="UnitAdministratorDeleteGlobalMaintenanceDocument-DeleteUnitAdministratorGlobal-parentBean"/>
+  <bean id="UnitAdministratorDeleteGlobalMaintenanceDocument-DeleteUnitAdministratorGlobal-parentBean" abstract="true" parent="MaintainableSectionDefinition">
+    <property name="id" value="unitAdministratorDeleteGlobal"/>
+    <property name="title" value="Delete Unit Administrator Global"/>
+    <property name="maintainableItems">
+      <list>
+        <bean parent="MaintainableCollectionDefinition">
+            <property name="name" value="unitAdministratorGlobalDetails"/>
+            <property name="businessObjectClass" value="edu.arizona.kra.global.unit.delete.UnitAdministratorGlobalDetail"/>
+            <property name="sourceClassName" value="org.kuali.kra.bo.UnitAdministrator"/>
+            <property name="summaryTitle" value="Unit Administrator"/>
+            <property name="summaryFields">
+                <list>
+                  <bean parent="MaintainableFieldDefinition" p:name="person.userName"/>
+                  <bean parent="MaintainableFieldDefinition" p:name="unitAdministratorTypeCode"/>
+                  <bean parent="MaintainableFieldDefinition" p:name="unitNumber"/>
+                </list>
+            </property>
+            <property name="maintainableFields">
+               <list>
+                    <bean parent="MaintainableFieldDefinition" p:name="personId" p:template="personId"/>
+                    <bean parent="MaintainableFieldDefinition" p:required="true" p:name="person.userName" />
+                    <bean parent="MaintainableFieldDefinition" p:required="true" p:name="unitAdministratorTypeCode" p:template="unitAdministratorTypeCode" />
+                    <bean parent="MaintainableFieldDefinition" p:required="true" p:name="unitNumber" p:template="unitNumber" />
+                </list>
+            </property>
+            <property name="duplicateIdentificationFields">
+               <list>
+                   <bean parent="MaintainableFieldDefinition" p:name="person.userName"/>
+                   <bean parent="MaintainableFieldDefinition" p:name="unitAdministratorTypeCode"/>
+                   <bean parent="MaintainableFieldDefinition" p:name="unitNumber"/>
+               </list>
+            </property>
+        </bean>
+      </list>
+    </property>
+  </bean>
+
+</beans>
