@@ -46,6 +46,7 @@ import org.kuali.rice.krad.workflow.DocumentInitiator;
 import org.kuali.rice.krad.workflow.KualiDocumentXmlMaterializer;
 import org.kuali.rice.krad.workflow.KualiTransactionalDocumentInformation;
 
+@SuppressWarnings( "rawtypes" )
 public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
 	private static final long serialVersionUID = -1879382692835231633L;
 	private static final Log LOG = LogFactory.getLog( ResearchDocumentBase.class );
@@ -129,7 +130,7 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
 	public Map<String, CustomAttributeDocument> getCustomAttributeDocuments() {
 		if ( customAttributeDocuments == null ) {
 			CustomAttributeService customAttributeService = KraServiceLocator.getService( CustomAttributeService.class );
-			customAttributeDocuments = customAttributeService.getDefaultCustomAttributeDocuments( getDocumentTypeCode(), getDocumentCustomData() );
+			customAttributeDocuments = customAttributeService.getCustomAttributeDocuments( documentNumber , getDocumentTypeCode() );
 		}
 		return customAttributeDocuments;
 	}

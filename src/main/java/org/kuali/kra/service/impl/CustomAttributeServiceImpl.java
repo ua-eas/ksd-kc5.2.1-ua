@@ -15,16 +15,25 @@
  */
 package org.kuali.kra.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.ArgValueLookup;
 import org.kuali.kra.bo.CustomAttributeDataType;
+import org.kuali.kra.bo.CustomAttributeDocValue;
 import org.kuali.kra.bo.CustomAttributeDocument;
 import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.infrastructure.PropertyConstants;
 import org.kuali.kra.service.CustomAttributeService;
+import org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.api.WorkflowDocumentFactory;
 import org.kuali.rice.kew.api.document.attribute.WorkflowAttributeDefinition;
@@ -32,49 +41,101 @@ import org.kuali.rice.kns.service.BusinessObjectDictionaryService;
 import org.kuali.rice.kns.service.DataDictionaryService;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
-import java.util.*;
-
 /**
  * This class provides the implementation of the Custom Attribute Service.
  * It provides service methods related to custom attributes.
  */
+@SuppressWarnings( { "deprecation", "unchecked", "rawtypes", "unused" } )
 public class CustomAttributeServiceImpl implements CustomAttributeService {
+
+	private static class CustomAttributeDocumentConstants {
+		public static final String CUSTOM_ATTRIBUTE_ID = "customAttributeId";
+		public static final String DOCUMENT_TYPE_CODE = "documentTypeName";
+		public static final String IS_REQUIRED = "required";
+		public static final String OBJ_ID = "objectId";
+		public static final String TYPE_NAME = "typeName";
+		public static final String ACTIVE_FLAG = "active";
+		public static final String UPDATE_TIMESTAMP = "updateTimestamp";
+		public static final String UPDATE_USER = "updateUser";
+		public static final String VER_NBR = "versionNumber";
+	}
+
+	private static class CustomAttributeDocValueConstants {
+		public static final String DOCUMENT_NUMBER = "documentNumber";
+		public static final String CUSTOM_ATTRIBUTE_ID = "customAttributeId";
+		public static final String OBJ_ID = "objectId";
+		public static final String UPDATE_TIMESTAMP = "updateTimestamp";
+		public static final String UPDATE_USER = "updateUser";
+		public static final String VALUE = "value";
+		public static final String VER_NBR = "versionNumber";
+	}
 
     private static final String ARGVALUELOOKUPE_CLASS = "org.kuali.kra.bo.ArgValueLookup";
     private BusinessObjectService businessObjectService;
 
-    @Override
+	/**
+	 * This method has been deprecated, it will now result in returning the currently active custom attribute documents.
+	 * Please replace usage with one of the following methods as appropriate for needs:
+	 *
+	 * @see CustomAttributeService#getCustomAttributeDocuments(String, String)
+	 * @see CustomAttributeService#getAllCustomAttributeDocuments(String)
+	 * @see CustomAttributeService#getActiveCustomAttributeDocuments(String)
+	 */
+    @Deprecated
     public Map<String, CustomAttributeDocument> getDefaultCustomAttributeDocuments(String documentTypeCode, List<? extends DocumentCustomData> customDataList) {
-        Map<String, CustomAttributeDocument> customAttributeDocuments = new HashMap<String, CustomAttributeDocument>();
-        Map<String, String> queryMap = new HashMap<String, String>();
-        queryMap.put(PropertyConstants.DOCUMENT.TYPE_NAME.toString(), documentTypeCode);
-        List<CustomAttributeDocument> customAttributeDocumentList = 
-            (List<CustomAttributeDocument>) getBusinessObjectService().findMatching(CustomAttributeDocument.class, queryMap);
-
-        HashSet<Long> customIds = new HashSet<Long>();
-        if (customDataList != null) {
-            customIds = getCurrentCustomAttributeIds(customDataList);
-        }
-        for(CustomAttributeDocument customAttributeDocument:customAttributeDocumentList) {
-            boolean customAttributeExists = false;
-            if (!customIds.isEmpty() && customIds.contains(customAttributeDocument.getCustomAttributeId().longValue())) {
-                customAttributeExists = true;
-            }
-
-            if (customAttributeDocument.isActive() || customAttributeExists) {
-            	for (int i = 0; i < customDataList.size(); i++) {
-            		if (customDataList.size() != 0 && customAttributeDocument.getCustomAttributeId().toString().equals(customDataList.get(i).getCustomAttributeId().toString())) {
-            			String customDataValue = customDataList.get(i).getValue();
-            			customAttributeDocument.getCustomAttribute().setValue(customDataValue);
-            			break;
-            		}
-            	}
-                customAttributeDocuments.put(customAttributeDocument.getCustomAttributeId().toString(), customAttributeDocument);
-            }
-        }
-        return customAttributeDocuments;
+        return getActiveCustomAttributeDocuments( documentTypeCode );
     }
-    
+	
+	@Override
+	public Map<String, CustomAttributeDocument> getCustomAttributeDocuments( String documentNumber, String documentTypeCode ) {
+		Map<String, CustomAttributeDocument> allCustomAttributeDocuments = getAllCustomAttributeDocuments( documentTypeCode );
+		Map<String, CustomAttributeDocument> activeCustomAttributeDocuments = getActiveCustomAttributeDocuments( documentTypeCode );
+		Map<String, CustomAttributeDocument> thisCustomAttributeDocuments = new HashMap<String, CustomAttributeDocument>();
+		Map<String, String> fieldValues = new HashMap<String, String>();
+		fieldValues.put( CustomAttributeDocValueConstants.DOCUMENT_NUMBER, documentNumber );
+		List<CustomAttributeDocValue> docValues = (List<CustomAttributeDocValue>) getBusinessObjectService().findMatching( CustomAttributeDocValue.class, fieldValues );
+		if ( docValues.size() > 0 ) {
+			for ( CustomAttributeDocValue docValue : docValues ) {
+				for ( Entry<String, CustomAttributeDocument> entry : allCustomAttributeDocuments.entrySet() ) {
+					String entryId = entry.getValue().getCustomAttributeId().toString();
+					String docValueId = docValue.getCustomAttributeId().toString();
+					if ( StringUtils.equals( entryId, docValueId ) ) {
+						thisCustomAttributeDocuments.put( entryId, entry.getValue() );
+					}
+				}
+			}
+			return thisCustomAttributeDocuments;
+		}
+		return activeCustomAttributeDocuments;
+	}
+	
+	@Override
+	public Map<String, CustomAttributeDocument> getAllCustomAttributeDocuments( String documentTypeCode ) {
+		Map<String, String> fieldValues = new HashMap<String, String>();
+		fieldValues.put( CustomAttributeDocumentConstants.DOCUMENT_TYPE_CODE, documentTypeCode );
+		List<CustomAttributeDocument> customAttributeDocumentList = (List<CustomAttributeDocument>) getBusinessObjectService().findMatching( CustomAttributeDocument.class, fieldValues );
+		Map<String, CustomAttributeDocument> allCustomAttributeDocuments = new HashMap<String, CustomAttributeDocument>();
+		for ( CustomAttributeDocument customAttributeDocument : customAttributeDocumentList ) {
+			String entryId = customAttributeDocument.getCustomAttributeId().toString();
+			allCustomAttributeDocuments.put( entryId, customAttributeDocument );
+		}
+		return allCustomAttributeDocuments;
+	}
+	
+	@Override
+	public Map<String, CustomAttributeDocument> getActiveCustomAttributeDocuments( String documentTypeCode ) {
+		Map<String, String> fieldValues = new HashMap<String, String>();
+		fieldValues.put( CustomAttributeDocumentConstants.DOCUMENT_TYPE_CODE, documentTypeCode );
+		fieldValues.put( CustomAttributeDocumentConstants.ACTIVE_FLAG, OjbCharBooleanConversion.DATABASE_BOOLEAN_TRUE_STRING_REPRESENTATION );
+		List<CustomAttributeDocument> customAttributeDocumentList = (List<CustomAttributeDocument>) getBusinessObjectService().findMatching( CustomAttributeDocument.class, fieldValues );
+		Map<String, CustomAttributeDocument> activeCustomAttributeDocuments = new HashMap<String, CustomAttributeDocument>();
+		for ( CustomAttributeDocument customAttributeDocument : customAttributeDocumentList ) {
+			String entryId = customAttributeDocument.getCustomAttributeId().toString();
+			activeCustomAttributeDocuments.put( entryId, customAttributeDocument );
+		}
+		return activeCustomAttributeDocuments;
+	}
+	
     protected HashSet<Long> getCurrentCustomAttributeIds(List<? extends DocumentCustomData> customDataList) {
         HashSet<Long> customIds = new HashSet<Long>();
         for(DocumentCustomData customData : customDataList) {
