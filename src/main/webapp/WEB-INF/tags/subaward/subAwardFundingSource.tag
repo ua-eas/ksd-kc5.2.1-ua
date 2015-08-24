@@ -88,6 +88,8 @@
    			</c:if>
    			</tbody>
      	<c:forEach var="subAwardFundingSource" items="${KualiForm.document.subAwardList[0].subAwardFundingSourceList}" varStatus="status">
+            <c:set var="isActiveAward" value="${subAwardFundingSource.award.awardSequenceStatus}"/>
+		    <c:if test="${isActiveAward=='ACTIVE'}">             
 		             <tr>
 		             
 						<th width="5%" class="infoline" rowspan="1">
@@ -95,14 +97,11 @@
 						</th>
 						<c:set  var="documentNumber" value="${subAwardFundingSource.award.awardDocument.documentNumber}"/> 
 						    <td width="6%" valign="middle"> 
-						    
-						    <a
-						href="${ConfigProperties.application.url}/awardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
+						      <a href="${ConfigProperties.application.url}/awardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
 						target="_blank" class="medusaOpenLink">Open award</a>
 						</td>
 						  <td width="6%" valign="middle"> 
-						 <a
-						href="${ConfigProperties.application.url}/awardHome.do?methodToCall=medusa&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
+						      <a href="${ConfigProperties.application.url}/awardHome.do?methodToCall=medusa&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
 						target="_blank" class="medusaOpenLink"> medusa </a>
 						 
 						    </td>
@@ -121,7 +120,7 @@
 						</td>
 		                <td width="9%" valign="middle">
 						<div align="center">
-	                		<kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.awardStatus.description" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.statusCode}"/>
+    	                		<kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.awardSequenceStatus" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.statusCode}"/>
 						</div>
 						</td>
 						<td width="9%" valign="middle">
@@ -150,7 +149,7 @@
 						</div>
 						</td>           
 		            </tr>
-      
+            </c:if>
 	        	</c:forEach>
         </table>
     </div> 

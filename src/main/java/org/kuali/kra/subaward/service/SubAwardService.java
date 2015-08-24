@@ -100,4 +100,11 @@ public interface SubAwardService {
      SubAward getActiveSubAward(Long subAwardCode);
 
      List<SubAward> getLinkedSubAwards(Award award);
+     
+     /**
+      * This method creates new Subaward funding sources for an award that is being versioned from an old version to a new version.
+      * @param oldAwardVersion
+      * @param newAwardVersion
+      */
+     public void updateLinkedSubAwards(Award oldAwardVersion, Award newAwardVersion);
 }

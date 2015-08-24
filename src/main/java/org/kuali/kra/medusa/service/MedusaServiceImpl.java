@@ -577,12 +577,12 @@ public class MedusaServiceImpl implements MedusaService {
         if (award == null) {
             return null;
         }
-        Award currentAward = (Award) getActiveOrCurrentVersion(Award.class, award.getAwardNumber());
+        Award currentAward = (Award) getVersionHistoryService().getActiveOrCurrentVersion(Award.class, award.getAwardNumber());
         return currentAward == null ? award : currentAward;
     }
     
     protected Award getAward(String awardNumber) {
-        Award currentAward = (Award) getActiveOrCurrentVersion(Award.class, awardNumber);
+        Award currentAward = (Award) getVersionHistoryService().getActiveOrCurrentVersion(Award.class, awardNumber);
         return currentAward;
     }
     
@@ -596,7 +596,7 @@ public class MedusaServiceImpl implements MedusaService {
         if (subAward == null) {
             return null;
         }
-        SubAward currentSubAward = (SubAward) getActiveOrCurrentVersion(SubAward.class, subAward.getSubAwardCode());
+        SubAward currentSubAward = (SubAward) getVersionHistoryService().getActiveOrCurrentVersion(SubAward.class, subAward.getSubAwardCode());
         if (currentSubAward != null) {
             KraServiceLocator.getService(SubAwardService.class).getAmountInfo(currentSubAward);
         }
@@ -635,36 +635,6 @@ public class MedusaServiceImpl implements MedusaService {
             }
         }
         return newest;
-    }
-    /**
-     * 
-     * Gets the active or if not available the most current, not cancelled version of a 
-     * versioned BO. Currently only Awards use the Version History framework though
-     * @param clazz
-     * @param sequenceName
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    protected SequenceOwner getActiveOrCurrentVersion(Class clazz, String sequenceName) {
-        VersionHistory activeVersion = versionHistoryService.findActiveVersion(clazz, sequenceName);
-        SequenceOwner bestVersion = null;
-        if (activeVersion != null) {
-            bestVersion = (SequenceOwner)activeVersion.getSequenceOwner();
-        } else {
-            List<VersionHistory> history = versionHistoryService.loadVersionHistory(clazz, sequenceName);
-            if (history != null && !history.isEmpty()) {
-                VersionHistory best = history.get(0);
-                for (VersionHistory curVersion : history) {
-                    if (curVersion.getVersionNumber() > best.getVersionNumber()) {
-                        if (curVersion.getStatus() != VersionStatus.CANCELED) {
-                            best = curVersion;
-                        }
-                    }
-                }
-                bestVersion = (SequenceOwner)best.getSequenceOwner();
-            } 
-        }
-        return bestVersion;  
     }
     
     /**
@@ -773,7 +743,7 @@ public class MedusaServiceImpl implements MedusaService {
         Collection<Award> awards = new ArrayList<Award>();
         SubAward newestSubAaward = getSubAward(subAward.getSubAwardCode());
 
-        Collection<SubAwardFundingSource> subAwardFundingSources = newestSubAaward.getSubAwardFundingSourceList();
+        Collection<SubAwardFundingSource> subAwardFundingSources = newestSubAaward.getActiveSubAwardFundingSourceList();
         for (SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
             awards.add(getAward(subAwardFundingSource.getAwardId()));
         }
@@ -781,7 +751,7 @@ public class MedusaServiceImpl implements MedusaService {
     }
     
     protected SubAward getSubAward(String subAwardCode) {
-        SubAward subAward = (SubAward) getActiveOrCurrentVersion(SubAward.class, subAwardCode);
+        SubAward subAward = (SubAward) getVersionHistoryService().getActiveOrCurrentVersion(SubAward.class, subAwardCode);
         return subAward;
     }
     

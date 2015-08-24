@@ -463,6 +463,8 @@ public class AwardHomeAction extends AwardAction {
         getAwardService().updateAwardSequenceStatus(newAwardDocument.getAward(), VersionStatus.PENDING);
         getVersionHistoryService().updateVersionHistory(newAwardDocument.getAward(), VersionStatus.PENDING,
                 GlobalVariables.getUserSession().getPrincipalName());
+        //add SubAwardFunding sources to point to the new version of the Award
+        getSubAwardService().updateLinkedSubAwards(award, newAwardDocument.getAward());
         reinitializeAwardForm(awardForm, newAwardDocument);
         return new ActionForward(makeDocumentOpenUrl(newAwardDocument), true);
     }

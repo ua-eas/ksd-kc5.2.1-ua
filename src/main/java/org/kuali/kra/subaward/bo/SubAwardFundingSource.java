@@ -284,4 +284,40 @@ public class SubAwardFundingSource extends SubAwardAssociate {
 
         this.subAwardFundingSourceId = null;
     }
+	
+	/**
+     * Constructs a new copy of this SubAwardFundingSource with all the attributes (except the id)
+     */
+    public SubAwardFundingSource copy() { 
+        SubAwardFundingSource newSubAwardFundingSource = new SubAwardFundingSource();
+        
+        newSubAwardFundingSource.setAccountNumber(this.accountNumber);
+        newSubAwardFundingSource.setAmountObligatedToDate(this.amountObligatedToDate);    
+        newSubAwardFundingSource.setAward(this.award);
+        newSubAwardFundingSource.setAwardAmountInfo(this.awardAmountInfo);
+       
+        newSubAwardFundingSource.setNewCollectionRecord(true);
+        newSubAwardFundingSource.setObligationExpirationDate(this.obligationExpirationDate);
+        
+        newSubAwardFundingSource.setSubAwardId(this.subAwardId);
+        newSubAwardFundingSource.setSubAwardCode(this.subAwardCode);
+        newSubAwardFundingSource.setAwardId(this.awardId);
+        newSubAwardFundingSource.setStatusCode(this.statusCode);
+        newSubAwardFundingSource.setSponsorCode(this.sponsorCode);
+        newSubAwardFundingSource.setSponsorName(this.sponsorName);
+        
+        if ( this.award != null ){
+            newSubAwardFundingSource.setAward(this.getAward());
+            newSubAwardFundingSource.setAwardId(this.award.getAwardId());
+            newSubAwardFundingSource.setAwardNumber(this.award.getAwardNumber());
+        }
+        
+        newSubAwardFundingSource.setSequenceOwner(this.getSequenceOwner());
+        //this actually holds the SubAward Version Number
+        newSubAwardFundingSource.setVersionNumber(this.getVersionNumber());
+        
+        return newSubAwardFundingSource;
+    }
+    
+    
 }
