@@ -321,7 +321,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			if ( actionRequest.isPending() 
 			        && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) 
 			        && recipientMatchesUser( actionRequest, loggedInPrincipalId ) 
-			        && ( isHierarchyRequestNode(actionRequest.getNodeName()) || !isNodeInCurrentRoute(actionRequest.getNodeName(),currentRouteNodeNames) ) ) {
+			        && ( !isNodeInCurrentRoute(actionRequest.getNodeName(),currentRouteNodeNames) ) )
+			        && isHierarchyRequestNode(actionRequest.getNodeName()) {
 				return true;
 			}
 		}
