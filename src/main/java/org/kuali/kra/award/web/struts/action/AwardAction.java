@@ -1826,12 +1826,7 @@ public class AwardAction extends BudgetParentActionBase {
      * @param award
      */
     protected void setSubAwardDetails(Award award){
-		List<SubAward> subAwardsForAllAwardVersions = new ArrayList<SubAward>();
-		List<Award> awardVersions = getAwardService().findAwardsForAwardNumber( award.getAwardNumber() );
-		for ( Award currentAward : awardVersions ) {
-			subAwardsForAllAwardVersions.addAll( getSubAwardService().getLinkedSubAwards( currentAward ) );
-		}
-		award.setSubAwardList( subAwardsForAllAwardVersions );
+        award.setSubAwardList(getSubAwardService().getLinkedSubAwards(award));
     }
 
     protected KcNotificationService getNotificationService() {

@@ -72,6 +72,15 @@ public interface VersionHistoryService {
      */
     VersionHistory findPendingVersion(Class<? extends SequenceOwner> klass, String versionName);
     
+    
+    /**
+     * Find the active - if any, if not the pending version for a given SequenceOwner
+     * @param klass
+     * @param versionName
+     * @return null if no active/pending version found
+     */
+    VersionHistory findActiveOrPendingVersion(Class<? extends SequenceOwner> klass, String versionName);
+    
     /**
      * Find version histories without fetching the sequence owner. If you need sequence owner included in history list, use loadVersionHistory() method.
      * @param klass
@@ -96,6 +105,16 @@ public interface VersionHistoryService {
     VersionHistory getActiveOrNewestVersion(Class<? extends SequenceOwner> klass, String versionName);
     
 	/**
+     * Gets the active or if not available the most current, not cancelled version of a versioned BO. 
+     * Note: Currently only Awards and Subawards use the Version History framework
+     * @param klass - extends SequenceOwner
+     * @param versionName
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public SequenceOwner getActiveOrCurrentVersion(Class<? extends SequenceOwner> klass, String versionName);
+	
+    /**
 	 * Find the VersionHistory for a given SequenceOwner type, version name and sequence number
 	 * 
 	 * @param klass

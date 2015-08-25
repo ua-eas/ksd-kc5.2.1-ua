@@ -157,6 +157,22 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         return pendingVersionHistory;
     }
     
+    
+    /**
+     * @see org.kuali.kra.service.VersionHistoryService#findActiveOrPendingVersion(java.lang.Class, java.lang.String)
+     */
+    public VersionHistory findActiveOrPendingVersion(Class<? extends SequenceOwner> klass, String versionName) {       
+        VersionHistory result = findActiveVersion(klass, versionName);
+        if (result == null) {
+            result = findPendingVersion(klass, versionName);
+        }
+        return result;
+    }
+    
+    
+    /**
+     * @see org.kuali.kra.service.VersionHistoryService#findPendingVersion(java.lang.Class, java.lang.String)
+     */
     public VersionHistory findPendingVersion(Class<? extends SequenceOwner> klass, String versionName) {
         VersionHistory pendingVersionHistory = null;
         
@@ -263,4 +279,33 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         }
         return history;
     }
+    
+    
+    /**
+     *  @see org.kuali.kra.service.VersionHistoryService#getActiveOrCurrentVersion(java.lang.Class, java.lang.String)
+     */
+    @SuppressWarnings("unchecked")
+    public SequenceOwner getActiveOrCurrentVersion(Class<? extends SequenceOwner> clazz, String versionName) {
+       
+        VersionHistory activeVersion = findActiveVersion(clazz, versionName);
+        SequenceOwner bestVersion = null;
+        if (activeVersion != null) {
+            bestVersion = (SequenceOwner)activeVersion.getSequenceOwner();
+        } else {
+            List<VersionHistory> history = loadVersionHistory(clazz, versionName);
+            if (history != null && !history.isEmpty()) {
+                VersionHistory best = history.get(0);
+                for (VersionHistory curVersion : history) {
+                    if (curVersion.getVersionNumber() > best.getVersionNumber()) {
+                        if (curVersion.getStatus() != VersionStatus.CANCELED) {
+                            best = curVersion;
+                        }
+                    }
+                }
+                bestVersion = (SequenceOwner)best.getSequenceOwner();
+            } 
+        }
+        return bestVersion;  
+    }
+    
 }

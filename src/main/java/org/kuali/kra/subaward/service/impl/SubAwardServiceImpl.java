@@ -329,6 +329,10 @@ public class SubAwardServiceImpl implements SubAwardService {
         return subAward;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.kuali.kra.subaward.service.SubAwardService#getLinkedSubAwards(org.kuali.kra.award.home.Award)
+     */
     @Override
     public List<SubAward> getLinkedSubAwards(Award award) {
         Map<String, Object> values = new HashMap<String, Object>();
@@ -338,20 +342,83 @@ public class SubAwardServiceImpl implements SubAwardService {
         for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
             subAwardSet.add(subAwardFundingSource.getSubAward().getSubAwardCode());
         }
+        List<SubAward> activeSubAwards = new ArrayList<SubAward>();
         List<SubAward> subAwards = new ArrayList<SubAward>();
+        
         for (String subAwardCode : subAwardSet) {
-            VersionHistory activeVersion = getVersionHistoryService().findActiveVersion(SubAward.class, subAwardCode);
-            if (activeVersion == null) {
-                VersionHistory pendingVersion = getVersionHistoryService().findPendingVersion(SubAward.class, subAwardCode);
-                if (pendingVersion != null) {
-                    subAwards.add((SubAward) pendingVersion.getSequenceOwner());
+            VersionHistory activeVersion = getVersionHistoryService().findActiveOrPendingVersion(SubAward.class, subAwardCode);
+            if (activeVersion != null) {
+                activeSubAwards.add((SubAward) activeVersion.getSequenceOwner());
+            }
+        }
+        //filter the active subawards by the the referenced subaward sequence nbr in the funding source
+        for(SubAward subAward: activeSubAwards){
+            for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
+                if (subAward.getSequenceNumber().equals(subAwardFundingSource.getSequenceNumber())){
+                    subAwards.add(subAward);
+                    break; // this doesn't allow adding duplicate subaward links
                 }
-            } else {
-                subAwards.add((SubAward) activeVersion.getSequenceOwner());
             }
         }
         return subAwards;
     }
+
+    /**
+     * This method copies over the linked Subaward funding sources for an award, from an old version to a new version.
+     * @param oldAwardVersion
+     * @param newAwardVersion
+     */
+    public void updateLinkedSubAwards(Award oldAwardVersion, Award newAwardVersion){
+        List<SubAwardFundingSource> activeFundingSources = findActiveSubawardFundingSourcesForAward(oldAwardVersion);
+        for ( SubAwardFundingSource currentSubAwardFundingSource : activeFundingSources ){
+            SubAwardFundingSource newSubAwardFundingSource = currentSubAwardFundingSource.copy();
+            newSubAwardFundingSource.setAward(newAwardVersion);
+            newSubAwardFundingSource.setAwardId(newAwardVersion.getAwardId());
+            newSubAwardFundingSource.setAwardNumber(newAwardVersion.getAwardNumber());
+            getBusinessObjectService().save(newSubAwardFundingSource);
+        }
+        
+    }
+    
+    /**
+     * Method that finds all the subaward funding sources related to a particular award version (specified by awardId in the award parameter)
+     * that belong to active or pending subawards
+     * @param award
+     * @return List<SubAwardFundingSource>
+     */
+    protected List<SubAwardFundingSource> findActiveSubawardFundingSourcesForAward(Award award){
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("awardId", award.getAwardId());
+        Collection<SubAwardFundingSource> subAwardFundingSources = businessObjectService.findMatching(SubAwardFundingSource.class, values);
+        
+        Set<String> subAwardSet = new TreeSet<String>();
+        //eliminate duplicate SubAward Ids
+        for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
+            subAwardSet.add(subAwardFundingSource.getSubAward().getSubAwardCode());
+        }
+        
+        //find the active subawards corresponding to the list above
+        List<SubAward> activeSubAwards = new ArrayList<SubAward>();
+        for (String subAwardCode : subAwardSet) {
+            VersionHistory activeVersion = getVersionHistoryService().findActiveOrPendingVersion(SubAward.class, subAwardCode);
+            if (activeVersion != null) {
+                activeSubAwards.add((SubAward) activeVersion.getSequenceOwner());
+            }
+        }
+        
+       //filter the funding sources for the award that belong to active subawards and ignore the rest
+       List<SubAwardFundingSource> activeSubAwardFundingSources = new ArrayList<SubAwardFundingSource>();
+       for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
+           for(SubAward subAward: activeSubAwards){
+               if ( subAwardFundingSource.getSequenceNumber().equals(subAward.getSequenceNumber())){
+                   activeSubAwardFundingSources.add(subAwardFundingSource);
+               }
+           }
+       }
+       
+       return activeSubAwardFundingSources;
+    }
+    
 
     public VersionHistoryService getVersionHistoryService() {
         return versionHistoryService;
