@@ -89,11 +89,12 @@
    			</tbody>
      	<c:forEach var="subAwardFundingSource" items="${KualiForm.document.subAwardList[0].subAwardFundingSourceList}" varStatus="status">
             <c:set var="isActiveAward" value="${subAwardFundingSource.award.awardSequenceStatus}"/>
-		    <c:if test="${isActiveAward=='ACTIVE'}">             
+            <c:set var="isEmptyAward" value="${subAwardFundingSource.award.awardId}"/>
+		    <c:if test="${isActiveAward=='ACTIVE'|| isEmptyAward==null}">             
 		             <tr>
 		             
-						<th width="5%" class="infoline" rowspan="1">
-							<c:out value="${status.index+1}" />
+						<th width="3%" class="infoline" rowspan="1">
+							<!-- c:out value="${status.index+1}" /-->
 						</th>
 						<c:set  var="documentNumber" value="${subAwardFundingSource.award.awardDocument.documentNumber}"/> 
 						    <td width="6%" valign="middle"> 
