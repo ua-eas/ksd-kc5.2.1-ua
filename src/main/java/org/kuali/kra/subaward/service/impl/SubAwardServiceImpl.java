@@ -371,11 +371,14 @@ public class SubAwardServiceImpl implements SubAwardService {
     public void updateLinkedSubAwards(Award oldAwardVersion, Award newAwardVersion){
         List<SubAwardFundingSource> activeFundingSources = findActiveSubawardFundingSourcesForAward(oldAwardVersion);
         for ( SubAwardFundingSource currentSubAwardFundingSource : activeFundingSources ){
-            SubAwardFundingSource newSubAwardFundingSource = currentSubAwardFundingSource.copy();
-            newSubAwardFundingSource.setAward(newAwardVersion);
-            newSubAwardFundingSource.setAwardId(newAwardVersion.getAwardId());
-            newSubAwardFundingSource.setAwardNumber(newAwardVersion.getAwardNumber());
-            getBusinessObjectService().save(newSubAwardFundingSource);
+            //avoid creating duplicate subAwardFundingSources for the new award
+            if (!currentSubAwardFundingSource.getAwardId().equals(newAwardVersion.getAwardId())){
+                SubAwardFundingSource newSubAwardFundingSource = currentSubAwardFundingSource.copy();
+                newSubAwardFundingSource.setAward(newAwardVersion);
+                newSubAwardFundingSource.setAwardId(newAwardVersion.getAwardId());
+                newSubAwardFundingSource.setAwardNumber(newAwardVersion.getAwardNumber());
+                getBusinessObjectService().save(newSubAwardFundingSource);
+            }
         }
         
     }
