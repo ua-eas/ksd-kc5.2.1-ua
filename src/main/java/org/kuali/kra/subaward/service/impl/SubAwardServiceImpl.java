@@ -178,8 +178,8 @@ public class SubAwardServiceImpl implements SubAwardService {
 
 	/** {@inheritDoc} */
     public String getNextSubAwardCode() {
- Long nextAwardNumber = sequenceAccessorService.
- getNextAvailableSequenceNumber(Constants.SUBAWARD_SEQUENCE_SUBAWARD_CODE);
+        Long nextAwardNumber = sequenceAccessorService.
+                getNextAvailableSequenceNumber(Constants.SUBAWARD_SEQUENCE_SUBAWARD_CODE);
 
         return nextAwardNumber.toString();
     }
@@ -328,37 +328,17 @@ public class SubAwardServiceImpl implements SubAwardService {
         getAmountInfo(subAward);
         return subAward;
     }
-
+   
     
     /* (non-Javadoc)
      * @see org.kuali.kra.subaward.service.SubAwardService#getLinkedSubAwards(org.kuali.kra.award.home.Award)
-     */
+    */ 
     @Override
     public List<SubAward> getLinkedSubAwards(Award award) {
-        Map<String, Object> values = new HashMap<String, Object>();
-        values.put("awardId", award.getAwardId());
-        Collection<SubAwardFundingSource> subAwardFundingSources = businessObjectService.findMatching(SubAwardFundingSource.class, values);
-        Set<String> subAwardSet = new TreeSet<String>();
-        for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
-            subAwardSet.add(subAwardFundingSource.getSubAward().getSubAwardCode());
-        }
-        List<SubAward> activeSubAwards = new ArrayList<SubAward>();
         List<SubAward> subAwards = new ArrayList<SubAward>();
-        
-        for (String subAwardCode : subAwardSet) {
-            VersionHistory activeVersion = getVersionHistoryService().findActiveOrPendingVersion(SubAward.class, subAwardCode);
-            if (activeVersion != null) {
-                activeSubAwards.add((SubAward) activeVersion.getSequenceOwner());
-            }
-        }
-        //filter the active subawards by the the referenced subaward sequence nbr in the funding source
-        for(SubAward subAward: activeSubAwards){
-            for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
-                if (subAward.getSequenceNumber().equals(subAwardFundingSource.getSequenceNumber())){
-                    subAwards.add(subAward);
-                    break; // this doesn't allow adding duplicate subaward links
-                }
-            }
+        Collection<SubAwardFundingSource> subAwardFundingSources = findActiveSubawardFundingSourcesForAward(award);
+        for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
+                subAwards.add(subAwardFundingSource.getSubAward());
         }
         return subAwards;
     }
@@ -380,7 +360,6 @@ public class SubAwardServiceImpl implements SubAwardService {
                 getBusinessObjectService().save(newSubAwardFundingSource);
             }
         }
-        
     }
     
     /**
@@ -413,13 +392,84 @@ public class SubAwardServiceImpl implements SubAwardService {
        List<SubAwardFundingSource> activeSubAwardFundingSources = new ArrayList<SubAwardFundingSource>();
        for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
            for(SubAward subAward: activeSubAwards){
-               if ( subAwardFundingSource.getSequenceNumber().equals(subAward.getSequenceNumber())){
+               if ( subAwardFundingSource.getSubAwardId().equals(subAward.getSubAwardId()) ){
                    activeSubAwardFundingSources.add(subAwardFundingSource);
+                   break;
                }
            }
        }
        
        return activeSubAwardFundingSources;
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see org.kuali.kra.subaward.service.SubAwardService#syncPendingLinkedSubAwards(org.kuali.kra.award.home.Award)
+    */ 
+    public void syncPendingLinkedSubAwards(Award award){
+        //first check if the award is active, otherwise just exit
+        if ( !award.getAwardSequenceStatus().equalsIgnoreCase(VersionStatus.ACTIVE.name()) ){
+            return;
+        }
+        //get the award funding sources
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("awardId", award.getAwardId());
+        Collection<SubAwardFundingSource> subAwardFundingSources = businessObjectService.findMatching(SubAwardFundingSource.class, values);
+        
+        //eliminate duplicate SubAward Codes
+        Set<String> subAwardSet = new TreeSet<String>();
+        for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
+            subAwardSet.add(subAwardFundingSource.getSubAward().getSubAwardCode());
+        }
+        
+        for ( String subawardCode: subAwardSet ){
+            //find if any, pending subawards for the corresponding SubawardCode
+            VersionHistory subAwardPendingVersion = getVersionHistoryService().findPendingVersion(SubAward.class, subawardCode);
+            if (subAwardPendingVersion != null) {
+                //find the active version of the corresponding subaward
+                VersionHistory subAwardActiveVersion = getVersionHistoryService().findActiveVersion(SubAward.class, subawardCode);
+                if (subAwardActiveVersion != null) {
+                    SubAward activeSubAward = (SubAward) subAwardActiveVersion.getSequenceOwner();
+                    //check that the active version of the subaward is linked to the current award
+                    boolean activeSubAwardIsLinkedToAward = false;
+                    SubAwardFundingSource activeSubAwardSFS = null;
+                   
+                    for (SubAwardFundingSource sfs: subAwardFundingSources){
+                        if ( sfs.getSubAwardId().equals(activeSubAward.getSubAwardId()) ){
+                            activeSubAwardIsLinkedToAward = true;
+                            activeSubAwardSFS = sfs;
+                            break;
+                        }
+                    }
+                    
+                    if (activeSubAwardIsLinkedToAward){
+                        boolean pendingSubAwardIsLinkedToAward = false;
+                        //check if the pending version of the same subaward has the link to the current award
+                        SubAward pendingSubAward = (SubAward) subAwardPendingVersion.getSequenceOwner();
+                        for (SubAwardFundingSource awardFS: subAwardFundingSources){
+                            if ( awardFS.getSubAwardId().equals(pendingSubAward.getSubAwardId()) ){
+                                pendingSubAwardIsLinkedToAward = true;
+                                break;
+                            }
+                        }
+                        
+                        if ( !pendingSubAwardIsLinkedToAward ){
+                            //need to add a new SFS with the current award to the pending subAward
+                            SubAwardFundingSource newSFS = activeSubAwardSFS.copy();
+                            
+                            newSFS.setSubAwardId(pendingSubAward.getSubAwardId());
+                            newSFS.setSubAwardCode(pendingSubAward.getSubAwardCode());
+                            
+                            newSFS.setAward(award);
+                            newSFS.setAwardId(award.getAwardId());
+                            newSFS.setAwardNumber(award.getAwardNumber());                          
+                            
+                            getBusinessObjectService().save(newSFS);
+                        }
+                    }
+                }
+            }
+        }
     }
     
 

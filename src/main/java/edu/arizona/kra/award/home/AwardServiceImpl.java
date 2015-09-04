@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
+import org.kuali.kra.award.notesandattachments.attachments.AwardAttachment;
+import org.kuali.kra.service.VersionException;
+import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 public class AwardServiceImpl extends org.kuali.kra.award.home.AwardServiceImpl {
@@ -47,5 +51,21 @@ public class AwardServiceImpl extends org.kuali.kra.award.home.AwardServiceImpl 
 		map.put("awardNumber", awardNumber);
 		return map;
 	}
+	
+	
+	
+
+    public AwardDocument createNewAwardVersion(AwardDocument awardDocument) throws VersionException, WorkflowException {
+        AwardDocument newVersion = super.createNewAwardVersion(awardDocument);
+        synchSubAwardFundingSources(awardDocument, newVersion);
+        return newVersion;
+    }
+    
+    protected void synchSubAwardFundingSources(AwardDocument oldAwardDocument, AwardDocument newAwardDocument){
+        
+    }
+	
+	
+	
 
 }

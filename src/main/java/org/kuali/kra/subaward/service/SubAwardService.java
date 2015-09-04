@@ -107,4 +107,11 @@ public interface SubAwardService {
       * @param newAwardVersion
       */
      public void updateLinkedSubAwards(Award oldAwardVersion, Award newAwardVersion);
+     
+     /**
+      * This method adds necessary SFS to the Pending SubAwards linked to a previous version of this Award (if the
+      * SFS with this AwardId doesn't already exist). Usually called when after a new Award version has been submitted and is final.
+      * @param award
+      */
+     public void syncPendingLinkedSubAwards(Award award);
 }

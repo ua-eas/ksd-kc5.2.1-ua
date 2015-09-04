@@ -36,6 +36,7 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.KraWorkflowService;
 import org.kuali.kra.service.VersionHistoryService;
+import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kim.api.identity.Person;
@@ -87,7 +88,8 @@ public class AwardSyncServiceImpl implements AwardSyncService {
     private PersonService personService;
     private KraWorkflowService kraWorkflowService;
     private KraAuthorizationService kraAuthorizationService;
-        
+    private transient SubAwardService subAwardService;
+    
     /**
      * @see org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncService#validateHierarchyChanges(org.kuali.kra.award.home.Award)
      */
@@ -391,6 +393,8 @@ public class AwardSyncServiceImpl implements AwardSyncService {
                         if (result) {
                             finalizeAwardStatus(awardDocument, awardStatus, successMessage, syncType, principalsToNotify);
                             finalizeAward(awardDocument, awardStatus);
+                            //add SubAwardFunding sources to point to the new version of the Award
+                            getSubAwardService().updateLinkedSubAwards(oldAward, award);
                         } else {
                             awardStatus.setStatus(failureMessage);
                             awardStatus.setSuccess(false);
@@ -415,6 +419,14 @@ public class AwardSyncServiceImpl implements AwardSyncService {
             LOG.info("Finished award sync - " + hierarchy.getAwardNumber() + " : " + elapsed + "ms");
         }
     }
+    
+    protected SubAwardService getSubAwardService() {
+        if (subAwardService == null) {
+            subAwardService = KraServiceLocator.getService(SubAwardService.class);
+        }
+        return subAwardService;
+    }
+    
     
     /**
      * Apply the list of changes against the award and then validate the changes.

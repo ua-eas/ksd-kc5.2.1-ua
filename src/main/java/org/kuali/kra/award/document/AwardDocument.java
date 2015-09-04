@@ -56,6 +56,7 @@ import org.kuali.kra.krms.service.KcKrmsFactBuilderService;
 import org.kuali.kra.service.KraWorkflowService;
 import org.kuali.kra.service.ResearchDocumentService;
 import org.kuali.kra.service.VersionHistoryService;
+import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
@@ -246,13 +247,13 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         if (LOG.isDebugEnabled()) {
             LOG.debug(String.format("********************* Status Change: from %s to %s", statusChangeEvent.getOldRouteStatus(), newStatus));
         }
-        
-        if (KewApiConstants.ROUTE_HEADER_FINAL_CD.equalsIgnoreCase(newStatus) || KewApiConstants.ROUTE_HEADER_PROCESSED_CD.equalsIgnoreCase(newStatus)) {
-       // if (KewApiConstants.ROUTE_HEADER_FINAL_CD.equalsIgnoreCase(newStatus)) {
-
-            //getVersionHistoryService().createVersionHistory(getAward(), VersionStatus.ACTIVE, GlobalVariables.getUserSession().getPrincipalName());
+        Boolean isDocumentInFinalState = KewApiConstants.ROUTE_HEADER_FINAL_CD.equalsIgnoreCase(newStatus);
+        if (isDocumentInFinalState || KewApiConstants.ROUTE_HEADER_PROCESSED_CD.equalsIgnoreCase(newStatus)) {
             getAwardService().updateAwardSequenceStatus(getAward(), VersionStatus.ACTIVE);
             getVersionHistoryService().updateVersionHistory(getAward(), VersionStatus.ACTIVE, GlobalVariables.getUserSession().getPrincipalName());
+            if ( isDocumentInFinalState ) {
+                getSubAwardService().syncPendingLinkedSubAwards( this.getAward() );
+            }
         }
         if (newStatus.equalsIgnoreCase(KewApiConstants.ROUTE_HEADER_CANCEL_CD) || newStatus.equalsIgnoreCase(KewApiConstants.ROUTE_HEADER_DISAPPROVED_CD)) {
             revertFundedProposals();
@@ -374,6 +375,10 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     
     protected AwardSyncService getAwardSyncService() {
         return KraServiceLocator.getService(AwardSyncService.class);
+    }
+    
+    protected SubAwardService getSubAwardService() {
+        return KraServiceLocator.getService(SubAwardService.class);
     }
 
      public List getBudgetDocumentVersions() {
