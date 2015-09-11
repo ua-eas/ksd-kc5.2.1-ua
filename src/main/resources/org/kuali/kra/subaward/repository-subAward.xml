@@ -262,6 +262,8 @@
 		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="true" />
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
 		<field-descriptor name="awardId" column="AWARD_ID" jdbc-type="BIGINT" />
+        <field-descriptor name="awardNumber" column="AWARD_NUMBER" jdbc-type="VARCHAR" />
+        <field-descriptor name="active" column="ACTIVE" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
 		
 		<reference-descriptor name="award" class-ref="org.kuali.kra.award.home.Award" auto-retrieve="true" auto-update="none" auto-delete="none"> 
 			<foreignkey field-ref="awardId"/>
@@ -271,7 +273,7 @@
 		</reference-descriptor>
 	</class-descriptor>
 
-	<class-descriptor class="org.kuali.kra.subaward.bo.SubAwardStatus" table="SUBAWARD_STATUS">
+	<class-descriptor class="org.kuali.kra.subaward.bo.`" table="SUBAWARD_STATUS">
 		<field-descriptor name="subAwardStatusCode" column="SUBAWARD_STATUS_CODE" jdbc-type="INTEGER" primarykey="true" />
 		<field-descriptor name="description" column="DESCRIPTION" jdbc-type="VARCHAR" />
 		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />

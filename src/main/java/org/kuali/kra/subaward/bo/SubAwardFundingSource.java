@@ -45,6 +45,7 @@ public class SubAwardFundingSource extends SubAwardAssociate {
     private Date obligationExpirationDate;
 
     private String awardNumber;
+    private boolean active = true;
 
     private AwardAmountInfo awardAmountInfo;
     
@@ -278,12 +279,22 @@ public class SubAwardFundingSource extends SubAwardAssociate {
 	public void setAwardAmountInfo(AwardAmountInfo awardAmountInfo) {
 		this.awardAmountInfo = awardAmountInfo;
 	}
+	
+	public void setActive(boolean active) {
+	    this.active = active;
+	}
+	    
+	public boolean isActive() {
+	    return active;
+	}
+	    
 
 	@Override
     public void resetPersistenceState() {
 
         this.subAwardFundingSourceId = null;
     }
+	
 	
 	/**
      * Constructs a new copy of this SubAwardFundingSource with all the attributes (except the id)
@@ -315,6 +326,8 @@ public class SubAwardFundingSource extends SubAwardAssociate {
         newSubAwardFundingSource.setSequenceOwner(this.getSequenceOwner());
         //this actually holds the SubAward Version Number
         newSubAwardFundingSource.setVersionNumber(this.getVersionNumber());
+        newSubAwardFundingSource.setAwardNumber(this.getAwardNumber());
+        newSubAwardFundingSource.setActive(this.isActive());
         
         return newSubAwardFundingSource;
     }
