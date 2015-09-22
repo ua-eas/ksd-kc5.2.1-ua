@@ -9,19 +9,17 @@
 			Adding the Award Number column to the SubAward Funding Source.
 		</comment>
 		<sql>
-			ALTER TABLE SUBAWARD_FUNDING_SOURCE ADD 
-                    (AWARD_NUMBER VARCHAR2(12 BYTE),
-                     ACTV_IND VARCHAR2(1) DEFAULT 'Y' NOT NULL);
-            UPDATE SUBAWARD_FUNDING_SOURCE sfs 
-                SET AWARD_NUMBER =
-                  ( SELECT AWARD_NUMBER FROM AWARD a
-                    WHERE a.AWARD_ID = sfs.AWARD_ID )
-            ;
-            ALTER TABLE SUBAWARD_FUNDING_SOURCE MODIFY (AWARD_NUMBER NOT NULL);
+			ALTER TABLE SUBAWARD_FUNDING_SOURCE ADD (AWARD_NUMBER VARCHAR2(12 BYTE),
+                     		ACTV_IND VARCHAR2(1) DEFAULT 'Y' NOT NULL);
+            		UPDATE SUBAWARD_FUNDING_SOURCE sfs 
+		                SET AWARD_NUMBER =
+		                  ( SELECT AWARD_NUMBER FROM AWARD a
+		                    WHERE a.AWARD_ID = sfs.AWARD_ID );
+            		ALTER TABLE SUBAWARD_FUNDING_SOURCE MODIFY (AWARD_NUMBER NOT NULL);
 		</sql>
 		<rollback>
 			ALTER TABLE SUBAWARD_FUNDING_SOURCE DROP COLUMN AWARD_NUMBER;
-            ALTER TABLE SUBAWARD_FUNDING_SOURCE DROP ACTIVE;
+            		ALTER TABLE SUBAWARD_FUNDING_SOURCE DROP COLUMN ACTV_IND;
 		</rollback>
 	</changeSet>
 </databaseChangeLog> 
