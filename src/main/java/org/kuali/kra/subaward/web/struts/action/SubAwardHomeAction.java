@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2015 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@ package org.kuali.kra.subaward.web.struts.action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.kuali.kra.award.AwardForm;
-import org.kuali.kra.award.home.ContactType;
+import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.infrastructure.Constants;
@@ -32,7 +31,7 @@ import org.kuali.kra.subaward.bo.SubAwardForms;
 import org.kuali.kra.subaward.bo.SubAwardFundingSource;
 import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.kra.subaward.subawardrule.SubAwardDocumentRule;
-import org.kuali.rice.core.api.util.KeyValue;
+import org.kuali.kra.subaward.web.SubAwardFundingSourceBean;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.krad.service.BusinessObjectService;
@@ -41,27 +40,27 @@ import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * This class is using as SubAwardHomeAction ...
+ * This class processes the Actions in the SubAward Home Page
  */
 public class SubAwardHomeAction extends SubAwardAction{
 
-private static final String DOC_HANDLER_URL_PATTERN =
-"%s/DocHandler.do?command=displayDocSearchView&docId=%s";
+private static final String DOC_HANDLER_URL_PATTERN = "%s/DocHandler.do?command=displayDocSearchView&docId=%s";
 private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.subaward.version.editpending.prompt";
 
     @Override
     public ActionForward execute(ActionMapping mapping,
     ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-        ActionForward actionForward =
-        super.execute(mapping, form, request, response);
+        ActionForward actionForward = super.execute(mapping, form, request, response);
         SubAwardForm subAwardForm = (SubAwardForm) form;
+        
         List<SubAwardForms> subAwardList = new ArrayList<SubAwardForms>();
         Collection<SubAwardForms> subAwardForms = (Collection<SubAwardForms>) KraServiceLocator.getService(BusinessObjectService.class).findAll(SubAwardForms.class);
         for(SubAwardForms subAwardFormValues : subAwardForms){
@@ -237,21 +236,18 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
         return String.format(DOC_HANDLER_URL_PATTERN, workflowUrl, newSubAwardDocument.getDocumentNumber());
     }
     /**.
-     * This method prepares the SubAwardForm with
-     * the document found via the SubAward lookup
-     * Because the helper beans may have preserved a different
-     *  SubAwardForm, we need to reset these too
+     * This method prepares the SubAwardForm with the document found via the SubAward lookup
+     * Because the helper beans may have preserved a different SubAwardForm, we need to reset these too
      * @param subAwardForm the SubAwardForm
      * @param document the SubAwardDocument
      * @throws WorkflowException
      */
-    private void reinitializeSubAwardForm(SubAwardForm subAwardForm,
-    SubAwardDocument document) throws WorkflowException {
-   subAwardForm.populateHeaderFields(document.getDocumentHeader().
-   getWorkflowDocument());
-        subAwardForm.setDocument(document);
-        document.setDocumentSaveAfterSubAwardLookupEditOrVersion(true);
+    private void reinitializeSubAwardForm(SubAwardForm subAwardForm, SubAwardDocument document) throws WorkflowException {
+        subAwardForm.populateHeaderFields(document.getDocumentHeader().getWorkflowDocument());
         subAwardForm.initialize();
+        subAwardForm.setDocument(document);
+        subAwardForm.setFilteredSubAwardFundingSources(findSFSForDisplay(document));
+        document.setDocumentSaveAfterSubAwardLookupEditOrVersion(true);
     }
 
     /**.
@@ -268,16 +264,15 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
     HttpServletResponse response) throws Exception {
         SubAwardForm subAwardForm = (SubAwardForm) form;
         SubAward subAward = subAwardForm.getSubAwardDocument().getSubAward();
-        SubAwardFundingSource fundingSources=
-        subAwardForm.getNewSubAwardFundingSource();
-
-        if (new SubAwardDocumentRule().
-        processAddSubAwardFundingSourceBusinessRules(
-        fundingSources, subAward)) {
-            addFundingSourceToSubAward(
-            subAwardForm.getSubAwardDocument().getSubAward(), fundingSources);
-            subAwardForm.setNewSubAwardFundingSource(
-            new SubAwardFundingSource());
+        SubAwardFundingSource newFundingSource=subAwardForm.getNewSubAwardFundingSource();
+        newFundingSource.setNewCollectionRecord(true);
+        newFundingSource.setSubAward(subAward);
+        
+        if (new SubAwardDocumentRule().processAddSubAwardFundingSourceBusinessRules(newFundingSource, subAward)) {
+            addFundingSourceToSubAward(subAward, newFundingSource);
+            int numberOfFilteredSFS = subAwardForm.getFilteredSubAwardFundingSources().size() +1;
+            subAwardForm.getFilteredSubAwardFundingSources().add(new SubAwardFundingSourceBean(String.valueOf(numberOfFilteredSFS), subAward, newFundingSource.getAward()));
+            subAwardForm.setNewSubAwardFundingSource(new SubAwardFundingSource());
         }
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
     }
@@ -289,14 +284,19 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
      * @param fundingSources the SubAwardFundingSource
      * @return boolean
      */
-    boolean addFundingSourceToSubAward(
-    SubAward subAward, SubAwardFundingSource fundingSources) {
+    boolean addFundingSourceToSubAward(SubAward subAward, SubAwardFundingSource newFundingSource) {
         if (subAward.getSubAwardCode() == null) {
             String subAwardCode = getSubAwardService().getNextSubAwardCode();
             subAward.setSubAwardCode(subAwardCode);
         }
-        fundingSources.setSubAward(subAward);
-        return subAward.getSubAwardFundingSourceList().add(fundingSources);
+        newFundingSource.setSubAward(subAward);
+        
+        Award fundingSourceAward = newFundingSource.getAward();
+        fundingSourceAward.setAwardId( newFundingSource.getAwardId());
+        fundingSourceAward.setAwardNumber( newFundingSource.getAwardNumber());
+        
+        
+        return subAward.getSubAwardFundingSourceList().add(newFundingSource);
     }
 
     /**.
@@ -308,21 +308,19 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
      * @return ActionForward
      * @throws Exception
      */
-    public ActionForward deleteFundingSource(ActionMapping mapping,
-    ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    public ActionForward deleteFundingSource(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     throws Exception {
         SubAwardForm subAwardForm = (SubAwardForm) form;
-        SubAwardDocument subAwardDocument = subAwardForm.getSubAwardDocument();
         int selectedLineNumber = getSelectedLine(request);
-        SubAwardFundingSource  subAwardFundingSource =
-        subAwardDocument.getSubAward().getSubAwardFundingSourceList().
-        get(selectedLineNumber);
-
-        subAwardDocument.getSubAward().
-        getSubAwardFundingSourceList().remove(selectedLineNumber);
-//      this.getBusinessObjectService().delete(subAwardFundingSource); // let save() do this
+        
+        SubAwardFundingSourceBean sfsToDelete = subAwardForm.getFilteredSubAwardFundingSources().get(selectedLineNumber);
+ 
+        getSubAwardService().deleteSubAwardFundingSource(sfsToDelete.getAward().getAwardNumber(), sfsToDelete.getSubaward().getSubAwardCode());
+        subAwardForm.getFilteredSubAwardFundingSources().remove(sfsToDelete);
+        
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
     }
+
 
     /**
      * This method is for adding contacts
@@ -438,39 +436,47 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
         subAwardCloseout.setSubAward(subAward);
         return subAward.getSubAwardCloseoutList().add(subAwardCloseout);
     }
-   /**.
- * This method is for deleteCloseout
-    * @param mapping the ActionMapping
-     * @param form the ActionForm
-     * @param request the Request
-     * @param response the Response
-     * @return ActionForward
-     * @throws Exception
- */
-public ActionForward deleteCloseout(ActionMapping mapping,
-		ActionForm form, HttpServletRequest request,
-		HttpServletResponse response) throws Exception {
-        SubAwardForm subAwardForm = (SubAwardForm) form;
-        SubAwardDocument subAwardDocument = subAwardForm.getSubAwardDocument();
-        int selectedLineNumber = getSelectedLine(request);
-        SubAwardCloseout subAwardCloseout =  subAwardDocument.
-        getSubAward().getSubAwardCloseoutList().get(selectedLineNumber);
-        subAwardDocument.getSubAward().
-        getSubAwardCloseoutList().remove(selectedLineNumber);
-//        this.getBusinessObjectService().delete(subAwardCloseout); // let save() do this
+    
+    /**.
+     * This method is for deleteCloseout
+        * @param mapping the ActionMapping
+         * @param form the ActionForm
+         * @param request the Request
+         * @param response the Response
+         * @return ActionForward
+         * @throws Exception
+     */
+    public ActionForward deleteCloseout(ActionMapping mapping,ActionForm form, HttpServletRequest request,
+    		HttpServletResponse response) throws Exception {
+            SubAwardForm subAwardForm = (SubAwardForm) form;
+            SubAwardDocument subAwardDocument = subAwardForm.getSubAwardDocument();
+            int selectedLineNumber = getSelectedLine(request);
+            SubAwardCloseout subAwardCloseout =  subAwardDocument.getSubAward().getSubAwardCloseoutList().get(selectedLineNumber);
+            subAwardDocument.getSubAward().getSubAwardCloseoutList().remove(selectedLineNumber);
+    //        this.getBusinessObjectService().delete(subAwardCloseout); // let save() do this
+            return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
+        }
+    
+    public ActionForward selectAllSubAwardPrintNoticeItems(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        SubAwardForm subAwardForm = (SubAwardForm)form;
+        subAwardForm.getSubAwardPrintAgreement().selectAllItems();
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
     }
+    
+    public ActionForward deselectAllSubAwardPrintNoticeItems(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        SubAwardForm subAwardForm = (SubAwardForm)form;
+        subAwardForm.getSubAwardPrintAgreement().deselectAllItems();
+        return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
+    }
+    
+    private void deleteSFSFromSubAward(SubAward subAward, String awardNumber, String subAwardCode) {
+        for (SubAwardFundingSource sfs: subAward.getSubAwardFundingSourceList()){
+            if ( awardNumber.equalsIgnoreCase(sfs.getAwardNumber()) && subAwardCode.equalsIgnoreCase(sfs.getSubAwardCode()) ){
+                sfs.setActive(false);
+            }
+        }
+        
+    }
 
-public ActionForward selectAllSubAwardPrintNoticeItems(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-    SubAwardForm subAwardForm = (SubAwardForm)form;
-    subAwardForm.getSubAwardPrintAgreement().selectAllItems();
-    return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
-}
-
-public ActionForward deselectAllSubAwardPrintNoticeItems(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-    SubAwardForm subAwardForm = (SubAwardForm)form;
-    subAwardForm.getSubAwardPrintAgreement().deselectAllItems();
-    return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
-}
-
+    
 }

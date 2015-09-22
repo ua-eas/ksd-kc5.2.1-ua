@@ -1822,16 +1822,11 @@ public class AwardAction extends BudgetParentActionBase {
         return reportTrackingService;
     }
     /**
-     * This method will populate the subawards  if award is added as a funding source to perticular subaward
+     * This method will populate the subawards  if award is added as a funding source to particular subaward
      * @param award
      */
     protected void setSubAwardDetails(Award award){
-		List<SubAward> subAwardsForAllAwardVersions = new ArrayList<SubAward>();
-		List<Award> awardVersions = getAwardService().findAwardsForAwardNumber( award.getAwardNumber() );
-		for ( Award currentAward : awardVersions ) {
-			subAwardsForAllAwardVersions.addAll( getSubAwardService().getLinkedSubAwards( currentAward ) );
-		}
-		award.setSubAwardList( subAwardsForAllAwardVersions );
+        award.setSubAwardList((List<SubAward>) getSubAwardService().getLinkedSubAwards(award));
     }
 
     protected KcNotificationService getNotificationService() {

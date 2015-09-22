@@ -17,7 +17,6 @@ package org.kuali.kra.medusa.service;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.SequenceOwner;
 import org.kuali.kra.award.AwardAmountInfoService;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.home.AwardAmountInfo;
@@ -26,7 +25,6 @@ import org.kuali.kra.bo.FundingSourceType;
 import org.kuali.kra.bo.NsfCode;
 import org.kuali.kra.bo.SpecialReviewApprovalType;
 import org.kuali.kra.bo.SpecialReviewType;
-import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.common.specialreview.bo.SpecialReview;
 import org.kuali.kra.iacuc.IacucProtocol;
@@ -42,7 +40,6 @@ import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceBase;
 import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.kra.subaward.bo.SubAward;
-import org.kuali.kra.subaward.bo.SubAwardFundingSource;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.bo.BusinessObject;
@@ -577,12 +574,12 @@ public class MedusaServiceImpl implements MedusaService {
         if (award == null) {
             return null;
         }
-        Award currentAward = (Award) getActiveOrCurrentVersion(Award.class, award.getAwardNumber());
+        Award currentAward = (Award) getVersionHistoryService().getActiveOrCurrentVersion(Award.class, award.getAwardNumber());
         return currentAward == null ? award : currentAward;
     }
     
     protected Award getAward(String awardNumber) {
-        Award currentAward = (Award) getActiveOrCurrentVersion(Award.class, awardNumber);
+        Award currentAward = (Award) getVersionHistoryService().getActiveOrCurrentVersion(Award.class, awardNumber);
         return currentAward;
     }
     
@@ -596,7 +593,7 @@ public class MedusaServiceImpl implements MedusaService {
         if (subAward == null) {
             return null;
         }
-        SubAward currentSubAward = (SubAward) getActiveOrCurrentVersion(SubAward.class, subAward.getSubAwardCode());
+        SubAward currentSubAward = (SubAward) getVersionHistoryService().getActiveOrCurrentVersion(SubAward.class, subAward.getSubAwardCode());
         if (currentSubAward != null) {
             KraServiceLocator.getService(SubAwardService.class).getAmountInfo(currentSubAward);
         }
@@ -636,37 +633,7 @@ public class MedusaServiceImpl implements MedusaService {
         }
         return newest;
     }
-    /**
-     * 
-     * Gets the active or if not available the most current, not cancelled version of a 
-     * versioned BO. Currently only Awards use the Version History framework though
-     * @param clazz
-     * @param sequenceName
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    protected SequenceOwner getActiveOrCurrentVersion(Class clazz, String sequenceName) {
-        VersionHistory activeVersion = versionHistoryService.findActiveVersion(clazz, sequenceName);
-        SequenceOwner bestVersion = null;
-        if (activeVersion != null) {
-            bestVersion = (SequenceOwner)activeVersion.getSequenceOwner();
-        } else {
-            List<VersionHistory> history = versionHistoryService.loadVersionHistory(clazz, sequenceName);
-            if (history != null && !history.isEmpty()) {
-                VersionHistory best = history.get(0);
-                for (VersionHistory curVersion : history) {
-                    if (curVersion.getVersionNumber() > best.getVersionNumber()) {
-                        if (curVersion.getStatus() != VersionStatus.CANCELED) {
-                            best = curVersion;
-                        }
-                    }
-                }
-                bestVersion = (SequenceOwner)best.getSequenceOwner();
-            } 
-        }
-        return bestVersion;  
-    }
-    
+   
     /**
      * 
      * Creates a MedusaNode for the BO given the BO is supported by Medusa(Award, Dev Prop or Inst Prop).
@@ -750,7 +717,6 @@ public class MedusaServiceImpl implements MedusaService {
      * @param instProposal
      * @return
      */
-    @SuppressWarnings("unchecked")
     protected Collection<DevelopmentProposal> getDevelopmentProposals(InstitutionalProposal instProposal) {
         //find any dev prop linked to any version of this inst prop
         Collection<DevelopmentProposal> devProposals = new ArrayList<DevelopmentProposal>();
@@ -767,27 +733,17 @@ public class MedusaServiceImpl implements MedusaService {
         return devProposals;
     }
     
-    @SuppressWarnings("unchecked")
     protected Collection<Award> getAwards(SubAward subAward) {
-        
-        Collection<Award> awards = new ArrayList<Award>();
-        SubAward newestSubAaward = getSubAward(subAward.getSubAwardCode());
-
-        Collection<SubAwardFundingSource> subAwardFundingSources = newestSubAaward.getSubAwardFundingSourceList();
-        for (SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
-            awards.add(getAward(subAwardFundingSource.getAwardId()));
-        }
-        return awards;
+        return getSubAwardService().getLinkedAwards(subAward);
     }
     
     protected SubAward getSubAward(String subAwardCode) {
-        SubAward subAward = (SubAward) getActiveOrCurrentVersion(SubAward.class, subAwardCode);
+        SubAward subAward = (SubAward) getVersionHistoryService().getActiveOrCurrentVersion(SubAward.class, subAwardCode);
         return subAward;
     }
     
     protected Collection<SubAward> getSubAwards(Award award) {
-        Collection<SubAward> subAwards = getSubAwardService().getLinkedSubAwards(award);
-        return subAwards;
+        return getSubAwardService().getLinkedSubAwards(award);
     }
     
     /**
@@ -797,7 +753,6 @@ public class MedusaServiceImpl implements MedusaService {
      * @param ip
      * @return
      */
-    @SuppressWarnings("unchecked")
     protected Collection<Award> getAwards(InstitutionalProposal ip) {
         Collection<Award> awards = new ArrayList<Award>();
         Collection<InstitutionalProposal> institutionalProposalVersions = businessObjectService.findMatching(InstitutionalProposal.class, getFieldValues("proposalNumber", ip.getProposalNumber()));
@@ -854,7 +809,6 @@ public class MedusaServiceImpl implements MedusaService {
      * @param award
      * @return
      */
-    @SuppressWarnings("unchecked")
     protected Collection<InstitutionalProposal> getProposals(Award award) {
         Collection<InstitutionalProposal> ips = new ArrayList<InstitutionalProposal>();
         Collection<Award> awardVersions = businessObjectService.findMatching(Award.class, getFieldValues("awardNumber", award.getAwardNumber()));
@@ -884,7 +838,6 @@ public class MedusaServiceImpl implements MedusaService {
      * @param devProposal
      * @return
      */
-    @SuppressWarnings("unchecked")
     protected Collection<InstitutionalProposal> getProposals(DevelopmentProposal devProposal) {
         Collection<ProposalAdminDetails> proposalAdminDetails = businessObjectService.findMatching(ProposalAdminDetails.class, getFieldValues("devProposalNumber", devProposal.getProposalNumber()));
         Collection<InstitutionalProposal> instProposals = new ArrayList<InstitutionalProposal>();

@@ -19,33 +19,29 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.kuali.kra.bo.FundingSourceType;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.krad.migration.FormViewAwareUifKeyValuesFinderBase;
+import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.kra.subaward.bo.SubAwardFundingSource;
 import org.kuali.kra.subaward.document.SubAwardDocument;
+import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
 import org.kuali.rice.core.api.util.KeyValue;
-import org.kuali.rice.krad.service.BusinessObjectService;
-import org.kuali.rice.krad.uif.control.UifKeyValuesFinderBase;
+
 
 public class SubAwardFundingSourceValuesFinder extends FormViewAwareUifKeyValuesFinderBase {
     
     @Override
     public List<KeyValue> getKeyValues() {
-        SubAwardDocument doc = (SubAwardDocument)getDocument();
-        StringBuffer fundingValues = new StringBuffer();
-        Long subawardID = doc.getSubAward().getSubAwardId();
+        SubAward subaward = ((SubAwardDocument)getDocument()).getSubAward();
+        
+        Collection<SubAwardFundingSource> fundingSources = (Collection<SubAwardFundingSource>) KraServiceLocator
+                .getService(SubAwardService.class).getActiveSubAwardFundingSources(subaward);
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
-        Collection<SubAwardFundingSource> fundingSource = (Collection<SubAwardFundingSource>) KraServiceLocator
-                .getService(BusinessObjectService.class).findAll(SubAwardFundingSource.class);
-        for (SubAwardFundingSource subAwardFunding : fundingSource) {
-            if (subAwardFunding.getSubAwardId().equals(subawardID)) {
-                fundingValues.append(subAwardFunding.getAward().getAwardNumber());
-                keyValues.add(new ConcreteKeyValue(subAwardFunding.getSubAwardFundingSourceId().toString(),"Award:"+subAwardFunding.getAward().getAwardNumber()));
-            }
+        for (SubAwardFundingSource sfs : fundingSources) {
+                keyValues.add(new ConcreteKeyValue(subaward.getSubAwardCode()+":"+sfs.getAwardNumber(),"Award:"+sfs.getAwardNumber()));
         }
-        if(fundingValues.length() == 0){
+        if(keyValues.size() == 0){
             keyValues.add(0, new ConcreteKeyValue("", "No Funding Source has been added to this Subaward"));
         }
         return keyValues;

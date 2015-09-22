@@ -17,9 +17,7 @@ package org.kuali.kra.subaward;
 
 import org.apache.struts.upload.FormFile;
 import org.kuali.kra.award.home.Award;
-import org.kuali.kra.award.printing.AwardPrintNotice;
 import org.kuali.kra.bo.Rolodex;
-import org.kuali.kra.bo.SponsorFormTemplateList;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.common.notification.web.struts.form.NotificationHelper;
 import org.kuali.kra.common.permissions.web.struts.form.PermissionsForm;
@@ -37,6 +35,7 @@ import org.kuali.kra.subaward.document.authorization.SubAwardTask;
 import org.kuali.kra.subaward.notification.SubAwardNotificationContext;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.kra.subaward.templateAttachments.SubAwardAttachmentFormBean;
+import org.kuali.kra.subaward.web.SubAwardFundingSourceBean;
 import org.kuali.kra.web.struts.form.Auditable;
 import org.kuali.kra.web.struts.form.CustomDataDocumentForm;
 import org.kuali.kra.web.struts.form.KraTransactionalDocumentFormBase;
@@ -68,6 +67,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
     private String lookupResultsBOClassName;
     private SubAwardCloseout newSubAwardCloseout;
     private SubAwardFundingSource newSubAwardFundingSource;
+    private List<SubAwardFundingSourceBean> filteredSubAwardFundingSources;
     private SubAwardAmountInfo newSubAwardAmountInfo;
     private SubAwardContact newSubAwardContact;
     private SubAwardAmountReleased newSubAwardAmountReleased;
@@ -82,9 +82,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
     private SubAwardPrintAgreement subAwardPrintAgreement;
     private SubAwardForms subAwardForms;
     
-   
-    
-
+      
 
 
     /**
@@ -283,6 +281,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         notificationHelper = new NotificationHelper<SubAwardNotificationContext>();
         subAwardAttachmentFormBean = new SubAwardAttachmentFormBean(this);
         subAwardPrintAgreement = new SubAwardPrintAgreement();
+        filteredSubAwardFundingSources = new ArrayList<SubAwardFundingSourceBean>();
     }
 
     /**
@@ -495,10 +494,21 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         if (getActionFormUtilMap() != null && getActionFormUtilMap() instanceof ActionFormUtilMap) {
             ((ActionFormUtilMap) getActionFormUtilMap()).setCacheValueFinderResults(false);
         } 
+        
     }
     
     protected VersionHistoryService getVersionHistoryService() {
         return KraServiceLocator.getService(VersionHistoryService.class);
     }
+    
+    public List<SubAwardFundingSourceBean> getFilteredSubAwardFundingSources() {
+        return filteredSubAwardFundingSources;
+    }
+
+    public void setFilteredSubAwardFundingSources(List<SubAwardFundingSourceBean> filteredSubAwardFundingSources) {
+        this.filteredSubAwardFundingSources = filteredSubAwardFundingSources;
+    }
+
+   
 
 }

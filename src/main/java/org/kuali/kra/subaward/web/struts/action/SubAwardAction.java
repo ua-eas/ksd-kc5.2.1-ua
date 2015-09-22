@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.common.notification.service.KcNotificationService;
 import org.kuali.kra.infrastructure.Constants;
@@ -48,6 +49,7 @@ import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.kra.subaward.notification.SubAwardNotificationContext;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.kra.subaward.subawardrule.SubAwardDocumentRule;
+import org.kuali.kra.subaward.web.SubAwardFundingSourceBean;
 import org.kuali.kra.subawardReporting.printing.SubAwardPrintType;
 import org.kuali.kra.subawardReporting.printing.service.SubAwardPrintingService;
 import org.kuali.kra.web.struts.action.AuditActionHelper;
@@ -143,14 +145,13 @@ public class SubAwardAction extends KraTransactionalDocumentActionBase{
             , HttpServletRequest request, HttpServletResponse response) throws Exception {
         SubAwardForm subAwardForm = (SubAwardForm) form;
         ActionForward forward;
-        forward = handleDocument(
-        mapping, form, request, response, subAwardForm);
-        SubAwardDocument subAwardDocument =
-        (SubAwardDocument) subAwardForm.getDocument();
+        forward = handleDocument(mapping, form, request, response, subAwardForm);
+        SubAwardDocument subAwardDocument = (SubAwardDocument) subAwardForm.getDocument();
         subAwardForm.initializeFormOrDocumentBasedOnCommand();
         SubAward subAward = KraServiceLocator.getService(
         SubAwardService.class).getAmountInfo(subAwardDocument.getSubAward());
         subAwardForm.getSubAwardDocument().setSubAward(subAward);
+        subAwardForm.setFilteredSubAwardFundingSources(findSFSForDisplay(subAwardDocument));
         return forward;
     }
 
@@ -657,5 +658,18 @@ protected void checkSubAwardTemplateCode(SubAward subAward){
       
       return  mapping.findForward(Constants.MAPPING_BASIC);
   }
+ 
+     protected List<SubAwardFundingSourceBean> findSFSForDisplay(SubAwardDocument subAwardDocument){
+         List<SubAwardFundingSourceBean> sfs = new ArrayList<SubAwardFundingSourceBean>();
+         SubAward subAward = subAwardDocument.getSubAward();
+         Collection<Award> linkedAwards = getSubAwardService().getLinkedAwards(subAward);
+         int idx=0;
+         for (Award award:linkedAwards){
+             SubAwardFundingSourceBean sfsForDisplay = new SubAwardFundingSourceBean(String.valueOf(idx++),subAward, award);
+             sfs.add(sfsForDisplay);
+         }
+    
+         return sfs;
+     }
 }
 

@@ -19,10 +19,12 @@ import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.service.VersionException;
 import org.kuali.kra.subaward.bo.SubAward;
+import org.kuali.kra.subaward.bo.SubAwardFundingSource;
 import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 
 import java.sql.Date;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -97,7 +99,60 @@ public interface SubAwardService {
       */
      public int getFollowupDateDefaultLengthInDays();
      
+     
+     /**
+     *
+     * This method returns the Active Version for the SubAward specified with the subAwardCode
+     * (using the VersionHistory service)
+     */
      SubAward getActiveSubAward(Long subAwardCode);
 
-     List<SubAward> getLinkedSubAwards(Award award);
+     /**
+     *
+     * This method finds all the linked SubAwards through SubAwardFundingSource for an Award
+     * It returns only the 'Active' versions of the corresponding SubAwards. Each linked Subaward is returned only once.
+     * @return List<SubAward>
+     */
+     public Collection<SubAward> getLinkedSubAwards(Award award);
+     
+     /**
+     *
+     * This method finds all the linked Awards through SFS for a SubAward
+     * It returns only the 'Active' versions of the corresponding Awards. Each linked Award is returned only once.
+     * @return List<SubAward>
+     */
+     public Collection<Award> getLinkedAwards(SubAward subAward);
+     
+     /**
+     *
+     * This method finds all the SubAwardFundingSources in the DB marked with the same SubAward code and Award Number and
+     * sets the active flag to false for all of them.
+     * 
+     */
+     public void deleteSubAwardFundingSource(SubAwardFundingSource sfs);
+     
+     /**
+     *
+     * This method finds all the SubAwardFundingSources in the DB marked with the same SubAward code and Award Number and
+     * sets the active flag to false for all of them.
+     * 
+     */
+     public void deleteSubAwardFundingSource(String awardNumber, String subAwardCode);
+     
+     /**
+     *
+     * This method returns all the ACTIVE SubAwardFundingSources related to a certain Award by AwardNumber
+     */
+     public Collection<SubAwardFundingSource> getActiveSubAwardFundingSources(Award award);
+     
+     
+     /**
+     *
+     * This method returns all the ACTIVE SubAwardFundingSources related to a certain SubAward by SubAwardCode
+     * 
+     */
+     public Collection<SubAwardFundingSource> getActiveSubAwardFundingSources(SubAward subAward);
+
+     
+     
 }

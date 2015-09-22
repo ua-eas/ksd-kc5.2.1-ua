@@ -17,10 +17,10 @@
 
 <c:set var="subAwardFundingSourceAttributes" value="${DataDictionary.SubAwardFundingSource.attributes}" />
 <c:set var="action" value="subAward" />
-<c:set var="subAwardFundingSource" value="${KualiForm.document.subAwardList[0].subAwardFundingSourceList}"/>
+<!-- c:set var="subAwardFundingSource" value="${KualiForm.document.subAwardList[0].subAwardFundingSourceList}"/-->
 <c:set var="newSubAwardFundingSource" value="${KualiForm.newSubAwardFundingSource}" />
 
-<kul:tab tabTitle="Funding Source" defaultOpen="${KualiForm.document.subAwardList[0].defaultOpen}" alwaysOpen="true" transparentBackground="false" tabErrorKey="newSubAwardFundingSource.award.awardNumber*" auditCluster="requiredFieldsAuditErrors" tabAuditKey="" useRiceAuditMode="true">
+<kul:tab tabTitle="Funding Source" defaultOpen="${KualiForm.document.subAwardList[0].defaultOpen}" alwaysOpen="true" transparentBackground="false" tabErrorKey="newSubAwardFundingSource.awardNumber*" auditCluster="requiredFieldsAuditErrors" tabAuditKey="" useRiceAuditMode="true">
 	<div class="tab-container" align="center">
     	<h3>
     		<span class="subhead-left"> Funding Source </span>	
@@ -30,7 +30,7 @@
 		<tbody class="addline">         
         <tr>
       	<th><div align="left">&nbsp;</div></th>
-        <th colspan=3><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardFundingSourceAttributes.awardId}" /></div></th>
+        <th colspan=3><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardFundingSourceAttributes.awardNumber}" /></div></th>
         <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardFundingSourceAttributes.accountNumber}" /></div></th>
         <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardFundingSourceAttributes.statusCode}" /></div></th>
         <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}" /></div></th>
@@ -43,10 +43,12 @@
                <th class="infoline" >
 						Add:
 				</th>
-     			 <td align="center"  colspan=3><kul:htmlControlAttribute property="newSubAwardFundingSource.award.awardNumber" attributeEntry="${subAwardFundingSourceAttributes.awardId}" />
-     			 <c:if test="${readOnly!='true'}">
-                 <kul:lookup boClassName="org.kuali.kra.award.home.Award" fieldConversions="awardNumber:newSubAwardFundingSource.award.awardNumber,awardDocument.documentNumber:newSubAwardFundingSource.award.awardDocument.documentNumber,awardId:newSubAwardFundingSource.awardId,accountNumber:newSubAwardFundingSource.award.accountNumber,statusCode:newSubAwardFundingSource.award.statusCode,sponsorCode:newSubAwardFundingSource.award.sponsorCode,sponsorName:newSubAwardFundingSource.award.sponsorName,awardAmountInfo.amountObligatedToDate:newSubAwardFundingSource.award.awardAmountInfos[0].amountObligatedToDate,awardAmountInfo.obligationExpirationDate:newSubAwardFundingSource.award.awardAmountInfos[0].obligationExpirationDate,awardStatus.description:newSubAwardFundingSource.award.awardStatus.description" anchor="${tabKey}" />
-                 </c:if>
+     			 <td align="center" colspan=3>
+                    <kul:htmlControlAttribute property="newSubAwardFundingSource.awardNumber" attributeEntry="${subAwardFundingSourceAttributes.awardNumber}" />
+         			<c:if test="${readOnly!='true'}">
+                        <kul:lookup boClassName="org.kuali.kra.award.home.Award" fieldConversions="awardNumber:newSubAwardFundingSource.awardNumber,awardDocument.documentNumber:newSubAwardFundingSource.award.awardDocument.documentNumber,awardId:newSubAwardFundingSource.awardId,accountNumber:newSubAwardFundingSource.award.accountNumber,statusCode:newSubAwardFundingSource.award.statusCode,sponsorCode:newSubAwardFundingSource.award.sponsorCode,awardAmountInfo.amountObligatedToDate:newSubAwardFundingSource.award.awardAmountInfos[0].amountObligatedToDate,awardAmountInfo.obligationExpirationDate:newSubAwardFundingSource.award.awardAmountInfos[0].obligationExpirationDate,awardStatus.description:newSubAwardFundingSource.award.awardStatus.description" anchor="${tabKey}" 
+                             lookupParameters="newSubAwardFundingSource.awardNumber:awardNumber"/>
+                    </c:if>
                	</td>
    				<td><div align="center">
      					<kul:htmlControlAttribute property="newSubAwardFundingSource.award.accountNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.accountNumber}" datePicker="false" />           
@@ -87,71 +89,64 @@
    			</tr> 
    			</c:if>
    			</tbody>
-     	<c:forEach var="subAwardFundingSource" items="${KualiForm.document.subAwardList[0].subAwardFundingSourceList}" varStatus="status">
+     	<c:forEach var="subAwardFundingSource" items="${KualiForm.filteredSubAwardFundingSources}" varStatus="status">
 		             <tr>
-		             
 						<th width="5%" class="infoline" rowspan="1">
 							<c:out value="${status.index+1}" />
 						</th>
-						<c:set  var="documentNumber" value="${subAwardFundingSource.award.awardDocument.documentNumber}"/> 
-						    <td width="6%" valign="middle"> 
-						    
-						    <a
-						href="${ConfigProperties.application.url}/awardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
-						target="_blank" class="medusaOpenLink">Open award</a>
-						</td>
+						<c:set  var="documentNumber" value="${subAwardFundingSource.award.awardDocument.documentNumber}"/>
+                        <c:set  var="awardNumber" value="${subAwardFundingSource.award.awardNumber}"/>  
+						  <td width="6%" valign="middle">    
+						    <a href="${ConfigProperties.application.url}/awardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
+						      target="_blank" class="medusaOpenLink">Open award</a>
+						  </td>
 						  <td width="6%" valign="middle"> 
-						 <a
-						href="${ConfigProperties.application.url}/awardHome.do?methodToCall=medusa&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
-						target="_blank" class="medusaOpenLink"> medusa </a>
-						 
-						    </td>
-		                 <td width="9%" valign="middle">
-		               
-		                  
-		                 
-						<div align="left">
-	                		<kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.awardNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.awardId}" />
-						</div>
-						</td> 
-		                <td width="9%" valign="middle">
-						<div align="center">
-	                		<kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.accountNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.accountNumber}"/>                		
-						</div>
-						</td>
-		                <td width="9%" valign="middle">
-						<div align="center">
-	                		<kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.awardStatus.description" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.statusCode}"/>
-						</div>
-						</td>
-						<td width="9%" valign="middle">
-						<div align="center">
-							<kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.sponsorCode" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}"/> : <kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.sponsorName" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}"/>         
-						</div>
-						</td>
-						<td width="9%" valign="middle">
-						<div align="center">
-							<kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.awardAmountInfos[0].amountObligatedToDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.amountObligatedToDate}"/>
-						</div>
-						</td>
-						<td width="9%" valign="middle">
-						<div align="center">
-							<kul:htmlControlAttribute property="document.subAwardList[0].subAwardFundingSourceList[${status.index}].award.awardAmountInfos[0].obligationExpirationDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.obligationExpirationDate}" datePicker="false"/>
-						</div>
-						</td>
+    						 <a	href="${ConfigProperties.application.url}/awardHome.do?methodToCall=medusa&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
+    						  target="_blank" class="medusaOpenLink"> medusa </a>
+						  </td>
+		                  <td width="9%" valign="middle">
+    						<div align="left">
+                                <!-- input type="hidden" name="filteredSubAwardFundingSources[${status.index}].award.awardId" value="${subAwardFundingSource.award.awardId}" /-->
+                                <kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.awardNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.awardNumber}" />
+                            </div>
+						  </td> 
+		                  <td width="9%" valign="middle">
+    						<div align="center">
+    	                		<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.accountNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.accountNumber}"/>                		
+    						</div>
+						  </td>
+		                  <td width="9%" valign="middle">
+    						<div align="center">
+    	                		<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.awardStatus.description" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.statusCode}"/>
+    						</div>
+						  </td>
+						  <td width="9%" valign="middle">
+    						<div align="center">
+    							<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.sponsorCode" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}"/> : <kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.sponsorName" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}"/>         
+    						</div>
+						  </td>
+						  <td width="9%" valign="middle">
+    						<div align="center">
+    							<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.awardAmountInfos[0].amountObligatedToDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.amountObligatedToDate}"/>
+    						</div>
+						  </td>
+						  <td width="9%" valign="middle">
+    						<div align="center">
+    							<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.awardAmountInfos[0].obligationExpirationDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.obligationExpirationDate}" datePicker="false"/>
+    						</div>
+						  </td>
 						
-						    <td width="10%" valign="middle" rowspan="1">
-						<div align="center">
-						  <c:if test="${!readOnly}">
-	                		<html:image property="methodToCall.deleteFundingSource.line${status.index}.anchor${currentTabIndex}"
-								src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif' styleClass="tinybutton"/>
-						  </c:if>
-						  <c:if test="${readOnly}">&nbsp;</c:if>
-						</div>
-						</td>           
+						   <td width="10%" valign="middle" rowspan="1">
+    						<div align="center">
+    						  <c:if test="${!readOnly}">
+    	                		<html:image property="methodToCall.deleteFundingSource.line${status.index}.anchor${currentTabIndex}"
+    								src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif' styleClass="tinybutton"/>
+    						  </c:if>
+    						  <c:if test="${readOnly}">&nbsp;</c:if>
+    						</div>
+						  </td>           
 		            </tr>
-      
-	        	</c:forEach>
-        </table>
+        </c:forEach>
+       </table>
     </div> 
 </kul:tab>

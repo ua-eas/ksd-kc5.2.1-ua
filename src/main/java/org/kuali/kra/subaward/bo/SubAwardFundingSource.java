@@ -48,6 +48,8 @@ public class SubAwardFundingSource extends SubAwardAssociate {
 
     private AwardAmountInfo awardAmountInfo;
     
+    private boolean active = true;
+    
     /**
      * 
      * Constructs a SubAwardFundingSource.java.
@@ -65,6 +67,17 @@ public class SubAwardFundingSource extends SubAwardAssociate {
         this();
         this.award = award;
         this.award.setAwardNumber("");
+    }
+    
+    /**
+     * 
+     * Constructs a SubAwardFundingSource.java.
+     * @param award and subawad
+     */ 
+    public SubAwardFundingSource(SubAward subAward, Award award) { 
+        this.setSubAward(subAward);
+        this.setAward(award);
+        this.active = true;
     }
 
 
@@ -213,6 +226,10 @@ public class SubAwardFundingSource extends SubAwardAssociate {
 	 */
 	public void setAward(Award award) {
 		this.award = award;
+		if (award != null){
+		    this.setAwardId(award.getAwardId());
+		    this.setAwardNumber(award.getAwardNumber());
+		}
 	}
 
 	/**.
@@ -279,9 +296,53 @@ public class SubAwardFundingSource extends SubAwardAssociate {
 		this.awardAmountInfo = awardAmountInfo;
 	}
 
+	public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    
 	@Override
     public void resetPersistenceState() {
 
         this.subAwardFundingSourceId = null;
+    }
+	
+	/**
+     * Constructs a new copy of this SubAwardFundingSource with all the attributes (except the id)
+     */
+    public SubAwardFundingSource copy() { 
+        SubAwardFundingSource newSubAwardFundingSource = new SubAwardFundingSource();
+        
+        newSubAwardFundingSource.setAccountNumber(this.accountNumber);
+        newSubAwardFundingSource.setAmountObligatedToDate(this.amountObligatedToDate);    
+        newSubAwardFundingSource.setAward(this.award);
+        newSubAwardFundingSource.setAwardAmountInfo(this.awardAmountInfo);
+       
+        newSubAwardFundingSource.setNewCollectionRecord(true);
+        newSubAwardFundingSource.setObligationExpirationDate(this.obligationExpirationDate);
+        
+        newSubAwardFundingSource.setSubAwardId(this.subAwardId);
+        newSubAwardFundingSource.setSubAwardCode(this.subAwardCode);
+        newSubAwardFundingSource.setAwardId(this.awardId);
+        newSubAwardFundingSource.setStatusCode(this.statusCode);
+        newSubAwardFundingSource.setSponsorCode(this.sponsorCode);
+        newSubAwardFundingSource.setSponsorName(this.sponsorName);
+        
+        if ( this.award != null ){
+            newSubAwardFundingSource.setAward(this.getAward());
+            newSubAwardFundingSource.setAwardId(this.award.getAwardId());
+            newSubAwardFundingSource.setAwardNumber(this.award.getAwardNumber());
+        }
+        
+        newSubAwardFundingSource.setSequenceOwner(this.getSequenceOwner());
+        //this actually holds the SubAward Version Number
+        newSubAwardFundingSource.setVersionNumber(this.getVersionNumber());
+        newSubAwardFundingSource.setAwardNumber(this.getAwardNumber());
+        newSubAwardFundingSource.setActive(this.isActive());
+        
+        return newSubAwardFundingSource;
     }
 }

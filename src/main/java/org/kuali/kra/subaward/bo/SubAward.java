@@ -937,7 +937,24 @@ implements Permissionable, SequenceOwner<SubAward>, Negotiable {
 	public List<SubAwardFundingSource> getSubAwardFundingSourceList() {
 		return subAwardFundingSourceList;
 	}
-
+	
+    /**.
+     * This returns only the ACTIVE subAwardFundingSources that link to ACTIVE versions of the award.
+     * @return Returns the subAwardFundingSourceList.
+     */
+    public List<SubAwardFundingSource> getActiveSubAwardFundingSourceList() {
+        List<SubAwardFundingSource> filteredFundingSources = new ArrayList<SubAwardFundingSource>();
+        if ( subAwardFundingSourceList!= null  ){
+            for (SubAwardFundingSource subAwardFundingSource:subAwardFundingSourceList){
+                if ( subAwardFundingSource.isActive() && subAwardFundingSource.getAward().getAwardSequenceStatus().equalsIgnoreCase("ACTIVE") ){
+                    filteredFundingSources.add(subAwardFundingSource);
+                }
+            }
+        }
+        return filteredFundingSources;
+    }
+	
+	
 	/**.
 	 * This is the Setter Method for subAwardFundingSourceList
 	 * @param subAwardFundingSourceList
