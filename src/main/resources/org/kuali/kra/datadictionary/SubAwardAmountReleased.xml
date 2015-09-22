@@ -86,8 +86,9 @@
     </property>
     <property name="required" value="true" />
     <property name="control" >
-    <bean parent="TextControlDefinition"
-            p:size="10" />
+      <bean parent="CurrencyControlDefinition"
+            p:formattedMaxLength="22"
+            p:size="16" />
     </property>
     <property name="summary" value="Amount Released" />
     <property name="description" value="Amount Released" />    
