@@ -335,13 +335,24 @@ public class SubAwardServiceImpl implements SubAwardService {
 
     @Override
     public Collection<SubAward> getLinkedSubAwards(Award award){
+        List <String> linkedSubAwardIds = null;
+        ArrayList<SubAward> linkedSubawards = new ArrayList<SubAward>();
         try {
-            return getSubAwardFundingSourceDao().getLinkedSubAwards(award);
+            linkedSubAwardIds = getSubAwardFundingSourceDao().getLinkedSubAwardsIds(award);
+            
+            if ( linkedSubAwardIds != null && !linkedSubAwardIds.isEmpty() ){
+                for (String subAwardId:linkedSubAwardIds){
+                    SubAward subAward = getBusinessObjectService().findBySinglePrimaryKey(SubAward.class, Long.parseLong(subAwardId));
+                    //needed for display in AwardPanel
+                    getAmountInfo(subAward);
+                    linkedSubawards.add(subAward);
+                }
+            }
         } catch (Exception e){
             e.printStackTrace();
             LOG.error(e);
         }
-        return new ArrayList<SubAward>();
+        return linkedSubawards;
     }
 
 

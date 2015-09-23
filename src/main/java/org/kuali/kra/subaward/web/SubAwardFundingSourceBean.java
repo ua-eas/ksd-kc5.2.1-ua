@@ -11,7 +11,8 @@ public class SubAwardFundingSourceBean implements Serializable {
     private String subAwardFundingSourceId;
     private SubAward subaward;
     private Award award;
-    
+    private boolean deleted = false;
+
     public SubAwardFundingSourceBean() {
         super();
     }
@@ -40,5 +41,13 @@ public class SubAwardFundingSourceBean implements Serializable {
     }
     public void setAward(Award award) {
         this.award = award;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

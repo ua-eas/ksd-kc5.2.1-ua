@@ -246,7 +246,7 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
         subAwardForm.populateHeaderFields(document.getDocumentHeader().getWorkflowDocument());
         subAwardForm.initialize();
         subAwardForm.setDocument(document);
-        subAwardForm.setFilteredSubAwardFundingSources(findSFSForDisplay(document));
+        subAwardForm.setSubAwardFundingSourcesBeans(findSFSForDisplay(document));
         document.setDocumentSaveAfterSubAwardLookupEditOrVersion(true);
     }
 
@@ -270,8 +270,8 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
         
         if (new SubAwardDocumentRule().processAddSubAwardFundingSourceBusinessRules(newFundingSource, subAward)) {
             addFundingSourceToSubAward(subAward, newFundingSource);
-            int numberOfFilteredSFS = subAwardForm.getFilteredSubAwardFundingSources().size() +1;
-            subAwardForm.getFilteredSubAwardFundingSources().add(new SubAwardFundingSourceBean(String.valueOf(numberOfFilteredSFS), subAward, newFundingSource.getAward()));
+            int numberOfFilteredSFS = subAwardForm.getSubAwardFundingSourcesBeans().size() +1;
+            subAwardForm.getSubAwardFundingSourcesBeans().add(new SubAwardFundingSourceBean(String.valueOf(numberOfFilteredSFS), subAward, newFundingSource.getAward()));
             subAwardForm.setNewSubAwardFundingSource(new SubAwardFundingSource());
         }
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
@@ -312,11 +312,11 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
     throws Exception {
         SubAwardForm subAwardForm = (SubAwardForm) form;
         int selectedLineNumber = getSelectedLine(request);
+        SubAward subAward = subAwardForm.getSubAward();
         
-        SubAwardFundingSourceBean sfsToDelete = subAwardForm.getFilteredSubAwardFundingSources().get(selectedLineNumber);
- 
-        getSubAwardService().deleteSubAwardFundingSource(sfsToDelete.getAward().getAwardNumber(), sfsToDelete.getSubaward().getSubAwardCode());
-        subAwardForm.getFilteredSubAwardFundingSources().remove(sfsToDelete);
+        SubAwardFundingSourceBean sfsToDelete = subAwardForm.getSubAwardFundingSourcesBeans().get(selectedLineNumber);
+        sfsToDelete.setDeleted(true);
+        deleteSFSFromSubAward(subAward, sfsToDelete.getAward().getAwardNumber(), sfsToDelete.getSubaward().getSubAwardCode());
         
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
     }

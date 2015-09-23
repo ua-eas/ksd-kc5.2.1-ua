@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2014 The Kuali Foundation
+ Copyright 2005-2015 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -89,13 +89,15 @@
    			</tr> 
    			</c:if>
    			</tbody>
-     	<c:forEach var="subAwardFundingSource" items="${KualiForm.filteredSubAwardFundingSources}" varStatus="status">
+     	<c:forEach var="subAwardFundingSource" items="${KualiForm.subAwardFundingSourcesBeans}" varStatus="status">
+            <c:set var="isDeleted" value="${subAwardFundingSource.deleted}"/>
+            <c:if test="${!isDeleted}">
 		             <tr>
 						<th width="5%" class="infoline" rowspan="1">
 							<c:out value="${status.index+1}" />
 						</th>
-						<c:set  var="documentNumber" value="${subAwardFundingSource.award.awardDocument.documentNumber}"/>
-                        <c:set  var="awardNumber" value="${subAwardFundingSource.award.awardNumber}"/>  
+						<c:set var="documentNumber" value="${subAwardFundingSource.award.awardDocument.documentNumber}"/>
+                        <c:set var="awardNumber" value="${subAwardFundingSource.award.awardNumber}"/>  
 						  <td width="6%" valign="middle">    
 						    <a href="${ConfigProperties.application.url}/awardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
 						      target="_blank" class="medusaOpenLink">Open award</a>
@@ -106,33 +108,32 @@
 						  </td>
 		                  <td width="9%" valign="middle">
     						<div align="left">
-                                <!-- input type="hidden" name="filteredSubAwardFundingSources[${status.index}].award.awardId" value="${subAwardFundingSource.award.awardId}" /-->
-                                <kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.awardNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.awardNumber}" />
+                                <kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.awardNumber}" />
                             </div>
 						  </td> 
 		                  <td width="9%" valign="middle">
     						<div align="center">
-    	                		<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.accountNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.accountNumber}"/>                		
+    	                		<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.accountNumber" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.accountNumber}"/>                		
     						</div>
 						  </td>
 		                  <td width="9%" valign="middle">
     						<div align="center">
-    	                		<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.awardStatus.description" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.statusCode}"/>
+    	                		<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardStatus.description" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.statusCode}"/>
     						</div>
 						  </td>
 						  <td width="9%" valign="middle">
     						<div align="center">
-    							<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.sponsorCode" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}"/> : <kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.sponsorName" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}"/>         
+    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.sponsorCode" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}"/> : <kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.sponsorName" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.sponsorCode}"/>         
     						</div>
 						  </td>
 						  <td width="9%" valign="middle">
     						<div align="center">
-    							<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.awardAmountInfos[0].amountObligatedToDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.amountObligatedToDate}"/>
+    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardAmountInfos[0].amountObligatedToDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.amountObligatedToDate}"/>
     						</div>
 						  </td>
 						  <td width="9%" valign="middle">
     						<div align="center">
-    							<kul:htmlControlAttribute property="filteredSubAwardFundingSources[${status.index}].award.awardAmountInfos[0].obligationExpirationDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.obligationExpirationDate}" datePicker="false"/>
+    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardAmountInfos[0].obligationExpirationDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.obligationExpirationDate}" datePicker="false"/>
     						</div>
 						  </td>
 						
@@ -146,6 +147,7 @@
     						</div>
 						  </td>           
 		            </tr>
+            </c:if>
         </c:forEach>
        </table>
     </div> 
