@@ -67,7 +67,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
     private String lookupResultsBOClassName;
     private SubAwardCloseout newSubAwardCloseout;
     private SubAwardFundingSource newSubAwardFundingSource;
-    private List<SubAwardFundingSourceBean> filteredSubAwardFundingSources;
+    private List<SubAwardFundingSourceBean> subAwardFundingSourcesBeans;
     private SubAwardAmountInfo newSubAwardAmountInfo;
     private SubAwardContact newSubAwardContact;
     private SubAwardAmountReleased newSubAwardAmountReleased;
@@ -281,7 +281,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         notificationHelper = new NotificationHelper<SubAwardNotificationContext>();
         subAwardAttachmentFormBean = new SubAwardAttachmentFormBean(this);
         subAwardPrintAgreement = new SubAwardPrintAgreement();
-        filteredSubAwardFundingSources = new ArrayList<SubAwardFundingSourceBean>();
+        subAwardFundingSourcesBeans = new ArrayList<SubAwardFundingSourceBean>();
     }
 
     /**
@@ -501,12 +501,12 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         return KraServiceLocator.getService(VersionHistoryService.class);
     }
     
-    public List<SubAwardFundingSourceBean> getFilteredSubAwardFundingSources() {
-        return filteredSubAwardFundingSources;
+    public List<SubAwardFundingSourceBean> getSubAwardFundingSourcesBeans() {
+        return subAwardFundingSourcesBeans;
     }
 
-    public void setFilteredSubAwardFundingSources(List<SubAwardFundingSourceBean> filteredSubAwardFundingSources) {
-        this.filteredSubAwardFundingSources = filteredSubAwardFundingSources;
+    public void setSubAwardFundingSourcesBeans(List<SubAwardFundingSourceBean> beans) {
+        this.subAwardFundingSourcesBeans = beans;
     }
 
    

@@ -51,7 +51,6 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
     
     private static final String AWARD_ID = "AWARD_ID";
     private static final String AWARD_NUMBER = "AWARD_NUMBER";
-    private static final String SUBAWARD_ID = "SUBAWARD_ID";
     private static final String SUBAWARD_CODE = "SUBAWARD_CODE";
 
     private static final String ACTIVE = "ACTIVE";
@@ -70,20 +69,9 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
         return new ArrayList<Award>(0);
     }
 
-    @SuppressWarnings("unchecked")
+
     @Override
-    public Collection<SubAward> getLinkedSubAwards(Award award) throws SQLException, LookupException {
-        List<String> subAwardIdsList = getLinkedSubAwardsIds(award);
-        if ( !subAwardIdsList.isEmpty() ){
-            Criteria criteria = new Criteria();
-            criteria.addColumnIn(SUBAWARD_ID, subAwardIdsList);
-            return (Collection<SubAward>)getPersistenceBrokerTemplate().getCollectionByQuery(QueryFactory.newQuery(SubAward.class, criteria));
-        }
-        return new ArrayList<SubAward>(0);
-    }
-
-
-    protected List<String> getLinkedSubAwardsIds(Award award) throws SQLException, LookupException {
+    public List<String> getLinkedSubAwardsIds(Award award) throws SQLException, LookupException {
         if ( award == null) {
             throw new IllegalArgumentException("SubAwardFundingSourceDaoOjb: getLinkedSubAwardsIds with a null Award!");
         }

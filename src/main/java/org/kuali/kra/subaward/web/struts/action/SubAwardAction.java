@@ -144,14 +144,13 @@ public class SubAwardAction extends KraTransactionalDocumentActionBase{
     public ActionForward docHandler(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) throws Exception {
         SubAwardForm subAwardForm = (SubAwardForm) form;
-        ActionForward forward;
-        forward = handleDocument(mapping, form, request, response, subAwardForm);
+        ActionForward forward = handleDocument(mapping, form, request, response, subAwardForm);
         SubAwardDocument subAwardDocument = (SubAwardDocument) subAwardForm.getDocument();
         subAwardForm.initializeFormOrDocumentBasedOnCommand();
         SubAward subAward = KraServiceLocator.getService(
         SubAwardService.class).getAmountInfo(subAwardDocument.getSubAward());
         subAwardForm.getSubAwardDocument().setSubAward(subAward);
-        subAwardForm.setFilteredSubAwardFundingSources(findSFSForDisplay(subAwardDocument));
+        subAwardForm.setSubAwardFundingSourcesBeans(findSFSForDisplay(subAwardDocument));
         return forward;
     }
 
@@ -249,6 +248,7 @@ public class SubAwardAction extends KraTransactionalDocumentActionBase{
         if (new SubAwardDocumentRule().processAddSubAwardBusinessRules(subAward) && new SubAwardDocumentRule().processAddSubAwardTemplateInfoBusinessRules(subAward)) {
             ActionForward forward = super.save(mapping, form, request, response);
             getSubAwardService().updateSubAwardSequenceStatus(subAward, VersionStatus.PENDING);
+            saveInactiveSubAwardFundingSources(subAwardForm);
 	    if (subAwardForm.isAuditActivated()) {
             	forward = mapping.findForward(Constants.MAPPING_SUBAWARD_ACTION_PAGE);
     	    }
@@ -670,6 +670,19 @@ protected void checkSubAwardTemplateCode(SubAward subAward){
          }
     
          return sfs;
+     }
+     
+     protected void saveInactiveSubAwardFundingSources(SubAwardForm subAwardForm){
+         List<SubAwardFundingSourceBean> sfsBeans = subAwardForm.getSubAwardFundingSourcesBeans();
+         if (sfsBeans != null && !sfsBeans.isEmpty()){
+             for(SubAwardFundingSourceBean sfsBean:sfsBeans){
+                 if (sfsBean.isDeleted()){
+                     getSubAwardService().deleteSubAwardFundingSource(sfsBean.getAward().getAwardNumber(), sfsBean.getSubaward().getSubAwardCode());
+                 }
+             }
+         }
+         
+         
      }
 }
 

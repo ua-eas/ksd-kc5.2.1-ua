@@ -17,6 +17,7 @@ package org.kuali.kra.subaward.dao;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.ojb.broker.accesslayer.LookupException;
 import org.kuali.kra.award.home.Award;
@@ -38,12 +39,12 @@ public interface SubAwardFundingSourceDao {
     
     /**
      * 
-    * This method finds all the linked SubAwards through SubAwardFundingSource for an Award
+    * This method finds all the linked SubAward Ids through SubAwardFundingSource for an Award
     * It returns only the 'Active' versions of the corresponding SubAwards (no 'Pending', 'Archived' etc).
     * Each linked SubAward is returned only once.
     * @return List<SubAward>
     */
-    Collection<SubAward> getLinkedSubAwards(Award award) throws SQLException, LookupException;
+    List<String> getLinkedSubAwardsIds(Award award) throws SQLException, LookupException;
 
     
     /**
@@ -58,5 +59,8 @@ public interface SubAwardFundingSourceDao {
      * 
      * */
     void deleteSubAwardFundingSource(String awardNumber, String subAwardcode) throws DataAccessException;
+
+
+    
 
 }
