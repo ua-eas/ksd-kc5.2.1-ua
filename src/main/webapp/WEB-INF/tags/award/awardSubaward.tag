@@ -125,7 +125,7 @@
 						</td>
                  					<td>${awardLinkedSubawards.organizationName}&nbsp; </td>
                  					<td>${awardLinkedSubawards.subAwardCode}&nbsp; </td>
-                 					<td>${awardLinkedSubawards.totalObligatedAmount}&nbsp; </td>
+                 					<td>$<fmt:formatNumber value="${awardLinkedSubawards.totalObligatedAmount}" type="currency" currencySymbol="" maxFractionDigits="2"/></td>
                  					<td>${KualiForm.document.awardList[0].awardStatus.description}&nbsp; </td>
                   	</tr>
         			</c:forEach>
