@@ -21,15 +21,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.award.home.Award;
-import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.protocol.ProtocolDaoOjbBase;
 import org.kuali.kra.service.VersionException;
 import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.kra.service.VersioningService;
@@ -37,6 +37,7 @@ import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.kra.subaward.bo.SubAwardAmountInfo;
 import org.kuali.kra.subaward.bo.SubAwardAmountReleased;
 import org.kuali.kra.subaward.bo.SubAwardFundingSource;
+import org.kuali.kra.subaward.dao.SubAwardFundingSourceDao;
 import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
@@ -60,6 +61,10 @@ public class SubAwardServiceImpl implements SubAwardService {
     private DocumentService documentService;
     private SequenceAccessorService sequenceAccessorService;
     private ParameterService parameterService;
+    private SubAwardFundingSourceDao subAwardFundingSourceDao;
+
+    private static final Log LOG = LogFactory.getLog(SubAwardService.class);
+  
 
     /**.
      * This method is for creating new subAward version
@@ -178,9 +183,7 @@ public class SubAwardServiceImpl implements SubAwardService {
 
 	/** {@inheritDoc} */
     public String getNextSubAwardCode() {
- Long nextAwardNumber = sequenceAccessorService.
- getNextAvailableSequenceNumber(Constants.SUBAWARD_SEQUENCE_SUBAWARD_CODE);
-
+        Long nextAwardNumber = sequenceAccessorService.getNextAvailableSequenceNumber(Constants.SUBAWARD_SEQUENCE_SUBAWARD_CODE);
         return nextAwardNumber.toString();
     }
     /**
@@ -291,6 +294,7 @@ public class SubAwardServiceImpl implements SubAwardService {
             } catch (Exception e) {
                 e.printStackTrace();
                 // something wasn't a number or a valid date element;
+                LOG.error(e);
             }
         }
         return empty;
@@ -330,29 +334,84 @@ public class SubAwardServiceImpl implements SubAwardService {
     }
 
     @Override
-    public List<SubAward> getLinkedSubAwards(Award award) {
-        Map<String, Object> values = new HashMap<String, Object>();
-        values.put("awardId", award.getAwardId());
-        Collection<SubAwardFundingSource> subAwardFundingSources = businessObjectService.findMatching(SubAwardFundingSource.class, values);
-        Set<String> subAwardSet = new TreeSet<String>();
-        for(SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
-            subAwardSet.add(subAwardFundingSource.getSubAward().getSubAwardCode());
-        }
-        List<SubAward> subAwards = new ArrayList<SubAward>();
-        for (String subAwardCode : subAwardSet) {
-            VersionHistory activeVersion = getVersionHistoryService().findActiveVersion(SubAward.class, subAwardCode);
-            if (activeVersion == null) {
-                VersionHistory pendingVersion = getVersionHistoryService().findPendingVersion(SubAward.class, subAwardCode);
-                if (pendingVersion != null) {
-                    subAwards.add((SubAward) pendingVersion.getSequenceOwner());
+    public Collection<SubAward> getLinkedSubAwards(Award award){
+        List <String> linkedSubAwardIds = null;
+        ArrayList<SubAward> linkedSubawards = new ArrayList<SubAward>();
+        try {
+            linkedSubAwardIds = getSubAwardFundingSourceDao().getLinkedSubAwardsIds(award);
+            
+            if ( linkedSubAwardIds != null && !linkedSubAwardIds.isEmpty() ){
+                for (String subAwardId:linkedSubAwardIds){
+                    SubAward subAward = getBusinessObjectService().findBySinglePrimaryKey(SubAward.class, Long.parseLong(subAwardId));
+                    //needed for display in AwardPanel
+                    getAmountInfo(subAward);
+                    linkedSubawards.add(subAward);
                 }
-            } else {
-                subAwards.add((SubAward) activeVersion.getSequenceOwner());
             }
+        } catch (Exception e){
+            e.printStackTrace();
+            LOG.error(e);
         }
-        return subAwards;
+        return linkedSubawards;
     }
 
+
+    @Override
+    public Collection<Award> getLinkedAwards(SubAward subAward) {
+        try {
+            return getSubAwardFundingSourceDao().getLinkedAwards(subAward);
+        } catch (Exception e){
+            e.printStackTrace();
+            LOG.error(e);
+        }
+        return new ArrayList<Award>();
+    }
+    
+    @Override
+    public void deleteSubAwardFundingSource(String awardNumber, String subAwardCode) {
+        LOG.debug("Deleting SubAwardFundingSource: award="+awardNumber+" subaward="+subAwardCode);
+        try {
+            getSubAwardFundingSourceDao().deleteSubAwardFundingSource(awardNumber, subAwardCode);
+        } catch (Exception e){
+            e.printStackTrace();
+            LOG.error(e);
+        }
+    }
+
+    @Override
+    public void deleteSubAwardFundingSource(SubAwardFundingSource sfs) {
+        LOG.debug("Deleting SubAwardFundingSource:"+sfs.getSubAwardFundingSourceId()+" award="+sfs.getAwardNumber()+" subaward="+sfs.getSubAwardCode());
+        try {
+            getSubAwardFundingSourceDao().deleteSubAwardFundingSource(sfs);
+        } catch (Exception e){
+            e.printStackTrace();
+            LOG.error(e);
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.kuali.kra.subaward.service.SubAwardService#getActiveSubAwardFundingSources(org.kuali.kra.award.home.Award)
+     */
+    @Override
+    public Collection<SubAwardFundingSource> getActiveSubAwardFundingSources(Award award){
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("awardNumber", award.getAwardNumber());
+        values.put("active", Boolean.TRUE );
+        return businessObjectService.findMatching(SubAwardFundingSource.class, values); 
+    }
+
+    
+    /* (non-Javadoc)
+     * @see org.kuali.kra.subaward.service.SubAwardService#getActiveSubAwardFundingSources(org.kuali.kra.award.home.Award)
+     */
+    @Override
+    public Collection<SubAwardFundingSource> getActiveSubAwardFundingSources(SubAward subAward){
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("subAwardCode", subAward.getSubAwardCode());
+        values.put("active", Boolean.TRUE );
+        return businessObjectService.findMatching(SubAwardFundingSource.class, values);
+    }
+    
     public VersionHistoryService getVersionHistoryService() {
         return versionHistoryService;
     }
@@ -360,4 +419,13 @@ public class SubAwardServiceImpl implements SubAwardService {
     public void setVersionHistoryService(VersionHistoryService versionHistoryService) {
         this.versionHistoryService = versionHistoryService;
     }
+    
+    public SubAwardFundingSourceDao getSubAwardFundingSourceDao() {
+        return subAwardFundingSourceDao;
+    }
+
+    public void setSubAwardFundingSourceDao(SubAwardFundingSourceDao subAwardFundingSourceDao) {
+        this.subAwardFundingSourceDao = subAwardFundingSourceDao;
+    }
+
 }
