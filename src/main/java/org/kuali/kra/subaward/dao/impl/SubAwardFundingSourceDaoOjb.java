@@ -81,10 +81,9 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+        PersistenceBroker broker=null;
         try {
-            //don't create another instance of the PersistenceBroker, just grab existing one
-            PersistenceBroker broker = this.getPersistenceBroker(false);
-
+            broker = this.getPersistenceBroker(true);
             conn = broker.serviceConnectionManager().getConnection();
             ps = conn.prepareStatement(SQL_SUBAWARDS);
             ps.setString(1, award.getAwardNumber());
@@ -103,7 +102,7 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
         } finally {
-            closeDatabaseObjects(rs, ps, conn);
+            closeDatabaseObjects(rs, ps, conn, broker);
         }
 
         return result;
@@ -120,10 +119,9 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+        PersistenceBroker broker=null;
         try {
-            //don't create another instance of the PersistenceBroker, just grab existing one
-            PersistenceBroker broker = this.getPersistenceBroker(false);
-
+            broker = this.getPersistenceBroker(true);
             conn = broker.serviceConnectionManager().getConnection();
             ps = conn.prepareStatement(SQL_AWARDS);
             ps.setString(1, subAward.getSubAwardCode());
@@ -142,7 +140,7 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
         } finally {
-            closeDatabaseObjects(rs, ps, conn);
+            closeDatabaseObjects(rs, ps, conn, broker);
         }
 
         return result;
@@ -169,7 +167,7 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
     }
 
 
-    protected void closeDatabaseObjects(ResultSet rs, PreparedStatement ps, Connection conn) {
+    protected void closeDatabaseObjects(ResultSet rs, PreparedStatement ps, Connection conn, PersistenceBroker broker) {
         if (rs != null) {
             try {
                 rs.close();
@@ -191,15 +189,14 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
                 LOG.warn("Failed to close Connection.", ex);
             }
         }
+        
+        if (broker != null) {
+            this.releasePersistenceBroker(broker);
+        }
     }
 
-    /**
-     * Utility method used internally to eliminate duplicate results from subAward/award queries.
-     * If there is a pending and and active version of the same award/subAward, it will only return the active one
-     * It operates under the assumption that there can only be ONE ACTIVE and/or ONE PENDING version at most of the Award/Subaward
-     * @param rs
-     * @return
-     */
+ 
+     
     private List<Row> eliminateDuplicates(ResultSet rs) throws SQLException{
         List<Row> rows = new ArrayList<Row>();
         while (rs.next()) {
