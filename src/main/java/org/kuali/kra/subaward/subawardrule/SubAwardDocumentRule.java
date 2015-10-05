@@ -74,7 +74,7 @@ AddSubAwardAttachmentRule,SubAwardTemplateInfoRule {
     private static final String DATE_FLLOWUP = "newSubAwardCloseout.dateFollowup";
     private static final String REPORT_TYPE = "subAwardAttachmentFormBean.newReport.subAwardReportTypeCode";
     
-    private static final String AWARD_NUMBER="newSubAwardFundingSource.award.awardNumber";
+    private static final String AWARD_NUMBER="newSubAwardFundingSource.awardNumber";
     private static final String AMOUNT_PERIOD_OF_PERFORMANCE_START_DATE = "newSubAwardAmountInfo.periodofPerformanceStartDate";
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(SubAwardDocumentRule.class);
     /**.
@@ -283,7 +283,7 @@ AddSubAwardAttachmentRule,SubAwardTemplateInfoRule {
         }  
         else{
             for(SubAwardFundingSource fundingSource : subAward.getSubAwardFundingSourceList()){
-                if(fundingSource.getAwardId().equals(subAwardFundingSource.getAwardId())){
+                if(fundingSource.isActive() && fundingSource.getAwardId().equals(subAwardFundingSource.getAwardId())){
                     rulePassed = false;
                     AwardService awardService = KraServiceLocator.getService(AwardService.class);
                     Award award = awardService.getAward(fundingSource.getAwardId());

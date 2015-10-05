@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="UAR-1497" author="Adam Kost">
+		<comment>
+			Adding the Award Number column to the SubAward Funding Source.
+		</comment>
+		<sql>
+			ALTER TABLE SUBAWARD_FUNDING_SOURCE ADD (AWARD_NUMBER VARCHAR2(12 BYTE),
+                     		ACTV_IND VARCHAR2(1) DEFAULT 'Y' NOT NULL);
+            		UPDATE SUBAWARD_FUNDING_SOURCE sfs 
+		                SET AWARD_NUMBER =
+		                  ( SELECT AWARD_NUMBER FROM AWARD a
+		                    WHERE a.AWARD_ID = sfs.AWARD_ID );
+            		ALTER TABLE SUBAWARD_FUNDING_SOURCE MODIFY (AWARD_NUMBER NOT NULL);
+		</sql>
+		<rollback>
+			ALTER TABLE SUBAWARD_FUNDING_SOURCE DROP COLUMN AWARD_NUMBER;
+            		ALTER TABLE SUBAWARD_FUNDING_SOURCE DROP COLUMN ACTV_IND;
+		</rollback>
+	</changeSet>
+</databaseChangeLog> 
