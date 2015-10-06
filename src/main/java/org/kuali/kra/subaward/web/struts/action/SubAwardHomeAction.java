@@ -269,9 +269,7 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
         newFundingSource.setSubAward(subAward);
         
         if (new SubAwardDocumentRule().processAddSubAwardFundingSourceBusinessRules(newFundingSource, subAward)) {
-            addFundingSourceToSubAward(subAward, newFundingSource);
-            int numberOfFilteredSFS = subAwardForm.getSubAwardFundingSourcesBeans().size() +1;
-            subAwardForm.getSubAwardFundingSourcesBeans().add(new SubAwardFundingSourceBean(String.valueOf(numberOfFilteredSFS), subAward, newFundingSource.getAward()));
+            addFundingSourceToSubAward(subAward, newFundingSource,subAwardForm.getSubAwardFundingSourcesBeans());
             subAwardForm.setNewSubAwardFundingSource(new SubAwardFundingSource());
         }
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
@@ -284,7 +282,7 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
      * @param fundingSources the SubAwardFundingSource
      * @return boolean
      */
-    boolean addFundingSourceToSubAward(SubAward subAward, SubAwardFundingSource newFundingSource) {
+    boolean addFundingSourceToSubAward(SubAward subAward, SubAwardFundingSource newFundingSource, List<SubAwardFundingSourceBean> sfsBeans) {
         if (subAward.getSubAwardCode() == null) {
             String subAwardCode = getSubAwardService().getNextSubAwardCode();
             subAward.setSubAwardCode(subAwardCode);
@@ -295,7 +293,18 @@ private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.s
         fundingSourceAward.setAwardId( newFundingSource.getAwardId());
         fundingSourceAward.setAwardNumber( newFundingSource.getAwardNumber());
         
-        
+        boolean isDeleted = false;
+        for (SubAwardFundingSourceBean sfs:sfsBeans){
+            if ( sfs.isDeleted() && sfs.getAward().getAwardNumber().equalsIgnoreCase(newFundingSource.getAwardNumber())){
+                sfs.setDeleted(false);
+                isDeleted = true;
+                break;
+            }
+        }
+        if (!isDeleted){
+            int numberOfFilteredSFS = sfsBeans.size() +1;
+            sfsBeans.add(new SubAwardFundingSourceBean(String.valueOf(numberOfFilteredSFS), subAward, newFundingSource.getAward()));
+        }
         return subAward.getSubAwardFundingSourceList().add(newFundingSource);
     }
 
