@@ -76,6 +76,7 @@ public class S2SConnectorServiceBase implements S2SConnectorService {
     private static final String KEY_OPPORTUNITY_ID = "OpportunityID";
     private static final String KEY_CFDA_NUMBER = "CFDANumber";
     private static final String KEY_SUBMISSION_TITLE = "SubmissionTitle";
+    private static final String KEY_CERT_ALGORITHM = "s2s.cert.algorithm";
 
     protected String serviceHost;
     protected String servicePort;
@@ -296,6 +297,11 @@ public class S2SConnectorServiceBase implements S2SConnectorService {
      */
     protected void setPossibleCypherSuites(TLSClientParameters tlsConfig) {
         FiltersType filters = new FiltersType();
+        filters.getInclude().add("EDH-RSA-DES-CBC3-SHA");  
+        filters.getInclude().add("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA");
+        filters.getInclude().add("TLS_DHE_RSA_WITH_AES_128_CBC_SHA");
+        filters.getInclude().add("TLS_DHE_DSS_WITH_AES_128_CBC_SHA256");
+        filters.getInclude().add("TLS_RSA_WITH_AES_128_CBC_SHA");
         filters.getInclude().add("SSL_RSA_WITH_RC4_128_MD5");
         filters.getInclude().add("SSL_RSA_WITH_RC4_128_SHA");
         filters.getInclude().add("SSL_RSA_WITH_3DES_EDE_CBC_SHA");
@@ -344,6 +350,10 @@ public class S2SConnectorServiceBase implements S2SConnectorService {
             trustManagerFactory.init(trustStore);
             TrustManager[] tm = trustManagerFactory.getTrustManagers();
             tlsConfig.setTrustManagers(tm);
+            String certAlgorithm = getS2SUtilService().getProperty(KEY_CERT_ALGORITHM);
+            if(certAlgorithm!=null){
+                tlsConfig.setSecureSocketProtocol(certAlgorithm);
+            }
         }catch (NoSuchAlgorithmException e){
             LOG.error(e);
             throw new S2SException(KeyConstants.ERROR_KEYSTORE_CONFIG,e.getMessage());
