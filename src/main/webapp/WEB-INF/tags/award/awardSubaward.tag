@@ -17,6 +17,7 @@
 
 <c:set var="awardAttributes" value="${DataDictionary.AwardDocument.attributes}" />
 <c:set var="awardApprovedSubawardAttributes" value="${DataDictionary.AwardApprovedSubaward.attributes}" />
+<c:set var="subAwardAttributes" value="${DataDictionary.SubAward.attributes}" />
 <c:set var="action" value="awardTimeAndMoney" />
 
 
@@ -99,36 +100,25 @@
     		<span class="subhead-left">Subawards where this award is a Funding source</span>
         </h3>
         <table id="subaward-table" cellpadding="0" cellspacing="0" summary="Subawards">
-        			<tr>
-        			<th>
-        			</th>
-        			<th>
-					<div align="center">Subrecipient Name:</div></th>
-					
-       				<th>
-						<div align="center">Subaward Id:</div></th>
-					
-					<th>
-					<div align="center">Obligated Amount:</div></th>
-					
-					<th>
-					<div align="center">Award Status:</div></th>
-					
-					</tr>
-                  	<c:forEach var="awardLinkedSubawards" items="${KualiForm.document.awardList[0].subAwardList}" varStatus="status">
-                  	<tr>
-                  					 <td width="8%" valign="middle"> 
-						    
-						    <a
-						href="${ConfigProperties.application.url}/subAwardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${awardLinkedSubawards.subAwardDocument.documentNumber}&medusaOpenedDoc=true&viewOnly=true"
-						target="_blank" class="medusaOpenLink">Open Subaward</a>
-						</td>
-                 					<td>${awardLinkedSubawards.organizationName}&nbsp; </td>
-                 					<td>${awardLinkedSubawards.subAwardCode}&nbsp; </td>
-                 					<td>$<fmt:formatNumber value="${awardLinkedSubawards.totalObligatedAmount}" type="currency" currencySymbol="" maxFractionDigits="2"/></td>
-                 					<td>${KualiForm.document.awardList[0].awardStatus.description}&nbsp; </td>
-                  	</tr>
-        			</c:forEach>
+            <tr>
+                <th></th>
+                <th><div align="center">Subrecipient Name:</div></th>
+                <th><div align="center">Subaward Id:</div></th>
+                <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAttributes.totalObligatedAmount}"/></div></th>
+                <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAttributes.statusCode}"/></div></th>
+            </tr>
+            <c:forEach var="awardLinkedSubawards" items="${KualiForm.document.awardList[0].subAwardList}" varStatus="status">
+                <tr>
+                    <td width="8%" valign="middle">
+                        <a href="${ConfigProperties.application.url}/subAwardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${awardLinkedSubawards.subAwardDocument.documentNumber}&medusaOpenedDoc=true&viewOnly=true"
+                            target="_blank" class="medusaOpenLink">Open Subaward</a>
+                    </td>
+                    <td width="30%">${awardLinkedSubawards.organizationName}&nbsp; </td>
+                    <td><div align="center">${awardLinkedSubawards.subAwardCode}&nbsp;</div></td>
+                    <td><div align="left">$<fmt:formatNumber value="${awardLinkedSubawards.totalObligatedAmount}" type="currency" currencySymbol="" maxFractionDigits="2"/></div></td>
+                    <td><div align="center"><kul:htmlControlAttribute property="document.awardList[0].subAwardList[${status.index}].statusCode" readOnly="true" attributeEntry="${subAwardAttributes.statusCode}"/></div></td>
+                </tr>
+            </c:forEach>
         </table>
      </div>
 </kul:tab>
