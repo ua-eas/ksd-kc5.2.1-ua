@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="UAR-1453_1" author="Natalia Ibanez">
+		<comment>
+			Adding tables for ord_expedited associated sequence
+		</comment>
+		<sql>
+			create table KRAOWNER.eps_prop_ord_expedited(
+                ID NUMBER(12,0) NOT NULL PRIMARY KEY,
+                PROPOSAL_NUMBER  VARCHAR2(12 BYTE) NOT NULL,
+                ORD_EXPEDITED CHAR(1 BYTE) DEFAULT 'N',
+                CUR_IND NUMBER(1,0),
+                OBJ_ID VARCHAR2(36 BYTE) NOT NULL,
+                UPDATE_TIMESTAMP DATE NOT NULL,
+                UPDATE_USER VARCHAR2(60 BYTE) NOT NULL,
+            CONSTRAINT fk_ord_expedited_kra
+                FOREIGN KEY (PROPOSAL_NUMBER)
+                REFERENCES EPS_PROPOSAL(PROPOSAL_NUMBER)
+            );
+            CREATE SEQUENCE KRAOWNER.eps_prop_ord_expedited_seq
+              MINVALUE 1
+              START WITH 1
+              INCREMENT BY 1
+              NOCACHE;
+		</sql>
+		<rollback>
+			DROP table eps_prop_ord_expedited CASCADE CONSTRAINTS;
+            DROP SEQUENCE eps_prop_ord_expedited_seq;    	
+        </rollback>
+	</changeSet>
+    <changeSet id="UAR-1453_2" author="Natalia Ibanez">
+        <comment>
+            Adding tables for sps_reviewer and associated sequence
+        </comment>
+        <sql>
+            create table KRAOWNER.eps_prop_sps_reviewer(
+                ID NUMBER(12,0) NOT NULL PRIMARY KEY,
+                PROPOSAL_NUMBER  VARCHAR2(12 BYTE) NOT NULL,
+                PERSON_ID VARCHAR2(40 BYTE),
+                    FULL_NAME VARCHAR2(90 BYTE),
+                CUR_IND NUMBER(1,0),
+                OBJ_ID VARCHAR2(36 BYTE) NOT NULL,
+                UPDATE_TIMESTAMP DATE NOT NULL,
+                UPDATE_USER VARCHAR2(60 BYTE) NOT NULL,
+            CONSTRAINT fk_sps_reviewer_prop_kra
+                FOREIGN KEY (PROPOSAL_NUMBER)
+                REFERENCES EPS_PROPOSAL(PROPOSAL_NUMBER)
+            );
+            
+            CREATE SEQUENCE KRAOWNER.eps_prop_sps_reviewer_seq
+              MINVALUE 1
+              START WITH 1
+              INCREMENT BY 1
+              NOCACHE;
+        </sql>
+        <rollback>
+            DROP table eps_prop_sps_reviewer CASCADE CONSTRAINTS;
+            DROP SEQUENCE eps_prop_sps_reviewer_seq;       
+        </rollback>
+    </changeSet>
+    <changeSet id="UAR-1453_3" author="Natalia Ibanez">
+        <comment>
+            Adding sps reviewer role and edit ord_expedited and sps_reviewer permissions and assigning them to the right folks
+        </comment>
+        <sql>
+            --create Edit SPS Reviewer Permission
+            insert into KRIM_PERM_T (PERM_ID,OBJ_ID,VER_NBR,PERM_TMPL_ID,NMSPC_CD,NM,DESC_TXT,ACTV_IND)
+            values (KRIM_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, '1', 'KC-ADM', 'Edit SPS Reviewer', 'Edit SPS Reviewer', 'Y');
+        
+            --create Edit ORD Expedited Permission
+            insert into KRIM_PERM_T (PERM_ID,OBJ_ID,VER_NBR,PERM_TMPL_ID,NMSPC_CD,NM,DESC_TXT,ACTV_IND)
+            values (KRIM_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, '1', 'KC-ADM', 'Edit ORD Expedited', 'Edit ORD Expedited', 'Y');
+        
+            --create SPS Proposal Reviewer Role
+            insert into KRIM_ROLE_T (ROLE_ID,OBJ_ID,VER_NBR,ROLE_NM,NMSPC_CD,DESC_TXT,KIM_TYP_ID,ACTV_IND,LAST_UPDT_DT)
+            values (KRIM_ROLE_ID_S.NEXTVAL, SYS_GUID(), 1, 'SPS Proposal Reviewer', 'KC-ADM', 'SPS Proposal Reviewers', '1', 'Y', CURRENT_TIMESTAMP);
+        
+            -- add Edit ORD Expedited permission to SPS Proposal Reviewer Role
+            insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+            values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y',
+            (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='SPS Proposal Reviewer'),
+            (select PERM_ID from KRIM_PERM_T where NM='Edit ORD Expedited'));
+            
+            -- add Edit SPS Reviewer permission to SPS Proposal Reviewer Role
+            insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+            values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y',
+            (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='SPS Proposal Reviewer'),
+            (select PERM_ID from KRIM_PERM_T where NM='Edit SPS Reviewer'));
+        
+            -- add people to Edit SPS Reviewer Role
+            insert into krim_role_mbr_t ( role_mbr_id, ver_nbr, obj_id, role_id, mbr_id, mbr_typ_cd, actv_frm_dt, actv_to_dt )
+            select KRIM_ROLE_MBR_ID_S.NEXTVAL, 1, SYS_GUID(),
+            (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='SPS Proposal Reviewer'),
+            prncpl_id, 'P', null, null
+            from krim_entity_cache_t
+            where prncpl_nm IN ('allisonharte', 'gtd', 'kyleajohnson', 'maryg', 'mundts', 'shana', 'tro');                
+        </sql>
+        <rollback>
+            delete from krim_role_mbr_t where ROLE_ID=(select ROLE_ID from KRIM_ROLE_T where ROLE_NM='SPS Proposal Reviewer')
+            and mbr_id IN (select prncpl_id from krim_entity_cache_t 
+              where prncpl_nm IN ('allisonharte', 'gtd', 'kyleajohnson', 'maryg', 'mundts', 'shana', 'tro'));
+              
+            delete from krim_role_perm_t where role_id IN (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='SPS Proposal Reviewer');
+
+            delete from krim_role_t where ROLE_NM='SPS Proposal Reviewer';
+            
+            delete from krim_perm_t where NM='Edit SPS Reviewer';
+   
+            delete from krim_perm_t where NM='Edit ORD Expedited';       
+        </rollback>
+    </changeSet>
+</databaseChangeLog> 

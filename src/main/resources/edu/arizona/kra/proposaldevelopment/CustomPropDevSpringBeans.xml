@@ -35,27 +35,42 @@
                            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
-    
-    <bean id="coreModuleConfiguration" parent="coreModuleConfiguration-parentBean">
-        <property name="packagePrefixes">
-            <list merge="true">
-                <value>edu.arizona.kra</value>
-            </list>
+                           
+    <bean id="propDevRoutingStateService" class="edu.arizona.kra.proposaldevelopment.service.impl.PropDevRoutingStateServiceImpl">
+        <property name="dataAccessObject">
+            <ref bean="propDevRoutingStateDao" />
         </property>
-        <property name="dataDictionaryPackages">
-            <list merge="true">
-                <value>edu/arizona/kra/datadictionary</value>
-            </list>
+        <property name="authorizationService">
+            <ref bean="customAuthorizationService" />
+        </property>
+        <property name="kcPersonService">
+            <ref bean="kcPersonService" />
         </property>
     </bean>
-    
-    <bean class="org.kuali.rice.core.framework.util.spring.NamedOrderedListBean">
-        <property name="name" value="scriptConfigurationFilePaths" />
-        <property name="listItem" value="classpath:org/kuali/kra/dwr-ua.xml" />
+    <bean id="propDevRoutingStateLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
+        <property name="lookupableHelperService">
+            <ref bean="propDevRoutingStateLookupableHelperService" />
+        </property>
     </bean>
-
-    <bean id="protocolCustomDataService" class="edu.arizona.kra.protocol.ProtocolCustomDataServiceImpl">
-        <property name="businessObjectService" ref="businessObjectService" />
-    </bean> 
-     
+    <bean id="propDevRoutingStateLookupableHelperService" class="edu.arizona.kra.proposaldevelopment.service.impl.PropDevRoutingStateLookupableHelperServiceImpl"
+          scope="prototype" parent="parentLookupableHelperService">
+        <property name="propDevRoutingStateService">
+            <ref bean="propDevRoutingStateService" />
+        </property>
+        <property name="kcPersonService">
+            <ref bean="kcPersonService" />
+        </property>
+        <property name="authorizationService">
+            <ref bean="customAuthorizationService" />
+        </property>
+    </bean>
+    <bean id="customAuthorizationService" class="edu.arizona.kra.proposaldevelopment.service.impl.CustomAuthorizationServiceImpl">
+        <property name="unitAuthorizationService" ref="unitAuthorizationService" />
+        <property name="kcPersonService" ref="kcPersonService" />
+        <property name="roleManagementService" ref="roleService" />
+        <property name="identityManagementService" ref="identityService" />
+        <property name="permissionService" ref="permissionService" />
+    </bean>
+    <bean id="propDevRoutingStateDao" parent="platformAwareDao" class="edu.arizona.kra.proposaldevelopment.dao.ojb.PropDevRoutingStateDaoOjb">
+    </bean>
 </beans>
