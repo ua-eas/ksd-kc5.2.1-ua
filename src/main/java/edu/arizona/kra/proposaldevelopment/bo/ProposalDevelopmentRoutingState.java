@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.arizona.kra.proposaldevelopment;
+package edu.arizona.kra.proposaldevelopment.bo;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
 import org.kuali.kra.common.permissions.Permissionable;
@@ -30,18 +29,17 @@ import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.rice.krad.bo.TransientBusinessObjectBase;
-import org.kuali.kra.infrastructure.Constants;
 
 /**
  * 
- * This class is used to search for Proposal Developments by their routing state
+ * This class is encapsulates the data for the search for Proposal Developments by their routing state
+ * @author nataliac
  */
-@SuppressWarnings("serial")
 public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase implements Permissionable{
-    
+    private static final long serialVersionUID = 1083657975061744488L;
     private DevelopmentProposal developmentProposal;
     private ProposalDevelopmentDocument proposalDocument;
-    
+
     private String proposalNumber;
     private String proposalDocumentNumber;
     private String proposalTitle;
@@ -59,12 +57,14 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     private Timestamp routeStopDate;
     private Boolean finalProposalReceived;
     private Boolean ordExpedited;
-    private KcPerson spsReviewer;
+    private String spsReviewerName;
+    private String spsPersonId;
+    private SPSReviewer spsReviewer;
     private Unit leadUnit;
     private Unit nodeStopLeadUnit;
     private Sponsor sponsor;
-    
-    
+
+
 
     public DevelopmentProposal getDevelopmentProposal() {
         return developmentProposal;
@@ -154,7 +154,7 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     public void setLeadUnitNumber(String leadUnitNumber) {
         this.leadUnitNumber = leadUnitNumber;
     }
-    
+
     public String getLeadUnitName() {
         return leadUnitName;
     }
@@ -162,7 +162,7 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     public void setLeadUnitName(String leadUnitName) {
         this.leadUnitName = leadUnitName;
     }
-   
+
     public String getRouteStopName() {
         return routeStopName;
     }
@@ -195,36 +195,49 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
         this.finalProposalReceived = finalProposalReceived;
     }
 
-    public KcPerson getSpsReviewer() {
+    public SPSReviewer getSPSReviewer() {
         return spsReviewer;
     }
 
-    public void setSpsReviewer(KcPerson reviewer) {
+    public void setSPSReviewer(SPSReviewer reviewer) {
         spsReviewer = reviewer;
-    }
-    
-    public String getSpsReviewerName(){
-        if ( spsReviewer != null ){
-            return spsReviewer.getFullName();
+        if (reviewer != null){
+            spsReviewerName = reviewer.getFullName();
+            spsPersonId = reviewer.getPrincipalId();
         }
-        return "";
     }
 
-    public Boolean isOrdExpedited() {
+    public String getSPSReviewerName(){
+        return spsReviewerName;
+    }
+
+    public Boolean isORDExpedited() {
         return ordExpedited;
     }
 
-    public void setOrdExpedited(Boolean ordExpedited) {
+    public void setORDExpedited(Boolean ordExpedited) {
         this.ordExpedited = ordExpedited;
     }
-    
+
+    public String getSPSPersonId() {
+        return spsPersonId;
+    }
+
+    public void setSPSPersonId(String spsPersonId) {
+        this.spsPersonId = spsPersonId;
+    }
+
+    public void setSPSReviewerName(String spsReviewerName) {
+        this.spsReviewerName = spsReviewerName;
+    }
+
     /**
      * Returns the route image which can be used to construct the route log link in custom lookup helper code.
      */
     public String getRouteLog() {
         return "<img alt=\"Route Log for Document\" src=\"images/my_route_log.gif\"/>";
     }
-    
+
     public String getLeadCollege() {
         return leadCollege;
     }
@@ -232,7 +245,7 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     public void setLeadCollege(String leadCollege) {
         this.leadCollege = leadCollege;
     }
-    
+
     public Unit getLeadUnit(){
         return this.leadUnit;
     }
@@ -240,7 +253,7 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     public void setLeadUnit(Unit unit){
         this.leadUnit = unit;
     }
-    
+
     public Unit getNodeStopLeadUnit() {
         return nodeStopLeadUnit;
     }
@@ -256,7 +269,7 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     public void setSponsor(Sponsor sponsor) {
         this.sponsor = sponsor;
     }
-    
+
     public ProposalDevelopmentDocument getProposalDocument() {
         return proposalDocument;
     }
@@ -282,7 +295,7 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
 
     @Override
     public String getNamespace() {
-       return Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT;
+        return Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT;
     }
 
     @Override

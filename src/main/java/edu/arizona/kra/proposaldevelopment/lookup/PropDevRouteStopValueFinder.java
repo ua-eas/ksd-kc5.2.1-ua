@@ -16,6 +16,7 @@
 package edu.arizona.kra.proposaldevelopment.lookup;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
@@ -23,9 +24,12 @@ import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.krad.uif.control.UifKeyValuesFinderBase;
 import static edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants.*;
 
-@SuppressWarnings("serial")
+/**
+ * Values to populate the Node Name dropdown for the Proposal Development Dashboard
+ * @author nataliac
+ */
 public class PropDevRouteStopValueFinder extends UifKeyValuesFinderBase {
-    
+    private static final long serialVersionUID = -348552528513204757L;
     private static KeyValue keyValueSelect = new ConcreteKeyValue("", NODE_NAME_ALL);
 
 

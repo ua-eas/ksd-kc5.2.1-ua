@@ -6,7 +6,8 @@
 
     <bean id="ProposalDevelopmentRoutingState" parent="ProposalDevelopmentRoutingState-parentBean" />
     <bean id="ProposalDevelopmentRoutingState-parentBean" abstract="true" parent="BusinessObjectEntry">
-        <property name="businessObjectClass" value="edu.arizona.kra.proposaldevelopment.ProposalDevelopmentRoutingState" />
+        <property name="businessObjectClass" value="edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState" />
+        <property name="exporterClass" value="org.kuali.rice.kew.export.DataExporter"/>
 		<property name="objectLabel" value="Proposal Routing Dashboard" />
         <property name="titleAttribute" value="proposalNumber" />
         <property name="lookupDefinition" >
@@ -326,24 +327,24 @@
     
     <bean id="ProposalDevelopmentRoutingState-spsReviewerName" parent="ProposalDevelopmentRoutingState-spsReviewerName-parentBean" />
     <bean id="ProposalDevelopmentRoutingState-spsReviewerName-parentBean" abstract="true" parent="PersonImpl-principalName">
-        <property name="name" value="spsReviewerName" />
+        <property name="name" value="SPSReviewerName" />
         <property name="label" value="SPS Reviewer" />
         <property name="shortLabel" value="SPS Reviewer" />
         <property name="control">
             <bean parent="HiddenControlDefinition" />
         </property>
-        <property name="displayLabelAttribute" value="spsReviewerName" />
+        <property name="displayLabelAttribute" value="SPS Reviewer Full Name" />
     </bean>
     
     <bean id="ProposalDevelopmentRoutingState-ordExpedited" parent="ProposalDevelopmentRoutingState-ordExpedited-parentBean" />
     <bean id="ProposalDevelopmentRoutingState-ordExpedited-parentBean" abstract="true" parent="AttributeDefinition">
-        <property name="name" value="ordExpedited" />
+        <property name="name" value="ORDExpedited" />
         <property name="label" value="ORD Expedited" />
         <property name="shortLabel" value="ORDExpedited" />
         <property name="control">
             <bean parent="HiddenControlDefinition" />
         </property>
-        <property name="displayLabelAttribute" value="ordExpedited" />
+        <property name="displayLabelAttribute" value="ORD Expedited" />
     </bean>
     
     <bean id="ProposalDevelopmentRoutingState-finalProposalReceived" parent="ProposalDevelopmentRoutingState-finalProposalReceived-parentBean" />
@@ -393,7 +394,7 @@
             <bean parent="SortDefinition" >
                 <property name="attributeNames">
                     <list>
-                        <value>ordExpedited</value>
+                        <value>ORDExpedited</value>
                     </list>
                 </property>
             </bean>
@@ -429,8 +430,8 @@
                 <bean parent="FieldDefinition" p:attributeName="leadUnitName"/>
                 <bean parent="FieldDefinition" p:attributeName="routeLog"/>
                 <bean parent="FieldDefinition" p:attributeName="finalProposalReceived"/>
-                <bean parent="FieldDefinition" p:attributeName="spsReviewerName"/>
-                <bean parent="FieldDefinition" p:attributeName="ordExpedited"/>
+                <bean parent="FieldDefinition" p:attributeName="SPSReviewerName"/>
+                <bean parent="FieldDefinition" p:attributeName="ORDExpedited"/>
             </list>
         </property>
     </bean>

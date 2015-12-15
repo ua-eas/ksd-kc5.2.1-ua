@@ -36,15 +36,26 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
                            
+    <bean id="propDevRoutingStateService" class="edu.arizona.kra.proposaldevelopment.service.impl.PropDevRoutingStateServiceImpl">
+        <property name="dataAccessObject">
+            <ref bean="propDevRoutingStateDao" />
+        </property>
+        <property name="authorizationService">
+            <ref bean="customAuthorizationService" />
+        </property>
+        <property name="kcPersonService">
+            <ref bean="kcPersonService" />
+        </property>
+    </bean>
     <bean id="propDevRoutingStateLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
         <property name="lookupableHelperService">
             <ref bean="propDevRoutingStateLookupableHelperService" />
         </property>
     </bean>
-    <bean id="propDevRoutingStateLookupableHelperService" class="edu.arizona.kra.proposaldevelopment.PropDevRoutingStateLookupableHelperServiceImpl"
+    <bean id="propDevRoutingStateLookupableHelperService" class="edu.arizona.kra.proposaldevelopment.service.impl.PropDevRoutingStateLookupableHelperServiceImpl"
           scope="prototype" parent="parentLookupableHelperService">
-        <property name="dataAccessObject">
-            <ref bean="propDevRoutingStateDao" />
+        <property name="propDevRoutingStateService">
+            <ref bean="propDevRoutingStateService" />
         </property>
         <property name="kcPersonService">
             <ref bean="kcPersonService" />
@@ -53,7 +64,7 @@
             <ref bean="customAuthorizationService" />
         </property>
     </bean>
-    <bean id="customAuthorizationService" class="edu.arizona.kra.service.impl.CustomAuthorizationServiceImpl">
+    <bean id="customAuthorizationService" class="edu.arizona.kra.proposaldevelopment.service.impl.CustomAuthorizationServiceImpl">
         <property name="unitAuthorizationService" ref="unitAuthorizationService" />
         <property name="kcPersonService" ref="kcPersonService" />
         <property name="roleManagementService" ref="roleService" />
