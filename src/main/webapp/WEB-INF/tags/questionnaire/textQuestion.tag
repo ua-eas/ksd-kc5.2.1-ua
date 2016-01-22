@@ -24,8 +24,9 @@
 <%@ attribute name="bean" required="true" type="org.kuali.kra.questionnaire.QuestionnaireHelperBase" %>
 <%@ attribute name="property" required="true" %>
 <%@ attribute name="answerValidationError" required = "true" %>
-
 <c:set var="questionFieldName" value="${property}.answerHeaders[${answerHeaderIndex}].answers[${questionIndex}].answer" />
+<script language="javascript" src="scripts/ua_kuali_application.js"></script>
+
 ${kfunc:registerEditableProperty(KualiForm, questionFieldName)}
 
 <c:set var="answerLength" value="${question.answerMaxLength}" />
@@ -34,7 +35,7 @@ ${kfunc:registerEditableProperty(KualiForm, questionFieldName)}
 		<html:textarea property="${questionFieldName}" style="" styleId="${questionFieldName}" title="Question Answer" tabindex="${tabindex}"
 			rows="3" cols="80"
 			styleClass="Qanswer answer questionnaireAnswer"
-			onkeyup="textLimit(this, ${answerLength});" />
+			onblur="textLimit(replaceWordChars(this), ${answerLength});"/>
 		<kul:expandedTextArea textAreaFieldName="${questionFieldName}" 
 			action="questionnaire" textAreaLabel="Question Answer" maxLength="${question.answerMaxLength}" />
 	</c:when>
