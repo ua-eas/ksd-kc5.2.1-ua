@@ -33,6 +33,7 @@
 <kra-pd:proposalDevelopmentInstitutionalAttachments /> 
 <kra-pd:proposalDevelopmentAbstracts />
 <kra-pd:proposalNotes />
+<kra-pd:proposalSPSNotes />
 <kul:panelFooter />
 <kul:documentControls transactionalDocument="true" suppressRoutingControls="true" suppressCancelButton="true" />
 <script language="javascript" src="scripts/kuali_application.js"></script>
