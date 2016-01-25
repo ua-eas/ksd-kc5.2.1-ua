@@ -25,7 +25,6 @@
 <%@ attribute name="property" required="true" %>
 <%@ attribute name="answerValidationError" required = "true" %>
 <c:set var="questionFieldName" value="${property}.answerHeaders[${answerHeaderIndex}].answers[${questionIndex}].answer" />
-<script language="javascript" src="scripts/ua_kuali_application.js"></script>
 
 ${kfunc:registerEditableProperty(KualiForm, questionFieldName)}
 
