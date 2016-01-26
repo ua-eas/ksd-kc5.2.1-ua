@@ -94,7 +94,9 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
                     rtState.setLeadUnitName( rs.getString(COL_LEAD_UNIT_NAME));
                     rtState.setLeadCollege("");
                     String ordExpedited = rs.getString(COL_ORD_EXP);
-                    rtState.setORDExpedited(!StringUtils.isEmpty(ordExpedited)&&YES.equalsIgnoreCase(ordExpedited));
+                    rtState.setORDExpedited(YES.equalsIgnoreCase(ordExpedited));
+                    String fpr = rs.getString(COL_FPR);
+                    rtState.setFinalProposalReceived(YES.equalsIgnoreCase(fpr));
                     rtState.setSPSPersonId(rs.getString(COL_SPS_REVIEWER_ID));
                     rtState.setSPSReviewerName(rs.getString(COL_SPS_REVIEWER_NAME));
                     results.add(rtState);

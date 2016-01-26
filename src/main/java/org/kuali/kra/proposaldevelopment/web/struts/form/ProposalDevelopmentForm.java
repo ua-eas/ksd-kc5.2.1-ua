@@ -21,6 +21,7 @@ import static org.kuali.kra.logging.BufferedLogger.warn;
 import static org.kuali.rice.krad.util.KRADConstants.EMPTY_STRING;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -120,10 +121,15 @@ import org.kuali.rice.kns.service.KNSServiceLocator;
 import org.kuali.rice.kns.util.ActionFormUtilMap;
 import org.kuali.rice.kns.web.ui.ExtraButton;
 import org.kuali.rice.kns.web.ui.HeaderField;
+import org.kuali.rice.krad.bo.Note;
+import org.kuali.rice.krad.exception.AuthorizationException;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.springframework.util.AutoPopulatingList;
+
+import edu.arizona.kra.proposaldevelopment.bo.SPSRestrictedNote;
+import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
 
 
 /**
@@ -241,6 +247,12 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
     private NarrativeStatus narrativeStatusesChange;
     
     private String leadUnitName;
+    
+    private PropDevRoutingStateService propDevRoutingStateService;
+    private boolean canEditSPSRestrictedNotes;
+    private SPSRestrictedNote newSPSRestrictedNote;
+    private List<SPSRestrictedNote> SPSRestrictedNotes;
+    
 
     public ProposalDevelopmentForm() {
         super();
@@ -315,6 +327,9 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
         setNewPropPersonBio(new ProposalPersonBiography());
         setApproverViewTabTitle();
         customDataHelper = new ProposalDevelopmentCustomDataHelper(this);
+        newSPSRestrictedNote = new SPSRestrictedNote();
+        //Save user authorization to edit SPS Restricted notes for use inside the jsp
+        canEditSPSRestrictedNotes = getPropDevRoutingStateService().canEditSPSRestrictedNotes();
     }
 
     /**
@@ -375,8 +390,15 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
             }   
             personCount++;
         }
+        
+        String proposalNumber = proposalDevelopmentDocument.getDevelopmentProposal().getProposalNumber();
+        if ( StringUtils.isNotEmpty( proposalNumber )){
+            setSPSRestrictedNotes(getPropDevRoutingStateService().getSPSRestrictedNotes(proposalNumber));
+        }
+        
     }
     
+
     /**
      * 
      * This method helps debug the http request object.  It prints the values in the request.
@@ -2121,6 +2143,38 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
     
     public String getLeadUnitName() {
     	return this.leadUnitName;
+    }
+    
+    protected PropDevRoutingStateService getPropDevRoutingStateService() {
+        if ( propDevRoutingStateService == null){
+            propDevRoutingStateService = KraServiceLocator.getService(PropDevRoutingStateService.class);
+        }
+        return propDevRoutingStateService;
+    }
+
+    public SPSRestrictedNote getNewSPSRestrictedNote() {
+        return newSPSRestrictedNote;
+    }
+
+    public void setNewSPSRestrictedNote(SPSRestrictedNote newSPSRestrictedNote) {
+        this.newSPSRestrictedNote = newSPSRestrictedNote;
+    }
+
+    public List<SPSRestrictedNote> getSPSRestrictedNotes() {
+        return SPSRestrictedNotes;
+    }
+
+    public void setSPSRestrictedNotes(List<SPSRestrictedNote> sPSRestrictedNotes) {
+        SPSRestrictedNotes = sPSRestrictedNotes;
+    }
+    
+    
+    public boolean getCanEditSPSRestrictedNotes(){
+        return canEditSPSRestrictedNotes;  
+    }
+    
+    public boolean canEditSPSRestrictedNotes(){
+        return canEditSPSRestrictedNotes;      
     }
 
 }
