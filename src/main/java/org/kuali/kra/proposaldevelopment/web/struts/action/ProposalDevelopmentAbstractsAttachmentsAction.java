@@ -25,6 +25,7 @@ import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.TimeFormatter;
 import org.kuali.kra.proposaldevelopment.bo.*;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.notification.ProposalDevelopmentNotificationContext;
@@ -39,14 +40,20 @@ import org.kuali.kra.web.struts.action.KraTransactionalDocumentActionBase;
 import org.kuali.kra.web.struts.action.StrutsConfirmation;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.core.api.util.RiceConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
+import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.krad.bo.Note;
+import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.MessageMap;
 import org.kuali.rice.krad.util.ObjectUtils;
+
+import edu.arizona.kra.proposaldevelopment.bo.SPSRestrictedNote;
+import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -84,6 +91,9 @@ public class ProposalDevelopmentAbstractsAttachmentsAction extends ProposalDevel
     private static final String CONFIRM_DELETE_INSTITUTIONAL_ATTACHMENT_KEY = "confirmDeleteInstitutionalAttachment";
     private static final String CONFIRM_DELETE_PERSONNEL_ATTACHMENT_KEY = "confirmDeletePersonnelAttachment";
     private static final String CONFIRM_DELETE_PROPOSAL_ATTACHMENT_KEY = "confirmDeleteProposalAttachment";
+    
+    protected PropDevRoutingStateService propDevRoutingStateService;
+    protected DateTimeService dateTimeService;
     
     /**
      * Overridden method from ProposalDevelopmentAction. It populates Narrative module user rights
@@ -905,4 +915,140 @@ public class ProposalDevelopmentAbstractsAttachmentsAction extends ProposalDevel
         newNote.setNotePostedTimestamp(CoreApiServiceLocator.getDateTimeService().getCurrentTimestamp());
         return super.insertBONote(mapping, form, request, response);
     }
+    
+    
+    
+    /**
+     * Add SPS Restricted Notes
+     */
+    public ActionForward insertSPSNote(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        LOG.debug("insertSPSNote: Start.");
+        ProposalDevelopmentForm propDevForm = (ProposalDevelopmentForm) form;
+        SPSRestrictedNote newNote = propDevForm.getNewSPSRestrictedNote();
+        //validate all required fields and formats
+        if (!validateSPSRestrictedNote(newNote)) {
+            return mapping.findForward(RiceConstants.MAPPING_BASIC); 
+        }
+        
+        Person kualiUser = GlobalVariables.getUserSession().getPerson();
+        if (kualiUser == null) {
+            throw new IllegalStateException("Current UserSession has a null Person.");
+        }
+        ProposalDevelopmentDocument proposalDoc = ((ProposalDevelopmentForm)form).getProposalDevelopmentDocument();
+        newNote.setProposalNumber(proposalDoc.getDevelopmentProposal().getProposalNumber());
+        newNote.setAuthorId(kualiUser.getPrincipalId());
+        newNote.setAuthorName(kualiUser.getName());
+        newNote.setCreateDate(CoreApiServiceLocator.getDateTimeService().getCurrentTimestamp());
+        
+        LOG.debug("new note "+newNote);
+        getPropDevRoutingStateService().addSPSRestrictedNote(newNote);
+        propDevForm.getSPSRestrictedNotes().add(newNote);
+        // reset the new note back to an empty one
+        propDevForm.setNewSPSRestrictedNote(new SPSRestrictedNote());
+    
+        return mapping.findForward(RiceConstants.MAPPING_BASIC);       
+    }
+    
+    /**
+     * Delete SPS Restricted Notes
+     */
+    public ActionForward deleteSPSNote(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        LOG.debug("deleteSPSNote: Start.");
+        ProposalDevelopmentForm propDevForm = (ProposalDevelopmentForm) form;
+        Document document = propDevForm.getDocument();
+        List <SPSRestrictedNote> spsRestrictedNotes = propDevForm.getSPSRestrictedNotes();
+
+        int lineToDeleteIdx = getLineToDelete(request);
+        if ( lineToDeleteIdx >=0 && lineToDeleteIdx<spsRestrictedNotes.size()){
+            SPSRestrictedNote noteToDelete = spsRestrictedNotes.get(lineToDeleteIdx);
+    
+            if (!document.getDocumentHeader().getWorkflowDocument().isInitiated()) {
+                getPropDevRoutingStateService().deleteSPSRestrictedNote(noteToDelete);
+            }
+            spsRestrictedNotes.remove(lineToDeleteIdx);
+        }
+        return mapping.findForward(RiceConstants.MAPPING_BASIC);
+    }
+    
+    
+    protected boolean validateSPSRestrictedNote(SPSRestrictedNote newNote){
+        boolean isValid = true;
+        GlobalVariables.getMessageMap().clearErrorMessages();
+        if (StringUtils.isBlank(newNote.getNoteTopic())) {
+            isValid = false;
+            GlobalVariables.getMessageMap().putError(
+                    KeyConstants.NEW_SPS_RESTRICTED_NOTE_TOPIC,
+                    KeyConstants.ERROR_REQUIRED, 
+                    "SPS Restricted Note Topic");
+        }
+        if (StringUtils.isBlank(newNote.getNoteText())) {
+            isValid = false;
+            GlobalVariables.getMessageMap().putError(
+                    KeyConstants.NEW_SPS_RESTRICTED_NOTE_TEXT,
+                    KeyConstants.ERROR_REQUIRED,
+                    "SPS Restricted Note Text");
+        }
+        if (newNote.getProposalReceivedDate() == null) {
+            isValid = false;
+            GlobalVariables.getMessageMap().putError(
+                    KeyConstants.NEW_SPS_RESTRICTED_NOTE_DATE,
+                    KeyConstants.ERROR_REQUIRED,
+                    "SPS Restricted Note Proposal Received Date");
+        } else {
+            try {
+                getDateTimeService().toDateString(newNote.getProposalReceivedDate());
+            } catch (Exception e) {
+                isValid = false;
+                GlobalVariables.getMessageMap().putError(
+                        KeyConstants.NEW_SPS_RESTRICTED_NOTE_DATE,
+                        KeyConstants.ERROR_INVALID_FORMAT_WITH_FORMAT,
+                        "SPS Restricted Note Proposal Received Date", newNote.getProposalReceivedDate().toString(), "MM/dd/yyyy");
+            }            
+        }
+        if (newNote.getProposalReceivedTime() == null) {
+            isValid = false;
+            GlobalVariables.getMessageMap().putError(
+                    KeyConstants.NEW_SPS_RESTRICTED_NOTE_TIME,
+                    KeyConstants.ERROR_REQUIRED,
+                    "SPS Restricted Note Proposal Received Time");
+        } else {
+            try {
+                TimeFormatter formatter = new TimeFormatter();
+                   
+                String propReceivedTime = (String) formatter.convertToObject(newNote.getProposalReceivedTime());
+                    if (!propReceivedTime.equalsIgnoreCase(Constants.INVALID_TIME)) {
+                        newNote.setProposalReceivedTime(propReceivedTime);
+                    } else {
+                        isValid = false;
+                        GlobalVariables.getMessageMap().putError(
+                                KeyConstants.NEW_SPS_RESTRICTED_NOTE_TIME,
+                                KeyConstants.ERROR_INVALID_FORMAT_WITH_FORMAT,
+                                "SPS Restricted Note Proposal Received Time", newNote.getProposalReceivedTime(), "(ex. 5:00 PM)");
+                       
+                    }
+            } catch (Exception e){
+                isValid = false;
+                GlobalVariables.getMessageMap().putError(
+                        KeyConstants.NEW_SPS_RESTRICTED_NOTE_TIME,
+                        KeyConstants.ERROR_INVALID_FORMAT_WITH_FORMAT,
+                        "SPS Restricted Note Proposal Received Time", newNote.getProposalReceivedTime(), "(ex. 5:00 PM)");
+            }    
+        }
+        return isValid;
+    }
+    
+    protected PropDevRoutingStateService getPropDevRoutingStateService() {
+        if ( propDevRoutingStateService == null){
+            propDevRoutingStateService = KraServiceLocator.getService(PropDevRoutingStateService.class);
+        }
+        return propDevRoutingStateService;
+    }
+    
+    private DateTimeService getDateTimeService() {
+        if(dateTimeService == null) {
+            dateTimeService = KraServiceLocator.getService(DateTimeService.class);
+        }
+        return dateTimeService;
+    }
+    
 }

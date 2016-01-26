@@ -30,16 +30,19 @@ public final class PropDevRoutingStateConstants {
     /* Permissions */   
     public static final String EDIT_ORD_EXPEDITED_PERMISSION = "Edit ORD Expedited";
     public static final String EDIT_SPS_REVIEWER_PERMISSION = "Edit SPS Reviewer";
+    public static final String EDIT_SPS_RESTRICTED_NOTES_PERMISSION = "Edit SPS Restricted Notes";
     /* Roles */ 
     public static final String SPS_REVIEWER_ROLE_NAME = "SPS Proposal Reviewer";
 
-
+    
     public static final String SQL_LOOKUP =  "select actions.nodeStopDate AS stop_date, rn.NM AS node_name, prop.PROPOSAL_NUMBER AS proposal_number, doc.DOC_HDR_ID AS document_number, prop.TITLE AS proposal_title,"
             +" s.SPONSOR_NAME AS sponsor_name, s.SPONSOR_CODE AS sponsor_code, prop.DEADLINE_DATE AS sponsor_deadline_date, prop.DEADLINE_TIME AS sponsor_deadline_time, pers.FULL_NAME AS principal_investigator, prop.OWNED_BY_UNIT AS lead_unit, "
-            +" u.UNIT_NAME AS lead_unit_name, actions.annot AS annotation, ord_expedited, tmp.full_name as sps_reviewer, tmp.person_id as sps_id"
+            +" u.UNIT_NAME AS lead_unit_name, actions.annot AS annotation, CASE WHEN tmp.ord_expedited IS NULL THEN 'N' ELSE tmp.ord_expedited END AS ord_expedited, tmp.full_name as sps_reviewer, tmp.person_id as sps_id, CASE WHEN tmp.fpr IS NULL THEN 'N' ELSE tmp.fpr END as final_prop_received"
             +" FROM krew_doc_hdr_t doc, krew_rte_node_t rn, krew_rte_node_instn_t rni, "
-            + " eps_proposal prop LEFT OUTER JOIN (select CASE WHEN ordexp.proposal_number IS NULL THEN sps.proposal_number ELSE ordexp.proposal_number END as proposal_nbr, ord_expedited, full_name, person_id FROM"
-            + " (SELECT * FROM eps_prop_ord_expedited WHERE eps_prop_ord_expedited.cur_ind=1) ordexp FULL OUTER JOIN (SELECT * FROM eps_prop_sps_reviewer WHERE eps_prop_sps_reviewer.cur_ind=1) sps ON ordexp.PROPOSAL_NUMBER = sps.proposal_number) tmp"
+            + " eps_proposal prop LEFT OUTER JOIN (select COALESCE(ordexp.proposal_number, sps.proposal_number, notes.proposal_number) AS proposal_nbr, ord_expedited, full_name, person_id,"
+            + " CASE WHEN notes_count IS NULL THEN 'N' ELSE 'Y' END AS fpr FROM"
+            + " (SELECT * FROM eps_prop_ord_expedited WHERE eps_prop_ord_expedited.cur_ind=1) ordexp FULL OUTER JOIN (SELECT * FROM eps_prop_sps_reviewer WHERE eps_prop_sps_reviewer.cur_ind=1) sps ON ordexp.proposal_number = sps.proposal_number"
+            + " FULL OUTER JOIN (select proposal_number, count(*) AS notes_count FROM eps_prop_sps_notes where eps_prop_sps_notes.ACTV_IND='Y' group by proposal_number) notes ON notes.proposal_number = coalesce(ordexp.PROPOSAL_NUMBER, sps.proposal_number)) tmp"
             + " ON prop.proposal_number = tmp.proposal_nbr, sponsor s, unit u, eps_prop_person pers,"
             +" ( SELECT actnRteNodeInstanceId, annot, nodeStopDate, adHocIndicator, Row_Number() OVER (PARTITION BY actnRteNodeInstanceId ORDER BY adHocIndicator, nodeStopDate) AS ord"
             +"   FROM ( SELECT actn.RTE_NODE_INSTN_ID actnRteNodeInstanceId, actn.ACTN_RQST_ANNOTN_TXT annot, actn.CRTE_DT nodeStopDate," 
@@ -83,6 +86,7 @@ public final class PropDevRoutingStateConstants {
     public static final String COL_LEAD_UNIT = "lead_unit";
     public static final String COL_LEAD_UNIT_NAME = "lead_unit_name";
     public static final String COL_ORD_EXP = "ord_expedited";
+    public static final String COL_FPR = "final_prop_received";
     public static final String COL_SPS_REVIEWER_NAME = "sps_reviewer";
     public static final String COL_SPS_REVIEWER_ID = "sps_id";
 
@@ -143,6 +147,10 @@ public final class PropDevRoutingStateConstants {
     public static final Map<String, String> SEARCH_QUERIES;
     public static final Map<String, String> SEARCH_QUERIES_LIKE;
     
+    public static final String PROP_NUMBER = "proposalNumber";
+    public static final String CREATED_DATE = "createdDate";
+    public static final String ACTIVE = "active";
+    
     static {
         //this maps the user search criteria to the appropriate sql criteria to add to the main query
         Map<String, String> aMap = new HashMap<String, String>( );
@@ -161,4 +169,5 @@ public final class PropDevRoutingStateConstants {
 
         annotationCriteriaOffset = SQL_LOOKUP.lastIndexOf("actn.actn_rqst_cd='A'")+21 ;
     }
+    
 }
