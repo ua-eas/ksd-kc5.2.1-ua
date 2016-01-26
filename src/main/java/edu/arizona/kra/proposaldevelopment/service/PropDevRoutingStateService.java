@@ -23,6 +23,7 @@ import org.kuali.kra.bo.KcPerson;
 import org.kuali.rice.krad.exception.AuthorizationException;
 
 import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
+import edu.arizona.kra.proposaldevelopment.bo.SPSRestrictedNote;
 import edu.arizona.kra.proposaldevelopment.bo.SPSReviewer;
 
 /**
@@ -78,10 +79,43 @@ public interface PropDevRoutingStateService {
 
     /**
      * Returns the list of SPSReviewer beans containing principalId and FullNames for the users that have the SPSReviewer role
-     * @return
+     * @return List<SPSReviewer> 
      * @throws LookupException 
      */
     public List<SPSReviewer> findSPSReviewers() throws LookupException;
+
+
+    /**
+     * Returns the list of SPSReviewer restricted notes for the given proposalNumber 
+     * @return List<SPSRestrictedNote>
+     * @throws AuthorizationException, IllegalArgumentException; 
+     */
+    public List<SPSRestrictedNote> getSPSRestrictedNotes(String proposalNumber) throws AuthorizationException, IllegalArgumentException;
+
+
+    /**
+     * Adds a new SPSRestrictedNote to the DB
+     * The service will check if the currentUser is not authorized for this action, will throw a AuthorizationException.
+     * @return SPSRestrictedNote - the newly added note
+     * @throws AuthorizationException, IllegalArgumentException 
+     */
+    public SPSRestrictedNote addSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException;
+
+
+    /**
+     * Delete the given SPSRestrictedNote from the DB
+     * The service will check if the currentUser is not authorized for this action, will throw a AuthorizationException.
+     * @return boolean - true if the deletion was successful, false otherwise
+     * @throws AuthorizationException, IllegalArgumentException 
+     */
+    public boolean deleteSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException;
+
+
+    /**
+     * Returns TRUE if the current authenticated user has the right to edit SPS Restricted Notes, FALSE otherwise
+     * @return boolean
+     */
+    public boolean canEditSPSRestrictedNotes();
 
 
 }

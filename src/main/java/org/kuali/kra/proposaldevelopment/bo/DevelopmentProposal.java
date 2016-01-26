@@ -59,7 +59,7 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
 
     private static final String ATTACHMENTS_COMPLETE = "Complete";
 
-    private static final String ATTACHMENTS_INCOMPLETE = "Inomplete";
+    private static final String ATTACHMENTS_INCOMPLETE = "Incomplete";
 
     private static final String ATTACHMENTS_NONE = "None";
     

@@ -37,8 +37,11 @@
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
                            
     <bean id="propDevRoutingStateService" class="edu.arizona.kra.proposaldevelopment.service.impl.PropDevRoutingStateServiceImpl">
-        <property name="dataAccessObject">
+        <property name="propDevRoutingStateDao">
             <ref bean="propDevRoutingStateDao" />
+        </property>
+        <property name="SPSRestrictedNoteDao">
+            <ref bean="SPSRestrictedNoteDao" />
         </property>
         <property name="authorizationService">
             <ref bean="customAuthorizationService" />
@@ -71,6 +74,6 @@
         <property name="identityManagementService" ref="identityService" />
         <property name="permissionService" ref="permissionService" />
     </bean>
-    <bean id="propDevRoutingStateDao" parent="platformAwareDao" class="edu.arizona.kra.proposaldevelopment.dao.ojb.PropDevRoutingStateDaoOjb">
-    </bean>
+    <bean id="propDevRoutingStateDao" parent="platformAwareDao" class="edu.arizona.kra.proposaldevelopment.dao.ojb.PropDevRoutingStateDaoOjb"/>
+    <bean id="SPSRestrictedNoteDao" parent="platformAwareDao" class="edu.arizona.kra.proposaldevelopment.dao.ojb.SPSRestrictedNoteDaoOjb" />
 </beans>
