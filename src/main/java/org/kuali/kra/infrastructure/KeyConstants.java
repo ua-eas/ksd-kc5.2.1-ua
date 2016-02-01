@@ -1114,6 +1114,12 @@ public final class KeyConstants {
 	public static final String ERROR_UNIT_ADMIN_MULTIPLE_FOR_TYPE_NOT_ALLOWED = "error.unit.admin.multiple.for.type.not.allowed";
 
     public static final String CLEAR_MODULAR_ERROR_BEFORE_FINALIZE = "clear.modular.error.before.finalize";
+    
+    // SPS Restricted Notes
+    public static final String NEW_SPS_RESTRICTED_NOTE_TOPIC = "newSPSRestrictedNote.noteTopic";
+    public static final String NEW_SPS_RESTRICTED_NOTE_TEXT = "newSPSRestrictedNote.noteText";
+    public static final String NEW_SPS_RESTRICTED_NOTE_DATE = "newSPSRestrictedNote.proposalReceivedDate";
+    public static final String NEW_SPS_RESTRICTED_NOTE_TIME = "newSPSRestrictedNote.proposalReceivedTime";
 
     /**
      * private utility class ctor.

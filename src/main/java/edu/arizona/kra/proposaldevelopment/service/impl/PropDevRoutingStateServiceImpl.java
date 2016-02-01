@@ -25,14 +25,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ojb.broker.accesslayer.LookupException;
 import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.krad.exception.AuthorizationException;
+import org.kuali.rice.krad.service.DocumentHeaderService;
+import org.kuali.rice.krad.service.NoteService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 import edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants;
 import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
+import edu.arizona.kra.proposaldevelopment.bo.SPSRestrictedNote;
 import edu.arizona.kra.proposaldevelopment.bo.SPSReviewer;
 import edu.arizona.kra.proposaldevelopment.dao.PropDevRoutingStateDao;
+import edu.arizona.kra.proposaldevelopment.dao.SPSRestrictedNoteDao;
 import edu.arizona.kra.proposaldevelopment.service.CustomAuthorizationService;
 import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
 
@@ -46,7 +51,9 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
 
     private CustomAuthorizationService authorizationService;
     private KcPersonService kcPersonService;
-    protected PropDevRoutingStateDao dataAccessObject;
+    private PropDevRoutingStateDao propDevRoutingStateDao;
+    private SPSRestrictedNoteDao SPSRestrictedNoteDao;
+    private DocumentHeaderService documentHeaderService;
 
 
     private static final Log LOG = LogFactory.getLog(PropDevRoutingStateServiceImpl.class);
@@ -62,9 +69,8 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
         LOG.debug("getSearchResults():"+searchCriteria.toString());
         List <ProposalDevelopmentRoutingState> results = new ArrayList<ProposalDevelopmentRoutingState>();
         try {
-            results = dataAccessObject.getPropDevRoutingState(searchCriteria);
+            results = propDevRoutingStateDao.getPropDevRoutingState(searchCriteria);
         } catch (Exception e){
-            e.printStackTrace();
             LOG.error(e);
         }
         LOG.debug("getSearchResults(): size="+results.size());
@@ -72,10 +78,85 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     }
 
 
-
-    public void setDataAccessObject(PropDevRoutingStateDao dataAccessObject) {
-        this.dataAccessObject = dataAccessObject;
+    @Override
+    public List<SPSRestrictedNote> getSPSRestrictedNotes(String proposalNumber) throws  AuthorizationException, IllegalArgumentException {
+        LOG.debug("getSPSRestrictedNotes(): prop="+proposalNumber+" currentUser:"+GlobalVariables.getUserSession().getPrincipalName());
+        
+        if ( StringUtils.isEmpty(proposalNumber) ){
+            throw new IllegalArgumentException("Null/empty proposalNumber !");
+        }
+        
+        List<SPSRestrictedNote> restrictedNotes = new ArrayList<SPSRestrictedNote>();
+        try {
+            restrictedNotes = SPSRestrictedNoteDao.getSPSRestrictedNotes(proposalNumber);
+            //populate SPS Restricted Notes Author Ids.
+            Collection<String> membersIds= new ArrayList<String>(restrictedNotes.size());
+            for (SPSRestrictedNote note: restrictedNotes){
+                membersIds.add(note.getAuthorId());
+            }
+            List<SPSReviewer> authors = propDevRoutingStateDao.findSPSReviewers(membersIds);
+            for (SPSRestrictedNote note: restrictedNotes){
+                for ( SPSReviewer author: authors){
+                    if ( note.getAuthorId().equalsIgnoreCase( author.getPrincipalId())){
+                        note.setAuthorName( author.getFullName());
+                        break;
+                    }
+                }
+            }
+            
+        } catch (Exception e){
+            LOG.error(e);
+            throw new RuntimeException(e);
+        }
+        LOG.debug("getSPSRestrictedNotes(): Finished.");
+        return restrictedNotes;
     }
+    
+    @Override
+    public boolean canEditSPSRestrictedNotes(){
+        LOG.debug("canEditSPSRestrictedNotes()");
+        String currentUserId = GlobalVariables.getUserSession().getPrincipalId();
+        if ( !StringUtils.isEmpty(currentUserId) ){
+            return getAuthorizationService().hasSPSPermission(currentUserId, PropDevRoutingStateConstants.EDIT_SPS_RESTRICTED_NOTES_PERMISSION);
+        }
+        return false;
+    }
+    
+    
+    @Override
+    public SPSRestrictedNote addSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException{
+        LOG.debug("addSPSRestrictedNote(): "+spsRestrictedNote);
+        checkUserAuthorization( PropDevRoutingStateConstants.EDIT_SPS_RESTRICTED_NOTES_PERMISSION);
+        try {
+            return SPSRestrictedNoteDao.addSPSRestrictedNote(spsRestrictedNote);
+        } catch (Exception e){
+            LOG.error(e);
+            throw new RuntimeException(e);
+        }
+    }
+    
+
+    @Override
+    public boolean deleteSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException {
+        LOG.debug("deleteSPSRestrictedNote(): "+spsRestrictedNote);
+        checkUserAuthorization( PropDevRoutingStateConstants.EDIT_SPS_RESTRICTED_NOTES_PERMISSION);
+        try {
+            return SPSRestrictedNoteDao.deleteSPSRestrictedNote(spsRestrictedNote);
+        } catch (Exception e){
+            LOG.error(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void setPropDevRoutingStateDao(PropDevRoutingStateDao propDevRoutingStateDao) {
+        this.propDevRoutingStateDao = propDevRoutingStateDao;
+    }
+    
+    public void setSPSRestrictedNoteDao(SPSRestrictedNoteDao SPSRestrictedNoteDao) {
+        this.SPSRestrictedNoteDao = SPSRestrictedNoteDao;
+    }
+
 
     public void setAuthorizationService(CustomAuthorizationService authorizationService) {
         this.authorizationService = authorizationService;
@@ -92,15 +173,21 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     public void setKcPersonService(KcPersonService kcPersonService) {
         this.kcPersonService = kcPersonService;
     }
+    
+    protected DocumentHeaderService getDocumentHeaderService() {
+        if (documentHeaderService == null ){
+            documentHeaderService = KraServiceLocator.getService(DocumentHeaderService.class);
+        }
+        return documentHeaderService;
+    }
 
 
     @Override
     public Boolean getORDExpedited(String proposalNumber) throws LookupException {
         LOG.debug("getORDExpedited():"+proposalNumber);
         try {
-            return dataAccessObject.getORDExpedited(proposalNumber);
+            return propDevRoutingStateDao.getORDExpedited(proposalNumber);
         } catch (Exception e){
-            e.printStackTrace();
             LOG.error(e);
             throw new LookupException(e);
         }
@@ -113,9 +200,8 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
         checkUserAuthorization( PropDevRoutingStateConstants.EDIT_ORD_EXPEDITED_PERMISSION);
 
         try {
-            dataAccessObject.setORDExpedited(proposalNumber, ordExp);
+            propDevRoutingStateDao.setORDExpedited(proposalNumber, ordExp);
         } catch (Exception e){
-            e.printStackTrace();
             LOG.error(e);
             throw new RuntimeException(e);
         }
@@ -127,12 +213,11 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     public KcPerson getSPSReviewer(String proposalNumber) throws LookupException {
         LOG.debug("getSPSReviewer():"+proposalNumber);
         try {
-            String spsReviewerId = dataAccessObject.getSPSReviewer(proposalNumber);
+            String spsReviewerId = propDevRoutingStateDao.getSPSReviewer(proposalNumber);
             if ( StringUtils.isNotEmpty(spsReviewerId)){
                 return getKcPersonService().getKcPersonByPersonId(spsReviewerId);
             }
         } catch (Exception e){
-            e.printStackTrace();
             LOG.error(e);
             throw new LookupException(e);
         }
@@ -152,9 +237,8 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
             throw new IllegalArgumentException("setSPSReviewer: Invalid user:"+kcPersonId);
         }
         try {
-            dataAccessObject.setSPSReviewer(proposalNumber, kcPerson.getPersonId(), kcPerson.getFullName());
+            propDevRoutingStateDao.setSPSReviewer(proposalNumber, kcPerson.getPersonId(), kcPerson.getFullName());
         } catch (Exception e){
-            e.printStackTrace();
             LOG.error(e);
             throw new RuntimeException(e);
         }
@@ -169,17 +253,14 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
         List<SPSReviewer> result = new ArrayList<SPSReviewer>();
         try {
             Collection<String> membersIds= getAuthorizationService().getSPSReviewerRoleMembers();
-            result = dataAccessObject.findSPSReviewers(membersIds);
+            result = propDevRoutingStateDao.findSPSReviewers(membersIds);
         } catch (Exception e){
-            e.printStackTrace();
             LOG.error(e);
             throw new LookupException(e);
         }
         LOG.debug("findSPSReviewers():FINISHED");
         return result;
     }
-
-
 
 
 
