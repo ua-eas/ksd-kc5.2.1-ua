@@ -34,9 +34,12 @@ ${kfunc:registerEditableProperty(KualiForm, questionFieldName)}
 		<html:textarea property="${questionFieldName}" style="" styleId="${questionFieldName}" title="Question Answer" tabindex="${tabindex}"
 			rows="3" cols="80"
 			styleClass="Qanswer answer questionnaireAnswer"
-			onblur="textLimit(replaceWordChars(this), ${answerLength});"/>
+			onblur="textLimit(replaceWordChars(this), ${answerLength});"
+			onkeyup="textLimit(replaceWordChars(this), ${answerLength});"
+			/>
 		<kul:expandedTextArea textAreaFieldName="${questionFieldName}" 
-			action="questionnaire" textAreaLabel="Question Answer" maxLength="${question.answerMaxLength}" />
+			action="questionnaire" textAreaLabel="Question Answer" maxLength="${question.answerMaxLength}"
+			/>
 	</c:when>
 	<c:otherwise>
 		<c:set var="fieldSize" value="${answerLength}" />
