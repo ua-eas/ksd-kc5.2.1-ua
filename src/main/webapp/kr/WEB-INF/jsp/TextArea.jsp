@@ -33,6 +33,7 @@ if (textAreaFieldLabel == null) {
 <head>
 <link href="${pageContext.request.contextPath}/kr/css/kuali.css" rel="stylesheet" type="text/css" />
 <script language="javascript" src="${pageContext.request.contextPath}/kr/scripts/core.js"></script>
+<script language="javascript" src="${pageContext.request.contextPath}/scripts/ua_kuali_application.js"></script>
 </head>
 <body onload="setTextArea('${textAreaFieldName}')">
 <div class="headerarea" id="headerarea-small">
@@ -120,7 +121,8 @@ if (textAreaFieldLabel == null) {
                         	rows="${attributeEntry.control.rows}"
                             cols="${attributeEntry.control.cols}"
                             maxlength="${textAreaMaxLength}"
-                            onkeyup="textLimit(this, ${textAreaMaxLength});"
+                            onkeyup="textLimit(replaceWordChars(this), ${textAreaMaxLength});"
+                            onblur="textLimit(replaceWordChars(this), ${textAreaMaxLength});"
                             ><%-- if it's a valid property then get the value...this is kind of hacky --%><c:catch><bean:write name="KualiForm" property="${textAreaFieldName}"/></c:catch></textarea>
 					</c:otherwise>
 				</c:choose>
