@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.kuali.kra.bo.AttachmentFile;
 import org.kuali.kra.bo.CoeusSubModule;
 import org.kuali.kra.committee.bo.CommitteeBatchCorrespondenceDetail;
 import org.kuali.kra.common.notification.service.KcNotificationService;
@@ -30,16 +31,22 @@ import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.irb.actions.IrbProtocolActionRequestService;
 import org.kuali.kra.irb.actions.ProtocolActionType;
+import org.kuali.kra.irb.actions.ProtocolStatus;
 import org.kuali.kra.irb.actions.ProtocolSubmissionBeanBase;
 import org.kuali.kra.irb.actions.notification.ProtocolNotificationRequestBean;
+import org.kuali.kra.irb.actions.print.ProtocolPrintingService;
 import org.kuali.kra.irb.auth.ProtocolTask;
 import org.kuali.kra.irb.correspondence.ProtocolCorrespondence;
+import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
+import org.kuali.kra.irb.noteattachment.ProtocolAttachmentStatus;
 import org.kuali.kra.irb.notification.IRBNotificationContext;
 import org.kuali.kra.irb.notification.IRBNotificationRenderer;
 import org.kuali.kra.irb.notification.IRBProtocolNotification;
 import org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewService;
 import org.kuali.kra.irb.personnel.ProtocolPersonTrainingService;
 import org.kuali.kra.irb.personnel.ProtocolPersonnelService;
+import org.kuali.kra.printing.Printable;
+import org.kuali.kra.printing.service.WatermarkService;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.protocol.ProtocolActionBase;
 import org.kuali.kra.protocol.ProtocolBase;
@@ -57,6 +64,7 @@ import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,13 +88,18 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     public static final String PROTOCOL_PERMISSIONS_HOOK = "permissions";
     public static final String PROTOCOL_CUSTOM_DATA_HOOK = "customData";
     public static final String PROTOCOL_MEDUSA = "medusa";
-    
+   
     private static final Log LOG = LogFactory.getLog(ProtocolAction.class);
     private static final String PROTOCOL_NUMBER = "protocolNumber";
     private static final String SUBMISSION_NUMBER = "submissionNumber";
     private static final String SUFFIX_T = "T";
     private static final String NOT_FOUND_SELECTION = "The attachment was not found for selection ";
     private static final ActionForward RESPONSE_ALREADY_HANDLED = null;
+    private static final String INVALID_WATERMARK = "Watermark the attachment to invalid due to attachment status or doc status.";
+    
+    
+    private WatermarkService watermarkService = null;
+    private ProtocolPrintingService protocolPrintingService = null;
        
     protected ProtocolSubmissionBeanBase getSubmissionBean(ActionForm form, String submissionActionType) {
         ProtocolSubmissionBeanBase submissionBean = null;
@@ -407,6 +420,59 @@ public abstract class ProtocolAction extends ProtocolActionBase {
         if (protocolCorrespondence == null && lastProtocolActionTypeCode.equalsIgnoreCase(ProtocolActionType.PROTOCOL_CREATED)) {
             getProtocolActionRequestService().createProtocol(protocolForm);
         }
+    }
+    
+    /**
+     * 
+     * This method for set the attachment with the watermark which selected  by the client .
+     * @param protocolForm form
+     * @param protocolAttachmentBase attachment
+     * @return attachment file
+     */
+    protected byte[] getProtocolAttachmentFile(ProtocolForm form, ProtocolAttachmentProtocol attachment){
+
+        byte[] attachmentFile =null;
+        final AttachmentFile file = attachment.getFile();
+        Printable printableArtifacts= getProtocolPrintingService().getProtocolPrintArtifacts(form.getProtocolDocument().getProtocol());
+        Protocol protocolCurrent = (Protocol) form.getProtocolDocument().getProtocol();
+        try {
+            if (printableArtifacts.isWatermarkEnabled()){              
+                String attachmentDocStatusCode=attachment.getDocumentStatusCode();
+                String statusCode=attachment.getStatusCode();
+                if(  ProtocolAttachmentStatus.DRAFT.equals(attachmentDocStatusCode) ){
+                    if (ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(statusCode)) {
+                        attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getWatermark());
+                    }
+                }else if (ProtocolStatus.AMENDMENT_MERGED.equals(protocolCurrent.getProtocolStatusCode()) || 
+                        ProtocolStatus.RENEWAL_MERGED.equals(protocolCurrent.getProtocolStatusCode()) ){
+                    if (ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(statusCode)) {
+                        attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getWatermark());
+                    }
+                }else {
+                    attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getInvalidWatermark());
+                    LOG.info(INVALID_WATERMARK + attachment.getDocumentId()+" attachment="+attachment.getAttachmentFileName());
+                }
+            }
+        }
+        catch (Exception e) {
+            LOG.error("Exception Occured in ProtocolNoteAndAttachmentAction. : ",e);    
+        }        
+        return attachmentFile;
+    }
+    
+   
+    protected WatermarkService getWatermarkService() {
+        if ( watermarkService == null ){
+            watermarkService =  KraServiceLocator.getService(WatermarkService.class);  
+        }
+        return watermarkService;
+    }
+    
+    protected ProtocolPrintingService getProtocolPrintingService() {
+        if ( protocolPrintingService == null ){
+            protocolPrintingService = KraServiceLocator.getService(ProtocolPrintingService.class);
+        }
+        return protocolPrintingService;
     }
     
 }

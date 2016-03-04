@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="UAR-1489" author="Natalia Ibanez">
+        <comment>
+            Adding the table and sequence for SPS Restricted Notes
+        </comment>
+        <sql>
+            update watermark
+            set STATUS_CODE='400', WATERMARK_TEXT='Protocol {PROTOCOL_NUMBER} Approved by Univ. of Arizona IRB (Expires {PROTOCOL_EXPIRATION_DATE})', WATERMARK_STATUS='Y', GROUP_NAME='IRB', 
+            FONT_COLOUR='BLACK', POSITION='FOOTER', FONT_SIZE='20', POSITION_FONT='9' where WATERMARK_ID='14';
+
+            update watermark
+            set STATUS_CODE='401', WATERMARK_TEXT='Protocol {PROTOCOL_NUMBER} Approved by Univ. of Arizona IRB (Expires {PROTOCOL_EXPIRATION_DATE})', WATERMARK_STATUS='Y', GROUP_NAME='IRB', 
+            FONT_COLOUR='BLACK', POSITION='FOOTER', FONT_SIZE='20', POSITION_FONT='9' where WATERMARK_ID='15';
+
+            update watermark set WATERMARK_TEXT='Invalid' where STATUS_CODE='-1';
+        </sql>
+        <rollback>
+            update watermark
+            set STATUS_CODE='103', WATERMARK_TEXT='Tabled', WATERMARK_STATUS='N', GROUP_NAME='IACUC', 
+            FONT_COLOUR='DARKGRAY', POSITION='HEADER', FONT_SIZE='50', POSITION_FONT='25' where WATERMARK_ID='14';
+
+            update watermark
+            set STATUS_CODE='104', WATERMARK_TEXT='Minor Revisions Required', WATERMARK_STATUS='N', GROUP_NAME='IACUC', 
+            FONT_COLOUR='DARKGRAY', POSITION='HEADER', FONT_SIZE='50', POSITION_FONT='25' where WATERMARK_ID='15';
+
+            update watermark set WATERMARK_TEXT='Protocol {PROTOCOL_NUMBER} Approved by Univ. of Arizona IRB (Expires {PROTOCOL_EXPIRATION_DATE})' where STATUS_CODE='-1';
+        </rollback>
+    </changeSet>
+</databaseChangeLog> 
