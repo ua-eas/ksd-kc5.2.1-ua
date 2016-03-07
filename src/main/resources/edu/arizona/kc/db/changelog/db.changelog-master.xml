@@ -23,5 +23,6 @@
   <include file="changesets/db.changelog-UAR-1497.xml" />
   <include file="changesets/db.changelog-UAR-1453.xml" />
   <include file="changesets/db.changelog-UAR-1609.xml" />
+  <include file="changesets/db.changelog-UAR-1489.xml" />
 </databaseChangeLog>
 
