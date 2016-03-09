@@ -347,7 +347,7 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
 	 * @return Negotiable - the BO for the object associated with this Negotiation
 	 */
 	public Negotiable getAssociatedNegotiable() {
-	    if (associatedNegotiable == null || getAssociatedNegotiable().getAssociatedDocumentId()!= this.getAssociatedDocumentId())
+	    if (associatedNegotiable == null )
 	        associatedNegotiable = getNegotiationService().getAssociatedObject(this);
 	    return associatedNegotiable;
 	}
