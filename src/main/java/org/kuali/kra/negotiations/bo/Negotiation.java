@@ -65,7 +65,7 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
 	private NegotiationUnassociatedDetail unAssociatedDetail;
 	private List<NegotiationCustomData> negotiationCustomDataList;
 	private Negotiable associatedDocument;
-
+	private Negotiable associatedNegotiable;
 	private NegotiationDocument negotiationDocument;
 
 	/**
@@ -342,9 +342,16 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
 		}
 	}
 
+	/**
+	 * Implementing a lazy accessor to try improving performance
+	 * @return Negotiable - the BO for the object associated with this Negotiation
+	 */
 	public Negotiable getAssociatedNegotiable() {
-		return getNegotiationService().getAssociatedObject( this );
+	    if (associatedNegotiable == null || getAssociatedNegotiable().getAssociatedDocumentId()!= this.getAssociatedDocumentId())
+	        associatedNegotiable = getNegotiationService().getAssociatedObject(this);
+	    return associatedNegotiable;
 	}
+
 
 	private NegotiationService getNegotiationService() {
 		return KraServiceLocator.getService( NegotiationService.class );

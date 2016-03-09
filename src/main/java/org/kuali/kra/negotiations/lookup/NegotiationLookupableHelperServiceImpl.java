@@ -69,24 +69,46 @@ public class NegotiationLookupableHelperServiceImpl extends KraLookupableHelperS
     @Override
     public List<HtmlData> getCustomActionUrls(BusinessObject businessObject, List pkNames) {
         List<HtmlData> htmlDataList = new ArrayList<HtmlData>();
-        htmlDataList.add(getOpenLink(((Negotiation) businessObject).getDocument()));
-        htmlDataList.add(getMedusaLink(((Negotiation) businessObject).getDocument(), false));
+        htmlDataList.add(getOpenLink(((Negotiation) businessObject).getDocumentNumber()));
+        htmlDataList.add(getMedusaLink(((Negotiation) businessObject).getDocumentNumber(), false));
         return htmlDataList;
     }
     
-    protected AnchorHtmlData getOpenLink(Document document) {
+    protected AnchorHtmlData getOpenLink(String documentNumber) {
         AnchorHtmlData htmlData = new AnchorHtmlData();
         htmlData.setDisplayText("open");
         Properties parameters = new Properties();
         parameters.put(KRADConstants.DISPATCH_REQUEST_PARAMETER, KRADConstants.DOC_HANDLER_METHOD);
         parameters.put(KRADConstants.PARAMETER_COMMAND, KewApiConstants.DOCSEARCH_COMMAND);
         parameters.put(KRADConstants.DOCUMENT_TYPE_NAME, getDocumentTypeName());
-        parameters.put("docId", document.getDocumentNumber());
+        parameters.put("docId", documentNumber);
         String href  = UrlFactory.parameterizeUrl("../" + getHtmlAction(), parameters);
         
         htmlData.setHref(href);
         return htmlData;
 
+    }
+    
+    /**
+     * Re-implementing method from super to avoid accessing/loading the NegotiationDocument just for displaying the search results
+     * when it only really needs a documentNumber that's already present in the Negotiation object.
+     * @param documentNumber
+     * @param readOnly
+     * @return
+     */
+    protected AnchorHtmlData getMedusaLink(String documentNumber, Boolean readOnly) {
+        AnchorHtmlData htmlData = new AnchorHtmlData();
+        htmlData.setDisplayText(MEDUSA);
+        Properties parameters = new Properties();
+        parameters.put(KRADConstants.DISPATCH_REQUEST_PARAMETER, "medusa");
+        parameters.put(KRADConstants.PARAMETER_COMMAND, KewApiConstants.DOCSEARCH_COMMAND);
+        parameters.put(KRADConstants.DOCUMENT_TYPE_NAME, getDocumentTypeName());
+        parameters.put("viewDocument", readOnly.toString());
+        parameters.put("docId", documentNumber);
+        String href  = UrlFactory.parameterizeUrl("../"+getHtmlAction(), parameters);
+        
+        htmlData.setHref(href);
+        return htmlData;
     }
     
 
