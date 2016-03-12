@@ -844,6 +844,16 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     public Date getProjectEndDate() {
         return awardAmountInfos.get(0).getFinalExpirationDate();
     }
+    
+
+    /**
+     * This method returns the project end date based on Amount Info 
+     * @return
+     * @throws WorkflowException 
+     */
+    public Date getProjectEffectiveEndDate() throws WorkflowException {
+        return awardAmountInfos.get(getIndexOfAwardAmountInfoForDisplay()).getFinalExpirationDate();
+    }
 
     /**
      * This method sets the project end date which is housed in the Amount Info list index[0] on the award.

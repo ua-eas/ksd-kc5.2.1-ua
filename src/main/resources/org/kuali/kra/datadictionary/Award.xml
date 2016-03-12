@@ -83,6 +83,7 @@
         <ref bean="Award-awardAmountInfo.obligationExpirationDate" />
         <ref bean="Award-awardAmountInfo.amountObligatedToDate" />
         <ref bean="Award-sponsor.sponsorName" />
+        <ref bean="Award-projectEffectiveEndDate" />
         
       </list>
     </property>
@@ -894,6 +895,17 @@
 	    <property name="summary" value="Project End Date" />
 	    <property name="description" value="Project End Date" />
   	</bean>
+    
+    <bean id="Award-projectEffectiveEndDate" parent="Award-projectEffectiveEndDate-parentBean" />
+    <bean id="Award-projectEffectiveEndDate-parentBean" abstract="true" parent="AttributeReferenceDummy-genericDate">
+        <property name="name" value="projectEffectiveEndDate" />
+        <property name="label" value="Project End Date" />
+        <property name="shortLabel" value="Project End Date" />
+        <property name="required" value="false" />
+        <property name="summary" value="Project End Date" />
+        <property name="description" value="Project End Date" />
+    </bean>
+    
 
 	<bean id="Award-updateTimestamp" parent="Award-updateTimestamp-parentBean" />
 	<bean id="Award-updateTimestamp-parentBean" abstract="true" parent="KraAttributeReferenceDummy-updateTimestamp" >
@@ -1134,9 +1146,7 @@
 			<bean p:attributeName="principalInvestigatorName" parent="FieldDefinition" />
 			<bean p:attributeName="ospAdministratorName" parent="FieldDefinition" />
 			<bean p:attributeName="awardEffectiveDate"  parent="FieldDefinition" />
-			<!-- Obligation Expiration Date -->
-			<!-- Final Expiration Date -->
-			<bean p:attributeName="projectEndDate" parent="FieldDefinition" />
+			<bean p:attributeName="projectEffectiveEndDate" parent="FieldDefinition" />
 			<bean p:attributeName="archiveLocation" parent="FieldDefinition" />
 		    <bean p:attributeName="closeoutDate" parent="FieldDefinition" />
 			
