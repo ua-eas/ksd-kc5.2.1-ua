@@ -38,6 +38,7 @@ import org.kuali.kra.irb.actions.print.ProtocolPrintingService;
 import org.kuali.kra.irb.auth.ProtocolTask;
 import org.kuali.kra.irb.correspondence.ProtocolCorrespondence;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
+import org.kuali.kra.irb.noteattachment.ProtocolAttachmentService;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentStatus;
 import org.kuali.kra.irb.notification.IRBNotificationContext;
 import org.kuali.kra.irb.notification.IRBNotificationRenderer;
@@ -52,6 +53,7 @@ import org.kuali.kra.protocol.ProtocolActionBase;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.ProtocolFormBase;
 import org.kuali.kra.protocol.auth.ProtocolTaskBase;
+import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 import org.kuali.kra.protocol.notification.ProtocolNotification;
 import org.kuali.kra.protocol.notification.ProtocolNotificationContextBase;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
@@ -66,6 +68,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +80,7 @@ import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
  * all user requests for that particular tab (web page).
  */
 public abstract class ProtocolAction extends ProtocolActionBase {
-    
+
     public static final String PROTOCOL_NAME_HOOK = "protocol";
     public static final String PROTOCOL_QUESTIONNAIRE_HOOK = "questionnaire";
     public static final String PROTOCOL_PERSONNEL_HOOK = "personnel";
@@ -88,7 +91,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     public static final String PROTOCOL_PERMISSIONS_HOOK = "permissions";
     public static final String PROTOCOL_CUSTOM_DATA_HOOK = "customData";
     public static final String PROTOCOL_MEDUSA = "medusa";
-   
+
     private static final Log LOG = LogFactory.getLog(ProtocolAction.class);
     private static final String PROTOCOL_NUMBER = "protocolNumber";
     private static final String SUBMISSION_NUMBER = "submissionNumber";
@@ -96,14 +99,15 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     private static final String NOT_FOUND_SELECTION = "The attachment was not found for selection ";
     private static final ActionForward RESPONSE_ALREADY_HANDLED = null;
     private static final String INVALID_WATERMARK = "Watermark the attachment to invalid due to attachment status or doc status.";
-    
-    
+
+
     private WatermarkService watermarkService = null;
     private ProtocolPrintingService protocolPrintingService = null;
-       
+    private ProtocolAttachmentService protocolAttachmentService = null;
+
     protected ProtocolSubmissionBeanBase getSubmissionBean(ActionForm form, String submissionActionType) {
         ProtocolSubmissionBeanBase submissionBean = null;
-                 
+
         if (ProtocolActionType.NOTIFY_IRB.equals(submissionActionType)) {
             submissionBean = ((ProtocolForm) form).getActionHelper().getProtocolNotifyIrbBean();
         } else {
@@ -111,12 +115,12 @@ public abstract class ProtocolAction extends ProtocolActionBase {
         }
         return submissionBean;
     }
-    
+
     public ActionForward customData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         ((ProtocolForm)form).getCustomDataHelper().prepareCustomData();
         return branchToPanelOrNotificationEditor(mapping, (ProtocolFormBase)form, getCustomDataForwardNameHook());
     }
-    
+
     public ActionForward medusa(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
         ProtocolForm protocolForm = (ProtocolForm) form;
         if (protocolForm.getProtocolDocument().getDocumentNumber() == null) {
@@ -136,11 +140,11 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     @Override
     public ActionForward docHandler(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ActionForward forward = null;
-        
+
         ProtocolForm protocolForm = (ProtocolForm) form;
         String command = protocolForm.getCommand();
         String detailId;
-       
+
         if (command.startsWith(KewApiConstants.DOCSEARCH_COMMAND+"detailId")) {
             detailId = command.substring((KewApiConstants.DOCSEARCH_COMMAND+"detailId").length());
             protocolForm.setDetailId(detailId);
@@ -169,14 +173,14 @@ public abstract class ProtocolAction extends ProtocolActionBase {
         } else {
             protocolForm.initialize();
         }
-        
+
         if (Constants.MAPPING_PROTOCOL_ACTIONS.equals(command)) {
             forward = protocolActions(mapping, protocolForm, request, response);
         }
         if (Constants.MAPPING_PROTOCOL_ONLINE_REVIEW.equals(command)) {
             forward = onlineReview(mapping, protocolForm, request, response);
         }
-        
+
         return forward;
     }
 
@@ -187,7 +191,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     protected ProtocolPersonTrainingService getProtocolPersonTrainingService() {
         return (ProtocolPersonTrainingService)KraServiceLocator.getService("protocolPersonTrainingService");
     }
-    
+
     /**
      * This method is to get protocol personnel service
      * @return ProtocolPersonnelService
@@ -195,16 +199,16 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     protected ProtocolPersonnelService getProtocolPersonnelService() {
         return (ProtocolPersonnelService)KraServiceLocator.getService("protocolPersonnelService");
     }
-    
+
     /*
      * Get the ProtocolOnlineReviewService
      * @return ProtocolOnlineReviewService
      */
-    
+
     protected ProtocolOnlineReviewService getProtocolOnlineReviewService() {
         return KraServiceLocator.getService(ProtocolOnlineReviewService.class);
     }
-        
+
     /**
      * 
      * This method is to print submission questionnaire answer
@@ -243,7 +247,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
         }
         return forward;
     }
-    
+
     /*
      * This is to retrieve answer header based on answerheaderid
      */
@@ -269,7 +273,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
         }
         return protocolNumber;
     }
-    
+
     private ProtocolFinderDao getProtocolFinder() {
         return KraServiceLocator.getService(ProtocolFinderDao.class);
     }
@@ -351,12 +355,12 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     protected String getCustomDataForwardNameHook() {
         return PROTOCOL_CUSTOM_DATA_HOOK;
     }
-    
+
     @Override
     protected ProtocolNotification getProtocolNotificationHook() {
         return new IRBProtocolNotification();
     }
-    
+
     @Override
     protected ProtocolTaskBase createNewModifyProtocolTaskInstanceHook(ProtocolBase protocol) {
         return new ProtocolTask(TaskName.MODIFY_PROTOCOL, (Protocol) protocol);
@@ -367,7 +371,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
         KraAuthorizationService kraAuthService = getKraAuthorizationService();
         kraAuthService.addRole(userId, RoleConstants.PROTOCOL_AGGREGATOR, protocol);
         kraAuthService.addRole(userId, RoleConstants.PROTOCOL_APPROVER, protocol); 
-        
+
     }
 
     @Override
@@ -382,7 +386,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     protected String getProtocolNotificationEditorHook() {
         return "protocolNotificationEditor";
     }
-    
+
     protected ProtocolNotificationContextBase getProtocolInitialSaveNotificationContextHook(ProtocolBase protocol) {
         IRBNotificationRenderer renderer = new IRBNotificationRenderer((Protocol)protocol);
         return new IRBNotificationContext((Protocol)protocol, ProtocolActionType.PROTOCOL_CREATED_NOTIFICATION, "Protocol Created", renderer, PROTOCOL_NAME_HOOK);
@@ -391,10 +395,10 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     protected IrbProtocolActionRequestService getProtocolActionRequestService() {
         return KraServiceLocator.getService(IrbProtocolActionRequestService.class);
     }
-    
+
     protected ProtocolCorrespondence getProtocolCorrespondence (ProtocolForm protocolForm, String forwardName, ProtocolNotificationRequestBean notificationRequestBean, boolean holdingPage) {
         boolean result = false;
-        
+
         Map<String,Object> keyValues = new HashMap<String, Object>();
         // actionid <-> action.actionid  actionidfk<->action.protocolactionid
         keyValues.put("actionIdFk", protocolForm.getProtocolDocument().getProtocol().getLastProtocolAction().getProtocolActionId());
@@ -407,10 +411,10 @@ public abstract class ProtocolAction extends ProtocolActionBase {
             correspondence.setNotificationRequestBean(notificationRequestBean);
             correspondence.setHoldingPage(holdingPage);
             return correspondence;
-            
+
         }
     }
-    
+
     @Override
     public void postSave(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         super.postSave(mapping, form, request, response);
@@ -421,7 +425,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
             getProtocolActionRequestService().createProtocol(protocolForm);
         }
     }
-    
+
     /**
      * 
      * This method for set the attachment with the watermark which selected  by the client .
@@ -430,49 +434,55 @@ public abstract class ProtocolAction extends ProtocolActionBase {
      * @return attachment file
      */
     protected byte[] getProtocolAttachmentFile(ProtocolForm form, ProtocolAttachmentProtocol attachment){
-
         byte[] attachmentFile =null;
         final AttachmentFile file = attachment.getFile();
-        Printable printableArtifacts= getProtocolPrintingService().getProtocolPrintArtifacts(form.getProtocolDocument().getProtocol());
-        Protocol protocolCurrent = (Protocol) form.getProtocolDocument().getProtocol();
+        Protocol currentProtocol = (Protocol) form.getProtocolDocument().getProtocol();
+        Printable printableArtifacts= getProtocolPrintingService().getProtocolPrintArtifacts(currentProtocol);     
         try {
-            if (printableArtifacts.isWatermarkEnabled()){              
-                String attachmentDocStatusCode=attachment.getDocumentStatusCode();
-                String statusCode=attachment.getStatusCode();
-                if(  ProtocolAttachmentStatus.DRAFT.equals(attachmentDocStatusCode) ){
-                    if (ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(statusCode)) {
-                        attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getWatermark());
-                    }
-                }else if (ProtocolStatus.AMENDMENT_MERGED.equals(protocolCurrent.getProtocolStatusCode()) || 
-                        ProtocolStatus.RENEWAL_MERGED.equals(protocolCurrent.getProtocolStatusCode()) ){
-                    if (ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(statusCode)) {
-                        attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getWatermark());
-                    }
-                }else {
+            if (printableArtifacts.isWatermarkEnabled() && ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(attachment.getStatusCode())){              
+                if( attachment.isDraft() || 
+                        ProtocolStatus.AMENDMENT_MERGED.equals(currentProtocol.getProtocolStatusCode()) ||
+                        ProtocolStatus.RENEWAL_MERGED.equals(currentProtocol.getProtocolStatusCode()) ||
+                        getProtocolAttachmentService().isAttachmentActive(attachment)){
+                    
+                    attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getWatermark());
+
+                } else {
+                    //print the Invalid watermark.
                     attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getInvalidWatermark());
-                    LOG.info(INVALID_WATERMARK + attachment.getDocumentId()+" attachment="+attachment.getAttachmentFileName());
+                    LOG.debug(INVALID_WATERMARK + attachment.getDocumentId()+" attachment="+attachment.getAttachmentFileName());
                 }
+                
+            } else {
+                LOG.debug("Attachment file not watermar enabled or is not marked as complete. No watermark for "+attachment.getAttachmentFileName()); 
             }
+            
         }
         catch (Exception e) {
-            LOG.error("Exception Occured in ProtocolNoteAndAttachmentAction. : ",e);    
+            LOG.error("Exception Occured in getProtocolAttachmentFile. : ",e);    
         }        
         return attachmentFile;
     }
-    
-   
+
+    protected ProtocolAttachmentService getProtocolAttachmentService() {
+        if ( protocolAttachmentService == null ){
+            protocolAttachmentService =  KraServiceLocator.getService(ProtocolAttachmentService.class);  
+        }
+        return protocolAttachmentService;
+    }
+
     protected WatermarkService getWatermarkService() {
         if ( watermarkService == null ){
             watermarkService =  KraServiceLocator.getService(WatermarkService.class);  
         }
         return watermarkService;
     }
-    
+
     protected ProtocolPrintingService getProtocolPrintingService() {
         if ( protocolPrintingService == null ){
             protocolPrintingService = KraServiceLocator.getService(ProtocolPrintingService.class);
         }
         return protocolPrintingService;
     }
-    
+
 }
