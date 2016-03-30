@@ -128,12 +128,12 @@
 						  </td>
 						  <td width="9%" valign="middle">
     						<div align="center">
-    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardAmountInfos[0].amountObligatedToDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.amountObligatedToDate}"/>
+    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.amountObligatedToDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.amountObligatedToDate}"/>
     						</div>
 						  </td>
 						  <td width="9%" valign="middle">
     						<div align="center">
-    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardAmountInfos[0].obligationExpirationDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.obligationExpirationDate}" datePicker="false"/>
+    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.obligationExpirationDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.obligationExpirationDate}" datePicker="false"/>
     						</div>
 						  </td>
 						

@@ -84,6 +84,7 @@
         <ref bean="Award-awardAmountInfo.amountObligatedToDate" />
         <ref bean="Award-sponsor.sponsorName" />
         <ref bean="Award-projectEffectiveEndDate" />
+        <ref bean="Award-amountObligatedToDate" />
         
       </list>
     </property>
@@ -896,6 +897,16 @@
 	    <property name="description" value="Project End Date" />
   	</bean>
     
+	<bean id="Award-amountObligatedToDate" parent="Award-amountObligatedToDate-parentBean" />
+	<bean id="Award-amountObligatedToDate-parentBean" abstract="true" parent="AttributeReferenceDummy-genericDate">
+	    <property name="name" value="amountObligatedToDate" />
+	    <property name="label" value="Amount Obligated To Date" />
+	    <property name="shortLabel" value="Amount" />
+	    <property name="required" value="false" />
+	    <property name="summary" value="Amount Obligated To Date" />
+	    <property name="description" value="Project End Date" />
+  	</bean>
+  	
     <bean id="Award-projectEffectiveEndDate" parent="Award-projectEffectiveEndDate-parentBean" />
     <bean id="Award-projectEffectiveEndDate-parentBean" abstract="true" parent="AttributeReferenceDummy-genericDate">
         <property name="name" value="projectEffectiveEndDate" />
@@ -1094,6 +1105,7 @@
 			    <bean p:attributeName="ospAdministratorName" parent="FieldDefinition" />
 			    <bean p:attributeName="archiveLocation" parent="FieldDefinition" />
 			    <bean p:attributeName="closeoutDate" parent="FieldDefinition" />
+			    <bean p:attributeName="amountObligatedToDate" parent="FieldDefinition" />
             </list>
           </property>
         </bean>
