@@ -377,13 +377,18 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
         this.sequenceNumber = sequenceNumber;
     }
 
-
     public int getIndexOfLastAwardAmountInfo() {
         return awardAmountInfos.size() - 1;
     }
 
     public AwardAmountInfo getLastAwardAmountInfo() {
-        return awardAmountInfos.get(getIndexOfLastAwardAmountInfo());
+        try {
+			return awardAmountInfos.get(getIndexOfAwardAmountInfoForDisplay());
+		} catch (WorkflowException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return awardAmountInfos.get(0);
     }
 
     public int getIndexOfAwardAmountInfoForDisplay() throws WorkflowException {
@@ -870,6 +875,14 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
 
     public void setObligationExpirationDate(Date date) {
         this.awardAmountInfos.get(0).setObligationExpirationDate(date);
+    }
+
+    public KualiDecimal getAmountObligatedToDate() {
+        return getLastAwardAmountInfo().getAmountObligatedToDate();
+    }
+
+    public void setAmountObligatedToDate(KualiDecimal amount) {
+        this.awardAmountInfos.get(0).setAmountObligatedToDate(amount);
     }
 
     /**
