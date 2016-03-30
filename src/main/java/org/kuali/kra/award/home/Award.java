@@ -377,43 +377,33 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
         this.sequenceNumber = sequenceNumber;
     }
 
-
     public int getIndexOfLastAwardAmountInfo() {
+        if ( awardAmountInfos == null || awardAmountInfos.isEmpty() ){
+            return -1;
+        }
         return awardAmountInfos.size() - 1;
     }
 
     public AwardAmountInfo getLastAwardAmountInfo() {
-        return awardAmountInfos.get(getIndexOfLastAwardAmountInfo());
+        int idx = getIndexOfLastAwardAmountInfo();
+        if ( idx>=0 ){
+            return awardAmountInfos.get(getIndexOfLastAwardAmountInfo());
+        }
+        return null;
     }
 
     public int getIndexOfAwardAmountInfoForDisplay() throws WorkflowException {
         AwardAmountInfo aai = getAwardAmountInfoService().fetchLastAwardAmountInfoForAwardVersionAndFinalizedTandMDocumentNumber(this);
-        int returnVal = 0;
-        int index = 0;
-        if (aai.getAwardAmountInfoId() != null && this.isAwardInMultipleNodeHierarchy()) {
-            this.refreshReferenceObject("awardAmountInfos");
-        }
-        if (isAwardInitialCopy()) {
-            // if it's copied, on initialization we want to return index of last AwardAmountInfo in collection.
-            returnVal = getAwardAmountInfos().size() - 1;
-        }else {
-            for (AwardAmountInfo awardAmountInfo : getAwardAmountInfos()) {
-                if (awardAmountInfo.getAwardAmountInfoId() == null && aai.getAwardAmountInfoId() == null) {
-                    returnVal = index;
-                }else if(awardAmountInfo.getAwardAmountInfoId().equals(aai.getAwardAmountInfoId())) {
-                    returnVal = index;
-                }else {
-                    index++;
-                }
-            }
-        }
-        return returnVal;
+        return getIndexOfAwardAmountInfoForDisplay(aai);
     }
 
     public int getIndexOfAwardAmountInfoForDisplayFromTimeAndMoneyDocNumber(String docNum) throws WorkflowException {
-        AwardAmountInfo aai = getAwardAmountInfoService().fetchLastAwardAmountInfoForDocNum(this, docNum);
+        AwardAmountInfo aai = getAwardAmountInfoService().fetchLastAwardAmountInfoForDocNum(this, docNum);       
+        return getIndexOfAwardAmountInfoForDisplay(aai);
+    }
+    
+    private int getIndexOfAwardAmountInfoForDisplay(AwardAmountInfo aai){
         int returnVal = 0;
-        int index = 0;
         if (aai.getAwardAmountInfoId() != null && this.isAwardInMultipleNodeHierarchy()) {
             this.refreshReferenceObject("awardAmountInfos");
         }
@@ -421,13 +411,17 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
             // if it's copied, on initialization we want to return index of last AwardAmountInfo in collection.
             returnVal = getAwardAmountInfos().size() - 1;
         }else {
-            for (AwardAmountInfo awardAmountInfo : getAwardAmountInfos()) {
-                if (awardAmountInfo.getAwardAmountInfoId() == null && aai.getAwardAmountInfoId() == null) {
+            //TODO check the logic inherited from Foundation... seems very convoluted.
+            for (int index=0; index<getAwardAmountInfos().size(); index++){
+                AwardAmountInfo crtAwardAmountInfo = getAwardAmountInfos().get(index);
+                
+                //if only one of crtAwardAmountInfo or aai is null, just move to the next element
+                if (crtAwardAmountInfo.getAwardAmountInfoId() == null){
+                    if (aai.getAwardAmountInfoId() == null) {
+                        returnVal = index;
+                    } 
+                } else if (crtAwardAmountInfo.getAwardAmountInfoId().equals(aai.getAwardAmountInfoId())){
                     returnVal = index;
-                }else if(awardAmountInfo.getAwardAmountInfoId().equals(aai.getAwardAmountInfoId())) {
-                    returnVal = index;
-                }else {
-                    index++;
                 }
             }
         }
@@ -864,7 +858,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     public Date getObligationExpirationDate() {
-        // return awardAmountInfos.get(0).getObligationExpirationDate();
         return getLastAwardAmountInfo().getObligationExpirationDate();
     }
 
@@ -2406,9 +2399,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      */
     public KualiDecimal getObligatedTotal() {
         KualiDecimal returnValue = new KualiDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAmountObligatedToDate()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAmountObligatedToDate());
-        // }
         if (getLastAwardAmountInfo().getAmountObligatedToDate() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getAmountObligatedToDate());
         }
@@ -2444,9 +2434,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      */
     public KualiDecimal getObligatedTotalDirect() {
         KualiDecimal returnValue = new KualiDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAmountObligatedToDate()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAmountObligatedToDate());
-        // }
         if (getLastAwardAmountInfo().getObligatedTotalDirect() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getObligatedTotalDirect());
         }
@@ -2459,9 +2446,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      */
     public KualiDecimal getObligatedTotalIndirect() {
         KualiDecimal returnValue = new KualiDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAmountObligatedToDate()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAmountObligatedToDate());
-        // }
         if (getLastAwardAmountInfo().getObligatedTotalIndirect() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getObligatedTotalIndirect());
         }
