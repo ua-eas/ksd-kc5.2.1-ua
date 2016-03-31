@@ -881,10 +881,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
         return getLastAwardAmountInfo().getAmountObligatedToDate();
     }
 
-    public void setAmountObligatedToDate(KualiDecimal amount) {
-        this.awardAmountInfos.get(0).setAmountObligatedToDate(amount);
-    }
-
     /**
      * 
      * @param beginDate
