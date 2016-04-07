@@ -23,13 +23,8 @@ import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.bo.AttachmentFile;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
-import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.ProtocolAction;
 import org.kuali.kra.irb.ProtocolForm;
-import org.kuali.kra.irb.actions.print.ProtocolPrintingService;
-import org.kuali.kra.printing.Printable;
-import org.kuali.kra.printing.service.WatermarkService;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolNotepadBase;
 import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
@@ -53,7 +48,6 @@ public class ProtocolNoteAndAttachmentAction extends ProtocolAction {
 
     private static final String CONFIRM_NO_DELETE = "";
     private static final String NOT_FOUND_SELECTION = "the attachment was not found for selection ";
-    private static final String INVALID_ATTACHMENT = "this attachment version is invalid ";
     
     
     private static final Log LOG = LogFactory.getLog(ProtocolNoteAndAttachmentAction.class);
@@ -288,41 +282,6 @@ public class ProtocolNoteAndAttachmentAction extends ProtocolAction {
         return RESPONSE_ALREADY_HANDLED;
     }
     
-    /**
-     * 
-     * This method for set the attachment with the watermark which selected  by the client .
-     * @param protocolForm form
-     * @param protocolAttachmentBase attachment
-     * @return attachment file
-     */
-    private byte[] getProtocolAttachmentFile(ProtocolForm form, ProtocolAttachmentProtocol attachment){
-        
-        byte[] attachmentFile =null;
-        final AttachmentFile file = attachment.getFile();
-        Printable printableArtifacts= getProtocolPrintingService().getProtocolPrintArtifacts(form.getProtocolDocument().getProtocol());
-        Protocol protocolCurrent = (Protocol) form.getProtocolDocument().getProtocol();
-        int currentProtoSeqNumber= protocolCurrent.getSequenceNumber();
-        try {
-            if(printableArtifacts.isWatermarkEnabled()){
-                int currentAttachmentSequence=attachment.getSequenceNumber();
-                String docStatusCode=attachment.getDocumentStatusCode();
-                String statusCode=attachment.getStatusCode();
-                // TODO perhaps the check for equality of protocol and attachment sequence numbers, below, is now redundant
-                if(((getProtocolAttachmentService().isAttachmentActive(attachment))&&(currentProtoSeqNumber == currentAttachmentSequence))||(docStatusCode.equals("1"))){
-                    if (ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(statusCode)) {
-                        attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getWatermark());
-                    }
-                }else{
-                    attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getInvalidWatermark());
-                    LOG.info(INVALID_ATTACHMENT + attachment.getDocumentId());
-                }
-            }
-        }
-        catch (Exception e) {
-            LOG.error("Exception Occured in ProtocolNoteAndAttachmentAction. : ",e);    
-        }        
-        return attachmentFile;
-    }
     
     
     /**
@@ -455,26 +414,4 @@ public class ProtocolNoteAndAttachmentAction extends ProtocolAction {
         return mapping.findForward(Constants.MAPPING_BASIC);
     }    
     
-    /**
-     * This method is to get protocol printing service.
-     * 
-     */
-    private ProtocolPrintingService getProtocolPrintingService() {
-        return KraServiceLocator.getService(ProtocolPrintingService.class);
-    }
-    
-    /**
-     * 
-     * This method is to get Protocol Attachment Service.
-     */    
-    private ProtocolAttachmentService getProtocolAttachmentService() {
-        return KraServiceLocator.getService(ProtocolAttachmentService.class);
-    }
-    
-    /**
-     * This method is to get Watermark Service. 
-     */
-    private WatermarkService getWatermarkService() {
-        return  KraServiceLocator.getService(WatermarkService.class);  
-    }
 }
