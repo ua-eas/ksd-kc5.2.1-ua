@@ -219,14 +219,14 @@
     <param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/CustomCoreSpringBeans.xml,classpath:edu/arizona/kra/budget/CustomBudgetSpringBeans.xml,classpath:edu/arizona/kra/irb/CustomIrbSpringBeans.xml,classpath:edu/arizona/kra/committee/CustomCommitteeSpringBeans.xml,classpath:edu/arizona/kra/proposaldevelopment/CustomPropDevSpringBeans.xml</param>
 
 
-	<!-- Daily emails every day at 1 AM -->
-	 <!-- By disabling the cronExpression below, that disables the related scheduled email -->
-	 <param name="dailyEmail.cronExpression" override="true">0 0/5 * * * ?</param>
-	 <param name="dailyEmail.active" override="true">true</param>
-	
-	<!-- Weekly emails every Monday at 2 AM -->
-	 <!-- By disabling the cronExpression below, that disables the related scheduled email -->
-	 <param name="weeklyEmail.cronExpression" override="true">0 0/5 * * * ?</param>
-	 <param name="weeklyEmail.active" override="false">true</param>
+    <!-- Enable daily/weekly email scheduling -->
+    <param name="email.reminder.lifecycle.enabled">true</param>
+    <!-- Daily emails every five minutes -->
+    <param name="dailyEmail.active" override="true">true</param>
+    <param name="dailyEmail.cronExpression" override="true">0 0/5 * * * ?</param>
+   
+    <!-- Weekly emails every five minutes-->
+    <param name="weeklyEmail.active" override="false">true</param>
+    <param name="weeklyEmail.cronExpression" override="true">0 0/5 * * * ?</param>
 
 </config>
