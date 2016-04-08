@@ -223,10 +223,10 @@
     <param name="email.reminder.lifecycle.enabled">true</param>
     <!-- Daily emails every five minutes -->
     <param name="dailyEmail.active" override="true">true</param>
-    <param name="dailyEmail.cronExpression" override="true">0 0/5 * * * ?</param>
+    <param name="dailyEmail.cronExpression" override="true">0 0 1 * * ?</param>
    
     <!-- Weekly emails every five minutes-->
     <param name="weeklyEmail.active" override="false">true</param>
-    <param name="weeklyEmail.cronExpression" override="true">0 0/5 * * * ?</param>
+    <param name="weeklyEmail.cronExpression" override="true">0 0 2 ? * 2</param>
 
 </config>
