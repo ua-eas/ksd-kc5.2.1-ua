@@ -221,7 +221,6 @@
 
     <!-- Daily emails every day at 1 AM -->
     <param name="email.reminder.lifecycle.enabled">true</param>
-    <!-- Daily emails every five minutes -->
     <param name="dailyEmail.active" override="true">true</param>
     <param name="dailyEmail.cronExpression" override="true">0 0 1 * * ?</param>
    
