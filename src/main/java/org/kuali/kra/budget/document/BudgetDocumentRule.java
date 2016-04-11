@@ -176,10 +176,6 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
             if (i < budgetDocument.getBudget().getBudgetCostShareCount()) {
                 for (int j = i + 1; j < budgetDocument.getBudget().getBudgetCostShareCount(); j++) {
                     BudgetCostShare tmpCostShare = budgetDocument.getBudget().getBudgetCostShare(j);
-                    boolean accountMatch = false;
-                    boolean unitNumberMatch = false;
-                    boolean isMatch = false;
-                    int fieldCount = 0;
                     int thisFiscalYear = budgetCostShare.getProjectPeriod() == null ? Integer.MIN_VALUE : budgetCostShare.getProjectPeriod();
                     int otherFiscalYear = tmpCostShare.getProjectPeriod() == null ? Integer.MIN_VALUE : tmpCostShare.getProjectPeriod();
                     
@@ -189,49 +185,17 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
 					    String otherSourceAccount = tmpCostShare.getSourceAccount() == null ? "" : tmpCostShare.getSourceAccount().trim();                   
 					    String thisSourceUnitNumber = budgetCostShare.getSourceUnitNumber() == null ? "" : budgetCostShare.getSourceUnitNumber().trim();
 					    String otherSourceUnitNumber = tmpCostShare.getSourceUnitNumber() == null ? "" : tmpCostShare.getSourceUnitNumber().trim();					    
-
-					    if((thisSourceAccount != "") || (otherSourceAccount != "")) {
-					        fieldCount++;			    	
-					    }
-					    	
-					    if((thisSourceAccount != "") && (otherSourceAccount != "")) {
-					        if(StringUtils.equalsIgnoreCase(thisSourceAccount, otherSourceAccount)) {
-					            accountMatch = true;
-					        }					        
-					    }					    					                       					   
-				        
-					    if((thisSourceUnitNumber != "") || (otherSourceUnitNumber != "")) {
-					    	fieldCount++;
-					    }
-					    
-					    if((thisSourceUnitNumber != "") && (otherSourceUnitNumber != "")) {
-					        if(StringUtils.equalsIgnoreCase(thisSourceUnitNumber, otherSourceUnitNumber)) {
-					            unitNumberMatch = true;
-					        }					        					       
-					    }
-					    
-					    switch(fieldCount) {
-					    	case 1:
-						    	if(accountMatch || unitNumberMatch) {
-						    		isMatch = true;
-						    	}
-						    	break;
-					    	case 2:
-						    	if(accountMatch && unitNumberMatch) {
-						    		isMatch = true;
-						    	}
-					    		break;
-					    }	
 					    
 	                    // Verify if there is a match and display error.
-	                    if(isMatch) {
-	                    	valid = false;
-	                        errorMap.putError("fiscalYear", 
-	                        		KeyConstants.ERROR_COST_SHARE_DUPLICATE, 
-	                                thisFiscalYear == Integer.MIN_VALUE ? "" : thisFiscalYear + "", 
-	                                thisSourceAccount == "" ? "\"\"" : thisSourceAccount,
-	                        		thisSourceUnitNumber == "" ? "\"\"" : thisSourceUnitNumber); 
-	                    }					    
+					    if (StringUtils.equalsIgnoreCase(thisSourceAccount, otherSourceAccount)) {				    	
+					    	if (StringUtils.equalsIgnoreCase(thisSourceUnitNumber, otherSourceUnitNumber)) {
+						    	valid = false;
+						    	errorMap.putError("fiscalYear", KeyConstants.ERROR_COST_SHARE_DUPLICATE, 
+						    	thisFiscalYear == Integer.MIN_VALUE ? "" : thisFiscalYear + "", 
+						    	thisSourceAccount == "" ? "\"\"" : thisSourceAccount,
+						    	thisSourceUnitNumber == "" ? "\"\"" : thisSourceUnitNumber); 
+					    	}
+				    	}
                     }                    
                 }
             }        
