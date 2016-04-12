@@ -84,7 +84,6 @@
         <ref bean="Award-awardAmountInfo.amountObligatedToDate" />
         <ref bean="Award-sponsor.sponsorName" />
         <ref bean="Award-projectEffectiveEndDate" />
-        
       </list>
     </property>
         <property name="collections">
@@ -895,7 +894,7 @@
 	    <property name="summary" value="Project End Date" />
 	    <property name="description" value="Project End Date" />
   	</bean>
-    
+  	
     <bean id="Award-projectEffectiveEndDate" parent="Award-projectEffectiveEndDate-parentBean" />
     <bean id="Award-projectEffectiveEndDate-parentBean" abstract="true" parent="AttributeReferenceDummy-genericDate">
         <property name="name" value="projectEffectiveEndDate" />
