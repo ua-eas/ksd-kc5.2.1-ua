@@ -1,6 +1,6 @@
 package org.kuali.kra.infrastructure;
 
-import org.drools.core.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kuali.rice.core.web.format.Formatter;
 
 import java.util.regex.Matcher;
