@@ -75,16 +75,23 @@ public class TimeFormatter extends Formatter {
     private String parseTwentyFourHourTime(Matcher matcher) {
         String hour = matcher.group(1);
         String minute = matcher.group(2);
-
         int intHour = Integer.parseInt(hour);
         String amPmMarker = "AM";
+
+        // Set meridian and hour value
         if (intHour == 0) {
             intHour = 12;
         }
         else if (intHour >= 12) {
             amPmMarker = "PM";
-            intHour -= 12;
+
+            // Change hour when it exceeds 12
+            if (intHour > 12) {
+                intHour -= 12;
+            }
         }
+
+        // Set minute value when not available
         if (minute == null) {
             minute = "00";
         }
