@@ -24,7 +24,18 @@
 <kul:tab tabTitle="Abstracts" defaultOpen="false" 
          tabItemCount="${fn:length(KualiForm.document.developmentProposalList[0].proposalAbstracts)}" 
          tabErrorKey="document.developmentProposalList[0].proposalAbstract*,newProposalAbstract*">
-         
+	<script>
+		// Add event to replace unicode characters.
+		jQuery(document).ready(function(){
+			// Get abstract details textarea object.
+			var txt = document.getElementById("abstracts-table").getElementsByTagName("textarea")[0];
+
+			// Add keyup event.
+			txt.onkeyup = function(){
+				txt.value = txt.value.replace(/[^A-Za-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '')
+			};
+		});
+	</script>
 	<div class="tab-container" align="center">
     	<h3>
     		<span class="subhead-left">Abstracts</span>
