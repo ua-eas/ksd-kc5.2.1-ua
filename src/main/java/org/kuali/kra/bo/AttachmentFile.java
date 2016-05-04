@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.kuali.kra.bo;
 import org.apache.struts.upload.FormFile;
 import org.kuali.kra.SeparateAssociate;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.noteattachment.ProtocolAttachmentService;
 import org.kuali.kra.service.KcAttachmentService;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.Arrays;
  * Represents a Protocol Attachment File.
  */
 public class AttachmentFile extends SeparateAssociate implements KcAttachment {
+    private static ProtocolAttachmentService  protocolAttachmentService;
 
     /** the max file name length. length={@value}*/
     public static final int MAX_FILE_NAME_LENGTH = 150;
@@ -147,11 +149,37 @@ public class AttachmentFile extends SeparateAssociate implements KcAttachment {
     }
 
     /**
-     * Gets the Protocol Attachment File data.
+     * Gets the Protocol Attachment File data using ProtocolAttachmentDao but does NOT store it in the session.
      * @return the Protocol Attachment File data
      */
     public byte[] getData() {
-        return (this.data == null) ? null : this.data.clone();
+        if(data != null) {
+            return data;
+        }
+        return getProtocolAttachmentService().getFileContents(id);
+    }
+    
+    @Override 
+    protected void postPersist() {
+        if(data != null) {
+            getProtocolAttachmentService().saveFileContents(id, data);
+            data = null;
+        }
+    }
+
+    @Override 
+    protected void postUpdate() {
+        if(data != null) {
+            getProtocolAttachmentService().saveFileContents(id, data);
+            data = null;
+        }
+    }
+
+    private static ProtocolAttachmentService getProtocolAttachmentService() {
+        if(protocolAttachmentService == null) {
+            protocolAttachmentService = KraServiceLocator.getService(ProtocolAttachmentService.class);
+        }
+        return protocolAttachmentService;
     }
 
     /**
@@ -167,7 +195,7 @@ public class AttachmentFile extends SeparateAssociate implements KcAttachment {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + Arrays.hashCode(this.getData());
+        result = prime * result + Arrays.hashCode(new byte[] {});
         result = prime * result + ((this.getName() == null) ? 0 : this.getName().hashCode());
         result = prime * result + ((this.getType() == null) ? 0 : this.getType().hashCode());
         return result;

@@ -250,9 +250,10 @@ public abstract class ProtocolAttachmentBase extends ProtocolAssociateBase imple
             if (other.file != null) {
                 return false;
             }
-        } else if (!isSameFile(this.file, other.file)) {
-            return false;
         }
+//            else if (!isSameFile(this.file, other.file)) {
+//            return false;
+//        }
         if (this.fileId == null) {
             if (other.fileId != null) {
                 return false;

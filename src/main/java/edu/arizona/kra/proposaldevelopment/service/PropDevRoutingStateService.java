@@ -74,7 +74,7 @@ public interface PropDevRoutingStateService {
      * @param String currentUser
      * @return void
      */
-    public void setSPSReviewer(String proposalNumber, String kcPersonId) throws AuthorizationException, IllegalArgumentException;
+    public void setSPSReviewer(String proposalNumber, String kcPersonId) throws AuthorizationException;
 
 
     /**
@@ -88,18 +88,18 @@ public interface PropDevRoutingStateService {
     /**
      * Returns the list of SPSReviewer restricted notes for the given proposalNumber 
      * @return List<SPSRestrictedNote>
-     * @throws AuthorizationException, IllegalArgumentException; 
+     * @throws AuthorizationException; 
      */
-    public List<SPSRestrictedNote> getSPSRestrictedNotes(String proposalNumber) throws AuthorizationException, IllegalArgumentException;
+    public List<SPSRestrictedNote> getSPSRestrictedNotes(String proposalNumber) throws AuthorizationException;
 
 
     /**
      * Adds a new SPSRestrictedNote to the DB
      * The service will check if the currentUser is not authorized for this action, will throw a AuthorizationException.
      * @return SPSRestrictedNote - the newly added note
-     * @throws AuthorizationException, IllegalArgumentException 
+     * @throws AuthorizationException 
      */
-    public SPSRestrictedNote addSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException;
+    public SPSRestrictedNote addSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException;
 
 
     /**
@@ -108,7 +108,7 @@ public interface PropDevRoutingStateService {
      * @return boolean - true if the deletion was successful, false otherwise
      * @throws AuthorizationException, IllegalArgumentException 
      */
-    public boolean deleteSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException;
+    public boolean deleteSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException;
 
 
     /**

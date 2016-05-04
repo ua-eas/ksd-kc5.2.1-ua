@@ -1629,7 +1629,7 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
                 attachmentSummary.setFileName(attachment.getFile().getName());
                 attachmentSummary.setAttachmentType("Protocol: " + attachment.getType().getDescription());
                 attachmentSummary.setDescription(attachment.getDescription());
-                attachmentSummary.setDataLength(attachment.getFile().getData() == null ? 0 : attachment.getFile().getData().length);
+//                attachmentSummary.setDataLength(attachment.getFile().getData() == null ? 0 : attachment.getFile().getData().length);
                 attachmentSummary.setUpdateTimestamp(attachment.getUpdateTimestamp());
                 attachmentSummary.setUpdateUser(attachment.getUpdateUser());
                 protocolSummary.add(attachmentSummary);
@@ -1643,7 +1643,7 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
                 attachmentSummary.setFileName(attachment.getFile().getName());
                 attachmentSummary.setAttachmentType(person.getPersonName() + ": " + attachment.getType().getDescription());
                 attachmentSummary.setDescription(attachment.getDescription());
-                attachmentSummary.setDataLength(attachment.getFile().getData() == null ? 0 : attachment.getFile().getData().length);
+//                attachmentSummary.setDataLength(attachment.getFile().getData() == null ? 0 : attachment.getFile().getData().length);
                 attachmentSummary.setUpdateTimestamp(attachment.getUpdateTimestamp());
                 attachmentSummary.setUpdateUser(attachment.getUpdateUser());                
                 protocolSummary.add(attachmentSummary);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,16 @@
  */
 package org.kuali.kra.irb;
 
+import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -39,7 +46,6 @@ import org.kuali.kra.irb.auth.ProtocolTask;
 import org.kuali.kra.irb.correspondence.ProtocolCorrespondence;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentService;
-import org.kuali.kra.irb.noteattachment.ProtocolAttachmentStatus;
 import org.kuali.kra.irb.notification.IRBNotificationContext;
 import org.kuali.kra.irb.notification.IRBNotificationRenderer;
 import org.kuali.kra.irb.notification.IRBProtocolNotification;
@@ -53,7 +59,6 @@ import org.kuali.kra.protocol.ProtocolActionBase;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.ProtocolFormBase;
 import org.kuali.kra.protocol.auth.ProtocolTaskBase;
-import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
 import org.kuali.kra.protocol.notification.ProtocolNotification;
 import org.kuali.kra.protocol.notification.ProtocolNotificationContextBase;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
@@ -63,16 +68,8 @@ import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.util.KRADConstants;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The ProtocolAction is the base class for all Protocol actions.  Each derived
@@ -92,13 +89,13 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     public static final String PROTOCOL_CUSTOM_DATA_HOOK = "customData";
     public static final String PROTOCOL_MEDUSA = "medusa";
 
-    private static final Log LOG = LogFactory.getLog(ProtocolAction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProtocolAction.class);
     private static final String PROTOCOL_NUMBER = "protocolNumber";
     private static final String SUBMISSION_NUMBER = "submissionNumber";
     private static final String SUFFIX_T = "T";
     private static final String NOT_FOUND_SELECTION = "The attachment was not found for selection ";
     private static final ActionForward RESPONSE_ALREADY_HANDLED = null;
-    private static final String INVALID_WATERMARK = "Watermark the attachment to invalid due to attachment status or doc status.";
+    private static final String INVALID_WATERMARK = "Document {} : Watermark the attachment {} to invalid due to attachment status or doc status.";
 
 
     private WatermarkService watermarkService = null;
@@ -219,6 +216,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
      * @return
      * @throws Exception
      */                  
+    @SuppressWarnings({"unchecked", "deprecation"})
     public ActionForward printSubmissionQuestionnaireAnswer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         ActionForward forward = mapping.findForward(MAPPING_BASIC);
@@ -277,7 +275,8 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     private ProtocolFinderDao getProtocolFinder() {
         return KraServiceLocator.getService(ProtocolFinderDao.class);
     }
-
+    
+    @SuppressWarnings({"unchecked", "deprecation"})
     private void viewBatchCorrespondence(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 
@@ -397,8 +396,6 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     }
 
     protected ProtocolCorrespondence getProtocolCorrespondence (ProtocolForm protocolForm, String forwardName, ProtocolNotificationRequestBean notificationRequestBean, boolean holdingPage) {
-        boolean result = false;
-
         Map<String,Object> keyValues = new HashMap<String, Object>();
         // actionid <-> action.actionid  actionidfk<->action.protocolactionid
         keyValues.put("actionIdFk", protocolForm.getProtocolDocument().getProtocol().getLastProtocolAction().getProtocolActionId());
@@ -411,7 +408,6 @@ public abstract class ProtocolAction extends ProtocolActionBase {
             correspondence.setNotificationRequestBean(notificationRequestBean);
             correspondence.setHoldingPage(holdingPage);
             return correspondence;
-
         }
     }
 
@@ -450,11 +446,11 @@ public abstract class ProtocolAction extends ProtocolActionBase {
                 } else {
                     //print the Invalid watermark.
                     attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getInvalidWatermark());
-                    LOG.debug(INVALID_WATERMARK + attachment.getDocumentId()+" attachment="+attachment.getAttachmentFileName());
+                    LOG.debug(INVALID_WATERMARK, attachment.getDocumentId(),attachment.getId());
                 }
                 
             } else {
-                LOG.debug("Attachment file not watermar enabled or is not marked as complete. No watermark for "+attachment.getAttachmentFileName()); 
+                LOG.debug("Attachment file not watermark enabled or is not marked as complete. No watermark for {}.",attachment.getId()); 
             }
             
         }
