@@ -1,4 +1,9 @@
-//replace special word characters with plain text equivalents
+// Replace unicode characters with an empty string.
+var replaceUnicodeChars = function(txtValue) {
+    return txtValue.replace(/[^A-valueZa-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
+}
+
+//replace special word characters with value text equivalents
 var replaceWordChars = function(taElement) {
     var s = taElement.value;
     // smart single quotes and apostrophe
