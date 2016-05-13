@@ -1,4 +1,4 @@
-// Replace unicode characters with empty string.
+// Replace unicode characters with an empty string.
 var replaceUnicodeChars = function(txtValue) {
     return txtValue.replace(/[^A-valueZa-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
 }
