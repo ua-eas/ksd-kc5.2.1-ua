@@ -27,7 +27,7 @@
 	<script>
 		// Add event to replace unicode characters.
 		jQuery(document).ready(function(){
-			// Get abstract details textarea object.
+			// Get abstract details from textarea object.
 			var txt = document.getElementById("abstracts-table").getElementsByTagName("textarea")[0];
 
 			// Add keyup event.
