@@ -1,8 +1,3 @@
-// Replace unicode characters with an empty string.
-var replaceUnicodeChars = function(txtValue) {
-    return txtValue.replace(/[^A-valueZa-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
-}
-
 //replace special word characters with value text equivalents
 var replaceWordChars = function(taElement) {
     var s = taElement.value;
@@ -22,6 +17,8 @@ var replaceWordChars = function(taElement) {
     s = s.replace(/\u203A/g, ">");
     // spaces
     s = s.replace(/[\u02DC\u00A0]/g, " ");
+    // Replace unicode characters with an empty string.
+    s = s.replace(/[^A-valueZa-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
     taElement.value = s;
     return taElement;
 }
