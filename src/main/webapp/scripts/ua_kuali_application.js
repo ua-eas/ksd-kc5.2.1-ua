@@ -1,4 +1,4 @@
-//replace special word characters with plain text equivalents
+//replace special word characters with value text equivalents
 var replaceWordChars = function(taElement) {
     var s = taElement.value;
     // smart single quotes and apostrophe
@@ -17,6 +17,8 @@ var replaceWordChars = function(taElement) {
     s = s.replace(/\u203A/g, ">");
     // spaces
     s = s.replace(/[\u02DC\u00A0]/g, " ");
+    // Replace unicode characters with an empty string.
+    s = s.replace(/[^A-valueZa-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
     taElement.value = s;
     return taElement;
 }
