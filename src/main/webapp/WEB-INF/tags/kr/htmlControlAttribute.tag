@@ -249,8 +249,8 @@ if (attributeEntry == null) {
             <html:textarea property="${property}" style="${textStyle}" title="${accessibleTitle}" tabindex="${tabindex}"
                            rows="${attributeEntry.control.rows}" cols="${attributeEntry.control.cols}"
                            styleId="${property}" disabled="${disableField}" styleClass="${styleClass}"
-                           onkeyup="textLimit(this, ${attributeEntry.maxLength});" />
-
+                           onkeyup="textLimit(this, ${attributeEntry.maxLength});replaceWordChars(this);"
+                           onblur="textLimit(this, ${attributeEntry.maxLength});replaceWordChars(this);" /> />
     </c:when>
 
     <%-- select --%>
