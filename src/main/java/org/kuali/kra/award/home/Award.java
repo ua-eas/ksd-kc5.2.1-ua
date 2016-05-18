@@ -77,8 +77,6 @@ import org.kuali.rice.kim.api.role.Role;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.springframework.util.AutoPopulatingList;
 
-import edu.arizona.kra.award.home.AwardServiceImpl;
-
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
