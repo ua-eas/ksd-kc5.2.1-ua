@@ -1,5 +1,5 @@
  <!--
-	Copyright 2005-2014 The Kuali Foundation
+	Copyright 2005-2016 The Kuali Foundation
 
 	Licensed under the Educational Community License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -25,7 +25,20 @@
 		<filter class="org.kuali.kra.web.servlet.dwr.KcDWRFilter"/>
         <convert converter="bean" match="edu.arizona.kra.proposaldevelopment.bo.SPSReviewer">
             <param name="include" value="fullName,principalId" />            
-        </convert>  
+        </convert> 
+        <convert converter="bean" match="org.kuali.kra.award.home.Award">
+			<param name="include" value="accountNumber,statusCode,sponsorCode,obligatedTotalStr,obligationExpirationDate,sponsorName,statusDescription,awardId,awardNumber,awardDocument,lastAwardAmountInfo" />
+		</convert>
+		<convert converter="bean" match="org.kuali.kra.award.home.AwardStatus">
+			<param name="include" value="statusCode,description" />
+		</convert>
+		<convert converter="bean" match="org.kuali.kra.award.home.AwardAmountInfo">
+			<param name="include" value="amountObligatedToDate,obligationExpirationDate" />
+		</convert>
+		<convert converter="bean" match="org.kuali.kra.award.document.AwardDocument">
+			<param name="include" value="documentNumber" />
+		</convert>
+         
 		<create creator="spring" javascript="PropDevRoutingStateService">
 			<param name="beanName" value="propDevRoutingStateService" />
 			<include method="getORDExpedited" />
@@ -33,6 +46,24 @@
 			<include method="getSPSReviewer" />
             <include method="setSPSReviewer" />
             <include method="findSPSReviewers" />
+		</create>
+		
+		<create creator="spring" javascript="AwardService">
+			<param name="beanName" value="awardService" />
+			<include method="getActiveOrNewestAward" />
+			<include method="getAwardStatus" />
+			<include method="getAccountNumber" />
+			<include method="getStatusCode" />
+			<include method="getStatusDescription" />
+			<include method="getDescription" />
+			<include method="getSponsorCode" />
+			<include method="getSponsorName" />
+			<include method="getAwardId" />
+			<include method="getAmountObligatedToDate" />
+			<include method="getObligationExpirationDate" />
+			<include method="getAwardNumber" />
+			<include method="getAwardDocument" />
+			<include method="getDocumentNumber" />
 		</create>
 	</allow>
 </dwr>
