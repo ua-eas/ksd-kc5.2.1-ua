@@ -77,6 +77,8 @@ import org.kuali.rice.kim.api.role.Role;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.springframework.util.AutoPopulatingList;
 
+import edu.arizona.kra.award.home.AwardServiceImpl;
+
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
@@ -88,6 +90,7 @@ import java.util.*;
  */
 public class Award extends KraPersistableBusinessObjectBase implements KeywordsManager<AwardScienceKeyword>, Permissionable,
         SequenceOwner<Award>, BudgetParent, Sponsorable, Negotiable, Disclosurable {
+    
     public static final String DEFAULT_AWARD_NUMBER = "000000-00000";
     public static final String BLANK_COMMENT = "";
     public static final String ICR_RATE_CODE_NONE = "ICRNONE";
@@ -2277,6 +2280,10 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
         return sponsorName;
     }
     
+    public void setSponsorName(String name) {
+        sponsorName = name;
+    }
+    
     public String getIcrRateCode() {
         return icrRateCode;
     }
@@ -2413,6 +2420,10 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
             returnValue = returnValue.add(getLastAwardAmountInfo().getAmountObligatedToDate());
         }
         return returnValue;
+    }
+    
+    public String getObligatedTotalStr(){
+        return getObligatedTotal().toString();
     }
 
     public KualiDecimal getObligatedDistributableTotal() {

@@ -84,6 +84,7 @@
         <ref bean="Award-awardAmountInfo.amountObligatedToDate" />
         <ref bean="Award-sponsor.sponsorName" />
         <ref bean="Award-projectEffectiveEndDate" />
+        <ref bean="Award-obligationExpirationDate" />
         
       </list>
     </property>
@@ -345,7 +346,7 @@
     <property name="required" value="false" />
     <property name="control" >
       <bean parent="TextControlDefinition"
-            p:size="12" />
+            p:size="13" />
     </property>
     <property name="summary" value="Award ID" />
     <property name="description" value="Award ID" />
@@ -364,7 +365,7 @@
     <property name="required" value="false" />
     <property name="control" >
       <bean parent="TextControlDefinition"
-            p:size="6" />
+            p:size="13" />
     </property>
     <property name="summary" value="Award Id" />
     <property name="description" value="Award Id" />
@@ -904,6 +905,16 @@
         <property name="required" value="false" />
         <property name="summary" value="Project End Date" />
         <property name="description" value="Project End Date" />
+    </bean>
+    
+    <bean id="Award-obligationExpirationDate" parent="Award-obligationExpirationDate-parentBean" />
+    <bean id="Award-obligationExpirationDate-parentBean" abstract="true" parent="AttributeReferenceDummy-genericDate">
+        <property name="name" value="obligationExpirationDate" />
+        <property name="label" value="Obligation Expiration Date" />
+        <property name="shortLabel" value="Obligation Expiration Date" />
+        <property name="required" value="false" />
+        <property name="summary" value="Obligation Expiration Date" />
+        <property name="description" value="Obligation Expiration Date" />
     </bean>
     
 
