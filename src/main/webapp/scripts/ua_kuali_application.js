@@ -17,6 +17,8 @@ var replaceWordChars = function(taElement) {
     s = s.replace(/\u203A/g, ">");
     // spaces
     s = s.replace(/[\u02DC\u00A0]/g, " ");
+    // Replace unicode characters with empty string.
+    s = s.replace(/[^A-valueZa-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
     taElement.value = s;
     return taElement;
 }
