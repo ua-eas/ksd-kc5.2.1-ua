@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,19 @@
  */
 package org.kuali.kra.protocol.noteattachment;
 
-import org.kuali.kra.infrastructure.Constants;
-import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
-import org.kuali.kra.irb.noteattachment.ProtocolAttachmentService;
-import org.kuali.kra.protocol.ProtocolBase;
-import org.kuali.rice.core.api.datetime.DateTimeService;
-import org.kuali.rice.krad.service.BusinessObjectService;
-import org.kuali.rice.krad.util.ObjectUtils;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.noteattachment.ProtocolAttachmentService;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 /**
  * This class represents the ProtocolBase Attachment ProtocolBase.
@@ -499,11 +494,12 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
 
     /**
      * Returns the source protocol number for when this attachment was last added in.
+     * @throws LookupException 
      */
-    public String getSourceProtocolNumber() {
+    public String getSourceProtocolNumber(){
     	ProtocolAttachmentService protocolAttachmentService = getProtocolAttachmentService();
         if (sourceProtocolNumber == null) {
-        	sourceProtocolNumber = protocolAttachmentService.getSourceProtocolNumber(this);
+                sourceProtocolNumber = protocolAttachmentService.getSourceProtocolNumber(this);
         }
         // avoid further lookups when this field is accessed and NPEs
         if (sourceProtocolNumber == null) {
@@ -514,8 +510,9 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
 
     /**
      * Returns the source amendment or renewal this attachment was added in.
+     * @throws LookupException 
      */
-    public String getSourceProtocolAmendRenewalNumber() {
+    public String getSourceProtocolAmendRenewalNumber(){
         String sourceProtocolNumber = getSourceProtocolNumber();
 
         if (sourceProtocolNumber.length() >= 10) {
@@ -552,11 +549,6 @@ public abstract class ProtocolAttachmentProtocolBase extends ProtocolAttachmentB
         if (getCreateTimestamp() == null) {
             setCreateTimestamp(((DateTimeService) KraServiceLocator.getService(Constants.DATE_TIME_SERVICE_NAME)).getCurrentTimestamp());
         }
-    }
-    
-    public String getAttachmentFileName() {
-    	ProtocolAttachmentService protocolAttachmentService = getProtocolAttachmentService();
-    	return protocolAttachmentService.getAttachmentFileName(this);
     }
     
     protected ProtocolAttachmentService getProtocolAttachmentService() {
