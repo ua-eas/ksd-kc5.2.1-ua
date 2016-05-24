@@ -76,114 +76,118 @@ function loadFundingSourceAwardNumber(awardNumberElementId, awardNumberHiddenEle
 					awardStatusElementId, awardStatusHiddenElementId, amountElementId, amountHiddenElementId,
 					obligationExpirationDateElementId, obligationExpirationDateHiddenElementId, sponsorElementId,
 					sponsorCodeElementId, sponsorNameElementId, awardDocumentNumberElementId, awardIdElementId) {
-    	var awardNumber = dwr.util.getValue( awardNumberElementId );
-    	
-	if (awardNumber != null ) {
-	    if ( awardNumber.length === 0 || !awardNumber.trim() ){ return };
-	    
-	    //TODO: Display busy icon
-		
-	        var awardNumberHiddenElement = document.getElementById(awardNumberHiddenElementId);
-		
-		var accountNumberElement = document.getElementById(accountNumberElementId);
-		var accountNumberHiddenElement = document.getElementById(accountNumberHiddenElementId);
+    var awardNumber = dwr.util.getValue( awardNumberElementId );
+ 
+    if (awardNumber != null ) {
+	//don't perform any searches for an empty field.
+	if ( awardNumber.length === 0 || !awardNumber.trim() ){ return };
+	
+	//don't perform any searches for an already found element.
+	var oldAwardNumber = dwr.util.getValue( awardNumberHiddenElementId );
+	if ( oldAwardNumber.length>0 && awardNumber.valueOf()===oldAwardNumber.valueOf()){ return };
+	
+	//TODO: Maybe display busy icon		
+	var awardNumberHiddenElement = document.getElementById(awardNumberHiddenElementId);
 
-		var awardStatusElement= document.getElementById(awardStatusElementId);
-		var awardStatusHiddenElement = document.getElementById(awardStatusHiddenElementId);
-		
-		var sponsorElement = document.getElementById(sponsorElementId);
-		var sponsorCodeElement = document.getElementById(sponsorCodeElementId);
-		var sponsorNameElement = document.getElementById(sponsorNameElementId);
+	var accountNumberElement = document.getElementById(accountNumberElementId);
+	var accountNumberHiddenElement = document.getElementById(accountNumberHiddenElementId);
 
-		var amountElement = document.getElementById(amountElementId);
-		var amountHiddenElement = document.getElementById(amountHiddenElementId);
-		
-		var obligationExpirationDateElement = document.getElementById(obligationExpirationDateElementId);
-		var obligationExpirationDateHiddenElement = document.getElementById(obligationExpirationDateHiddenElementId);
+	var awardStatusElement= document.getElementById(awardStatusElementId);
+	var awardStatusHiddenElement = document.getElementById(awardStatusHiddenElementId);
+	
+	var sponsorElement = document.getElementById(sponsorElementId);
+	var sponsorCodeElement = document.getElementById(sponsorCodeElementId);
+	var sponsorNameElement = document.getElementById(sponsorNameElementId);
 
-		var awardIdElement = document.getElementById(awardIdElementId);
-		var awardDocumentNumberElement = document.getElementById(awardDocumentNumberElementId);
-		var sponsorConcatString = " : ";
+	var amountElement = document.getElementById(amountElementId);
+	var amountHiddenElement = document.getElementById(amountHiddenElementId);
 
-		var dwrReply = {
-			callback:function(data) {
-			    //TODO: Remove busy icon
-				if ( data != null ) {
-				    	if (awardNumber != null ) awardNumberHiddenElement.value = data.awardNumber;
-				    	
-					if (accountNumberElement != null) accountNumberElement.innerHTML = data.accountNumber;
-					if (accountNumberHiddenElement != null) accountNumberHiddenElement.value = data.accountNumber;
+	var obligationExpirationDateElement = document.getElementById(obligationExpirationDateElementId);
+	var obligationExpirationDateHiddenElement = document.getElementById(obligationExpirationDateHiddenElementId);
 
-					if (awardStatusElement != null) {
-						if (data.statusCode == "1") {
-							awardStatusElement.innerHTML = "Active";
-						}
-						else if (data.statusCode == "3") {
-							awardStatusElement.innerHTML = "Saved";
-						}
-						else if (data.statusCode == "6") {
-							awardStatusElement.innerHTML = "Closed";
-						}
-					}
-					if (awardStatusHiddenElement != null) {
-						if (data.statusCode == "1") {
-							awardStatusHiddenElement.value = "Active";
-						}
-						else if (data.statusCode == "3") {
-							awardStatusHiddenElement.value = "Saved";
-						}
-						else if (data.statusCode == "6") {
-							awardStatusElement.innerHTML = "Closed";
-						}
-					}
-					if (amountElement != null) {
-						amountElement.innerHTML = data.obligatedTotalStr;
-						amountElement.value = data.obligatedTotalStr;
-					}
+	var awardIdElement = document.getElementById(awardIdElementId);
+	var awardDocumentNumberElement = document.getElementById(awardDocumentNumberElementId);
+	var sponsorConcatString = " : ";
 
-					if (amountHiddenElement != null) {
-						amountHiddenElement.innerHTML = data.obligatedTotalStr;
-						amountHiddenElement.value = data.obligatedTotalStr;
-					}
+	var dwrReply = {
+		callback:function(data) {
+		    //TODO: Remove busy icon if displayed
+		    if ( data != null ) {
+			if (awardNumber != null ) awardNumberHiddenElement.value = data.awardNumber;
 
-					if (obligationExpirationDateElement != null) obligationExpirationDateElement.innerHTML = formattedDate(data.obligationExpirationDate);
-					if (awardIdElement != null) awardIdElement.value = data.awardId;
-					if (sponsorElement != null) sponsorElement.innerHTML = (data.sponsorCode.concat(sponsorConcatString)).concat(data.sponsorName);
-					if (sponsorCodeElement != null) { sponsorCodeElement.value = data.sponsorCode; sponsorCodeElement.innerHTML = data.sponsorCode; }
-					if (sponsorNameElement != null) { sponsorNameElement.value = data.sponsorName; sponsorNameElement.innerHTML = data.sponsorName; }
+			if (accountNumberElement != null) accountNumberElement.innerHTML = data.accountNumber;
+			if (accountNumberHiddenElement != null) accountNumberHiddenElement.value = data.accountNumber;
 
-					if (obligationExpirationDateHiddenElement != null) {
-						obligationExpirationDateHiddenElement.value = formattedDate(data.obligationExpirationDate);
-						obligationExpirationDateHiddenElement.innerHTML = formattedDate(data.obligationExpirationDate);
-					}
-					if (awardDocumentNumberElement != null) {
-						awardDocumentNumberElement.value = data.awardDocument['documentNumber'];
-						awardDocumentNumberElement.innerHTML = data.awardDocument['documentNumber'];
-					}
-				}
-				else {
-					if (accountNumberElement != null) accountNumberElement.innerHTML = wrapError( "not found" );
-					if (awardStatusElement != null) awardStatusElement.innerHTML = wrapError( "not found" );
-					if (sponsorElement != null) sponsorElement.innerHTML = wrapError( "not found" );
-					if (amountElement != null) amountElement.innerHTML = wrapError( "not found" );
-					if (obligationExpirationDateElement != null) obligationExpirationDateElement.innerHTML = wrapError( "not found" );
-					if (awardDocumentNumberElement != null) awardDocumentNumberElement.value = "";
-					if (awardIdElement != null) awardIdElement.value = "";
-				}
-			},
-			errorHandler:function( errorMessage ) {
-				window.status = errorMessage;
-				if (accountNumberElement != null) accountNumberElement.innerHTML = wrapError( "not found" );
-				if (awardStatusElement != null) awardStatusElement.innerHTML = wrapError( "not found" );
-				if (sponsorElement != null) sponsorElement.innerHTML = wrapError( "not found" );
-				if (amountElement != null) amountElement.innerHTML = wrapError( "not found" );
-				if (obligationExpirationDateElement != null) obligationExpirationDateElement.innerHTML = wrapError( "not found" );
-				if (awardDocumentNumberElement != null) awardDocumentNumberElement.value = "";
-				if (awardIdElement != null) awardIdElement.value = null;
+			if (awardStatusElement != null) {
+			    if (data.statusCode == "1") {
+				awardStatusElement.innerHTML = "Active";
+			    }
+			    else if (data.statusCode == "3") {
+				awardStatusElement.innerHTML = "Saved";
+			    }
+			    else if (data.statusCode == "6") {
+				awardStatusElement.innerHTML = "Closed";
+			    }
 			}
-		};
-		AwardService.getActiveOrNewestAward(awardNumber, dwrReply);
-	}
+			if (awardStatusHiddenElement != null) {
+			    if (data.statusCode == "1") {
+				awardStatusHiddenElement.value = "Active";
+			    }
+			    else if (data.statusCode == "3") {
+				awardStatusHiddenElement.value = "Saved";
+			    }
+			    else if (data.statusCode == "6") {
+				awardStatusHiddenElement.value = "Closed";
+			    }
+			}
+			if (amountElement != null) {
+			    amountElement.innerHTML = data.obligatedTotalStr;
+			    amountElement.value = data.obligatedTotalStr;
+			}
+
+			if (amountHiddenElement != null) {
+			    amountHiddenElement.innerHTML = data.obligatedTotalStr;
+			    amountHiddenElement.value = data.obligatedTotalStr;
+			}
+
+			if (obligationExpirationDateElement != null) obligationExpirationDateElement.innerHTML = formattedDate(data.obligationExpirationDate);
+			if (awardIdElement != null) awardIdElement.value = data.awardId;
+			if (sponsorElement != null) sponsorElement.innerHTML = (data.sponsorCode.concat(sponsorConcatString)).concat(data.sponsorName);
+			if (sponsorCodeElement != null) { sponsorCodeElement.value = data.sponsorCode; sponsorCodeElement.innerHTML = data.sponsorCode; }
+			if (sponsorNameElement != null) { sponsorNameElement.value = data.sponsorName; sponsorNameElement.innerHTML = data.sponsorName; }
+
+			if (obligationExpirationDateHiddenElement != null) {
+			    obligationExpirationDateHiddenElement.value = formattedDate(data.obligationExpirationDate);
+			    obligationExpirationDateHiddenElement.innerHTML = formattedDate(data.obligationExpirationDate);
+			}
+			if (awardDocumentNumberElement != null) {
+			    awardDocumentNumberElement.value = data.awardDocument['documentNumber'];
+			    awardDocumentNumberElement.innerHTML = data.awardDocument['documentNumber'];
+			}
+		    }
+		    else {
+			if (accountNumberElement != null) accountNumberElement.innerHTML = wrapError( "not found" );
+			if (awardStatusElement != null) awardStatusElement.innerHTML = wrapError( "not found" );
+			if (sponsorElement != null) sponsorElement.innerHTML = wrapError( "not found" );
+			if (amountElement != null) amountElement.innerHTML = wrapError( "not found" );
+			if (obligationExpirationDateElement != null) obligationExpirationDateElement.innerHTML = wrapError( "not found" );
+			if (awardDocumentNumberElement != null) awardDocumentNumberElement.value = "";
+			if (awardIdElement != null) awardIdElement.value = "";
+		    }
+		},
+		errorHandler:function( errorMessage ) {
+		    window.status = errorMessage;
+		    if (accountNumberElement != null) accountNumberElement.innerHTML = wrapError( "not found" );
+		    if (awardStatusElement != null) awardStatusElement.innerHTML = wrapError( "not found" );
+		    if (sponsorElement != null) sponsorElement.innerHTML = wrapError( "not found" );
+		    if (amountElement != null) amountElement.innerHTML = wrapError( "not found" );
+		    if (obligationExpirationDateElement != null) obligationExpirationDateElement.innerHTML = wrapError( "not found" );
+		    if (awardDocumentNumberElement != null) awardDocumentNumberElement.value = "";
+		    if (awardIdElement != null) awardIdElement.value = null;
+		}
+	};
+	AwardService.getActiveOrNewestAward(awardNumber, dwrReply);
+    }
 }
 
 function formattedDate(date) {
