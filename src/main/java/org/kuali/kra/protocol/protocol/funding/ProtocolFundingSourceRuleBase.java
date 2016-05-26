@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,12 @@
  */
 package org.kuali.kra.protocol.protocol.funding;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
+import org.kuali.kra.award.home.fundingproposal.AwardFundingProposal;
 import org.kuali.kra.bo.FundingSourceType;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.infrastructure.Constants;
@@ -24,10 +29,8 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
 import org.kuali.kra.service.SponsorService;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
+import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
 
 /**
  * 
@@ -37,6 +40,10 @@ import java.util.Map;
 public abstract class ProtocolFundingSourceRuleBase extends ResearchDocumentRuleBase implements BusinessRuleInterface<AddProtocolFundingSourceEventBase>{
 
     private ProtocolFundingSourceService protocolFundingSourceService;
+    private InstitutionalProposalService institutionalProposalService;
+    
+    private final static String FUNDING_SOURCE_IP_TYPE = "5";
+    private final static int IP_STATUS_FUNDED = 2;
         
     /**
      * This method will validate funding source based on type & check for duplicates.
@@ -53,7 +60,7 @@ public abstract class ProtocolFundingSourceRuleBase extends ResearchDocumentRule
         } else {
             isValid &= checkFundingSource(fundingSrc);
             isValid &= checkForDuplicates(addProtocolFundingSourceEvent);
-            isValid &= checkProtocolFundingSource(fundingSrc,addProtocolFundingSourceEvent);
+            isValid &= validateInstitutionalProposalLinkage(fundingSrc);
         }
         
         return isValid;
@@ -104,18 +111,28 @@ public abstract class ProtocolFundingSourceRuleBase extends ResearchDocumentRule
         return isValid;
     }
 
-    private boolean checkProtocolFundingSource(ProtocolFundingSourceBase fundingSource,AddProtocolFundingSourceEventBase addProtocolFundingSourceEvent) {
-        boolean isValid = true;
+    /**
+     * Checks if the funding source is an InstitutionalProposal that is already funded by an Award and returns an error message.
+     * (see UAR-1941 for details)
+     * @param fundingSource
+     * @return
+     */
+    private boolean validateInstitutionalProposalLinkage(ProtocolFundingSourceBase fundingSource) {
         FundingSourceType fundingSourceType = fundingSource.getFundingSourceType();
-        //ProtocolDocument protocolDocument = (ProtocolDocument)addProtocolFundingSourceEvent.getDocument();
-        if (!fundingSourceType.getFundingSourceTypeCode().equals("5"))
-        {
-        	return false;
+        if (FUNDING_SOURCE_IP_TYPE.equals(fundingSourceType.getFundingSourceTypeCode())){
+        	InstitutionalProposal ip = getInstitutionalProposalSeervice().getActiveInstitutionalProposalVersion(fundingSource.getFundingSourceNumber());
+        	if ( ip != null && IP_STATUS_FUNDED ==ip.getStatusCode().intValue()){
+        		String awardNumber = "";
+        		if ( ip.getAwardFundingProposalsExist() ){
+        			awardNumber = ip.getAwardFundingProposal(0).getAward().getAwardNumber();
+        		}
+        		reportError(Constants.PROTOCOL_FUNDING_SOURCE_NAME_FIELD, KeyConstants.ERROR_PROTOCOL_FUNDING_SOURCE_LINKING, awardNumber);
+        		return false;
+        	}
         }
-        reportError(Constants.PROTOCOL_FUNDING_SOURCE_NAME_FIELD, KeyConstants.ERROR_PROTOCOL_FUNDING_SOURCE_LINKING);
-        
-        return isValid;
+       return true;
     }
+    
     private boolean checkForDuplicates(AddProtocolFundingSourceEventBase addProtocolFundingSourceEvent) {
         boolean isValid = true;
         
@@ -136,6 +153,13 @@ public abstract class ProtocolFundingSourceRuleBase extends ResearchDocumentRule
             protocolFundingSourceService =  KraServiceLocator.getService(getProtocolFundingSourceServiceClassHook());
         }
         return protocolFundingSourceService;
+    }
+    
+    private InstitutionalProposalService getInstitutionalProposalSeervice() {
+        if (institutionalProposalService == null) {
+        	institutionalProposalService =  KraServiceLocator.getService(InstitutionalProposalService.class);
+        }
+        return institutionalProposalService;
     }
 
     protected abstract Class<? extends ProtocolFundingSourceService> getProtocolFundingSourceServiceClassHook();
