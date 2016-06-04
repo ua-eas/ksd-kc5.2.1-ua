@@ -23,6 +23,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Collections;
+import java.util.Comparator;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -54,7 +56,8 @@ public abstract class CommitteeScheduleBase<CS extends CommitteeScheduleBase<CS,
     
     private static final long serialVersionUID = -360139608123017188L;
     public static final Long DEFAULT_SCHEDULE_ID = 9999999999L;
-    
+    public static final String DISAPPROVED = "Disapproved";
+
     private Time12HrFmt viewTime;
     
     private boolean filter = true;
@@ -197,6 +200,7 @@ public abstract class CommitteeScheduleBase<CS extends CommitteeScheduleBase<CS,
 	 * @return
 	 */
 	public Timestamp getTime() {
+		if(this.time != null) {
 	    java.util.Date dt = new java.util.Date(this.time.getTime());
 	    dt = DateUtils.round(dt, Calendar.DAY_OF_MONTH);
 	    if (viewTime != null) {
@@ -206,7 +210,8 @@ public abstract class CommitteeScheduleBase<CS extends CommitteeScheduleBase<CS,
             //dt = DateUtils.addMinutes(dt, viewTime.findMinutes());
             //dt = DateUtils.addMinutes(dt, getViewTime().findMinutes());
 	        this.time = new Timestamp(dt.getTime());
-	    }
+	     }
+		}
 	    return time;
 	}
 
@@ -501,7 +506,8 @@ public abstract class CommitteeScheduleBase<CS extends CommitteeScheduleBase<CS,
                 returnList.add(submission);
             } else {
                 String key = submission.getProtocol().getProtocolNumber();
-                if (submission.getProtocol().isActive()) {
+                if (submission.getProtocol().isActive() ||
+                        StringUtils.equals(submission.getProtocol().getProtocolStatus().getDescription(), DISAPPROVED)) {
                     PS existingSubmission = latestSubmissions.get(key);
                     if (existingSubmission == null) {
                         latestSubmissions.put(key, submission);
@@ -555,6 +561,14 @@ public abstract class CommitteeScheduleBase<CS extends CommitteeScheduleBase<CS,
     }
 
     public List<CSM> getCommitteeScheduleMinutes() {
+        if (committeeScheduleMinutes != null) {
+            Collections.sort(committeeScheduleMinutes, new Comparator<CSM>() {
+                @Override
+                public int compare(CSM o1, CSM o2) {
+                    return o1.getEntryNumber().compareTo(o2.getEntryNumber());
+                }
+            });
+        }
         return committeeScheduleMinutes;
     }
 
