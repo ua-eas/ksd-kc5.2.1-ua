@@ -69,6 +69,6 @@ public class ProtocolReviewNotRequiredServiceImpl implements ProtocolReviewNotRe
         protocol.setApprovalDate(actionBean.getDecisionDate());
         
         protocol.refreshReferenceObject("protocolStatus");
-        businessObjectService.save(protocolDocument.getProtocol());
+        protocol.getProtocolDocument().getDocumentHeader().getWorkflowDocument().approve(actionBean.getComments());
     }
 }
