@@ -154,7 +154,86 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
     * @param budgetDocument
     * @return
     */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings("rawtypes")  
+	protected boolean processBudgetProjectIncomeBusinessRule(BudgetDocument budgetDocument) {
+        boolean valid = true;
+        MessageMap errorMap = GlobalVariables.getMessageMap();
+        int i = 0;
+        
+        // Get each budget cost share.
+        for (BudgetCostShare budgetCostShare : budgetDocument.getBudget().getBudgetCostShares()) {
+            String errorPath = "budgetCostShare[" + i + "]";
+            errorMap.addToErrorPath(errorPath);
+            
+            // Validate share percentage.
+            if(budgetCostShare.getSharePercentage() != null && (budgetCostShare.getSharePercentage().isLessThan(new BudgetDecimal(0)) || 
+               budgetCostShare.getSharePercentage().isGreaterThan(new BudgetDecimal(100)))) {
+                errorMap.putError("sharePercentage", KeyConstants.ERROR_COST_SHARE_PERCENTAGE);
+                valid = false;
+            }
+            
+            // Check for duplicate fiscal year, source account and unit number on all unchecked cost shares.
+            if (i < budgetDocument.getBudget().getBudgetCostShareCount()) {
+                for (int j = i + 1; j < budgetDocument.getBudget().getBudgetCostShareCount(); j++) {
+                    BudgetCostShare tmpCostShare = budgetDocument.getBudget().getBudgetCostShare(j);
+                    int thisFiscalYear = budgetCostShare.getProjectPeriod() == null ? Integer.MIN_VALUE : budgetCostShare.getProjectPeriod();
+                    int otherFiscalYear = tmpCostShare.getProjectPeriod() == null ? Integer.MIN_VALUE : tmpCostShare.getProjectPeriod();
+                    
+                    //Only validate for same fiscal year
+                    if (thisFiscalYear == otherFiscalYear) {                        
+					    String thisSourceAccount = budgetCostShare.getSourceAccount() == null ? "" : budgetCostShare.getSourceAccount().trim();
+					    String otherSourceAccount = tmpCostShare.getSourceAccount() == null ? "" : tmpCostShare.getSourceAccount().trim();                   
+					    String thisSourceUnitNumber = budgetCostShare.getSourceUnitNumber() == null ? "" : budgetCostShare.getSourceUnitNumber().trim();
+					    String otherSourceUnitNumber = tmpCostShare.getSourceUnitNumber() == null ? "" : tmpCostShare.getSourceUnitNumber().trim();					    
+					    
+	                    // Verify if there is a match and display error.
+					    if (StringUtils.equalsIgnoreCase(thisSourceAccount, otherSourceAccount)) {				    	
+					    	if (StringUtils.equalsIgnoreCase(thisSourceUnitNumber, otherSourceUnitNumber)) {
+						    	valid = false;
+						    	errorMap.putError("fiscalYear", KeyConstants.ERROR_COST_SHARE_DUPLICATE, 
+						    	thisFiscalYear == Integer.MIN_VALUE ? "" : thisFiscalYear + "", 
+						    	thisSourceAccount == "" ? "\"\"" : thisSourceAccount,
+						    	thisSourceUnitNumber == "" ? "\"\"" : thisSourceUnitNumber); 
+					    	}
+				    	}
+                    }                    
+                }
+            }        
+            
+            // Validate project period stuff.            
+            String currentField = "document.budget.budgetCostShare[" + i + "].projectPeriod";
+            int numberOfProjectPeriods = budgetDocument.getBudget().getBudgetPeriods().size();
+            boolean validationCheck = this.validateProjectPeriod(budgetCostShare.getProjectPeriod(), currentField, numberOfProjectPeriods);            
+            valid &= validationCheck;
+            
+            errorMap.removeFromErrorPath(errorPath);
+            i++;
+        }
+        
+        // Check project income for values that are not greater than 0.
+        GlobalVariables.getMessageMap().removeFromErrorPath("budget");
+        GlobalVariables.getMessageMap().addToErrorPath("budgets[0]"); 
+        i = 0;
+        
+        for (BudgetProjectIncome budgetProjectIncome : budgetDocument.getBudget().getBudgetProjectIncomes()) {
+            String errorPath = "budgetProjectIncomes[" + i + "]";
+            errorMap.addToErrorPath(errorPath);
+            
+            if (budgetProjectIncome.getProjectIncome() == null || !budgetProjectIncome.getProjectIncome().isGreaterThan(new KualiDecimal(0.00))) {
+                errorMap.putError("projectIncome", "error.projectIncome.negativeOrZero");
+                valid = false;
+            }
+            
+            errorMap.removeFromErrorPath(errorPath);
+            i++;
+        }
+        
+        GlobalVariables.getMessageMap().removeFromErrorPath("budgets[0]");
+        GlobalVariables.getMessageMap().addToErrorPath("budget");
+        
+        return valid;
+    }    
+/*    
 	protected boolean processBudgetProjectIncomeBusinessRule(BudgetDocument budgetDocument) {
         boolean valid = true;
         MessageMap errorMap = GlobalVariables.getMessageMap();
@@ -211,7 +290,8 @@ public class BudgetDocumentRule extends CostShareRuleResearchDocumentBase implem
         
         return valid;
     }
-
+*/	
+    
     /**
     *
     * Validate budget rates. 
