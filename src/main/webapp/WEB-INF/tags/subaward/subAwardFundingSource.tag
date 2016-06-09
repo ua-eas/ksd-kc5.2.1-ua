@@ -98,6 +98,7 @@
 						</th>
 						<c:set var="documentNumber" value="${subAwardFundingSource.award.awardDocument.documentNumber}"/>
                         <c:set var="awardNumber" value="${subAwardFundingSource.award.awardNumber}"/>  
+                        <c:set var="awardAmountInfoIdx" value="${subAwardFundingSource.award.indexOfAwardAmountInfoForDisplay}"/>
 						  <td width="6%" valign="middle">    
 						    <a href="${ConfigProperties.application.url}/awardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${documentNumber}&medusaOpenedDoc=true"
 						      target="_blank" class="medusaOpenLink">Open award</a>
@@ -128,12 +129,12 @@
 						  </td>
 						  <td width="9%" valign="middle">
     						<div align="center">
-    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardAmountInfos[0].amountObligatedToDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.amountObligatedToDate}"/>
+    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardAmountInfos[${awardAmountInfoIdx}].amountObligatedToDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.amountObligatedToDate}"/>
     						</div>
 						  </td>
 						  <td width="9%" valign="middle">
     						<div align="center">
-    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardAmountInfos[0].obligationExpirationDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.obligationExpirationDate}" datePicker="false"/>
+    							<kul:htmlControlAttribute property="subAwardFundingSourcesBeans[${status.index}].award.awardAmountInfos[${awardAmountInfoIdx}].obligationExpirationDate" readOnly="true" attributeEntry="${subAwardFundingSourceAttributes.obligationExpirationDate}" datePicker="false"/>
     						</div>
 						  </td>
 						
