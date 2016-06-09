@@ -79,7 +79,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
 
 
     @Override
-    public List<SPSRestrictedNote> getSPSRestrictedNotes(String proposalNumber) throws  AuthorizationException, IllegalArgumentException {
+    public List<SPSRestrictedNote> getSPSRestrictedNotes(String proposalNumber) throws  AuthorizationException {
         LOG.debug("getSPSRestrictedNotes(): prop="+proposalNumber+" currentUser:"+GlobalVariables.getUserSession().getPrincipalName());
         
         if ( StringUtils.isEmpty(proposalNumber) ){
@@ -124,7 +124,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     
     
     @Override
-    public SPSRestrictedNote addSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException{
+    public SPSRestrictedNote addSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException{
         LOG.debug("addSPSRestrictedNote(): "+spsRestrictedNote);
         checkUserAuthorization( PropDevRoutingStateConstants.EDIT_SPS_RESTRICTED_NOTES_PERMISSION);
         try {
