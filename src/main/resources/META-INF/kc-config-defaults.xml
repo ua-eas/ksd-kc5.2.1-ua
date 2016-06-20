@@ -218,4 +218,15 @@
 
     <param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/CustomCoreSpringBeans.xml,classpath:edu/arizona/kra/budget/CustomBudgetSpringBeans.xml,classpath:edu/arizona/kra/irb/CustomIrbSpringBeans.xml,classpath:edu/arizona/kra/committee/CustomCommitteeSpringBeans.xml,classpath:edu/arizona/kra/proposaldevelopment/CustomPropDevSpringBeans.xml</param>
 
+    <!-- Enable daily/weekly email scheduling -->
+    <param name="email.reminder.lifecycle.enabled">true</param>
+    
+    <!-- Daily emails run every day at 7 AM -->
+    <param name="dailyEmail.active" override="true">true</param>
+    <param name="dailyEmail.cronExpression" override="true">0 0 7 * * ?</param>
+   
+    <!-- Weekly emails run every Monday at 7 AM -->
+    <param name="weeklyEmail.active" override="false">true</param>
+    <param name="weeklyEmail.cronExpression" override="true">0 0 7 ? * 2</param>
+
 </config>

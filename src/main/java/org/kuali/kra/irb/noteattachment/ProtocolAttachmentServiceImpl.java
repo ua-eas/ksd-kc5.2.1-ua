@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.kuali.kra.protocol.noteattachment.*;
 import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
-import edu.arizona.kra.irb.noteattachment.dao.ProtocolAttachmentProtocolDao;
+import edu.arizona.kra.protocol.dao.ProtocolAttachmentDao;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,8 +32,8 @@ import java.util.Collections;
 
 /** Implementation of {@link ProtocolAttachmentService ProtocolNoteAndAttachmentService}. */
 public class ProtocolAttachmentServiceImpl extends ProtocolAttachmentServiceImplBase implements ProtocolAttachmentService {
-	
-	private ProtocolAttachmentProtocolDao protocolAttachmentProtocolDao;
+
+    private ProtocolAttachmentDao protocolAttachmentDao;
 
     public ProtocolAttachmentServiceImpl(BusinessObjectService boService, ProtocolDao protocolDao) {
         super(boService, protocolDao);
@@ -44,19 +44,18 @@ public class ProtocolAttachmentServiceImpl extends ProtocolAttachmentServiceImpl
         if (code == null) {
             throw new IllegalArgumentException("the code is null");
         }
-        
-        @SuppressWarnings("unchecked")
+
         final Collection<ProtocolAttachmentTypeGroup> typeGroups
-            = this.boService.findMatching(ProtocolAttachmentTypeGroup.class, Collections.singletonMap("groupCode", code));
+        = this.boService.findMatching(ProtocolAttachmentTypeGroup.class, Collections.singletonMap("groupCode", code));
         if (typeGroups == null) {
             return new ArrayList<ProtocolAttachmentTypeBase>();
         }
-        
+
         final Collection<ProtocolAttachmentTypeBase> types = new ArrayList<ProtocolAttachmentTypeBase>();
         for (final ProtocolAttachmentTypeGroup typeGroup : typeGroups) {
             types.add(typeGroup.getType());
         }
-        
+
         return types;
     }
 
@@ -94,24 +93,59 @@ public class ProtocolAttachmentServiceImpl extends ProtocolAttachmentServiceImpl
     public Class<? extends ProtocolAttachmentPersonnelBase> getProtocolAttachmentPersonnelClassHook() {
         return ProtocolAttachmentPersonnel.class;
     }
-    
-    public void setProtocolAttachmentProtocolDao(ProtocolAttachmentProtocolDao protocolAttachmentProtocolDao) {
-    	this.protocolAttachmentProtocolDao = protocolAttachmentProtocolDao;
-    }
-    
-    protected ProtocolAttachmentProtocolDao getProtocolAttachmentProtocolDao() {
-    	return this.protocolAttachmentProtocolDao;
+
+    public void setProtocolAttachmentDao(ProtocolAttachmentDao protocolAttachmentDao) {
+        this.protocolAttachmentDao = protocolAttachmentDao;
     }
 
-	@Override
-	public String getAttachmentFileName(ProtocolAttachmentBase attachment) {
-		ProtocolAttachmentProtocolDao protocolAttachmentProtocolDao = getProtocolAttachmentProtocolDao();
-		return protocolAttachmentProtocolDao.getFileName(attachment);
-	}
+    protected ProtocolAttachmentDao getProtocolAttachmentDao() {
+        return this.protocolAttachmentDao;
+    }
 
-	@Override
-	public String getSourceProtocolNumber(ProtocolAttachmentBase attachment) {
-		ProtocolAttachmentProtocolDao protocolAttachmentProtocolDao = getProtocolAttachmentProtocolDao();
-		return protocolAttachmentProtocolDao.getSourceProtocolNumber(attachment);
-	}
+
+    @Override
+    public String getSourceProtocolNumber(ProtocolAttachmentBase attachment){
+        try {
+            return getProtocolAttachmentDao().getSourceProtocolNumber(attachment);
+        } catch (Exception e){
+            LOG.error(e);
+        }
+        return null;
+    }
+
+    @Override
+    public  byte[] getFileContents(Long fileId){
+        try {
+            return getProtocolAttachmentDao().getAttachmentData(fileId);
+        } catch (Exception e){
+            LOG.error(e);
+        }
+        return null;
+    }
+
+    @Override
+    public  void saveFileContents(Long fileId, byte[] attachmentData){
+        //Safeguard against overwriting valid files with empty data
+        if (attachmentData==null || attachmentData.length == 0){
+            throw new IllegalArgumentException("Cannot save file with empty content!");
+        }
+        try {
+            getProtocolAttachmentDao().saveAttachmentData(fileId, attachmentData);
+        } catch (Exception e){
+            LOG.error(e);
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public ArrayList<Long> checkForNullFileData(Long protocolId){
+        try{
+            return getProtocolAttachmentDao().checkForNullFileData(protocolId);
+        } catch (Exception e){
+            LOG.error(e);
+        }
+        return null;
+
+    }
 }

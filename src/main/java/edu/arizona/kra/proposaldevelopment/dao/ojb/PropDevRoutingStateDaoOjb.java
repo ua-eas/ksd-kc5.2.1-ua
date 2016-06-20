@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2015 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.ojb.broker.PersistenceBroker;
 import org.apache.ojb.broker.accesslayer.LookupException;
 import org.kuali.rice.krad.dao.impl.LookupDaoOjb;
@@ -48,14 +49,14 @@ import edu.arizona.kra.proposaldevelopment.lookup.PropDevRouteStopValueFinder;
  */
 @SuppressWarnings("unchecked")
 public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRoutingStateDao {
-    private static final Log LOG = LogFactory.getLog(PropDevRoutingStateDaoOjb.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PropDevRoutingStateDaoOjb.class);
     private static final PropDevRouteStopValueFinder nodeNameFinder = new PropDevRouteStopValueFinder();  
 
     @Override
     public List<ProposalDevelopmentRoutingState> getPropDevRoutingState(Map<String, String> searchCriteria) throws SQLException, LookupException {        
         List<ProposalDevelopmentRoutingState> results = new ArrayList<ProposalDevelopmentRoutingState>();
         HashSet<String> resultDocNumbers = new HashSet<String>();
-        LOG.debug("getPropDevRoutingState searchCriteria="+searchCriteria.toString());
+        LOG.debug("getPropDevRoutingState searchCriteria={}",searchCriteria);
 
         String sqlQuery = buildSqlQuery(searchCriteria);
         boolean displayAdHocNodes = (searchCriteria.containsKey(ROUTE_STOP_NAME) && StringUtils.isEmpty(searchCriteria.get(ROUTE_STOP_NAME)));
@@ -115,7 +116,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
             closeDatabaseObjects(rs, ps, conn, broker);
         }
 
-        LOG.debug("getPropDevRoutingState results="+results.size());
+        LOG.debug("getPropDevRoutingState: no of results={}.",results.size());
         return results;
 
     }
@@ -171,7 +172,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
 
         query.append(ORDER_CRITERIA);
 
-        LOG.debug("getPropDevRoutingState sqlQuery="+query);
+        LOG.debug("END getPropDevRoutingState sqlQuery={}.",query);
         return query.toString();
     }
 
@@ -233,7 +234,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
 
     @Override
     public Boolean getORDExpedited(String proposalNumber) throws SQLException, LookupException {
-        LOG.debug("getORDExpedited proposalNumber="+proposalNumber);
+        LOG.debug("getORDExpedited proposalNumber={}",proposalNumber);
 
         if (StringUtils.isEmpty(proposalNumber)){
             throw new IllegalArgumentException("PropDevRoutingStateDaoOjb: getORDExpedited with a null proposalNumber!");
@@ -267,7 +268,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         } finally {
             closeDatabaseObjects(rs, ps, conn, broker);
         }
-        LOG.debug("getORDExpedited Result="+result);
+        LOG.debug("getORDExpedited Result={}.",result);
         return result;
     }
 
@@ -275,7 +276,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
     @Override
     @Transactional 
     public void setORDExpedited(String proposalNumber, Boolean ordExp) throws SQLException, LookupException {
-        LOG.debug("setORDExpedited proposalNumber="+proposalNumber+" value="+ordExp);
+        LOG.debug("setORDExpedited proposalNumber={} value={}.",proposalNumber,ordExp);
         if (StringUtils.isEmpty(proposalNumber) || ordExp == null){
             throw new IllegalArgumentException("PropDevRoutingStateDaoOjb: setORDExpedited with null args!");
         }
@@ -322,7 +323,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
 
     @Override
     public String getSPSReviewer(String proposalNumber) throws SQLException, LookupException {
-        LOG.debug("getSPSReviewer proposalNumber="+proposalNumber);
+        LOG.debug("getSPSReviewer proposalNumber={}",proposalNumber);
 
         if (StringUtils.isEmpty(proposalNumber)){
             throw new IllegalArgumentException("PropDevRoutingStateDaoOjb: getSPSReviewer with a null proposalNumber!");
@@ -354,7 +355,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         } finally {
             closeDatabaseObjects(rs, ps, conn, broker);
         }
-        LOG.debug("getSPSReviewer Result="+spsReviewerId);
+        LOG.debug("getSPSReviewer Result={}.",spsReviewerId);
         return spsReviewerId;
     }
 
@@ -362,7 +363,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
     @Override
     @Transactional
     public void setSPSReviewer(String proposalNumber, String kcPersonId, String fullName) throws SQLException, LookupException {
-        LOG.debug("setSPSReviewer proposalNumber="+proposalNumber+" kcPersonId="+kcPersonId +" fullName="+fullName);
+        LOG.debug("setSPSReviewer proposalNumber={}  fullName={}.",proposalNumber,fullName);
         if (StringUtils.isEmpty(proposalNumber) || StringUtils.isEmpty(kcPersonId) ||  StringUtils.isEmpty(fullName)){
             throw new IllegalArgumentException("PropDevRoutingStateDaoOjb: setSPSReviewer with null args!");
         }
@@ -410,10 +411,9 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
 
     @Override 
     public List<SPSReviewer> findSPSReviewers(Collection<String> principalIds) throws SQLException, LookupException {
-        LOG.debug("findSPSReviewers: personIds "+principalIds);
+        LOG.debug("findSPSReviewers: personIds {}.",principalIds);
         List<SPSReviewer> result = new ArrayList<SPSReviewer>();
         if ( principalIds != null && principalIds.size() > 0){
-            String[] values = principalIds.toArray(new String[principalIds.size()]);
 
             StringBuilder query = new StringBuilder(SPS_REVIEWERS_QUERY);
             for (String id:principalIds){
@@ -422,7 +422,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
             //remove last comma
             query.setLength(query.length()-1);
             query.append(")");
-            LOG.debug("findSPSReviewers: query="+query.toString());
+            LOG.debug("findSPSReviewers: query={}",query);
             Connection conn = null;
             PreparedStatement ps = null;
             ResultSet rs = null;
@@ -449,7 +449,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
                 closeDatabaseObjects(rs, ps, conn, broker);
             }
         }       
-        LOG.debug("findSPSReviewers: Finished result size="+result.size());
+        LOG.debug("findSPSReviewers: Finished result size={}.",result.size());
         return result;
     }
 
