@@ -16,10 +16,10 @@ import org.springmodules.orm.ojb.OjbFactoryUtils;
 public class DBConnection implements Closeable{
     private static final Log LOG = LogFactory.getLog(DBConnection.class);
 
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    PersistenceBroker broker = null;
+    private Connection conn = null;
+    private PreparedStatement ps = null;
+    private ResultSet rs = null;
+    private PersistenceBroker broker = null;
 
     public DBConnection(PersistenceBroker pb){
         broker = pb;
@@ -64,9 +64,9 @@ public class DBConnection implements Closeable{
         }
         if ( conn != null ){
             try {
-                conn.close();
+                broker.serviceConnectionManager().releaseConnection();
             } catch (Exception ex) {
-                LOG.warn("Failed to close Connection.", ex);
+                LOG.warn("Failed to release Connection.", ex);
             }
         }
         if (broker != null) {
