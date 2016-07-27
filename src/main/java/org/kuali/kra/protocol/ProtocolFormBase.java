@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,10 +59,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * This class...
- * @author Kuali Nervous System Team (kualidev@oncourse.iu.edu)
- */
+
 public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase implements PermissionsForm, Auditable, QuestionableFormInterface,
                                                                                         CustomDataDocumentForm {
     
@@ -88,8 +85,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     private OnlineReviewsActionHelperBase onlineReviewsActionHelper;
     private QuestionnaireHelperBase questionnaireHelper;    
     private NotificationHelper<ProtocolNotificationContextBase> protocolNotificationHelper;  
-    //transient so that the helper and its members don't have to be serializable or transient
-    //reinitialized in the getter
+    //transient so that the helper and its members don't have to be serializable or transient reinitialized in the getter
     private transient NotesAttachmentsHelperBase notesAttachmentsHelper;
     private boolean auditActivated;
     
@@ -125,27 +121,34 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     public void initialize() throws Exception {
         setProtocolHelper(createNewProtocolHelperInstanceHook(this));
         setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
-        setPermissionsHelper(createNewPermissionsHelperInstanceHook(this));        
         setCustomDataHelper(createNewCustomDataHelperInstanceHook(this)); 
         setSpecialReviewHelper(createNewSpecialReviewHelperInstanceHook(this));
-        setActionHelper(createNewActionHelperInstanceHook(this));
-        setQuestionnaireHelper(createNewQuestionnaireHelperInstanceHook(this));        
-        setNotesAttachmentsHelper(createNewNotesAttachmentsHelperInstanceHook(this));   
-        this.notesAttachmentsHelper.prepareView();        
+        setQuestionnaireHelper(createNewQuestionnaireHelperInstanceHook(this));
         setNewProtocolReferenceBean(createNewProtocolReferenceBeanInstance());
         setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
         setNotificationHelper(getNotificationHelperHook());
         setMedusaBean(new MedusaBean());
     }
        
-  
+    public void initializePermission() throws Exception{
+        setPermissionsHelper(createNewPermissionsHelperInstanceHook(this));
+    }
+
+    public void initializeNotesAttachments() throws Exception {
+        setNotesAttachmentsHelper(createNewNotesAttachmentsHelperInstanceHook(this));
+        this.notesAttachmentsHelper.prepareView();
+    }
+
+    public void initializeProtocolAction() throws Exception {
+        setActionHelper(createNewActionHelperInstanceHook(this, true));
+    }
 
     protected abstract NotificationHelper<? extends ProtocolNotificationContextBase> getNotificationHelperHook();
     
     protected abstract ProtocolReferenceBeanBase createNewProtocolReferenceBeanInstance();
 
     protected abstract QuestionnaireHelperBase createNewQuestionnaireHelperInstanceHook(ProtocolFormBase protocolForm);
-    protected abstract ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm) throws Exception;
+    protected abstract ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions) throws Exception;
     protected abstract ProtocolSpecialReviewHelperBase createNewSpecialReviewHelperInstanceHook(ProtocolFormBase protocolForm);
     protected abstract ProtocolCustomDataHelperBase createNewCustomDataHelperInstanceHook(ProtocolFormBase protocolForm);
     protected abstract OnlineReviewsActionHelperBase createNewOnlineReviewsActionHelperInstanceHook(ProtocolFormBase protocolForm);

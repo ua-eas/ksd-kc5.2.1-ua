@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,10 +63,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This class...
- * @author Kuali Nervous System Team (kualidev@oncourse.iu.edu)
- */
 @SuppressWarnings("deprecation")
 public class ProtocolForm extends ProtocolFormBase {
     
@@ -103,7 +99,6 @@ public class ProtocolForm extends ProtocolFormBase {
      * List if it is disabled.
      * 
      */
-    @SuppressWarnings("deprecation")
     @Override
     public HeaderNavigation[] getHeaderNavigationTabs() {
         
@@ -327,8 +322,12 @@ public class ProtocolForm extends ProtocolFormBase {
 
 
     @Override
-    protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm) throws Exception {
-        return new ActionHelper((ProtocolForm) protocolForm);
+    protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions) throws Exception {
+        ActionHelper actionHelper = new ActionHelper((ProtocolForm) protocolForm);
+        if(initializeActions) {
+            actionHelper.initializeProtocolActions();
+        }
+        return actionHelper;
     }
 
 

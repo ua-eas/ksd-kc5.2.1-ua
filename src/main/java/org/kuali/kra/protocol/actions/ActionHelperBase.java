@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -336,7 +336,9 @@ public abstract class ActionHelperBase implements Serializable {
      */
     public ActionHelperBase(ProtocolFormBase form) throws Exception {
         this.form = form;
+    }
 
+    public void initializeProtocolActions() throws Exception {
         protocolSubmitAction = getNewProtocolSubmitActionInstanceHook(this);
         protocolWithdrawBean = getNewProtocolWithdrawBeanInstanceHook(this);
 
@@ -722,6 +724,9 @@ public abstract class ActionHelperBase implements Serializable {
     private void prepareProtocolSubmitActionView() {        
         canSubmitProtocol = hasSubmitProtocolPermission();
         canSubmitProtocolUnavailable = hasSubmitProtocolUnavailablePermission();
+        if(protocolSubmitAction == null) {
+            protocolSubmitAction = getNewProtocolSubmitActionInstanceHook(this);
+        }
         protocolSubmitAction.prepareView();
         // Initialize the submit committee key values (expensive call) only after checking the conditions for the display of the committee selection
         if(canSubmitProtocol && isShowCommittee()) {            

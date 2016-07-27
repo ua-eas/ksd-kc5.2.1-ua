@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -202,6 +202,10 @@ public class ActionHelper extends ActionHelperBase {
      */
     public ActionHelper(ProtocolForm form) throws Exception {
         super(form);
+    }
+
+    @Override
+    public void initializeProtocolActions() throws Exception {
         protocolNotifyIrbBean = new ProtocolNotifyIrbBean(this, "protocolNotifyIrbBean");
         // setting the attachment here so new files can be attached to newActionAttachment
         protocolNotifyIrbBean.setNewActionAttachment(new ProtocolActionAttachment());

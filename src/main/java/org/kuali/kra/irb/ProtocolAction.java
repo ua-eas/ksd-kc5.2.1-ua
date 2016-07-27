@@ -425,8 +425,8 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     /**
      * 
      * This method for set the attachment with the watermark which selected  by the client .
-     * @param protocolForm form
-     * @param protocolAttachmentBase attachment
+     * @param ProtocolForm form
+     * @param ProtocolAttachmentProtocol attachment
      * @return attachment file
      */
     protected byte[] getProtocolAttachmentFile(ProtocolForm form, ProtocolAttachmentProtocol attachment){

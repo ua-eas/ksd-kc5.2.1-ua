@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,12 +86,12 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         if(KNSGlobalVariables.getAuditErrorMap().isEmpty()) {
             new AuditActionHelper().auditConditionally((ProtocolFormBase) form);
         }
-        
+
         return forward;
     }
 
 
-    
+
     //invoke these hooks at appropriate points in action methods to get the actual forward name from the subclasses
     protected abstract String getProtocolForwardNameHook();
     protected abstract String getQuestionnaireForwardNameHook();
@@ -103,27 +103,30 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     protected abstract String getSpecialReviewForwardNameHook();
     protected abstract String getCustomDataForwardNameHook();
     protected abstract ProtocolNotification getProtocolNotificationHook();
-    
+
     public ActionForward protocol(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
+        //?protocolForm.initializeProtocol();
         protocolForm.getProtocolHelper().prepareView();
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolForwardNameHook());
     }
 
-    public ActionForward permissions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    public ActionForward permissions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
+        protocolForm.initializePermission();
         protocolForm.getPermissionsHelper().prepareView();
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolPermissionsForwardNameHook());
-    }    
+    }
 
     public ActionForward personnel(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
+        //?protocolForm.initializePersonnel();
         getProtocolPersonnelService().selectProtocolUnit(protocolForm.getProtocolDocument().getProtocol().getProtocolPersons());
         getProtocolPersonTrainingService().updatePersonTrained(protocolForm.getProtocolDocument().getProtocol().getProtocolPersons());
         protocolForm.getPersonnelHelper().prepareView();
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getPersonnelForwardNameHook());
-    }    
-    
+    }
+
     /**
      * This method gets called upon navigation to Questionnaire tab.
      * @param mapping the Action Mapping
@@ -134,6 +137,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
      */
     public ActionForward questionnaire(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
+        //?protocolForm.initializeQuestionnaire();
         protocolForm.getQuestionnaireHelper().prepareView();
         protocolForm.getQuestionnaireHelper().populateAnswers();
         protocolForm.getQuestionnaireHelper().setQuestionnaireActiveStatuses();
@@ -148,13 +152,13 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
      * @param response Http Response
      * @return the Action Forward
      */
-    public ActionForward noteAndAttachment(ActionMapping mapping, ActionForm form
-            , HttpServletRequest request, HttpServletResponse response) {        
+    public ActionForward noteAndAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
+        protocolForm.initializeNotesAttachments();
         protocolForm.getNotesAttachmentsHelper().prepareView();
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getNoteAndAttachmentForwardNameHook());
     }
-    
+
     /**
      * This method gets called upon navigation to Special Review tab.
      * @param mapping
@@ -165,11 +169,12 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
      */
     public ActionForward specialReview(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
+        //>protocolForm.initializeSpecialReview();
         protocolForm.getSpecialReviewHelper().prepareView();
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getSpecialReviewForwardNameHook());
     }
 
-    
+
     /**
      * This method gets called upon navigation to ProtocolBase Actions tab.
      * @param mapping
@@ -181,38 +186,44 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     public ActionForward protocolActions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
         // for protocol lookup copy link - rice 1.1 need this
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
+
         String command = request.getParameter("command");
         if (KewApiConstants.DOCSEARCH_COMMAND.equals(command)) {
             String docIdRequestParameter = request.getParameter(KRADConstants.PARAMETER_DOC_ID);
             Document retrievedDocument = KRADServiceLocatorWeb.getDocumentService().getByDocumentHeaderId(docIdRequestParameter);
             protocolForm.setDocument(retrievedDocument);
-            request.setAttribute(KRADConstants.PARAMETER_DOC_ID, docIdRequestParameter);        
+            request.setAttribute(KRADConstants.PARAMETER_DOC_ID, docIdRequestParameter);
        }
        // make sure current submission is displayed when navigate to action page.
+       protocolForm.initializeProtocolActions();
        protocolForm.getActionHelper().setCurrentSubmissionNumber(-1);
        protocolForm.getActionHelper().prepareView();
        protocolForm.getActionHelper().prepareCommentsView();
- 
-       
-       //When a user selects the Questionnaires tab, empty answerHeaders are generated and saved to the database so that subsequent methods relying
-       //on that persisted data have it available to render panels.  Make Protocol Actions tab work in this same manner so it's sub-tab 
-       //Print ==> Questionnaires will render when a user enters a protocol but does not select the Questionnaire tab to answer the questions.
-       protocolForm.getQuestionnaireHelper().prepareView();
-       protocolForm.getQuestionnaireHelper().populateAnswers();
-       protocolForm.getQuestionnaireHelper().setQuestionnaireActiveStatuses();
-       Document document = protocolForm.getDocument();
-       List<AnswerHeader> answerHeaders = protocolForm.getQuestionnaireHelper().getAnswerHeaders();       
-       if (applyRules(new SaveQuestionnaireAnswerEvent(document, answerHeaders)) && applyRules(new SaveProtocolQuestionnaireEvent(document, answerHeaders)) ) {
-           protocolForm.getQuestionnaireHelper().preSave();
-           getBusinessObjectService().save(answerHeaders);
-       }
-  
-       return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolActionsForwardNameHook());
+
+
+
+        saveQuestionnaire(protocolForm);
+        return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolActionsForwardNameHook());
     }
-    
+
+    protected void saveQuestionnaire(ProtocolFormBase protocolForm) {
+        //When a user selects the Questionnaires tab, empty answerHeaders are generated and saved to the database so that subsequent methods relying
+        //on that persisted data have it available to render panels.  Make Protocol Actions tab work in this same manner so it's sub-tab
+        //Print ==> Questionnaires will render when a user enters a protocol but does not select the Questionnaire tab to answer the questions.
+        protocolForm.getQuestionnaireHelper().prepareView();
+        protocolForm.getQuestionnaireHelper().populateAnswers();
+        protocolForm.getQuestionnaireHelper().setQuestionnaireActiveStatuses();
+        Document document = protocolForm.getDocument();
+        List<AnswerHeader> answerHeaders = protocolForm.getQuestionnaireHelper().getAnswerHeaders();
+        if (applyRules(new SaveQuestionnaireAnswerEvent(document, answerHeaders)) && applyRules(new SaveProtocolQuestionnaireEvent(document, answerHeaders))) {
+            protocolForm.getQuestionnaireHelper().preSave();
+            getBusinessObjectService().save(answerHeaders);
+        }
+    }
     
     public ActionForward customData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
+        //?protocolForm.initializeCustomData();
         protocolForm.getCustomDataHelper().prepareCustomData();
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getCustomDataForwardNameHook());
     }
