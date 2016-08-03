@@ -47,6 +47,8 @@ import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
+import java.util.Comparator;
+import java.util.Collections;
 
 /**
  * This class is service impl for subAward...
@@ -248,6 +250,17 @@ public class SubAwardServiceImpl implements SubAwardService {
         subAward.setTotalAnticipatedAmount(totalAnticipatedAmount);
         subAward.setTotalAmountReleased(totalAmountReleased);
         subAward.setTotalAvailableAmount(totalObligatedAmount.subtract(totalAmountReleased));
+
+        // BUKC-0145: Transactions on Financial Tab - Order switching (DFCT0011505)  - fixes issue with BUKC-0105
+        List<SubAwardAmountInfo> sortedlist = subAward.getSubAwardAmountInfoList();
+        if (!sortedlist.isEmpty() && !(sortedlist.get(sortedlist.size() - 1).getSubAwardAmountInfoId() == null)) {
+            Collections.sort(sortedlist, new Comparator<SubAwardAmountInfo>() {
+                public int compare(SubAwardAmountInfo o1, SubAwardAmountInfo o2) {
+                    return o1.getSubAwardAmountInfoId() - o2.getSubAwardAmountInfoId();
+                }
+            });
+        }
+        subAward.setSubAwardAmountInfoList(sortedlist);
 
         return subAward;
     }
