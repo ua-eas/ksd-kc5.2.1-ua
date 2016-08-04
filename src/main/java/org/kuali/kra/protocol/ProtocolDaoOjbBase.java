@@ -100,6 +100,11 @@ public abstract class ProtocolDaoOjbBase<GenericProtocol extends ProtocolBase> e
                 crit.addExists(getUnitReportQuery(entry));
             }
         }
+
+        // Limit search results
+        String maxResultsCount = LookupUtils.getSearchResultsLimit(getProtocolBOClassHook()).toString();
+        crit.addSql("rownum <= " + maxResultsCount);
+
         Query q = QueryFactory.newQuery(getProtocolBOClassHook(), crit, true);
         logQuery(q);
         
