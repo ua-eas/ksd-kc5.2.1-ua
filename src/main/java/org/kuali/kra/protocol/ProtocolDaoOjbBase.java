@@ -31,6 +31,7 @@ import org.kuali.rice.krad.bo.PersistableBusinessObject;
 import org.kuali.rice.krad.dao.LookupDao;
 import org.kuali.rice.krad.service.util.OjbCollectionAware;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.rice.kns.lookup.LookupUtils;
 
 import java.sql.Date;
 import java.util.*;
@@ -100,6 +101,11 @@ public abstract class ProtocolDaoOjbBase<GenericProtocol extends ProtocolBase> e
                 crit.addExists(getUnitReportQuery(entry));
             }
         }
+
+        // Limit search results
+        String maxResultsCount = LookupUtils.getSearchResultsLimit(getProtocolBOClassHook()).toString();
+        crit.addSql("rownum <= " + maxResultsCount);
+
         Query q = QueryFactory.newQuery(getProtocolBOClassHook(), crit, true);
         logQuery(q);
         

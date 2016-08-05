@@ -66,11 +66,11 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
         fieldValues.remove(AWARD_NUMBER);
         fieldValues.remove(ORGANIZATION_NAME);
         fieldValues.remove(REQUISITIONER_USER_NAME);
-        List<SubAward> unboundedResults =
-        (List<SubAward>) super.getSearchResultsUnbounded(fieldValues);
+        List<SubAward> searchResults =
+        (List<SubAward>) super.getSearchResults(fieldValues);
         List<SubAward> returnResults = new ArrayList<SubAward>();
         try {
-            returnResults = filterForActiveSubAwards(unboundedResults, awardNumber, subrecipientName, requisitionerUserName, fieldValues.get("statusCode"));
+            returnResults = filterForActiveSubAwards(searchResults, awardNumber, subrecipientName, requisitionerUserName, fieldValues.get("statusCode"));
         } catch (WorkflowException e) {
             throw new RuntimeException(e);
         }
