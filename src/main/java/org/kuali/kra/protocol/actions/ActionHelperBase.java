@@ -336,6 +336,9 @@ public abstract class ActionHelperBase implements Serializable {
      */
     public ActionHelperBase(ProtocolFormBase form) throws Exception {
         this.form = form;
+
+	//this field is accessed before initializeProtocolActions() is called so it has to be instantiated in the constructor
+	protocolFullApprovalBean = buildProtocolApproveBean(getFullApprovalProtocolActionTypeHook(), Constants.PROTOCOL_FULL_APPROVAL_ACTION_PROPERTY_KEY);
     }
 
     public void initializeProtocolActions() throws Exception {
@@ -350,7 +353,6 @@ public abstract class ActionHelperBase implements Serializable {
         protocolDeleteBean = getNewProtocolDeleteBeanInstanceHook(this);      
         assignToAgendaBean = getNewProtocolAssignToAgendaBeanInstanceHook(this);         
         assignToAgendaBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());        
-        protocolFullApprovalBean = buildProtocolApproveBean(getFullApprovalProtocolActionTypeHook(), Constants.PROTOCOL_FULL_APPROVAL_ACTION_PROPERTY_KEY);
 
         protocolAdminApprovalBean = buildProtocolApproveBean(getAdminApprovalProtocolActionTypeHook(), Constants.PROTOCOL_ADMIN_APPROVAL_ACTION_PROPERTY_KEY);
         protocolAdminWithdrawBean = getNewProtocolAdminWithdrawBeanInstanceHook(this);

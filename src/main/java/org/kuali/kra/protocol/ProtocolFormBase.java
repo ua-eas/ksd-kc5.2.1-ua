@@ -127,6 +127,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
         setNewProtocolReferenceBean(createNewProtocolReferenceBeanInstance());
         setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
         setNotificationHelper(getNotificationHelperHook());
+	setActionHelper(createNewActionHelperInstanceHook(this, false));
         setMedusaBean(new MedusaBean());
     }
        
