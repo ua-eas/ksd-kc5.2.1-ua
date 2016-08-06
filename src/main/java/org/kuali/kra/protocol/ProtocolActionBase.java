@@ -195,7 +195,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
             request.setAttribute(KRADConstants.PARAMETER_DOC_ID, docIdRequestParameter);
        }
        // make sure current submission is displayed when navigate to action page.
-       protocolForm.initializeProtocolActions();
+       protocolForm.initializeProtocolAction();
        protocolForm.getActionHelper().setCurrentSubmissionNumber(-1);
        protocolForm.getActionHelper().prepareView();
        protocolForm.getActionHelper().prepareCommentsView();

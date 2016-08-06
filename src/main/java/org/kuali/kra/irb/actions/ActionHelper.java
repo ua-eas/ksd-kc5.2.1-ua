@@ -206,6 +206,7 @@ public class ActionHelper extends ActionHelperBase {
 
     @Override
     public void initializeProtocolActions() throws Exception {
+        super.initializeProtocolActions();
         protocolNotifyIrbBean = new ProtocolNotifyIrbBean(this, "protocolNotifyIrbBean");
         // setting the attachment here so new files can be attached to newActionAttachment
         protocolNotifyIrbBean.setNewActionAttachment(new ProtocolActionAttachment());
