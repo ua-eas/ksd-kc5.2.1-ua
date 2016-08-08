@@ -29,8 +29,7 @@ import org.kuali.kra.negotiations.bo.NegotiationUnassociatedDetail;
 import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
-import org.kuali.rice.kns.datadictionary.BusinessObjectEntry;
-import org.kuali.rice.kns.service.KNSServiceLocator;
+import org.kuali.rice.krad.lookup.LookupUtils;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.dao.impl.LookupDaoOjb;
 import org.kuali.rice.krad.lookup.CollectionIncomplete;
@@ -288,8 +287,7 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
     
     private Integer getNegotiatonSearchResultsLimit(){
         if (maxSearchResults == null) {
-            BusinessObjectEntry businessObjectEntry = (BusinessObjectEntry) KNSServiceLocator.getDataDictionaryService().getDataDictionary().getBusinessObjectEntry("Negotiation");
-            maxSearchResults =  businessObjectEntry.getLookupDefinition().getResultSetLimit();
+            maxSearchResults = LookupUtils.getApplicationSearchResultsLimit();
         }
         return maxSearchResults;
     }
