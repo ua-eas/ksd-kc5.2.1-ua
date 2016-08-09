@@ -251,9 +251,8 @@ public class SubAwardServiceImpl implements SubAwardService {
         subAward.setTotalAmountReleased(totalAmountReleased);
         subAward.setTotalAvailableAmount(totalObligatedAmount.subtract(totalAmountReleased));
 
-        // BUKC-0145: Transactions on Financial Tab - Order switching (DFCT0011505)  - fixes issue with BUKC-0105
         List<SubAwardAmountInfo> sortedlist = subAward.getSubAwardAmountInfoList();
-        if (!sortedlist.isEmpty() && !(sortedlist.get(sortedlist.size() - 1).getSubAwardAmountInfoId() == null)) {
+        if ( sortedlist.size() > 1 ) {
             Collections.sort(sortedlist, new Comparator<SubAwardAmountInfo>() {
                 public int compare(SubAwardAmountInfo o1, SubAwardAmountInfo o2) {
                     return o1.getSubAwardAmountInfoId() - o2.getSubAwardAmountInfoId();
