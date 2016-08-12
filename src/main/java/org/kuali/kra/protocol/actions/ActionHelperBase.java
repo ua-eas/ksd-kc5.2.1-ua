@@ -346,10 +346,8 @@ public abstract class ActionHelperBase implements Serializable {
         protocolWithdrawBean = getNewProtocolWithdrawBeanInstanceHook(this);
 
         createAmendmentBean();
-        
-        protocolNotifyCommitteeBean = getNewProtocolNotifyCommitteeBeanInstanceHook(this);
 
-        protocolDeleteBean = getNewProtocolDeleteBeanInstanceHook(this);      
+        protocolDeleteBean = getNewProtocolDeleteBeanInstanceHook(this);
         assignToAgendaBean = getNewProtocolAssignToAgendaBeanInstanceHook(this);         
         assignToAgendaBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());        
 
@@ -745,7 +743,7 @@ public abstract class ActionHelperBase implements Serializable {
       
 
     private void prepareNotifyCommitteeActionView() {
-        protocolNotifyCommitteeBean.prepareView();
+        getProtocolNotifyCommitteeBean().prepareView();
         canNotifyCommittee = hasNotifyCommitteePermission();
         canNotifyCommitteeUnavailable = hasNotifyCommitteeUnavailablePermission();
         // Initialize the notify cmt key values only after checking the conditions for the display of the committee selection
@@ -1294,6 +1292,9 @@ public abstract class ActionHelperBase implements Serializable {
 
 
     public ProtocolNotifyCommitteeBean getProtocolNotifyCommitteeBean() {
+        if ( protocolNotifyCommitteeBean == null){
+            protocolNotifyCommitteeBean = getNewProtocolNotifyCommitteeBeanInstanceHook(this);
+        }
         return protocolNotifyCommitteeBean;
     }
     
