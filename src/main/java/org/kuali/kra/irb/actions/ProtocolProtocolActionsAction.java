@@ -124,8 +124,8 @@ import java.util.Map;
  */
 @SuppressWarnings("deprecation")
 public class ProtocolProtocolActionsAction extends ProtocolAction implements AuditModeAction {
-
     private static final Log LOG = LogFactory.getLog(ProtocolProtocolActionsAction.class);
+
     private static final String CONFIRM_NO_ACTION = "";
     private static final String CONFIRM_DELETE_ACTION_ATT = "confirmDeleteActionAttachment";
     private static final String CONFIRM_FOLLOWUP_ACTION = "confirmAddFollowupAction";
@@ -159,6 +159,8 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
     /** {@inheritDoc} */
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
+        LOG.debug("ProtocolProtocolActionsAction: execute()");
+
         ProtocolForm protocolForm = (ProtocolForm) form;
         // set the current task name on the action helper before the requested method is dispatched
         // so that beans etc can access it when preparing view after/during the requested method's execution
@@ -173,7 +175,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         protocolForm.getActionHelper().prepareView();
         // submit action may change "submission details", so re-initializa it
         protocolForm.getActionHelper().initSubmissionDetails();
-        
+        LOG.debug("ProtocolProtocolActionsAction: execute() exit...");
         return actionForward;
     }
 
@@ -189,7 +191,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
      */
     public ActionForward copyProtocol(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-
+        LOG.debug("ProtocolProtocolActionsAction: copyProtocol()");
 
         ProtocolForm protocolForm = (ProtocolForm) form;
 
@@ -241,7 +243,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
      */
     public ActionForward refreshPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-
+        LOG.debug("ProtocolProtocolActionsAction: refreshPage()");
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
 
@@ -1066,6 +1068,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
      */
     public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
+        LOG.debug("start()");
         Map<String, String> fieldValues = new HashMap<String, String>();
         fieldValues.put(SUBMISSION_ID, request.getParameter(SUBMISSION_ID));
         ProtocolSubmission protocolSubmission = (ProtocolSubmission) getBusinessObjectService().findByPrimaryKey(ProtocolSubmission.class, fieldValues);
@@ -1074,7 +1077,9 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         ProtocolForm protocolForm = (ProtocolForm) form;
         protocolForm.setDocId(protocolSubmission.getProtocol().getProtocolDocument().getDocumentNumber());
         loadDocument(protocolForm);
+        LOG.debug("start()-> protocolForm.initialize()");
         protocolForm.initialize();
+        LOG.debug("start() exit...");
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
     

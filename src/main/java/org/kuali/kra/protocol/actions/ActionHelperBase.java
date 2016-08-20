@@ -100,14 +100,16 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The form helper class for the ProtocolBase Actions tab.
  */
 @SuppressWarnings("serial")
 public abstract class ActionHelperBase implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(ActionHelperBase.class);
 
-    protected static final String NAMESPACE = "KC-UNT";
     protected transient QuestionnaireAnswerService questionnaireAnswerService;
 
     private static final String DEFAULT_TAB = "Versions";
@@ -335,21 +337,24 @@ public abstract class ActionHelperBase implements Serializable {
      * @throws Exception 
      */
     public ActionHelperBase(ProtocolFormBase form) throws Exception {
+        LOG.debug("ActionHelperBase: constructor()");
         this.form = form;
 
 	    //this field is accessed before initializeProtocolActions() is called so it has to be instantiated in the constructor
 	    protocolFullApprovalBean = buildProtocolApproveBean(getFullApprovalProtocolActionTypeHook(), Constants.PROTOCOL_FULL_APPROVAL_ACTION_PROPERTY_KEY);
+        LOG.debug("ActionHelperBase: constructor exit...");
     }
 
     public void initializeProtocolActions() throws Exception {
+        LOG.debug("ActionHelperBase: initializeProtocolActions()");
+
         protocolSubmitAction = getNewProtocolSubmitActionInstanceHook(this);
         protocolWithdrawBean = getNewProtocolWithdrawBeanInstanceHook(this);
 
         createAmendmentBean();
 
         protocolDeleteBean = getNewProtocolDeleteBeanInstanceHook(this);
-        assignToAgendaBean = getNewProtocolAssignToAgendaBeanInstanceHook(this);         
-        assignToAgendaBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());        
+        getAssignToAgendaBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
 
         protocolAdminApprovalBean = buildProtocolApproveBean(getAdminApprovalProtocolActionTypeHook(), Constants.PROTOCOL_ADMIN_APPROVAL_ACTION_PROPERTY_KEY);
         protocolAdminWithdrawBean = getNewProtocolAdminWithdrawBeanInstanceHook(this);
@@ -358,10 +363,10 @@ public abstract class ActionHelperBase implements Serializable {
         protocolDisapproveBean = buildProtocolGenericActionBean(getDisapprovedProtocolActionTypeHook(), Constants.PROTOCOL_DISAPPROVE_ACTION_PROPERTY_KEY);
         protocolSMRBean = buildProtocolGenericActionBean(getSMRProtocolActionTypeHook(), Constants.PROTOCOL_SMR_ACTION_PROPERTY_KEY);  
         protocolSRRBean = buildProtocolGenericActionBean(getSRRProtocolActionTypeHook(), Constants.PROTOCOL_SRR_ACTION_PROPERTY_KEY);
-        protocolReturnToPIBean = buildProtocolGenericActionBean(getReturnToPIActionTypeHook(), Constants.PROTOCOL_RETURN_TO_PI_PROPERTY_KEY);
         protocolSuspendBean = buildProtocolGenericActionBean(getSuspendKeyHook(), Constants.PROTOCOL_SUSPEND_ACTION_PROPERTY_KEY);
         protocolExpireBean = buildProtocolGenericActionBean(getExpireKeyHook(), Constants.PROTOCOL_EXPIRE_ACTION_PROPERTY_KEY);
-        protocolTerminateBean = buildProtocolGenericActionBean(getTerminateKeyHook(), Constants.PROTOCOL_TERMINATE_ACTION_PROPERTY_KEY);        
+        protocolReturnToPIBean = buildProtocolGenericActionBean(getReturnToPIActionTypeHook(), Constants.PROTOCOL_RETURN_TO_PI_PROPERTY_KEY);
+        protocolTerminateBean = buildProtocolGenericActionBean(getTerminateKeyHook(), Constants.PROTOCOL_TERMINATE_ACTION_PROPERTY_KEY);
         protocolAbandonBean = buildProtocolGenericActionBean(getAbandonActionTypeHook(), getAbandonPropertyKeyHook());
         
           
@@ -383,7 +388,9 @@ public abstract class ActionHelperBase implements Serializable {
             protocolManageReviewCommentsBean.getReviewAttachmentsBean().setHideReviewerName(getReviewerCommentsService().setHideReviewerName(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments()));
         }
         
-        initActionBeanTaskMap();        
+        initActionBeanTaskMap();
+        LOG.debug("ActionHelperBase: initializeProtocolActions() exit...");
+
     }
     
     
@@ -431,7 +438,8 @@ public abstract class ActionHelperBase implements Serializable {
      * The reason TaskName (a text code) is used and ProtocolActionType (a number code) is not is because not every task is mapped to a ProtocolActionType.
      */
     protected void initActionBeanTaskMap() {
-        
+        LOG.debug("initActionBeanTaskMap()");
+
         actionBeanTaskMap.put(TaskName.PROTOCOL_ADMIN_CORRECTION, protocolAdminCorrectionBean);
         actionBeanTaskMap.put(TaskName.CREATE_PROTOCOL_AMMENDMENT, protocolAmendmentBean);
         actionBeanTaskMap.put(TaskName.CREATE_PROTOCOL_RENEWAL, protocolRenewAmendmentBean);
@@ -458,6 +466,8 @@ public abstract class ActionHelperBase implements Serializable {
         actionBeanTaskMap.put(TaskName.ADMIN_APPROVE_PROTOCOL, protocolAdminApprovalBean);
         actionBeanTaskMap.put(TaskName.ADMIN_WITHDRAW_PROTOCOL, protocolAdminWithdrawBean);
         actionBeanTaskMap.put(TaskName.ADMIN_INCOMPLETE_PROTOCOL, protocolAdminIncompleteBean);
+
+        LOG.debug("initActionBeanTaskMap() exit...");
     }
     
     
@@ -547,7 +557,7 @@ public abstract class ActionHelperBase implements Serializable {
     }
 
     protected ProtocolActionBase findProtocolAction(String actionTypeCode, List<ProtocolActionBase> protocolActions, ProtocolSubmissionBase currentSubmission) {
-
+        LOG.debug("ActionHelperBase: findProtocolAction()");
         for (ProtocolActionBase pa : protocolActions) {
             if (pa.getProtocolActionType().getProtocolActionTypeCode().equals(actionTypeCode)
                     && (pa.getProtocolSubmission() == null || pa.getProtocolSubmission().equals(currentSubmission))) {
@@ -630,11 +640,12 @@ public abstract class ActionHelperBase implements Serializable {
     }    
 
     public void prepareView() throws Exception {
+        LOG.debug("ActionHelperBase: prepareView()");
         initializeSubmissionConstraintHook();
         prepareProtocolSubmitActionView();
         prepareNotifyCommitteeActionView();
                   
-        assignToAgendaBean.prepareView();        
+        getAssignToAgendaBean().prepareView();
         canCreateAmendment = hasCreateAmendmentPermission();
         canCreateAmendmentUnavailable = hasCreateAmendmentUnavailablePermission();
         canModifyAmendmentSections = hasModifyAmendmentSectionsPermission();
@@ -703,6 +714,8 @@ public abstract class ActionHelperBase implements Serializable {
         initAmendmentBeans(false);
         initPrintQuestionnaire();
         initPrintCorrespondence();
+
+        LOG.debug("ActionHelperBase: prepareView() exit");
     }
     
             
@@ -720,7 +733,8 @@ public abstract class ActionHelperBase implements Serializable {
     }
 
 
-    private void prepareProtocolSubmitActionView() {        
+    private void prepareProtocolSubmitActionView() {
+        LOG.debug("ActionHelperBase:prepareProtocolSubmitActionView()");
         canSubmitProtocol = hasSubmitProtocolPermission();
         canSubmitProtocolUnavailable = hasSubmitProtocolUnavailablePermission();
         if(protocolSubmitAction == null) {
@@ -733,6 +747,7 @@ public abstract class ActionHelperBase implements Serializable {
             Collection<? extends CommitteeBase<?, ?, ?>> committees = 
                 getCommitteeIdByUnitValuesFinderService().getAssignmentCommittees(getProtocol().getLeadUnitNumber(), getDocRouteStatus(), null);
             submitActionCommitteeIdByUnitKeyValues = getKeyValuesForCommitteeSelection(committees);
+            LOG.debug("ActionHelperBase:prepareProtocolSubmitActionView() exit...");
         }
     }
     
@@ -743,6 +758,7 @@ public abstract class ActionHelperBase implements Serializable {
       
 
     private void prepareNotifyCommitteeActionView() {
+        LOG.debug("prepareNotifyCommitteeActionView()");
         getProtocolNotifyCommitteeBean().prepareView();
         canNotifyCommittee = hasNotifyCommitteePermission();
         canNotifyCommitteeUnavailable = hasNotifyCommitteeUnavailablePermission();
@@ -753,6 +769,7 @@ public abstract class ActionHelperBase implements Serializable {
                 getCommitteeIdByUnitValuesFinderService().getAssignmentCommittees(null, getDocRouteStatus(), protocolNotifyCommitteeBean.getCommitteeId());
             notifyCmtActionCommitteeIdByUnitKeyValues = getKeyValuesForCommitteeSelection(committees);
         }
+        LOG.debug("prepareNotifyCommitteeActionView() exit...");
     }
        
     protected boolean hasNotifyCommitteePermission() {
@@ -760,7 +777,7 @@ public abstract class ActionHelperBase implements Serializable {
         return getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task);
     }
     
-    protected abstract ProtocolTaskBase getNewNotifyCommitteeTaskInstanceHook(ProtocolBase protocol);
+    protected abstract ProtocolTaskBase     getNewNotifyCommitteeTaskInstanceHook(ProtocolBase protocol);
 
     
     private boolean hasNotifyCommitteeUnavailablePermission() {
@@ -792,6 +809,7 @@ public abstract class ActionHelperBase implements Serializable {
 
     @SuppressWarnings("unchecked")
     protected void populateReviewersAndOnlineReviewsMap() {
+        LOG.debug("populateReviewersAndOnlineReviewsMap()");
         String protocolNum = getProtocol().getProtocolNumber();
         // populate the current submission's reviewers
         this.currentReviewers = getReviewerCommentsService().getProtocolReviewers(protocolNum, currentSubmissionNumber);
@@ -800,6 +818,7 @@ public abstract class ActionHelperBase implements Serializable {
         for (ProtocolOnlineReviewBase review : activeReviews) {
             this.getOnlineReviewsMap().put(review.getProtocolReviewer().getProtocolReviewerId().toString(), review);
         }
+        LOG.debug("populateReviewersAndOnlineReviewsMap() exit...");
     }
 
     private boolean hasAdministrativelyApprovePermission() {
@@ -863,10 +882,12 @@ public abstract class ActionHelperBase implements Serializable {
     
     
    protected void initProtocolCorrespondenceAuthorizationFlags() {
+       LOG.debug("initProtocolCorrespondenceAuthorizationFlags()");
        ProtocolCorrespondenceAuthorizationService correspondenceAuthorizationService = getProtocolCorrespondenceAuthorizationService(); 
        this.allowedToViewProtocolCorrespondence = correspondenceAuthorizationService.isAllowedToViewProtocolCorrespondence(getProtocol());
        this.allowedToUpdateProtocolCorrespondence = correspondenceAuthorizationService.isAllowedToUpdateProtocolCorrespondence(getProtocol());
        this.allowedToRegenerateProtocolCorrespondence = correspondenceAuthorizationService.isAllowedToRegenerateProtocolCorrespondence(getProtocol());
+       LOG.debug("initProtocolCorrespondenceAuthorizationFlags() exit...");
    }
 
     /**
@@ -874,7 +895,7 @@ public abstract class ActionHelperBase implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public void prepareCommentsView() {
-        
+        LOG.debug("prepareCommentsView()");
         protocolAdminApprovalBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
              
         assignToAgendaBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
@@ -896,7 +917,9 @@ public abstract class ActionHelperBase implements Serializable {
         }
         
         protocolReturnToPIBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        LOG.debug("prepareCommentsView() exit...");
     }
+
     
     @SuppressWarnings({ "rawtypes" })
     protected List<CommitteeScheduleMinuteBase> getCopiedReviewComments() {
@@ -1138,11 +1161,11 @@ public abstract class ActionHelperBase implements Serializable {
     protected abstract ProtocolTaskBase getAdminCorrectionUnavailableProtocolTaskInstanceHook(ProtocolBase protocol);
     
     protected boolean hasUndoLastActionPermission() {
-        return hasPermission(TaskName.PROTOCOL_UNDO_LAST_ACTION) && undoLastActionBean.canUndoLastAction();
+        return hasPermission(TaskName.PROTOCOL_UNDO_LAST_ACTION) && getUndoLastActionBean().canUndoLastAction();
     }
     
     protected boolean hasUndoLastActionUnavailablePermission() {
-        return hasPermission(TaskName.PROTOCOL_UNDO_LAST_ACTION) && !undoLastActionBean.canUndoLastAction();
+        return hasPermission(TaskName.PROTOCOL_UNDO_LAST_ACTION) && !getUndoLastActionBean().canUndoLastAction();
     }
     
     protected boolean hasRecordCommitteeDecisionPermission() {
@@ -1319,6 +1342,9 @@ public abstract class ActionHelperBase implements Serializable {
     }
     
     public ProtocolAssignToAgendaBean getAssignToAgendaBean(){
+        if ( assignToAgendaBean == null) {
+            assignToAgendaBean = getNewProtocolAssignToAgendaBeanInstanceHook(this);
+        }
         return this.assignToAgendaBean;
     }
     
@@ -1359,6 +1385,9 @@ public abstract class ActionHelperBase implements Serializable {
     }
     
     public UndoLastActionBean getUndoLastActionBean() {
+        if ( undoLastActionBean == null){
+            undoLastActionBean = getNewUndoLastActionBeanInstanceHook();
+        }
         return undoLastActionBean;
     }
 
@@ -1918,6 +1947,7 @@ public abstract class ActionHelperBase implements Serializable {
     }
 
     protected void setReviewComments(List<CommitteeScheduleMinuteBase> reviewComments) {
+        LOG.debug("ActionHelper: setReviewComments()");
         this.reviewComments = reviewComments;
     }
 
@@ -2069,6 +2099,7 @@ public abstract class ActionHelperBase implements Serializable {
     protected abstract ProtocolSubmissionQuestionnaireHelper getProtocolSubmissionQuestionnaireHelperHook(ProtocolBase protocol, String actionTypeCode, String submissionNumber, boolean finalDoc);
     
     public void setCurrentTask(String currentTaskName) {
+        LOG.debug("ActionHelperBase: setCurrentTask{}",currentTaskName);
         this.currentTaskName = currentTaskName;
     }
     
@@ -2360,6 +2391,7 @@ public abstract class ActionHelperBase implements Serializable {
     }
     
     public ProtocolActionBean getActionBean(String taskName) {
+        LOG.debug("getActionBean({})", taskName);
         return actionBeanTaskMap.get(taskName);
     }
 

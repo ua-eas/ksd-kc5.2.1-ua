@@ -77,6 +77,7 @@ import org.slf4j.LoggerFactory;
  * all user requests for that particular tab (web page).
  */
 public abstract class ProtocolAction extends ProtocolActionBase {
+    private static final Logger LOG = LoggerFactory.getLogger(ProtocolAction.class);
 
     public static final String PROTOCOL_NAME_HOOK = "protocol";
     public static final String PROTOCOL_QUESTIONNAIRE_HOOK = "questionnaire";
@@ -89,7 +90,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     public static final String PROTOCOL_CUSTOM_DATA_HOOK = "customData";
     public static final String PROTOCOL_MEDUSA = "medusa";
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProtocolAction.class);
+
     private static final String PROTOCOL_NUMBER = "protocolNumber";
     private static final String SUBMISSION_NUMBER = "submissionNumber";
     private static final String SUFFIX_T = "T";
@@ -136,6 +137,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
      */
     @Override
     public ActionForward docHandler(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        LOG.debug("docHandler()");
         ActionForward forward = null;
 
         ProtocolForm protocolForm = (ProtocolForm) form;
@@ -166,8 +168,10 @@ public abstract class ProtocolAction extends ProtocolActionBase {
         }
 
         if (KewApiConstants.INITIATE_COMMAND.equals(protocolForm.getCommand())) {
+            LOG.debug("docHandler() initiate command....");
             protocolForm.getProtocolDocument().initialize();
         } else {
+            LOG.debug("docHandler() protocolForm.initialize() ...");
             protocolForm.initialize();
         }
 
@@ -219,6 +223,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     @SuppressWarnings({"unchecked", "deprecation"})
     public ActionForward printSubmissionQuestionnaireAnswer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+        LOG.debug("printSubmissionQuestionnaireAnswer()");
         ActionForward forward = mapping.findForward(MAPPING_BASIC);
         Map<String, Object> reportParameters = new HashMap<String, Object>();
         AnswerHeader answerHeader = getAnswerHeader(request);
@@ -243,6 +248,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
             streamToResponse(dataStream, response);
             forward = null;
         }
+        LOG.debug("printSubmissionQuestionnaireAnswer() exit... forward={}", forward);
         return forward;
     }
 

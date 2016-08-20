@@ -58,6 +58,8 @@ import org.kuali.rice.kns.datadictionary.HeaderNavigation;
 import org.kuali.rice.kns.util.ActionFormUtilMap;
 import org.kuali.rice.kns.web.ui.HeaderField;
 import org.kuali.rice.krad.util.GlobalVariables;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -65,6 +67,7 @@ import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class ProtocolForm extends ProtocolFormBase {
+    private static final Logger LOG = LoggerFactory.getLogger(ProtocolForm.class);
     
     private static final long serialVersionUID = 3736148760520952504L;
     
@@ -79,6 +82,7 @@ public class ProtocolForm extends ProtocolFormBase {
     
     public ProtocolForm() throws Exception {
         super();
+        LOG.debug("constructor()");
     }
   
     
@@ -101,6 +105,7 @@ public class ProtocolForm extends ProtocolFormBase {
      */
     @Override
     public HeaderNavigation[] getHeaderNavigationTabs() {
+        LOG.debug("getHeaderNavigationTabs()");
         
         HeaderNavigation[] navigation = super.getHeaderNavigationTabs();
         
@@ -138,6 +143,7 @@ public class ProtocolForm extends ProtocolFormBase {
         
         HeaderNavigation[] result = new HeaderNavigation[resultList.size()];
         resultList.toArray(result);
+        LOG.debug("getHeaderNavigationTabs() exit...");
         return result;
     }
     
@@ -154,7 +160,8 @@ public class ProtocolForm extends ProtocolFormBase {
     
     @SuppressWarnings("deprecation")
     @Override
-    public void populate(HttpServletRequest request) { 
+    public void populate(HttpServletRequest request) {
+        LOG.debug("populate()");
         initAnswerList(request);
         super.populate(request);
         
@@ -162,6 +169,7 @@ public class ProtocolForm extends ProtocolFormBase {
         if (getActionFormUtilMap() instanceof ActionFormUtilMap) {
             ((ActionFormUtilMap) getActionFormUtilMap()).clear();
         }
+        LOG.debug("populate() exit...");
     }
     
     /*
@@ -169,7 +177,7 @@ public class ProtocolForm extends ProtocolFormBase {
      * so, it has to be retrieved, then populate with the new data.
      */
     private void initAnswerList(HttpServletRequest request) {
-        
+        LOG.debug("initAnswerList()");
         String protocolNumber = request.getParameter("questionnaireHelper.protocolNumber");
         String submissionNumber = request.getParameter("questionnaireHelper.submissionNumber");
         if (StringUtils.isNotBlank(protocolNumber) && protocolNumber.endsWith("T")) {
@@ -177,6 +185,7 @@ public class ProtocolForm extends ProtocolFormBase {
             this.getQuestionnaireHelper().setAnswerHeaders(
                     getQuestionnaireAnswerService().getQuestionnaireAnswer(moduleQuestionnaireBean));
         }
+        LOG.debug("initAnswerList() exit...");
     }
 
     private QuestionnaireAnswerService getQuestionnaireAnswerService() {
@@ -186,6 +195,7 @@ public class ProtocolForm extends ProtocolFormBase {
     @SuppressWarnings("deprecation")
     @Override
     public void populateHeaderFields(WorkflowDocument workflowDocument) {
+        LOG.debug("populateHeaderFields()");
         super.populateHeaderFields(workflowDocument);
         ProtocolDocument pd = (ProtocolDocument) getProtocolDocument();
         
@@ -227,6 +237,7 @@ public class ProtocolForm extends ProtocolFormBase {
         
         HeaderField expirationDate = new HeaderField("DataDictionary.Protocol.attributes.expirationDate", expirationDateStr);
         getDocInfo().add(expirationDate);
+        LOG.debug("populateHeaderFields() exit...");
     }
 
     public ProtocolHelper getProtocolHelper() {

@@ -59,6 +59,8 @@ import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.KRADUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -74,10 +76,13 @@ import java.util.Map;
  */
 public abstract class ProtocolActionBase extends KraTransactionalDocumentActionBase {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ProtocolActionBase.class);
+
     /** {@inheritDoc} */
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
+        LOG.debug("execute()");
         final ActionForward forward = super.execute(mapping, form, request, response);
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
         if (protocolForm.isAuditActivated()) {
@@ -86,7 +91,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         if(KNSGlobalVariables.getAuditErrorMap().isEmpty()) {
             new AuditActionHelper().auditConditionally((ProtocolFormBase) form);
         }
-
+        LOG.debug("execute() exit...");
         return forward;
     }
 
@@ -105,25 +110,31 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     protected abstract ProtocolNotification getProtocolNotificationHook();
 
     public ActionForward protocol(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        LOG.debug("protocol()");
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
         //?protocolForm.initializeProtocol();
         protocolForm.getProtocolHelper().prepareView();
+        LOG.debug("protocol() exit...");
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolForwardNameHook());
     }
 
     public ActionForward permissions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        LOG.debug("permissions()");
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
         protocolForm.initializePermission();
         protocolForm.getPermissionsHelper().prepareView();
+        LOG.debug("permissions() exit...");
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolPermissionsForwardNameHook());
     }
 
     public ActionForward personnel(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        LOG.debug("personnel()");
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
         //?protocolForm.initializePersonnel();
         getProtocolPersonnelService().selectProtocolUnit(protocolForm.getProtocolDocument().getProtocol().getProtocolPersons());
         getProtocolPersonTrainingService().updatePersonTrained(protocolForm.getProtocolDocument().getProtocol().getProtocolPersons());
         protocolForm.getPersonnelHelper().prepareView();
+        LOG.debug("personnel() exit...");
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getPersonnelForwardNameHook());
     }
 
@@ -153,9 +164,11 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
      * @return the Action Forward
      */
     public ActionForward noteAndAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        LOG.debug("noteAndAttachment()");
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
         protocolForm.initializeNotesAttachments();
         protocolForm.getNotesAttachmentsHelper().prepareView();
+        LOG.debug("noteAndAttachment() exit...");
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getNoteAndAttachmentForwardNameHook());
     }
 
@@ -168,9 +181,11 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
      * @return
      */
     public ActionForward specialReview(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        LOG.debug("specialReview()");
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
         //>protocolForm.initializeSpecialReview();
         protocolForm.getSpecialReviewHelper().prepareView();
+        LOG.debug("specialReview() exit...");
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getSpecialReviewForwardNameHook());
     }
 
@@ -184,6 +199,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
      * @return
      */
     public ActionForward protocolActions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
+        LOG.debug("protocolActions()");
         // for protocol lookup copy link - rice 1.1 need this
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
 
@@ -200,10 +216,9 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
        protocolForm.getActionHelper().prepareView();
        protocolForm.getActionHelper().prepareCommentsView();
 
-
-
-        saveQuestionnaire(protocolForm);
-        return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolActionsForwardNameHook());
+       saveQuestionnaire(protocolForm);
+       LOG.debug("protocolActions() exit...");
+       return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolActionsForwardNameHook());
     }
 
     protected void saveQuestionnaire(ProtocolFormBase protocolForm) {
@@ -229,14 +244,15 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     }
     
     protected ActionForward branchToPanelOrNotificationEditor(ActionMapping mapping, ProtocolFormBase protocolForm, String ulitmateDestination) {
+        LOG.debug("branchToPanelOrNotificationEditor() ultimate destination = {}",ulitmateDestination);
         if (protocolForm.isShowNotificationEditor()) {
             protocolForm.setShowNotificationEditor(false);
             protocolForm.getNotificationHelper().getNotificationContext().setForwardName(ulitmateDestination);
+            LOG.debug("branchToPanelOrNotificationEditor() -> getProtocolNotificationEditorHook exit...");
             return mapping.findForward(getProtocolNotificationEditorHook());
-        } else {
-            return mapping.findForward(ulitmateDestination);
         }
-    
+        LOG.debug("branchToPanelOrNotificationEditor() exit...");
+        return mapping.findForward(ulitmateDestination);
     }
     
     /**
@@ -245,7 +261,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
         throws Exception {
-        
+        LOG.debug("save()");
         ActionForward actionForward = mapping.findForward(Constants.MAPPING_BASIC);
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
         ProtocolBase protocol = protocolForm.getProtocolDocument().getProtocol();
@@ -268,18 +284,20 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
                     ProtocolNotificationContextBase context = getProtocolInitialSaveNotificationContextHook(protocol);
                     if (protocolForm.getNotificationHelper().getPromptUserForNotificationEditor(context)) {
                         protocolForm.getNotificationHelper().initializeDefaultValues(context);
-                        if (KRADConstants.SAVE_METHOD.equals(protocolForm.getMethodToCall())) { 
+                        if (KRADConstants.SAVE_METHOD.equals(protocolForm.getMethodToCall())) {
+                            LOG.debug("save() exit 1...");
                             return mapping.findForward(getProtocolNotificationEditorHook());
                         }
                     } else {
                         protocolForm.setShowNotificationEditor(false);
                         getNotificationService().sendNotificationAndPersist(context, getProtocolNotificationHook(), protocol);
+                        LOG.debug("save() exit 2...");
                         return actionForward;
                     }
                 }
             }
         }
-
+        LOG.debug("save() exit 3...");
         return actionForward;
     }
 
@@ -339,7 +357,6 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
       UnitAclLoadService unitAclLoadService = getUnitAclLoadService();
       unitAclLoadService.loadUnitAcl(permissionable);
 
-//moved      sendNotification(protocolForm);
    }
     
     /**
@@ -371,7 +388,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     public ActionForward refresh(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         super.refresh(mapping, form, request, response);
-        
+        LOG.debug("refresh()");
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
         ProtocolDocumentBase protocolDocument = protocolForm.getProtocolDocument();
                      
@@ -399,6 +416,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         if (StringUtils.isNotBlank(protocolForm.getFormKey())) {
             protocolForm.setFormKey("");
         }
+        LOG.debug("refresh() exit...");
         return mapping.findForward(Constants.MAPPING_BASIC );
     }
     
@@ -420,7 +438,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
 
     @Override
     public ActionForward docHandler(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-                  
+        LOG.debug("docHandler()");
         ActionForward forward = null;
         
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
@@ -445,6 +463,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         if (KewApiConstants.INITIATE_COMMAND.equals(protocolForm.getCommand())) {
             protocolForm.getProtocolDocument().initialize();
         } else {
+            LOG.debug("docHandler() -> protocolForm.initialize();");
             protocolForm.initialize();
         }
         
@@ -454,7 +473,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         if (getProtocolOnlineReviewMappingNameHoook().equals(command)) {
             forward = onlineReview(mapping, protocolForm, request, response);
         }
-        
+        LOG.debug("docHandler() exit...");
         return forward;
     }
     

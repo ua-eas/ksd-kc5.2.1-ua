@@ -51,6 +51,8 @@ import org.kuali.rice.kns.web.ui.ExtraButton;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Date;
@@ -62,7 +64,7 @@ import java.util.Map;
 
 public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase implements PermissionsForm, Auditable, QuestionableFormInterface,
                                                                                         CustomDataDocumentForm {
-    
+    private static final Logger LOG = LoggerFactory.getLogger(ProtocolFormBase.class);
     private static final long serialVersionUID = 4646326030098259702L;
     
     private static final String DATE_FORMAT = "MM/dd/yyyy";
@@ -108,8 +110,10 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     
     public ProtocolFormBase() throws Exception {
         super();
+        LOG.debug("ProtocolFormBase constructor() -> initialize() ");
         initialize();
         this.registerEditableProperty("methodToCall");
+        LOG.debug("ProtocolFormBase constructor() exit... ");
     }
     
 
@@ -119,6 +123,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
      * @throws Exception 
      */
     public void initialize() throws Exception {
+        LOG.debug("initialize()");
         setProtocolHelper(createNewProtocolHelperInstanceHook(this));
         setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
         setCustomDataHelper(createNewCustomDataHelperInstanceHook(this)); 
@@ -129,19 +134,28 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
         setNotificationHelper(getNotificationHelperHook());
 	    setActionHelper(createNewActionHelperInstanceHook(this, false));
         setMedusaBean(new MedusaBean());
+        LOG.debug("initialize() exit...");
     }
        
     public void initializePermission() throws Exception{
+        LOG.debug("initializePermission()");
         setPermissionsHelper(createNewPermissionsHelperInstanceHook(this));
+        LOG.debug("initializePermission() exit");
+
     }
 
     public void initializeNotesAttachments() throws Exception {
+        LOG.debug("initializeNotesAttachments()");
         setNotesAttachmentsHelper(createNewNotesAttachmentsHelperInstanceHook(this));
         this.notesAttachmentsHelper.prepareView();
+        LOG.debug("initializeNotesAttachments() exit");
+
     }
 
     public void initializeProtocolAction() throws Exception {
+        LOG.debug("initializeProtocolAction() TRUE");
         setActionHelper(createNewActionHelperInstanceHook(this, true));
+        LOG.debug("initializeProtocolAction() TRUE exit...");
     }
 
     protected abstract NotificationHelper<? extends ProtocolNotificationContextBase> getNotificationHelperHook();
@@ -179,11 +193,13 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
      */
     @Override
     public void reset(ActionMapping mapping, HttpServletRequest request) {
+        LOG.debug("reset()");
         super.reset(mapping, request);
         this.setLookupResultsSequenceNumber(null);
         this.setLookupResultsBOClassName(null);
         
         onlineReviewsActionHelper.init(true);
+        LOG.debug("reset() exit..");
     }
     
     public String getLookupResultsSequenceNumber() {
@@ -423,6 +439,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     // At non-terminal nodes however we will not restrict the list of available requested actions in any way.
     @SuppressWarnings("deprecation")
     public List<ActionRequest> getActionRequests() {
+        LOG.debug("getActionRequests() ");
         List<ActionRequest> retVal;
         List<ActionRequest> allAvailableRequests = super.getActionRequests(); 
         if(!isDocumentAtTerminalNode()) {
@@ -437,6 +454,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
                 }
             }
         }
+        LOG.debug("getActionRequests() exit...");
         return retVal;
     }
     

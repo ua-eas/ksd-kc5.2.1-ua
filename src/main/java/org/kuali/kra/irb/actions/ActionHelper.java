@@ -102,6 +102,8 @@ import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
 
@@ -110,6 +112,7 @@ import org.kuali.rice.krad.util.ObjectUtils;
  */
 @SuppressWarnings("serial")
 public class ActionHelper extends ActionHelperBase {
+    private static final Logger LOG = LoggerFactory.getLogger(ActionHelper.class);
 
     private static final String NAMESPACE = "KC-UNT";
     private static final List<String> ACTION_TYPE_SUBMISSION_DOC;
@@ -202,10 +205,12 @@ public class ActionHelper extends ActionHelperBase {
      */
     public ActionHelper(ProtocolForm form) throws Exception {
         super(form);
+        LOG.debug("ActionHelper constructor exit...");
     }
 
     @Override
     public void initializeProtocolActions() throws Exception {
+        LOG.debug("ActionHelper initializeProtocolActions()");
         super.initializeProtocolActions();
         protocolNotifyIrbBean = new ProtocolNotifyIrbBean(this, "protocolNotifyIrbBean");
         // setting the attachment here so new files can be attached to newActionAttachment
@@ -259,7 +264,8 @@ public class ActionHelper extends ActionHelperBase {
      * Initializes the mapping between the task names and the beans.  This is used to get the bean associated to the task name passed in from the tag file.
      * The reason TaskName (a text code) is used and ProtocolActionType (a number code) is not is because not every task is mapped to a ProtocolActionType.
      */    
-    private void initIRBSpecificActionBeanTaskMap() {    
+    private void initIRBSpecificActionBeanTaskMap() {
+        LOG.debug("initIRBSpecificActionBeanTaskMap()");
         actionBeanTaskMap.put(TaskName.ASSIGN_TO_COMMITTEE_SCHEDULE, assignCmtSchedBean);
         actionBeanTaskMap.put(TaskName.ASSIGN_REVIEWERS, protocolAssignReviewersBean);  
         actionBeanTaskMap.put(TaskName.CLOSE_PROTOCOL, protocolCloseBean);
@@ -442,7 +448,7 @@ public class ActionHelper extends ActionHelperBase {
     }
 
     public void prepareView() throws Exception {
-        
+        LOG.debug("ActionHelper: prepareView()");
         super.prepareView();
         assignCmtSchedBean.init();
         prepareAssignCommitteeScheduleActionView();
@@ -521,6 +527,7 @@ public class ActionHelper extends ActionHelperBase {
         initFilterDatesView();
 
         this.populateSubmissionQuestionnaires();
+        LOG.debug("ActionHelper: prepareView() exit...");
     }
     
     
@@ -860,11 +867,11 @@ public class ActionHelper extends ActionHelperBase {
     }
     
     protected boolean hasUndoLastActionPermission() {
-        return hasPermission(TaskName.PROTOCOL_UNDO_LAST_ACTION) && undoLastActionBean.canUndoLastAction();
+        return hasPermission(TaskName.PROTOCOL_UNDO_LAST_ACTION) && getUndoLastActionBean().canUndoLastAction();
     }
     
     protected boolean hasUndoLastActionUnavailablePermission() {
-        return hasPermission(TaskName.PROTOCOL_UNDO_LAST_ACTION) && !undoLastActionBean.canUndoLastAction();
+        return hasPermission(TaskName.PROTOCOL_UNDO_LAST_ACTION) && !getUndoLastActionBean().canUndoLastAction();
     }
     
  // hooks from overridden methods given null impls
@@ -1029,6 +1036,8 @@ public class ActionHelper extends ActionHelperBase {
     public UndoLastActionBean getUndoLastActionBean() {
         if(null != undoLastActionBean) {
             undoLastActionBean.refreshActionsPerformed();
+        } else {
+            undoLastActionBean = getNewUndoLastActionBeanInstanceHook();
         }
         return undoLastActionBean;
     }
@@ -1247,6 +1256,7 @@ public class ActionHelper extends ActionHelperBase {
      * Sets up dates for the submission details subpanel.
      */
     public void initSubmissionDetails() {
+        LOG.debug("ActionHelper: initSubmissionDetails()");
         if (currentSubmissionNumber <= 0) {
             currentSubmissionNumber = getTotalSubmissions();
         }
