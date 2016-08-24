@@ -91,7 +91,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         if(KNSGlobalVariables.getAuditErrorMap().isEmpty()) {
             new AuditActionHelper().auditConditionally((ProtocolFormBase) form);
         }
-        LOG.debug("execute() exit...");
+        LOG.debug("execute() exit... forward={}",forward);
         return forward;
     }
 
@@ -473,7 +473,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         if (getProtocolOnlineReviewMappingNameHoook().equals(command)) {
             forward = onlineReview(mapping, protocolForm, request, response);
         }
-        LOG.debug("docHandler() exit...");
+        LOG.debug("docHandler() exit... command={} forward={}",command, forward);
         return forward;
     }
     

@@ -178,8 +178,9 @@ public class ActionHelper extends ActionHelperBase {
 
     private ProtocolAssignReviewersBean protocolAssignReviewersBean;
     private ProtocolGrantExemptionBean protocolGrantExemptionBean;
-    private ProtocolExpeditedApproveBean protocolExpeditedApprovalBean;
-    private ProtocolApproveBean protocolResponseApprovalBean;
+    private ProtocolExpeditedApproveBean protocolExpeditedApproveBean;
+    private ProtocolApproveBean protocolResponseApprovalBean = (ProtocolApproveBean) buildProtocolApproveBean(ProtocolActionType.RESPONSE_APPROVAL,
+            Constants.PROTOCOL_RESPONSE_APPROVAL_ACTION_PROPERTY_KEY);
     private ProtocolGenericActionBean protocolReopenEnrollmentBean;
     private ProtocolGenericActionBean protocolCloseEnrollmentBean;
     private ProtocolGenericActionBean protocolSuspendByDsmbBean;
@@ -189,6 +190,7 @@ public class ActionHelper extends ActionHelperBase {
     private ProtocolModifySubmissionBean protocolModifySubmissionBean;    
     private ProtocolGenericActionBean protocolDeferBean;
     private ProtocolReviewNotRequiredBean protocolReviewNotRequiredBean;
+    private ProtocolGenericActionBean protocolClosedBean;
     private transient ProtocolSubmitActionService protocolSubmitActionService;
 
     private boolean currentUserAuthorizedToAssignCommittee = true;
@@ -215,13 +217,13 @@ public class ActionHelper extends ActionHelperBase {
         protocolNotifyIrbBean = new ProtocolNotifyIrbBean(this, "protocolNotifyIrbBean");
         // setting the attachment here so new files can be attached to newActionAttachment
         protocolNotifyIrbBean.setNewActionAttachment(new ProtocolActionAttachment());
-        assignCmtSchedBean = new ProtocolAssignCmtSchedBean(this);
-        assignCmtSchedBean.init();
+
+        getAssignCmtSchedBean().init();
         protocolAssignReviewersBean = new ProtocolAssignReviewersBean(this);
         protocolGrantExemptionBean = new ProtocolGrantExemptionBean(this);
         protocolGrantExemptionBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         
-        protocolExpeditedApprovalBean = buildProtocolExpeditedApproveBean(ProtocolActionType.EXPEDITE_APPROVAL);
+        protocolExpeditedApproveBean = buildProtocolExpeditedApproveBean(ProtocolActionType.EXPEDITE_APPROVAL);
         protocolResponseApprovalBean = (ProtocolApproveBean) buildProtocolApproveBean(ProtocolActionType.RESPONSE_APPROVAL, 
                 Constants.PROTOCOL_RESPONSE_APPROVAL_ACTION_PROPERTY_KEY);
         protocolReopenEnrollmentBean = buildProtocolGenericActionBean(ProtocolActionType.REOPEN_ENROLLMENT, 
@@ -230,7 +232,7 @@ public class ActionHelper extends ActionHelperBase {
                 Constants.PROTOCOL_CLOSE_ENROLLMENT_ACTION_PROPERTY_KEY);
         protocolSuspendByDsmbBean = buildProtocolGenericActionBean(ProtocolActionType.SUSPENDED_BY_DSMB, 
                 Constants.PROTOCOL_SUSPEND_BY_DSMB_ACTION_PROPERTY_KEY);
-        protocolCloseBean = buildProtocolGenericActionBean(ProtocolActionType.CLOSED_ADMINISTRATIVELY_CLOSED, 
+        protocolClosedBean = buildProtocolGenericActionBean(ProtocolActionType.CLOSED_ADMINISTRATIVELY_CLOSED,
                 Constants.PROTOCOL_CLOSE_ACTION_PROPERTY_KEY);
         protocolPermitDataAnalysisBean = buildProtocolGenericActionBean(ProtocolActionType.DATA_ANALYSIS_ONLY, 
                 Constants.PROTOCOL_PERMIT_DATA_ANALYSIS_ACTION_PROPERTY_KEY);
@@ -275,7 +277,7 @@ public class ActionHelper extends ActionHelperBase {
         actionBeanTaskMap.put(TaskName.PERMIT_DATA_ANALYSIS, protocolPermitDataAnalysisBean);
         actionBeanTaskMap.put(TaskName.PROTOCOL_REQUEST_DATA_ANALYSIS, protocolDataAnalysisRequestBean);
         actionBeanTaskMap.put(TaskName.DEFER_PROTOCOL, protocolDeferBean);
-        actionBeanTaskMap.put(TaskName.EXPEDITE_APPROVAL, protocolExpeditedApprovalBean);
+        actionBeanTaskMap.put(TaskName.EXPEDITE_APPROVAL, protocolExpeditedApproveBean);
         actionBeanTaskMap.put(TaskName.GRANT_EXEMPTION, protocolGrantExemptionBean);
         actionBeanTaskMap.put(TaskName.IRB_ACKNOWLEDGEMENT, protocolIrbAcknowledgementBean);
         actionBeanTaskMap.put(TaskName.MODIFY_PROTOCOL_SUBMISSION, protocolModifySubmissionBean);
@@ -317,7 +319,7 @@ public class ActionHelper extends ActionHelperBase {
         return bean;
     }
 
-    private ProtocolExpeditedApproveBean buildProtocolExpeditedApproveBean(String actionTypeCode) throws Exception {
+    private ProtocolExpeditedApproveBean buildProtocolExpeditedApproveBean(String actionTypeCode) {
         
         ProtocolExpeditedApproveBean bean = new ProtocolExpeditedApproveBean(this);
         
@@ -384,6 +386,7 @@ public class ActionHelper extends ActionHelperBase {
 
     @SuppressWarnings("unchecked")
     private UndoLastActionBean createUndoLastActionBean(Protocol protocol) throws Exception {
+        LOG.debug("createUndoLastActionBean()");
         undoLastActionBean = new UndoLastActionBean(this);
         undoLastActionBean.setProtocol(protocol);
         Collections.sort((List)protocol.getProtocolActions(), new Comparator<ProtocolAction>() {
@@ -392,6 +395,7 @@ public class ActionHelper extends ActionHelperBase {
             }
         });
         undoLastActionBean.setActionsPerformed((List)protocol.getProtocolActions());
+        LOG.debug("createUndoLastActionBean() exit...");
         return undoLastActionBean;
     }
     
@@ -449,14 +453,18 @@ public class ActionHelper extends ActionHelperBase {
 
     public void prepareView() throws Exception {
         LOG.debug("ActionHelper: prepareView()");
+
+        //Creating bean before accessing super method due to fix for NPE in super.prepareView()
+        undoLastActionBean = createUndoLastActionBean((Protocol) getProtocol());
+
         super.prepareView();
-        assignCmtSchedBean.init();
+        getAssignCmtSchedBean().init();
         prepareAssignCommitteeScheduleActionView();
         prepareModifySubmissionRequestActionView();
         prepareNotifyIrbActionView();
        
-        protocolAssignReviewersBean.prepareView();
-        protocolExpeditedApprovalBean.prepareView();
+        getProtocolAssignReviewersBean().prepareView();
+        getProtocolExpeditedApproveBean().prepareView();
         
         
         
@@ -519,7 +527,7 @@ public class ActionHelper extends ActionHelperBase {
         canAddReopenEnrollmentReviewerComments = hasReopenEnrollmentRequestLastAction();
         hideReviewerName = checkToHideReviewName();
         hidePrivateFinalFlagsForPublicCommentsAttachments = checkToHidePrivateFinalFlagsForPublicCommentsAttachments();        
-        undoLastActionBean = createUndoLastActionBean((Protocol) getProtocol());
+
        
         initSummaryDetails();
 
@@ -551,7 +559,7 @@ public class ActionHelper extends ActionHelperBase {
 
 
     private void prepareAssignCommitteeScheduleActionView() {
-        assignCmtSchedBean.prepareView();
+        getAssignCmtSchedBean().prepareView();
         canAssignCmtSched = hasAssignCmtSchedPermission();
         canAssignCmtSchedUnavailable = hasAssignCmtSchedUnavailablePermission();
         // Initialize the assign committee key values (expensive call) only after checking the conditions for the display of the committee selection
@@ -567,7 +575,7 @@ public class ActionHelper extends ActionHelperBase {
     //being replaced by the modify submission request action panel but all of the underlying assign to 
     //committee and schedule processing and data beans being left in place.  
     private void prepareModifySubmissionRequestActionView() {
-        protocolModifySubmissionBean.prepareView();
+        getProtocolAssignReviewersBean().prepareView();
         canModifyProtocolSubmission = hasCanModifySubmissionPermission();
         canModifyProtocolSubmissionUnavailable = hasCanModifySubmissionUnavailablePermission();
         // Initialize the assign committee key values (expensive call) only after checking the conditions for the display of the committee selection
@@ -585,17 +593,16 @@ public class ActionHelper extends ActionHelperBase {
     public void prepareCommentsView() {
         
         super.prepareCommentsView();
-        protocolGrantExemptionBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        protocolIrbAcknowledgementBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        protocolExpeditedApprovalBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        protocolResponseApprovalBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        protocolReopenEnrollmentBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        protocolCloseEnrollmentBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        protocolSuspendByDsmbBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        protocolCloseBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        protocolPermitDataAnalysisBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        
-        protocolDeferBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolGrantExemptionBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolIrbAcknowledgementBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolExpeditedApproveBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolResponseApprovalBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolReopenEnrollmentBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolCloseEnrollmentBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolSuspendByDsmbBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolClosedBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolPermitDataAnalysisBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolDeferBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
     }
     
     protected ProtocolVersionService getProtocolVersionService() {
@@ -994,42 +1001,86 @@ public class ActionHelper extends ActionHelperBase {
     }
     
     public ProtocolAssignCmtSchedBean getAssignCmtSchedBean() {
+        if ( assignCmtSchedBean == null ) {
+            assignCmtSchedBean = new ProtocolAssignCmtSchedBean(this);
+        }
         return assignCmtSchedBean;
     }
     
     public ProtocolAssignReviewersBean getProtocolAssignReviewersBean() {
+        if ( protocolAssignReviewersBean == null ){
+            protocolAssignReviewersBean = new ProtocolAssignReviewersBean(this);
+        }
         return protocolAssignReviewersBean;
     }
                            
     public ProtocolGrantExemptionBean getProtocolGrantExemptionBean() {
+        if ( protocolGrantExemptionBean == null ){
+            protocolGrantExemptionBean =  new ProtocolGrantExemptionBean(this);
+        }
         return protocolGrantExemptionBean;
     }
 
-    public ProtocolApproveBean getProtocolExpeditedApprovalBean() {
-        return protocolExpeditedApprovalBean;
+    public ProtocolExpeditedApproveBean getProtocolExpeditedApproveBean() {
+        if ( protocolExpeditedApproveBean == null ){
+            protocolExpeditedApproveBean = buildProtocolExpeditedApproveBean(ProtocolActionType.EXPEDITE_APPROVAL);
+        }
+        return protocolExpeditedApproveBean;
     }
     
     public ProtocolApproveBean getProtocolResponseApprovalBean() {
+        if ( protocolResponseApprovalBean == null ){
+            protocolResponseApprovalBean =(ProtocolApproveBean) buildProtocolApproveBean(ProtocolActionType.RESPONSE_APPROVAL,
+                    Constants.PROTOCOL_RESPONSE_APPROVAL_ACTION_PROPERTY_KEY);
+        }
         return protocolResponseApprovalBean;
     }
     
     public ProtocolGenericActionBean getProtocolReopenEnrollmentBean() {
+        if ( protocolReopenEnrollmentBean == null ){
+            protocolReopenEnrollmentBean = buildProtocolGenericActionBean(ProtocolActionType.REOPEN_ENROLLMENT,
+                    Constants.PROTOCOL_REOPEN_ENROLLMENT_ACTION_PROPERTY_KEY);
+        }
         return protocolReopenEnrollmentBean;
     }
     
     public ProtocolGenericActionBean getProtocolCloseEnrollmentBean() {
+        if ( protocolCloseEnrollmentBean == null ){
+            protocolCloseEnrollmentBean =  buildProtocolGenericActionBean(ProtocolActionType.CLOSED_FOR_ENROLLMENT,
+                    Constants.PROTOCOL_CLOSE_ENROLLMENT_ACTION_PROPERTY_KEY);
+        }
         return protocolCloseEnrollmentBean;
     }
     
     public ProtocolGenericActionBean getProtocolSuspendByDsmbBean() {
+        if ( protocolSuspendByDsmbBean == null ){
+            protocolSuspendByDsmbBean = buildProtocolGenericActionBean(ProtocolActionType.SUSPENDED_BY_DSMB,
+                    Constants.PROTOCOL_SUSPEND_BY_DSMB_ACTION_PROPERTY_KEY);
+        }
         return protocolSuspendByDsmbBean;
+    }
+
+    protected ProtocolGenericActionBean getProtocolClosedBean() {
+        if ( protocolClosedBean == null ){
+            protocolClosedBean = buildProtocolGenericActionBean(ProtocolActionType.CLOSED_ADMINISTRATIVELY_CLOSED,
+                    Constants.PROTOCOL_CLOSE_ACTION_PROPERTY_KEY);
+        }
+        return protocolClosedBean;
     }
     
     public ProtocolGenericActionBean getProtocolPermitDataAnalysisBean() {
+        if ( protocolPermitDataAnalysisBean == null ){
+            protocolPermitDataAnalysisBean = buildProtocolGenericActionBean(ProtocolActionType.DATA_ANALYSIS_ONLY,
+                    Constants.PROTOCOL_PERMIT_DATA_ANALYSIS_ACTION_PROPERTY_KEY);
+        }
         return protocolPermitDataAnalysisBean;
     }
     
     public ProtocolGenericActionBean getProtocolIrbAcknowledgementBean() {
+        if ( protocolIrbAcknowledgementBean == null ){
+            protocolIrbAcknowledgementBean = buildProtocolGenericActionBean(ProtocolActionType.IRB_ACKNOWLEDGEMENT,
+                    Constants.PROTOCOL_IRB_ACKNOWLEDGEMENT_ACTION_PROPERTY_KEY);
+        }
         return protocolIrbAcknowledgementBean;
     }
 
@@ -1037,7 +1088,11 @@ public class ActionHelper extends ActionHelperBase {
         if(null != undoLastActionBean) {
             undoLastActionBean.refreshActionsPerformed();
         } else {
-            undoLastActionBean = getNewUndoLastActionBeanInstanceHook();
+            try {
+                undoLastActionBean = createUndoLastActionBean((Protocol) getProtocol());
+            } catch (Exception e){
+                LOG.error("ActionHelper: getUndoLastActionBean() -> Exception", e);
+            }
         }
         return undoLastActionBean;
     }
@@ -1267,14 +1322,14 @@ public class ActionHelper extends ActionHelperBase {
             setPrevDisabled(true);
             setNextDisabled(true);
         }
-
+        LOG.debug("Protocol={} currentSubmissionNumber={}",getProtocol(), currentSubmissionNumber);
         setReviewComments(getReviewerCommentsService().getReviewerComments(getProtocol().getProtocolNumber(), currentSubmissionNumber));
         if (CollectionUtils.isNotEmpty(getReviewComments())) {
             // check if our comments bean has empty list of review comments, this can happen if the submission has no schedule assigned
             // also check that the list of deleted comments is empty, because deletion of comments can also lead to an empty list of review comments.
-            if( (protocolManageReviewCommentsBean.getReviewCommentsBean().getReviewComments().size() == 0)
+            if( (getProtocolManageReviewCommentsBean().getReviewCommentsBean().getReviewComments().size() == 0)
                 && 
-                (protocolManageReviewCommentsBean.getReviewCommentsBean().getDeletedReviewComments().size() == 0) ) {
+                (getProtocolManageReviewCommentsBean().getReviewCommentsBean().getDeletedReviewComments().size() == 0) ) {
                 List<CommitteeScheduleMinute> reviewComments = getReviewerCommentsService().getReviewerComments(getProtocol().getProtocolNumber(), currentSubmissionNumber);
                 Collections.sort(reviewComments, new Comparator<CommitteeScheduleMinute>() {
 
@@ -1288,7 +1343,7 @@ public class ActionHelper extends ActionHelperBase {
                     }
                     
                 });
-                protocolManageReviewCommentsBean.getReviewCommentsBean().setReviewComments((List)reviewComments);
+                getProtocolManageReviewCommentsBean().getReviewCommentsBean().setReviewComments((List)reviewComments);
                 getReviewerCommentsService().setHideReviewerName(reviewComments);
                 setHidePrivateFinalFlagsForPublicCommentsAttachments(getReviewerCommentsService().isHidePrivateFinalFlagsForPI(reviewComments));                
             }
@@ -1389,11 +1444,18 @@ public class ActionHelper extends ActionHelperBase {
     }
 
     public ProtocolGenericActionBean getProtocolDeferBean() {
+        if ( protocolDeferBean == null ){
+            protocolDeferBean = buildProtocolGenericActionBean(ProtocolActionType.DEFERRED,
+                    Constants.PROTOCOL_DEFER_ACTION_PROPERTY_KEY);
+        }
         return protocolDeferBean;
     }
 
     
     public ProtocolReviewNotRequiredBean getProtocolReviewNotRequiredBean() {
+        if (protocolReviewNotRequiredBean == null ){
+            protocolReviewNotRequiredBean =  new ProtocolReviewNotRequiredBean(this);
+        }
         return this.protocolReviewNotRequiredBean;
     }
 

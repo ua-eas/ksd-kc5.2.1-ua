@@ -110,6 +110,8 @@ import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.kns.web.struts.action.AuditModeAction;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -124,7 +126,7 @@ import java.util.Map;
  */
 @SuppressWarnings("deprecation")
 public class ProtocolProtocolActionsAction extends ProtocolAction implements AuditModeAction {
-    private static final Log LOG = LogFactory.getLog(ProtocolProtocolActionsAction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProtocolProtocolActionsAction.class);
 
     private static final String CONFIRM_NO_ACTION = "";
     private static final String CONFIRM_DELETE_ACTION_ATT = "confirmDeleteActionAttachment";
@@ -165,6 +167,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         // set the current task name on the action helper before the requested method is dispatched
         // so that beans etc can access it when preparing view after/during the requested method's execution
         String currentTaskName = getTaskName(request);
+        LOG.debug("ProtocolProtocolActionsAction: execute() currentTaskName={}",currentTaskName);
         if(currentTaskName != null) {
             protocolForm.getActionHelper().setCurrentTask(currentTaskName);
         }
@@ -175,13 +178,13 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         protocolForm.getActionHelper().prepareView();
         // submit action may change "submission details", so re-initializa it
         protocolForm.getActionHelper().initSubmissionDetails();
-        LOG.debug("ProtocolProtocolActionsAction: execute() exit...");
+        LOG.debug("ProtocolProtocolActionsAction: execute() exit...{}",actionForward.toString());
         return actionForward;
     }
 
     /**
+     *
      * Invoked when the "copy protocol" button is clicked.
-     * 
      * @param mapping
      * @param form
      * @param request

@@ -492,7 +492,7 @@ public abstract class ActionHelperBase implements Serializable {
 
         
  
-    protected ProtocolApproveBean buildProtocolApproveBean(String actionTypeCode, String errorPropertyKey) throws Exception {        
+    protected ProtocolApproveBean buildProtocolApproveBean(String actionTypeCode, String errorPropertyKey) {
         ProtocolApproveBean bean = getNewProtocolApproveBeanInstanceHook(this, errorPropertyKey);       
         bean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         
@@ -908,12 +908,12 @@ public abstract class ActionHelperBase implements Serializable {
         protocolSuspendBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         protocolExpireBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         protocolTerminateBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        committeeDecision.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());        
-        protocolManageReviewCommentsBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        committeeDecision.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolManageReviewCommentsBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         getProtocol().getProtocolSubmission().refreshReferenceObject("reviewAttachments");
-        protocolManageReviewCommentsBean.getReviewAttachmentsBean().setReviewAttachments(getProtocol().getProtocolSubmission().getReviewAttachments());
-        if (CollectionUtils.isNotEmpty(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments())) {
-            protocolManageReviewCommentsBean.getReviewAttachmentsBean().setHideReviewerName(getReviewerCommentsService().setHideReviewerName(protocolManageReviewCommentsBean.getReviewAttachmentsBean().getReviewAttachments()));
+        getProtocolManageReviewCommentsBean().getReviewAttachmentsBean().setReviewAttachments(getProtocol().getProtocolSubmission().getReviewAttachments());
+        if (CollectionUtils.isNotEmpty(getProtocolManageReviewCommentsBean().getReviewAttachmentsBean().getReviewAttachments())) {
+            getProtocolManageReviewCommentsBean().getReviewAttachmentsBean().setHideReviewerName(getReviewerCommentsService().setHideReviewerName(getProtocolManageReviewCommentsBean().getReviewAttachmentsBean().getReviewAttachments()));
         }
         
         protocolReturnToPIBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
@@ -1210,6 +1210,9 @@ public abstract class ActionHelperBase implements Serializable {
     
     
     protected boolean hasFollowupAction(String actionCode) {
+        if (followupActionActions == null) {
+            return false;
+        }
         for (ValidProtocolActionActionBase action : followupActionActions) {
             if (StringUtils.equals(action.getFollowupActionCode(),actionCode)) {
                 return true;
@@ -1410,6 +1413,10 @@ public abstract class ActionHelperBase implements Serializable {
     }
   
     public ProtocolGenericActionBean getProtocolManageReviewCommentsBean() {
+        if ( protocolManageReviewCommentsBean == null ){
+            protocolManageReviewCommentsBean = buildProtocolGenericActionBean(getProtocolActionTypeCodeForManageReviewCommentsHook(),
+                    Constants.PROTOCOL_MANAGE_REVIEW_COMMENTS_KEY);
+        }
         return protocolManageReviewCommentsBean;
     }
 
@@ -1947,7 +1954,7 @@ public abstract class ActionHelperBase implements Serializable {
     }
 
     protected void setReviewComments(List<CommitteeScheduleMinuteBase> reviewComments) {
-        LOG.debug("ActionHelper: setReviewComments()");
+        LOG.debug("ActionHelperBase: setReviewComments()");
         this.reviewComments = reviewComments;
     }
 
@@ -2054,9 +2061,9 @@ public abstract class ActionHelperBase implements Serializable {
         if (CollectionUtils.isNotEmpty(getReviewComments())) {
             // check if our comments bean has empty list of review comments, this can happen if the submission has no schedule assigned
             // also check that the list of deleted comments is empty, because deletion of comments can also lead to an empty list of review comments.
-            if( (protocolManageReviewCommentsBean.getReviewCommentsBean().getReviewComments().size() == 0) 
+            if( (getProtocolManageReviewCommentsBean().getReviewCommentsBean().getReviewComments().size() == 0)
                     && 
-                (protocolManageReviewCommentsBean.getReviewCommentsBean().getDeletedReviewComments().size() == 0) ) {
+                (getProtocolManageReviewCommentsBean().getReviewCommentsBean().getDeletedReviewComments().size() == 0) ) {
                 // TODO OPTIMIZATION perhaps the call below is not needed, can simply use getReviewComments since the review comments have been set above 
                 List<CommitteeScheduleMinuteBase> reviewComments = getReviewerCommentsService().getReviewerComments(getProtocol().getProtocolNumber(), currentSubmissionNumber);
                 Collections.sort(reviewComments, new Comparator<CommitteeScheduleMinuteBase>() {
@@ -2071,7 +2078,7 @@ public abstract class ActionHelperBase implements Serializable {
                     }
                     
                 });
-                protocolManageReviewCommentsBean.getReviewCommentsBean().setReviewComments(reviewComments);
+                getProtocolManageReviewCommentsBean().getReviewCommentsBean().setReviewComments(reviewComments);
                 getReviewerCommentsService().setHideReviewerName(reviewComments);
                 setHidePrivateFinalFlagsForPublicCommentsAttachments(getReviewerCommentsService().isHidePrivateFinalFlagsForPI(reviewComments));
             }
