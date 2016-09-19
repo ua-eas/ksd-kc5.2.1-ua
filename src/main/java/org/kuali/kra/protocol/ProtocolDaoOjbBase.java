@@ -31,6 +31,9 @@ import org.kuali.rice.krad.bo.PersistableBusinessObject;
 import org.kuali.rice.krad.dao.LookupDao;
 import org.kuali.rice.krad.service.util.OjbCollectionAware;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.rice.krad.lookup.CollectionIncomplete;
+import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.kns.lookup.LookupUtils;
 
 import java.sql.Date;
 import java.util.*;
@@ -100,10 +103,14 @@ public abstract class ProtocolDaoOjbBase<GenericProtocol extends ProtocolBase> e
                 crit.addExists(getUnitReportQuery(entry));
             }
         }
+
         Query q = QueryFactory.newQuery(getProtocolBOClassHook(), crit, true);
         logQuery(q);
-        
-        return (List<GenericProtocol>) getPersistenceBrokerTemplate().getCollectionByQuery(q);
+
+        List<GenericProtocol> searchResults;
+        searchResults = (List<GenericProtocol>) getPersistenceBrokerTemplate().getCollectionByQuery(q);
+
+        return new CollectionIncomplete(searchResults, new Long(searchResults.size()));
     }
 
     /** {@inheritDoc} */
