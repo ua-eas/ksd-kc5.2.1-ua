@@ -252,15 +252,20 @@ public class SubAwardServiceImpl implements SubAwardService {
         subAward.setTotalAvailableAmount(totalObligatedAmount.subtract(totalAmountReleased));
 
         List<SubAwardAmountInfo> sortedlist = subAward.getSubAwardAmountInfoList();
+
         if ( sortedlist.size() > 1 ) {
             Collections.sort(sortedlist, new Comparator<SubAwardAmountInfo>() {
                 public int compare(SubAwardAmountInfo o1, SubAwardAmountInfo o2) {
-                    return o1.getSubAwardAmountInfoId() - o2.getSubAwardAmountInfoId();
+                    if((o1.getSubAwardAmountInfoId() != null) && (o2.getSubAwardAmountInfoId() != null)) {
+                        return o1.getSubAwardAmountInfoId() - o2.getSubAwardAmountInfoId();
+                    }else{
+                        return 0;
+                    }
                 }
             });
         }
-        subAward.setSubAwardAmountInfoList(sortedlist);
 
+        subAward.setSubAwardAmountInfoList(sortedlist);
         return subAward;
     }
     /**.
