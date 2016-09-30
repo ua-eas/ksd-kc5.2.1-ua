@@ -42,6 +42,9 @@ import org.kuali.rice.kns.web.ui.Row;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
+import org.kuali.rice.krad.lookup.CollectionIncomplete;
+import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.kns.lookup.LookupUtils;
 
 /**
  * This class is for SubAwardLookupableHelperServiceImpl
@@ -75,7 +78,16 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
             throw new RuntimeException(e);
         }
 
-        return returnResults;
+        Integer searchResultsLimit = LookupUtils.getSearchResultsLimit(SubAward.class);
+        List<SubAward> searchResultsReturn = new ArrayList<SubAward>();
+
+        if ( searchResultsLimit < returnResults.size()){
+            searchResultsReturn = returnResults.subList(0, searchResultsLimit);
+        } else {
+            searchResultsReturn = returnResults;
+        }
+
+        return new CollectionIncomplete(searchResultsReturn, new Long(returnResults.size()));
     }
 
 

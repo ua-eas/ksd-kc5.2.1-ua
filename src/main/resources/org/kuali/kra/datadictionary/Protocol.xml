@@ -971,6 +971,7 @@
 					p:attributeName="relatedProjectsIndicator" /> -->
 			</list>
 		</property>
+
  	</bean>
 
 </beans>
