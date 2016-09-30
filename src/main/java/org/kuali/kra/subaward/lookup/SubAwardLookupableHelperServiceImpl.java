@@ -80,15 +80,11 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
 
         Integer searchResultsLimit = LookupUtils.getSearchResultsLimit(SubAward.class);
         List<SubAward> searchResultsReturn = new ArrayList<SubAward>();
-        int i = 0;
 
-        for (SubAward subAward : returnResults) {
-            searchResultsReturn.add(subAward);
-            i++;
-
-            if (i >= searchResultsLimit) {
-                break;
-            }
+        if ( searchResultsLimit < returnResults.size()){
+            searchResultsReturn = returnResults.subList(0, searchResultsLimit);
+        } else {
+            searchResultsReturn = returnResults;
         }
 
         return new CollectionIncomplete(searchResultsReturn, new Long(returnResults.size()));
