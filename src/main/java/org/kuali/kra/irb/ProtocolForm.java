@@ -241,6 +241,7 @@ public class ProtocolForm extends ProtocolFormBase {
     }
 
     public ProtocolHelper getProtocolHelper() {
+
         return (ProtocolHelper) super.getProtocolHelper();
     }
     
@@ -248,9 +249,9 @@ public class ProtocolForm extends ProtocolFormBase {
         return (PersonnelHelper) super.getPersonnelHelper();
     }
     
-    public PermissionsHelper getPermissionsHelper() {
-        return (PermissionsHelper) super.getPermissionsHelper();
-    }
+//    public PermissionsHelper getPermissionsHelper() {
+//        return (PermissionsHelper) super.getPermissionsHelper();
+//    }
     
     public ProtocolReferenceBean getNewProtocolReferenceBean() {
         return (ProtocolReferenceBean) super.getNewProtocolReferenceBean();
@@ -287,7 +288,8 @@ public class ProtocolForm extends ProtocolFormBase {
         if (propertyName.startsWith("actionHelper.protocolSubmitAction.reviewer") ||
                 propertyName.startsWith("methodToCall.printSubmissionQuestionnaireAnswer.line")
                 || propertyName.startsWith("methodToCall.saveCorrespondence")
-                || propertyName.startsWith("methodToCall.closeCorrespondence")) {
+                || propertyName.startsWith("methodToCall.closeCorrespondence")
+                || propertyName.startsWith("methodToCall.viewCorrespondence")) {
             return true;
         } else {
             return super.isPropertyEditable(propertyName);

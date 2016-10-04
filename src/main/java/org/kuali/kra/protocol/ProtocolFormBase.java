@@ -107,6 +107,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     private transient List<ProtocolFundingSourceBase> deletedProtocolFundingSources;
  
     private boolean showNotificationEditor = false;  // yep, it's a hack
+    private boolean initialized = false;
     
     public ProtocolFormBase() throws Exception {
         super();
@@ -123,18 +124,20 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
      * @throws Exception 
      */
     public void initialize() throws Exception {
-        LOG.debug("initialize()");
-        setProtocolHelper(createNewProtocolHelperInstanceHook(this));
-        setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
-        setCustomDataHelper(createNewCustomDataHelperInstanceHook(this)); 
-        setSpecialReviewHelper(createNewSpecialReviewHelperInstanceHook(this));
-        setQuestionnaireHelper(createNewQuestionnaireHelperInstanceHook(this));
-        setNewProtocolReferenceBean(createNewProtocolReferenceBeanInstance());
-        setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
-        setNotificationHelper(getNotificationHelperHook());
-	    setActionHelper(createNewActionHelperInstanceHook(this, false));
-        setMedusaBean(new MedusaBean());
-        LOG.debug("initialize() exit...");
+        if ( !initialized) {
+            LOG.debug("initialize()");
+            setProtocolHelper(createNewProtocolHelperInstanceHook(this));
+            setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
+            setCustomDataHelper(createNewCustomDataHelperInstanceHook(this));
+            setSpecialReviewHelper(createNewSpecialReviewHelperInstanceHook(this));
+            setQuestionnaireHelper(createNewQuestionnaireHelperInstanceHook(this));
+            setNewProtocolReferenceBean(createNewProtocolReferenceBeanInstance());
+            setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
+            setNotificationHelper(getNotificationHelperHook());
+            setMedusaBean(new MedusaBean());
+            initialized = true;
+            LOG.debug("initialize() exit...");
+        }
     }
        
     public void initializePermission() throws Exception{
@@ -240,9 +243,21 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     }
     
     public PermissionsHelperBase getPermissionsHelper() {
-          return permissionsHelper;
+        if (permissionsHelper == null ){
+            try {
+                this.initializePermission();
+            } catch (Exception e){
+                throw new RuntimeException(e);
+            }
+        }
+        return permissionsHelper;
     }
-    
+
+    public void resetUserPermissionStates() {
+        if (permissionsHelper != null) {
+            permissionsHelper.resetUserStates();
+        }
+    }
     
     public void setNewProtocolReferenceBean(ProtocolReferenceBeanBase newProtocolReferenceBean) {
         this.newProtocolReferenceBean = newProtocolReferenceBean;
@@ -266,12 +281,12 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     }
     
     
-    /** {@inheritDoc} */
+    @Override
     public boolean isAuditActivated() {
         return this.auditActivated;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void setAuditActivated(boolean auditActivated) {
         this.auditActivated = auditActivated;
     }

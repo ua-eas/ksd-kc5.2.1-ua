@@ -32,6 +32,7 @@ public class CustomProtocolForm extends org.kuali.kra.irb.ProtocolForm {
 
 	public CustomProtocolForm() throws Exception {
         super();
+        LOG.debug("constructor()");
     }
 
     @Override

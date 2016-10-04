@@ -340,8 +340,6 @@ public abstract class ActionHelperBase implements Serializable {
         LOG.debug("ActionHelperBase: constructor()");
         this.form = form;
 
-	    //this field is accessed before initializeProtocolActions() is called so it has to be instantiated in the constructor
-	    protocolFullApprovalBean = buildProtocolApproveBean(getFullApprovalProtocolActionTypeHook(), Constants.PROTOCOL_FULL_APPROVAL_ACTION_PROPERTY_KEY);
         LOG.debug("ActionHelperBase: constructor exit...");
     }
 
@@ -368,7 +366,9 @@ public abstract class ActionHelperBase implements Serializable {
         protocolReturnToPIBean = buildProtocolGenericActionBean(getReturnToPIActionTypeHook(), Constants.PROTOCOL_RETURN_TO_PI_PROPERTY_KEY);
         protocolTerminateBean = buildProtocolGenericActionBean(getTerminateKeyHook(), Constants.PROTOCOL_TERMINATE_ACTION_PROPERTY_KEY);
         protocolAbandonBean = buildProtocolGenericActionBean(getAbandonActionTypeHook(), getAbandonPropertyKeyHook());
-        
+        LOG.debug("ActionHelperBase: before initializing buildProtocolApproveBean");
+        protocolFullApprovalBean = buildProtocolApproveBean(getFullApprovalProtocolActionTypeHook(), Constants.PROTOCOL_FULL_APPROVAL_ACTION_PROPERTY_KEY);
+        LOG.debug("ActionHelperBase: after initializing buildProtocolApproveBean");
           
         protocolAdminCorrectionBean = createAdminCorrectionBean();
         undoLastActionBean = getNewUndoLastActionBeanInstanceHook();
@@ -1261,7 +1261,7 @@ public abstract class ActionHelperBase implements Serializable {
      * @return the current session's userName
      */
     protected String getUserIdentifier() {
-         return GlobalVariables.getUserSession().getPrincipalId();
+        return GlobalVariables.getUserSession().getPrincipalId();
     }
 
     public String getSubmissionConstraint() {
@@ -1300,21 +1300,13 @@ public abstract class ActionHelperBase implements Serializable {
         this.protocolWithdrawSuspendRequestBean = protocolWithdrawSuspendRequestBean;
     }
 
-
-
-
     public ProtocolRequestBean getProtocolWithdrawTerminateRequestBean() {
         return protocolWithdrawTerminateRequestBean;
     }
 
-
-
-
     public void setProtocolWithdrawTerminateRequestBean(ProtocolRequestBean protocolWithdrawTerminateRequestBean) {
         this.protocolWithdrawTerminateRequestBean = protocolWithdrawTerminateRequestBean;
     }
-
-
 
 
     public ProtocolNotifyCommitteeBean getProtocolNotifyCommitteeBean() {
@@ -1352,6 +1344,10 @@ public abstract class ActionHelperBase implements Serializable {
     }
     
     public ProtocolApproveBean getProtocolFullApprovalBean() {
+        if ( protocolFullApprovalBean == null ){
+            LOG.debug("ActionHelperBase: getProtocolFullApprovalBean() - initializing ProtocolFullApprovalBean.");
+            protocolFullApprovalBean = buildProtocolApproveBean(getFullApprovalProtocolActionTypeHook(), Constants.PROTOCOL_FULL_APPROVAL_ACTION_PROPERTY_KEY);
+        }
         return protocolFullApprovalBean;
     }
     
@@ -2039,7 +2035,8 @@ public abstract class ActionHelperBase implements Serializable {
             prevProtocolSummary.compare(protocolSummary);
         }
 
-        setSummaryQuestionnaireExist(hasAnsweredQuestionnaire((protocol.isAmendment() || protocol.isRenewal()) ? CoeusSubModule.AMENDMENT_RENEWAL : CoeusSubModule.ZERO_SUBMODULE, protocol.getSequenceNumber().toString()));
+        if ( protocol != null)
+            setSummaryQuestionnaireExist(hasAnsweredQuestionnaire((protocol.isAmendment() || protocol.isRenewal()) ? CoeusSubModule.AMENDMENT_RENEWAL : CoeusSubModule.ZERO_SUBMODULE, protocol.getSequenceNumber().toString()));
     }
 
     /**
@@ -2786,8 +2783,8 @@ public abstract class ActionHelperBase implements Serializable {
         public AmendmentSummary(ProtocolBase protocol) {
             amendmentType = protocol.isRenewalWithoutAmendment() ? "Renewal" : protocol.isRenewal() ? "Renewal with Amendment" : protocol.isAmendment() ? "Amendment" : "New";
             //Why even set these here. They will be set blow in the if/else block.
-            //versionNumber = protocol.getProtocolNumber().substring(protocol.getProtocolNumber().length() - 3);
-            //versionNumberUrl = buildForwardUrl(protocol.getProtocolDocument().getDocumentNumber());
+            versionNumber = protocol.getProtocolNumber().substring(protocol.getProtocolNumber().length() - 3);
+            versionNumberUrl = buildForwardUrl(protocol.getProtocolDocument().getDocumentNumber());
             if (protocol.isAmendment() || protocol.isRenewal()) {
                 ProtocolAmendRenewalBase correctAmendment = protocol.getProtocolAmendRenewal();
                 if (correctAmendment != null) {
