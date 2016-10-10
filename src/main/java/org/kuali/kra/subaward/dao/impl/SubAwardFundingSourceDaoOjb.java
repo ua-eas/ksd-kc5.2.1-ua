@@ -15,17 +15,17 @@
  */
 package org.kuali.kra.subaward.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import edu.arizona.kra.util.DBConnection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ojb.broker.PersistenceBroker;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.ojb.broker.accesslayer.LookupException;
 import org.apache.ojb.broker.query.Criteria;
 import org.apache.ojb.broker.query.QueryFactory;
@@ -46,10 +46,11 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
     private static final Log LOG = LogFactory.getLog(SubAwardFundingSourceDaoOjb.class);
 
 
-    private static final String SQL_SUBAWARDS =  "select SUBAWARD.SUBAWARD_ID, SUBAWARD.SUBAWARD_CODE, status from SUBAWARD join (select unique SUBAWARD_CODE sc, h.SEQ_OWNER_SEQ_NUMBER seq, h.VERSION_STATUS status from SUBAWARD_FUNDING_SOURCE sfs JOIN VERSION_HISTORY h on sfs.SUBAWARD_CODE = h.SEQ_OWNER_VERSION_NAME_VALUE where AWARD_NUMBER=? and ACTV_IND='Y'and h.SEQ_OWNER_CLASS_NAME='org.kuali.kra.subaward.bo.SubAward' and (h.VERSION_STATUS='ACTIVE' or h.VERSION_STATUS='PENDING')) a on SUBAWARD.SUBAWARD_CODE = a.sc and SUBAWARD.SEQUENCE_NUMBER = a.seq order by SUBAWARD_ID";
+    private static final String SQL_SUBAWARDS =  "select SUBAWARD.SUBAWARD_ID, SUBAWARD.SUBAWARD_CODE, status from SUBAWARD join (select unique SUBAWARD_CODE sc, h.SEQ_OWNER_SEQ_NUMBER seq, h.VERSION_STATUS status from SUBAWARD_FUNDING_SOURCE sfs JOIN VERSION_HISTORY h on sfs.SUBAWARD_CODE = h.SEQ_OWNER_VERSION_NAME_VALUE where AWARD_NUMBER LIKE ? and ACTV_IND='Y'and h.SEQ_OWNER_CLASS_NAME='org.kuali.kra.subaward.bo.SubAward' and (h.VERSION_STATUS='ACTIVE' or h.VERSION_STATUS='PENDING')) a on SUBAWARD.SUBAWARD_CODE = a.sc and SUBAWARD.SEQUENCE_NUMBER = a.seq order by SUBAWARD_ID";
     private static final String SQL_AWARDS =  "select AWARD_ID, AWARD_NUMBER, AWARD_SEQUENCE_STATUS from AWARD join (select unique AWARD_NUMBER an, h.SEQ_OWNER_SEQ_NUMBER seq from SUBAWARD_FUNDING_SOURCE sfs JOIN VERSION_HISTORY h on sfs.AWARD_NUMBER = h.SEQ_OWNER_VERSION_NAME_VALUE where sfs.SUBAWARD_CODE=? and ACTV_IND='Y'and h.SEQ_OWNER_CLASS_NAME='org.kuali.kra.award.home.Award' and  (h.VERSION_STATUS='ACTIVE' or h.VERSION_STATUS='PENDING')) a on AWARD.AWARD_NUMBER = a.an and AWARD.SEQUENCE_NUMBER = a.seq and (AWARD.AWARD_SEQUENCE_STATUS = 'ACTIVE' or AWARD.AWARD_SEQUENCE_STATUS = 'PENDING') order by AWARD_ID";
     
     private static final String AWARD_ID = "AWARD_ID";
+    private static final String SUBAWARD_ID = "SUBAWARD_ID";
     private static final String AWARD_NUMBER = "AWARD_NUMBER";
     private static final String SUBAWARD_CODE = "SUBAWARD_CODE";
 
@@ -69,25 +70,41 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
         return new ArrayList<Award>(0);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<SubAward> getLinkedSubAwards(String awardNumber) throws SQLException, LookupException {
+
+        List<String> subAwardIdsList = getLinkedSubAwardsIds(awardNumber);
+        if ( !subAwardIdsList.isEmpty() ){
+            Criteria criteria = new Criteria();
+            criteria.addColumnIn(SUBAWARD_ID, subAwardIdsList);
+            return (Collection<SubAward>)getPersistenceBrokerTemplate().getCollectionByQuery(QueryFactory.newQuery(SubAward.class, criteria));
+        }
+        return new ArrayList<>(0);
+    }
+
 
     @Override
     public List<String> getLinkedSubAwardsIds(Award award) throws SQLException, LookupException {
-        if ( award == null) {
+        if (award == null) {
             throw new IllegalArgumentException("SubAwardFundingSourceDaoOjb: getLinkedSubAwardsIds with a null Award!");
         }
-        LOG.debug("getLinkedSubAwardsCodes awardNumber="+award.getAwardNumber()+" awardId="+award.getAwardId());
-        List<String> result = new ArrayList<String>();
+        LOG.debug("getLinkedSubAwardsCodes awardNumber=" + award.getAwardNumber() + " awardId=" + award.getAwardId());
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        PersistenceBroker broker=null;
-        try {
-            broker = this.getPersistenceBroker(true);
-            conn = broker.serviceConnectionManager().getConnection();
-            ps = conn.prepareStatement(SQL_SUBAWARDS);
-            ps.setString(1, award.getAwardNumber());
-            rs = ps.executeQuery();
+        return getLinkedSubAwardsIds(award.getAwardNumber());
+    }
+
+    @Override
+    public List<String> getLinkedSubAwardsIds(String awardNumber) throws SQLException, LookupException {
+        if ( StringUtils.isEmpty(awardNumber) ) {
+            throw new IllegalArgumentException("SubAwardFundingSourceDaoOjb: getLinkedSubAwardsIds with an empty Award Number!");
+        }
+        LOG.debug("getLinkedSubAwardsCodes awardNumber="+awardNumber);
+        List<String> result = new ArrayList<String>();
+        Object[] params = new Object[] { awardNumber };
+
+        try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
+            ResultSet rs = dbc.executeQuery(SQL_SUBAWARDS, params);
             //eliminate duplicate results
             List<Row> rows = eliminateDuplicates(rs);
 
@@ -101,8 +118,6 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
         } catch (LookupException le) {
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
-        } finally {
-            closeDatabaseObjects(rs, ps, conn, broker);
         }
 
         return result;
@@ -115,17 +130,11 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
         }
         LOG.debug("getLinkedAwardsIds subAward code="+subAward.getSubAwardCode()+" subAwardId="+subAward.getSubAwardId());
         List<String> result = new ArrayList<String>();
+        Object[] params = new Object[] { subAward.getSubAwardCode() };
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        PersistenceBroker broker=null;
-        try {
-            broker = this.getPersistenceBroker(true);
-            conn = broker.serviceConnectionManager().getConnection();
-            ps = conn.prepareStatement(SQL_AWARDS);
-            ps.setString(1, subAward.getSubAwardCode());
-            rs = ps.executeQuery();
+        try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
+            ResultSet rs = dbc.executeQuery(SQL_AWARDS, params);
+
             //eliminate duplicate results
             List<Row> rows = eliminateDuplicates(rs);
 
@@ -139,8 +148,6 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
         } catch (LookupException le) {
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
-        } finally {
-            closeDatabaseObjects(rs, ps, conn, broker);
         }
 
         return result;
@@ -163,35 +170,6 @@ public class SubAwardFundingSourceDaoOjb extends PlatformAwareDaoBaseOjb impleme
         for (SubAwardFundingSource subAwardFS:results){
             subAwardFS.setActive(false);
             getPersistenceBrokerTemplate().store(subAwardFS);
-        }
-    }
-
-
-    protected void closeDatabaseObjects(ResultSet rs, PreparedStatement ps, Connection conn, PersistenceBroker broker) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException ex) {
-                LOG.warn("Failed to close ResultSet.", ex);
-            }
-        }
-        if ( ps != null ){
-            try {
-                ps.close();
-            } catch (SQLException ex) {
-                LOG.warn("Failed to close PreparedStatement.", ex);
-            }
-        }
-        if ( conn != null ){
-            try {
-                conn.close();
-            } catch (SQLException ex) {
-                LOG.warn("Failed to close Connection.", ex);
-            }
-        }
-        
-        if (broker != null) {
-            this.releasePersistenceBroker(broker);
         }
     }
 

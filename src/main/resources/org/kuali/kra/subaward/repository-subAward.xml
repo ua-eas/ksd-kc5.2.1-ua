@@ -33,7 +33,9 @@
 	
 	<class-descriptor class="org.kuali.kra.subaward.bo.SubAward" table="SUBAWARD">
 		<field-descriptor name="subAwardId" column="SUBAWARD_ID" jdbc-type="BIGINT" primarykey="true"  autoincrement="true" sequence-name="SUBAWARD_ID_S" />
-		<field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" access="anonymous" />		
+    <field-descriptor id="1" name="subAwardCode" column="SUBAWARD_CODE" jdbc-type="VARCHAR" />
+    <field-descriptor id="2" name="sequenceNumber" column="SEQUENCE_NUMBER" jdbc-type="INTEGER"/>
+    <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" access="anonymous" />
 		<field-descriptor name="sequenceNumber" column="SEQUENCE_NUMBER" jdbc-type="INTEGER"/>	
 		<field-descriptor name="subAwardCode" column="SUBAWARD_CODE" jdbc-type="VARCHAR" />
 		<field-descriptor name="organizationId" column="ORGANIZATION_ID" jdbc-type="VARCHAR" />
@@ -107,6 +109,10 @@
 		<collection-descriptor name="subAwardTemplateInfo" proxy="true" element-class-ref="org.kuali.kra.subaward.bo.SubAwardTemplateInfo" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="none">
 			<inverse-foreignkey field-ref="subAwardId"/>
 		</collection-descriptor>
+    <reference-descriptor name="versionHistory" class-ref="org.kuali.kra.bo.versioning.VersionHistorySearchBo" auto-retrieve="true" auto-update="none" auto-delete="none">
+      <foreignkey field-id-ref="1" />
+      <foreignkey field-id-ref="2" />
+    </reference-descriptor>
 	</class-descriptor>
 	
     <class-descriptor class="org.kuali.kra.subaward.bo.SubAwardAmountInfo" table="SUBAWARD_AMOUNT_INFO">
