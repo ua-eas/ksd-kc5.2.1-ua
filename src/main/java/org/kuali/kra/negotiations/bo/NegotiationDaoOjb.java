@@ -202,21 +202,8 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
     
     private Collection executeSearch(Class businessObjectClass, Criteria criteria, boolean unbounded) {
         Collection searchResults = new ArrayList();
-        Long matchingResultsCount = null;
         try {
-            Integer searchResultsLimit = getNegotiatonSearchResultsLimit();
-            if (!unbounded && (searchResultsLimit != null)) {
-                matchingResultsCount = new Long(getPersistenceBrokerTemplate().getCount(QueryFactory.newQuery(businessObjectClass, criteria)));
-                getDbPlatform().applyLimit(searchResultsLimit, criteria);
-            }
-            if ((matchingResultsCount == null) || (matchingResultsCount.intValue() <= searchResultsLimit.intValue())) {
-                matchingResultsCount = new Long(0);
-            }
             searchResults = getPersistenceBrokerTemplate().getCollectionByQuery(QueryFactory.newQuery(businessObjectClass, criteria));
-            // populate Person objects in business objects
-            List bos = new ArrayList();
-            bos.addAll(searchResults);
-            searchResults = bos;
         }
         catch (OjbOperationException e) {
             throw new RuntimeException("NegotiationDaoOjb encountered exception during executeSearch", e);
@@ -224,7 +211,7 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
         catch (DataIntegrityViolationException e) {
             throw new RuntimeException("NegotiationDaoOjb encountered exception during executeSearch", e);
         }
-        return new CollectionIncomplete(searchResults, matchingResultsCount);
+        return searchResults;
     }
     
     private Integer getNegotiatonSearchResultsLimit(){
