@@ -51,15 +51,13 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
     private static final String NEGOTIATION_TYPE_ATTR = "negotiationAssociationTypeId";
     private static final String ASSOCIATED_DOC_ID_ATTR = "associatedDocumentId";
     private static final String INVALID_COLUMN_NAME = "NaN";
-    
+
     private static Map<String, String> awardTransform;
     private static Map<String, String> proposalTransform;
     private static Map<String, String> proposalLogTransform;
     private static Map<String, String> unassociatedTransform;
     private static Map<String, String> subAwardTransform;
-    
-    private static Integer maxSearchResults;
-    
+
     private NegotiationService negotiationService;
     
     static {
@@ -147,25 +145,7 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
     
     private void addListToList(Collection<Negotiation> fullResultList, Collection<Negotiation> listToAdd) {
         if (fullResultList != null && listToAdd != null) {
-            Integer max = getNegotiatonSearchResultsLimit();
-            if (max == null) {
-                max = 500;
-            }
-            if (fullResultList.size() < max) {
-                int fullResultListPlusListToAddSize = fullResultList.size() + listToAdd.size();
-                if (fullResultListPlusListToAddSize <= max) {
-                    fullResultList.addAll(listToAdd);
-                } else {
-                    int numberOfNewEntriesToAdd = max - fullResultList.size();
-                    int counter = 1;
-                    for (Negotiation neg : listToAdd) {
-                        if (counter < numberOfNewEntriesToAdd) {
-                            fullResultList.add(neg);
-                        }
-                        counter++;
-                    }
-                }
-            }
+            fullResultList.addAll(listToAdd);
         }
     }
     
@@ -212,14 +192,6 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
             throw new RuntimeException("NegotiationDaoOjb encountered exception during executeSearch", e);
         }
         return searchResults;
-    }
-    
-    private Integer getNegotiatonSearchResultsLimit(){
-        if (maxSearchResults == null) {
-            BusinessObjectEntry businessObjectEntry = (BusinessObjectEntry) KNSServiceLocator.getDataDictionaryService().getDataDictionary().getBusinessObjectEntry("Negotiation");
-            maxSearchResults =  businessObjectEntry.getLookupDefinition().getResultSetLimit();
-        }
-        return maxSearchResults;
     }
     
     /**
