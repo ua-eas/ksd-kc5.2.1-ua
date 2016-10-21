@@ -124,11 +124,11 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
         
         Collection<Negotiation> result = new ArrayList<Negotiation>();
         if (!associationDetails.isEmpty()) {
-            addListToList(result, getNegotiationsLinkedToAward(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToProposal(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToProposalLog(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsUnassociated(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToSubAward(fieldValues, associationDetails));
+            result.addAll(getNegotiationsLinkedToAward(fieldValues, associationDetails));
+            result.addAll(getNegotiationsLinkedToProposal(fieldValues, associationDetails));
+            result.addAll(getNegotiationsLinkedToProposalLog(fieldValues, associationDetails));
+            result.addAll(getNegotiationsUnassociated(fieldValues, associationDetails));
+            result.addAll(getNegotiationsLinkedToSubAward(fieldValues, associationDetails));
         } else {
             result = findCollectionBySearchHelper(Negotiation.class, fieldValues, false, false, null);
         }
@@ -142,13 +142,7 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
         }
         return result;
     }
-    
-    private void addListToList(Collection<Negotiation> fullResultList, Collection<Negotiation> listToAdd) {
-        if (fullResultList != null && listToAdd != null) {
-            fullResultList.addAll(listToAdd);
-        }
-    }
-    
+
     public Collection findCollectionBySearchHelper(Class businessObjectClass, Map formProps, boolean unbounded, boolean usePrimaryKeyValuesOnly, Object additionalCriteria ) {
         BusinessObject businessObject = checkBusinessObjectClass(businessObjectClass);
         if (usePrimaryKeyValuesOnly) {
