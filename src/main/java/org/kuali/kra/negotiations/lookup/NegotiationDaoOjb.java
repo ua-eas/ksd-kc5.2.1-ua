@@ -57,8 +57,7 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
     private static Map<String, String> proposalLogTransform;
     private static Map<String, String> unassociatedTransform;
     private static Map<String, String> subAwardTransform;
-    
-    private static Integer maxSearchResults;
+
     
     private NegotiationService negotiationService;
     
@@ -126,11 +125,11 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
         
         Collection<Negotiation> result = new ArrayList<Negotiation>();
         if (!associationDetails.isEmpty()) {
-            addListToList(result, getNegotiationsLinkedToAward(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToProposal(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToProposalLog(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsUnassociated(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToSubAward(fieldValues, associationDetails));
+            result.addAll(getNegotiationsLinkedToAward(fieldValues, associationDetails));
+            result.addAll(getNegotiationsLinkedToProposal(fieldValues, associationDetails));
+            result.addAll(getNegotiationsLinkedToProposalLog(fieldValues, associationDetails));
+            result.addAll(getNegotiationsUnassociated(fieldValues, associationDetails));
+            result.addAll(getNegotiationsLinkedToSubAward(fieldValues, associationDetails));
         } else {
             result = findCollectionBySearchHelper(Negotiation.class, fieldValues, false, false, null);
         }
@@ -144,31 +143,7 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
         }
         return result;
     }
-    
-    private void addListToList(Collection<Negotiation> fullResultList, Collection<Negotiation> listToAdd) {
-        if (fullResultList != null && listToAdd != null) {
-            Integer max = getNegotiatonSearchResultsLimit();
-            if (max == null) {
-                max = 500;
-            }
-            if (fullResultList.size() < max) {
-                int fullResultListPlusListToAddSize = fullResultList.size() + listToAdd.size();
-                if (fullResultListPlusListToAddSize <= max) {
-                    fullResultList.addAll(listToAdd);
-                } else {
-                    int numberOfNewEntriesToAdd = max - fullResultList.size();
-                    int counter = 1;
-                    for (Negotiation neg : listToAdd) {
-                        if (counter < numberOfNewEntriesToAdd) {
-                            fullResultList.add(neg);
-                        }
-                        counter++;
-                    }
-                }
-            }
-        }
-    }
-    
+
     public Collection findCollectionBySearchHelper(Class businessObjectClass, Map formProps, boolean unbounded, boolean usePrimaryKeyValuesOnly, Object additionalCriteria ) {
         BusinessObject businessObject = checkBusinessObjectClass(businessObjectClass);
         if (usePrimaryKeyValuesOnly) {
@@ -202,21 +177,8 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
     
     private Collection executeSearch(Class businessObjectClass, Criteria criteria, boolean unbounded) {
         Collection searchResults = new ArrayList();
-        Long matchingResultsCount = null;
         try {
-            Integer searchResultsLimit = getNegotiatonSearchResultsLimit();
-            if (!unbounded && (searchResultsLimit != null)) {
-                matchingResultsCount = new Long(getPersistenceBrokerTemplate().getCount(QueryFactory.newQuery(businessObjectClass, criteria)));
-                getDbPlatform().applyLimit(searchResultsLimit, criteria);
-            }
-            if ((matchingResultsCount == null) || (matchingResultsCount.intValue() <= searchResultsLimit.intValue())) {
-                matchingResultsCount = new Long(0);
-            }
             searchResults = getPersistenceBrokerTemplate().getCollectionByQuery(QueryFactory.newQuery(businessObjectClass, criteria));
-            // populate Person objects in business objects
-            List bos = new ArrayList();
-            bos.addAll(searchResults);
-            searchResults = bos;
         }
         catch (OjbOperationException e) {
             throw new RuntimeException("NegotiationDaoOjb encountered exception during executeSearch", e);
@@ -224,17 +186,9 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
         catch (DataIntegrityViolationException e) {
             throw new RuntimeException("NegotiationDaoOjb encountered exception during executeSearch", e);
         }
-        return new CollectionIncomplete(searchResults, matchingResultsCount);
+        return searchResults;
     }
-    
-    private Integer getNegotiatonSearchResultsLimit(){
-        if (maxSearchResults == null) {
-            BusinessObjectEntry businessObjectEntry = (BusinessObjectEntry) KNSServiceLocator.getDataDictionaryService().getDataDictionary().getBusinessObjectEntry("Negotiation");
-            maxSearchResults =  businessObjectEntry.getLookupDefinition().getResultSetLimit();
-        }
-        return maxSearchResults;
-    }
-    
+
     /**
      * Search for awards linked to negotiation using both award and negotiation values.
      * @param negotiationValues

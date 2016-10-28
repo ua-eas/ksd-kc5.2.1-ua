@@ -32,6 +32,8 @@ import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.util.BeanPropertyComparator;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
+import org.kuali.rice.krad.lookup.CollectionIncomplete;
+
 
 import java.util.*;
 
@@ -61,7 +63,17 @@ public class NegotiationLookupableHelperServiceImpl extends KraLookupableHelperS
         if (defaultSortColumns.size() > 0) {
             Collections.sort(searchResults, new BeanPropertyComparator(defaultSortColumns, true));
         }
-        return searchResults;
+
+        Integer searchResultsLimit = LookupUtils.getSearchResultsLimit(Negotiation.class);
+        List<Negotiation> searchResultsReturn = new ArrayList<Negotiation>();
+
+        if (searchResultsLimit < searchResults.size()) {
+            searchResultsReturn = searchResults.subList(0, searchResultsLimit);
+        } else {
+            searchResultsReturn = searchResults;
+        }
+
+        return new CollectionIncomplete(searchResultsReturn, new Long(searchResults.size()));
         
     }
     
