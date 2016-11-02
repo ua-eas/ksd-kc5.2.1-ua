@@ -74,6 +74,9 @@ import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.exception.WorkflowException;
+import org.kuali.rice.kew.engine.node.RouteNodeInstance;
+import org.kuali.rice.kew.engine.node.hierarchyrouting.HierarchyRoutingNode;
+import org.kuali.rice.kew.service.KEWServiceLocator;
 import org.kuali.rice.kim.api.role.Role;
 import org.kuali.rice.kim.api.role.RoleService;
 import org.kuali.rice.kns.util.AuditCluster;
@@ -83,6 +86,7 @@ import org.kuali.rice.kns.util.WebUtils;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
 import org.kuali.rice.krad.bo.Note;
+import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.event.KualiDocumentEvent;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
@@ -95,6 +99,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -1403,6 +1408,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 		// recall to action only if the button was selected by the user
 		else if ( KRADConstants.DOCUMENT_RECALL_QUESTION.equals( resp.question ) && NonCancellingRecallQuestion.YES.equals( resp.button ) ) {
 			KualiDocumentFormBase kualiDocumentFormBase = (KualiDocumentFormBase) form;
+			activateUnitHierarchyApprovalNodeInstances( kualiDocumentFormBase );
 			doProcessingAfterPost( kualiDocumentFormBase, request );
 			getDocumentService().recallDocument( kualiDocumentFormBase.getDocument(), resp.reason, false );
 			// we should return to the portal to avoid problems with workflow routing changes to the document.
@@ -1415,6 +1421,32 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 		}
 
 		return forward;
+	}
+
+	/**
+	 * This method checks for a RouteNodeInstance named UnitHierarchyApproval and checks if both Active and Complete
+	 * flags are set to false. If they are, the method will set the Active flag to true and save it.
+	 *
+	 * @param kualiDocumentFormBase
+	 */
+	@SuppressWarnings( "deprecation" )
+	private void activateUnitHierarchyApprovalNodeInstances( KualiDocumentFormBase kualiDocumentFormBase ) {
+		LOG.info( "Examining route node instances for potiential problem causers." );
+		Document document = kualiDocumentFormBase.getDocument();
+		String documentNumber = document.getDocumentNumber();
+		@SuppressWarnings( "unchecked" )
+		List<RouteNodeInstance> nodeInstances = KEWServiceLocator.getRouteNodeService().findRouteNodeInstances( documentNumber );
+		for ( RouteNodeInstance nodeInstance : nodeInstances ) {
+			if ( nodeInstance != null ) {
+				boolean isUnitHierarchyApproval = StringUtils.equals( nodeInstance.getRouteNode().getNodeType(), HierarchyRoutingNode.class.getCanonicalName() );
+				if ( isUnitHierarchyApproval && !nodeInstance.isActive() && !nodeInstance.isComplete() ) {
+					LOG.info( "Activating node instance " + nodeInstance.getRouteNodeInstanceId() );
+					nodeInstance.setActive( true );
+					KEWServiceLocator.getRouteNodeService().save( nodeInstance );
+				}
+			}
+		}
+		LOG.info( "Completed Route Node Instance examination." );
 	}
 
 	/**
