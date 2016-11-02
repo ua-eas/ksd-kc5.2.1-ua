@@ -1429,6 +1429,14 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 	 *
 	 * @param kualiDocumentFormBase
 	 */
+	/*
+	 * FIXME: This was working on Thursday 10-27-2016, however the recall issue remained on the OSP Approver node.
+	 * Monday 10-31-2016 the RouteNodeService.save method stopped saving the modified node instance so recalling from
+	 * the UnitHierarchyApproval node started happening again. No changes were made to the code.
+	 *
+	 * My idea to resolve the issue with the OSP Approver node was to simply set all routeNodeInstances to complete,
+	 * since this is done when recalling the document anyway.
+	 */
 	@SuppressWarnings( "deprecation" )
 	private void activateUnitHierarchyApprovalNodeInstances( KualiDocumentFormBase kualiDocumentFormBase ) {
 		LOG.info( "Examining route node instances for potiential problem causers." );
