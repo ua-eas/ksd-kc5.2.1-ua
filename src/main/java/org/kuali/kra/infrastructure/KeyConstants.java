@@ -340,6 +340,7 @@ public final class KeyConstants {
     // Budget Version
     public static final String BUDGET_VERSION_EXISTS = "error.budgetVersion.exists";
     public static final String MOVE_UNIT_OWN_DESCENDANTS = "error_move_unit";
+    public static final String ERROR_INVALID_PARENT_UNIT_NUMBER = "error.select.parentUnitNumber";
     public static final String UNIT_ADMINISTRATOR_MULTIPLE_TYPES_NOT_ALLOWED = "error.unitAdministrator.multiple.types.not.allowed";
 
     public static final String PERSONNEL_CATEGORY = "P";

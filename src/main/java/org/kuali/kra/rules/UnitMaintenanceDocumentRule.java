@@ -39,7 +39,7 @@ public class UnitMaintenanceDocumentRule extends KraMaintenanceDocumentRuleBase 
      * @see org.kuali.core.maintenance.rules.MaintenanceDocumentRuleBase#processCustomRouteDocumentBusinessRules(org.kuali.core.document.MaintenanceDocument)
      */ 
     protected boolean processCustomRouteDocumentBusinessRules(MaintenanceDocument document) {
-        return moveUnit(document);
+        return isValidUnit(document);
     }
     
     /**
@@ -48,32 +48,37 @@ public class UnitMaintenanceDocumentRule extends KraMaintenanceDocumentRuleBase 
      */
     @Override
     protected boolean processCustomApproveDocumentBusinessRules(MaintenanceDocument document) {
-        return moveUnit(document);
+        return isValidUnit(document);
     }
     /**
      * 
-     * Units cannot be moved to its own descendants.
-     * This method returns false if it is moving to its own descendants.
+     * Units cannot be moved to its own descendants. Units must have valid parent unit.
+     * This method returns false if it is moving to its own descendants or parent number is invalid.
      * @param maintenanceDocument
      * @return
      */
-    private boolean moveUnit(MaintenanceDocument maintenanceDocument) {
-
+    private boolean isValidUnit(MaintenanceDocument maintenanceDocument) {
         boolean valid = true;
-        Unit unit=(Unit)maintenanceDocument.getNewMaintainableObject().getDataObject();
-        String unitNumber=unit.getUnitNumber();
-        String parentUnitNumber=unit.getParentUnitNumber();
-        List<Unit> allSubUnits = KraServiceLocator.getService(UnitService.class).getAllSubUnits(unitNumber); 
-        for (Unit subunits : allSubUnits) {  
+        Unit unit = (Unit)maintenanceDocument.getNewMaintainableObject().getDataObject();
+        String unitNumber = unit.getUnitNumber();
+        String parentUnitNumber = unit.getParentUnitNumber();
+        UnitService unitService = KraServiceLocator.getService(UnitService.class);
+        List<Unit> allSubUnits = unitService.getAllSubUnits(unitNumber);
+
+        for (Unit subunits : allSubUnits) {
             if(subunits.getUnitNumber().equals(parentUnitNumber)){
                 GlobalVariables.getMessageMap().putError("document.newMaintainableObject.parentUnitNumber", KeyConstants.MOVE_UNIT_OWN_DESCENDANTS,
                         new String[] { unit.getParentUnitNumber(), unit.getParentUnitNumber() });
-                valid=false;
+                valid = false;
             }
-            
         }
 
-        
-    return valid;
-}
+        if( ( parentUnitNumber != null ) && unitService.getUnit( parentUnitNumber ) == null ) {
+            GlobalVariables.getMessageMap().putError("document.newMaintainableObject.parentUnitNumber", KeyConstants.ERROR_INVALID_PARENT_UNIT_NUMBER,
+                    new String[] { unit.getParentUnitNumber(), unit.getParentUnitNumber() });
+            valid = false;
+        }
+
+        return valid;
+    }
 }
