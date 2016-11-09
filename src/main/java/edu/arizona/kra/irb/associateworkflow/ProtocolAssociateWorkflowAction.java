@@ -55,12 +55,13 @@ public class ProtocolAssociateWorkflowAction extends KualiAction {
 		urlBuilder = new StringBuilder(baseUrl + METHOD_TO_CALL_SEARCH);
 		link.setAnchorText("Pending Submissions ");
 		addQueryStringParam("associateUser.principalName", getSessionUser(), urlBuilder);
-		addQueryStringParam("committeeId", "Staff", urlBuilder);
+		//addQueryStringParam("committeeId", "Staff", urlBuilder);
+		addQueryStringParam("committeeId", "Admin Review", urlBuilder);
 		addQueryStringParam("submissionStatusCode", "102", urlBuilder);
 		addQueryStringParam("submissionStatusCode", "213", urlBuilder);
 		addQueryStringParam("submissionStatusCode", "100", urlBuilder);
 		link.setUrl(urlBuilder.toString());
-		link.setLinkDescription("Associate = User, Committee = Staff, Submission Status = Pending, Returned to PI, Submitted to Committee");
+		link.setLinkDescription("Associate = User, Committee = Admin Review, Submission Status = Pending, Returned to PI, Submitted to Committee");
 		linksList.add(link);
 		
 		// Employee Assignment (Last 30 days) 
