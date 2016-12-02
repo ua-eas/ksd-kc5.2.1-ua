@@ -63,6 +63,23 @@ public final class PropDevRoutingStateConstants {
     public static final String SPS_REVIEWER_QUERY = "select person_id AS sps_id FROM eps_prop_sps_reviewer WHERE cur_ind=1 AND proposal_number=?";
     public static final String SPS_REVIEWERS_QUERY = "select prncpl_id AS sps_id, (COALESCE(first_nm, '')||' '||COALESCE(middle_nm, '')||' '||COALESCE(last_nm, '')) AS sps_reviewer FROM krim_entity_cache_t WHERE prncpl_id IN (";
 
+    public static final String WORKFLOW_UNITS_PROPOSALS_QUERY = "SELECT DISTINCT proposal_number FROM ("+
+            " SELECT DISTINCT e.PROPOSAL_NUMBER FROM EPS_PROP_PERSON_UNITS e WHERE e.UNIT_NUMBER IN ";
+    public static final String WORKFLOW_UNITS_PROPOSALS_QUERY_CONT = "UNION SELECT distinct p.PROPOSAL_NUMBER FROM EPS_PROP_COST_SHARING ecs"+
+            " JOIN BUDGET b ON b.BUDGET_ID = ecs.BUDGET_ID "+
+            " JOIN BUDGET_DOCUMENT bd ON bd.DOCUMENT_NUMBER=b.DOCUMENT_NUMBER "+
+            " JOIN EPS_PROPOSAL_DOCUMENT epd on bd.PARENT_DOCUMENT_KEY= epd.DOCUMENT_NUMBER "+
+            " JOIN EPS_PROPOSAL p on p.DOCUMENT_NUMBER = epd.DOCUMENT_NUMBER "+
+            " WHERE bd.PARENT_DOCUMENT_TYPE_CODE='PRDV' AND b.FINAL_VERSION_FLAG='Y' AND p.STATUS_CODE in (1,2,5,12) " +
+            " AND ecs.SOURCE_UNIT IS NOT NULL and ecs.SOURCE_UNIT IN ";
+    public static final String WORKFLOW_UNITS_PROPOSALS_QUERY_FIN = ")";
+
+    public static final String WORKFLOW_UNIT_HIERARCHY_QUERY="SELECT DISTINCT unit_number FROM (" +
+            " SELECT unit_number FROM unit u WHERE u.ACTIVE_FLAG='Y' START WITH u.UNIT_NUMBER=? CONNECT BY PRIOR u.UNIT_NUMBER = u.PARENT_UNIT_NUMBER " +
+            " UNION " +
+            " SELECT unit_number FROM unit u WHERE ACTIVE_FLAG='Y' START WITH u.UNIT_NUMBER=? CONNECT BY u.UNIT_NUMBER = PRIOR u.PARENT_UNIT_NUMBER)";
+
+
     public static final String CUR_IND_UPDATE_STMT = "UPDATE $tablename SET cur_ind=0 where proposal_number=? and cur_ind=1";
     public static final String ORD_EXP_TABLE_NAME = "eps_prop_ord_expedited";
     public static final String SPS_REV_TABLE_NAME = "eps_prop_sps_reviewer"; 
@@ -71,6 +88,7 @@ public final class PropDevRoutingStateConstants {
             +" VALUES(eps_prop_ord_expedited_seq.NEXTVAL, ?, ?, 1, SYS_GUID(), CURRENT_TIMESTAMP, ?)";
     public static final String ADD_SPS_REVIEWER_QUERY = "INSERT INTO eps_prop_sps_reviewer (ID, PROPOSAL_NUMBER, PERSON_ID, FULL_NAME, CUR_IND, OBJ_ID, UPDATE_TIMESTAMP, UPDATE_USER)"
             +" VALUES(eps_prop_sps_reviewer_seq.NEXTVAL, ?, ?, ?, 1, SYS_GUID(), CURRENT_TIMESTAMP, ?)";
+
 
     public static final String COL_STOP_DATE = "stop_date";
     public static final String COL_NODE_NAME = "node_name";
@@ -104,6 +122,7 @@ public final class PropDevRoutingStateConstants {
     public static final String PROPOSAL_PERSON_NAME = "proposalPersonName";
     public static final String LEAD_UNIT = "leadUnit.unitNumber";
     public static final String LEAD_COLLEGE = "leadUnit.parentUnitNumber";
+    public static final String WORKFLOW_UNIT = "workflowUnit.unitNumber";
 
     public static final String NODE_NAME_CRITERIA = " AND rn.NM = '";
     public static final String SPONSOR_NAME_CRITERIA = " AND lower(s.SPONSOR_NAME) LIKE '%";
@@ -119,7 +138,8 @@ public final class PropDevRoutingStateConstants {
     public static final String LEAD_COLLEGE_CRITERIA = " AND prop.owned_by_unit IN (SELECT unit_number FROM unit u START WITH u.UNIT_NUMBER='";
     public static final String LEAD_COLLEGE_CRITERIA_CONT = "' CONNECT BY PRIOR u.UNIT_NUMBER = u.PARENT_UNIT_NUMBER)";
     public static final String ORDER_CRITERIA = " ORDER BY stop_date";
-
+    public static final String WORKFLOW_UNITS_CRITERIA = " AND prop.owned_by_unit IN (";
+    public static final String WORKFLOW_UNITS_CRITERIA_CONT = ") ";
 
     public static final String DATE_QUERY_PREFIX = "to_date('";
     public static final String DATE_FORMAT_STR = "','MM/DD/RRRR')";

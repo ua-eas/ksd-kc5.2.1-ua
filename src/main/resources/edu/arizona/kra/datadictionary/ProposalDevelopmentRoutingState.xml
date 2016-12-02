@@ -39,7 +39,8 @@
                 <ref bean="ProposalDevelopmentRoutingState-routeLog"/> 
                 <ref bean="ProposalDevelopmentRoutingState-finalProposalReceived"/>
                 <ref bean="ProposalDevelopmentRoutingState-spsReviewerName"/>
-                <ref bean="ProposalDevelopmentRoutingState-ordExpedited"/>     
+                <ref bean="ProposalDevelopmentRoutingState-ordExpedited"/>
+                <ref bean="ProposalDevelopmentRoutingState-workflowUnit.unitNumber"/>
             </list>
         </property>
         <property name="relationships" >
@@ -55,14 +56,24 @@
               </property>
             </bean>
             <bean parent="RelationshipDefinition">
-              <property name="objectAttributeName" value="nodeStopLeadUnit" />
+              <property name="objectAttributeName" value="workflowUnit" />
               <property name="primitiveAttributes" >
                 <list>
                   <bean parent="PrimitiveAttributeDefinition"
-                        p:sourceName="nodeStopLeadUnit.unitNumber"
+                        p:sourceName="workflowUnit.unitNumber"
                         p:targetName="unitNumber" />
                 </list>
               </property>
+            </bean>
+            <bean parent="RelationshipDefinition">
+                <property name="objectAttributeName" value="nodeStopLeadUnit" />
+                <property name="primitiveAttributes" >
+                    <list>
+                        <bean parent="PrimitiveAttributeDefinition"
+                            p:sourceName="nodeStopLeadUnit.unitNumber"
+                             p:targetName="unitNumber" />
+                    </list>
+                </property>
             </bean>
             <bean parent="RelationshipDefinition">
               <property name="objectAttributeName" value="developmentProposal" />
@@ -357,9 +368,24 @@
         </property>
         <property name="displayLabelAttribute" value="finalProposalReceived" />
     </bean>
-    
-    
-    
+
+    <bean id="ProposalDevelopmentRoutingState-workflowUnit.unitNumber" parent="ProposalDevelopmentRoutingState-workflowUnit.unitNumber-parentBean" />
+    <bean id="ProposalDevelopmentRoutingState-workflowUnit.unitNumber-parentBean" abstract="true" parent="AttributeDefinition">
+        <property name="name" value="workflowUnit.unitNumber" />
+        <property name="label" value="Workflow Unit" />
+        <property name="shortLabel" value="Workflow Unit" />
+        <property name="forceUppercase" value="true" />
+        <property name="maxLength" value="8" />
+        <property name="validationPattern" >
+            <bean parent="AnyCharacterValidationPattern" />
+        </property>
+        <property name="required" value="false" />
+        <property name="control" >
+            <bean parent="TextControlDefinition" p:size="8" />
+        </property>
+        <property name="summary" value="The Proposal's Workflow Unit" />
+        <property name="description" value="The Proposal's Workflow Unit" />
+    </bean>
 
 
     <!-- Business Object Inquiry Definition -->
@@ -413,12 +439,13 @@
                 <bean parent="FieldDefinition" p:attributeName="proposalPersonName"/>
                 <bean parent="FieldDefinition" p:attributeName="leadUnit.unitNumber" p:forceLookup="true" />
                 <bean parent="FieldDefinition" p:attributeName="leadUnit.parentUnitNumber"/>
+                <bean parent="FieldDefinition" p:attributeName="workflowUnit.unitNumber" p:forceLookup="true" />
             </list>
         </property>
         <property name="resultFields" >
             <list>
                 <bean parent="FieldDefinition" p:attributeName="routeStopDate"/>
-				<bean parent="FieldDefinition" p:attributeName="routeStopName"/>
+				        <bean parent="FieldDefinition" p:attributeName="routeStopName"/>
                 <bean parent="FieldDefinition" p:attributeName="proposalNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="proposalDocumentNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="proposalTitle"/>

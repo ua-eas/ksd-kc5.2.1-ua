@@ -62,7 +62,9 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     private SPSReviewer spsReviewer;
     private Unit leadUnit;
     private Unit nodeStopLeadUnit;
+    private Unit workflowUnit;
     private Sponsor sponsor;
+    private String workflowUnitNumber;
 
 
 
@@ -137,7 +139,6 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     public void setPrincipalInvestigatorName(String principalInvestigatorName) {
         this.principalInvestigatorName = principalInvestigatorName;
     }
-
 
     public String getProposalPersonName() {
         return proposalPersonName;
@@ -246,6 +247,14 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
         this.leadCollege = leadCollege;
     }
 
+    public Unit getNodeStopLeadUnit(){
+        return this.nodeStopLeadUnit;
+    }
+
+    public void setNodeStopLeadUnit(Unit unit){
+        this.nodeStopLeadUnit = unit;
+    }
+
     public Unit getLeadUnit(){
         return this.leadUnit;
     }
@@ -254,12 +263,12 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
         this.leadUnit = unit;
     }
 
-    public Unit getNodeStopLeadUnit() {
-        return nodeStopLeadUnit;
+    public Unit getWorkflowUnit() {
+        return workflowUnit;
     }
 
-    public void setNodeStopLeadUnit(Unit nodeStopLeadUnit) {
-        this.nodeStopLeadUnit = nodeStopLeadUnit;
+    public void setWorkflowUnit(Unit workflowUnit) {
+        this.workflowUnit = workflowUnit;
     }
 
     public Sponsor getSponsor() {
@@ -276,6 +285,14 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
 
     public void setProposalDocument(ProposalDevelopmentDocument proposalDocument) {
         this.proposalDocument = proposalDocument;
+    }
+
+    public String getWorkflowUnitNumber(){
+        return workflowUnitNumber;
+    }
+
+    public void setWorkflowUnitNumber(String workflowUnitNumber){
+        this.workflowUnitNumber = workflowUnitNumber;
     }
 
     @Override

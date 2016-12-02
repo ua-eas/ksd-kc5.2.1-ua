@@ -15,8 +15,7 @@
  */
 package edu.arizona.kra.proposaldevelopment.dao.ojb;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,15 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 
+import edu.arizona.kra.util.DBConnection;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.ojb.broker.PersistenceBroker;
 import org.apache.ojb.broker.accesslayer.LookupException;
 import org.kuali.rice.krad.dao.impl.LookupDaoOjb;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.springframework.transaction.annotation.Transactional;
-import org.springmodules.orm.ojb.OjbFactoryUtils;
 
 import static edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants.*;
 import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
@@ -47,7 +45,7 @@ import edu.arizona.kra.proposaldevelopment.lookup.PropDevRouteStopValueFinder;
  * Proposal Development Routing State Dashboard Search DAO Ojb implementation.
  * @author nataliac
  */
-@SuppressWarnings("unchecked")
+
 public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRoutingStateDao {
     private static final Logger LOG = LoggerFactory.getLogger(PropDevRoutingStateDaoOjb.class);
     private static final PropDevRouteStopValueFinder nodeNameFinder = new PropDevRouteStopValueFinder();  
@@ -61,15 +59,9 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         String sqlQuery = buildSqlQuery(searchCriteria);
         boolean displayAdHocNodes = (searchCriteria.containsKey(ROUTE_STOP_NAME) && StringUtils.isEmpty(searchCriteria.get(ROUTE_STOP_NAME)));
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        PersistenceBroker broker = null;
-        try {
-            broker = this.getPersistenceBroker(true);
-            conn = broker.serviceConnectionManager().getConnection();
-            ps = conn.prepareStatement(sqlQuery);
-            rs = ps.executeQuery();
+        try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
+
+            ResultSet rs = dbc.executeQuery(sqlQuery, null);
 
             while (rs.next()) { 
                 String documentNumber = rs.getString(COL_DOCUMENT_NUMBER);
@@ -112,11 +104,25 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         } catch (LookupException le) {
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
-        } finally {
-            closeDatabaseObjects(rs, ps, conn, broker);
         }
 
-        LOG.debug("getPropDevRoutingState: no of results={}.",results.size());
+        LOG.debug("getPropDevRoutingState: no of unfiltered results={}.",results.size());
+
+        //perform additional filtering on the results if the user specified a workflow unit
+        if ( !results.isEmpty() && searchCriteria.containsKey( WORKFLOW_UNIT ) && StringUtils.isNotEmpty(searchCriteria.get(WORKFLOW_UNIT))) {
+            String workflowUnit = searchCriteria.get( WORKFLOW_UNIT );
+            List<String> workFlowUnits = findWorkflowUnitNumbers( workflowUnit );
+            List<String> proposalNumbers = findProposalsForWorkflowUnits(workFlowUnits);
+
+            List<ProposalDevelopmentRoutingState> filteredResults = new ArrayList<ProposalDevelopmentRoutingState>();
+            for (ProposalDevelopmentRoutingState rtState:results){
+                if ( proposalNumbers.contains( rtState.getProposalNumber()) ){
+                    filteredResults.add(rtState);
+                }
+            }
+            LOG.debug("getPropDevRoutingState: filtered results={}.",filteredResults.size());
+            return filteredResults;
+        }
         return results;
 
     }
@@ -126,24 +132,31 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         return ( StringUtils.isNotEmpty(nodeAnnotation) && nodeAnnotation.startsWith(NODE_NAME_ADHOC));
     }
 
-    private String buildSqlQuery(Map<String, String> searchCriteria){
+    /**
+     * Method that builds the main query for searching for in route proposals
+     * @param searchCriteria
+     * @return
+     * @throws SQLException
+     * @throws LookupException
+     */
+    private String buildSqlQuery(Map<String, String> searchCriteria) throws SQLException, LookupException {
         StringBuilder query = new StringBuilder(SQL_LOOKUP);
 
-        if ( searchCriteria.containsKey(ROUTE_UNIT_NBR) && !StringUtils.isEmpty(searchCriteria.get(ROUTE_UNIT_NBR))){
+        if ( searchCriteria.containsKey(ROUTE_UNIT_NBR) && StringUtils.isNotEmpty(searchCriteria.get(ROUTE_UNIT_NBR))){
             String routeUnitNumber = searchCriteria.get(ROUTE_UNIT_NBR);
 
             query.insert(annotationCriteriaOffset, LEAD_UNIT_ANNOT_CRITERIA+routeUnitNumber+"%'");
         }
 
 
-        if ( searchCriteria.containsKey(PROPOSAL_PERSON_NAME) && !StringUtils.isEmpty(searchCriteria.get(PROPOSAL_PERSON_NAME))){
+        if ( searchCriteria.containsKey(PROPOSAL_PERSON_NAME) && StringUtils.isNotEmpty(searchCriteria.get(PROPOSAL_PERSON_NAME))){
             String ppName = searchCriteria.get(PROPOSAL_PERSON_NAME).replaceAll("[\"?]", "");
             query.append(PROPOSAL_PERSON_NAME_CRITERIA);
             query.append(StringUtils.lowerCase(ppName.replaceAll("[*]", "%")));
             query.append("%')"); 
         } 
 
-        if ( searchCriteria.containsKey(LEAD_COLLEGE) && !StringUtils.isEmpty(searchCriteria.get(LEAD_COLLEGE))){
+        if ( searchCriteria.containsKey(LEAD_COLLEGE) && StringUtils.isNotEmpty(searchCriteria.get(LEAD_COLLEGE))){
             String leadCollege = searchCriteria.get(LEAD_COLLEGE);
             query.append(LEAD_COLLEGE_CRITERIA);
             query.append(leadCollege);
@@ -151,7 +164,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         }
 
         for ( String searchKey: SEARCH_QUERIES.keySet()){
-            if (searchCriteria.containsKey(searchKey) && !StringUtils.isEmpty(searchCriteria.get(searchKey))){
+            if (searchCriteria.containsKey(searchKey) && StringUtils.isNotEmpty(searchCriteria.get(searchKey))){
                 query.append(SEARCH_QUERIES.get(searchKey));
                 query.append(searchCriteria.get(searchKey));
                 query.append("'"); 
@@ -159,7 +172,7 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         }
 
         for ( String searchKey: SEARCH_QUERIES_LIKE.keySet()){
-            if (searchCriteria.containsKey(searchKey) && !StringUtils.isEmpty(searchCriteria.get(searchKey))){
+            if (searchCriteria.containsKey(searchKey) && StringUtils.isNotEmpty(searchCriteria.get(searchKey))){
                 String value = searchCriteria.get(searchKey).replaceAll("[\"?]", "");
                 query.append(SEARCH_QUERIES_LIKE.get(searchKey));
                 query.append(StringUtils.lowerCase(value.replaceAll("[*]", "%")));
@@ -240,19 +253,12 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
             throw new IllegalArgumentException("PropDevRoutingStateDaoOjb: getORDExpedited with a null proposalNumber!");
         }
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         Boolean result = Boolean.FALSE;
-        PersistenceBroker broker = null;
-        try {
-            broker = this.getPersistenceBroker(true);
-            conn = broker.serviceConnectionManager().getConnection();
+        Object[] params = new Object[] { proposalNumber };
+        try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
 
-            ps = conn.prepareStatement(ORD_EXPEDITED_QUERY);
-            ps.setString(1, proposalNumber);
-            rs = ps.executeQuery();
-            if (rs.next()) { 
+            ResultSet rs = dbc.executeQuery(ORD_EXPEDITED_QUERY, params);
+            if (rs.next()) {
                 String ordExpedited = rs.getString(COL_ORD_EXP);
                 if ( YES.equalsIgnoreCase(ordExpedited) ){
                     result = Boolean.TRUE;
@@ -265,8 +271,6 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         } catch (LookupException le) {
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
-        } finally {
-            closeDatabaseObjects(rs, ps, conn, broker);
         }
         LOG.debug("getORDExpedited Result={}.",result);
         return result;
@@ -280,25 +284,21 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         if (StringUtils.isEmpty(proposalNumber) || ordExp == null){
             throw new IllegalArgumentException("PropDevRoutingStateDaoOjb: setORDExpedited with null args!");
         }
-        String currentUserName = GlobalVariables.getUserSession().getPrincipalName();
-        Connection conn = null;
-        PreparedStatement ps1 = null, ps2 = null;
-        ResultSet rs = null;
-        String curIndQuery = CUR_IND_UPDATE_STMT.replace("$tablename", ORD_EXP_TABLE_NAME);
-        PersistenceBroker broker = null;
+
         try {
-            broker = this.getPersistenceBroker(true);
-            conn = broker.serviceConnectionManager().getConnection();
-            //first 'remove' last active version by setting cur_ind to 0
-            ps1 = conn.prepareStatement(curIndQuery);
-            ps1.setString(1, proposalNumber);
-            ps1.executeUpdate();
-            //insert new vale with cur_ind=1
-            ps2 = conn.prepareStatement(ADD_ORD_EXPEDITED_QUERY);
-            ps2.setString(1, proposalNumber);
-            ps2.setString(2, ordExp?YES:NO);
-            ps2.setString(3, currentUserName);
-            ps2.executeUpdate();
+            //first 'remove' last active version of the ORDExpedited by setting its cur_ind to 0
+            String curIndQuery = CUR_IND_UPDATE_STMT.replace("$tablename", ORD_EXP_TABLE_NAME);
+            Object[] params = new Object[] { proposalNumber };
+            try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ) {
+                dbc.executeUpdate(curIndQuery, params);
+            }
+
+            //insert updated new value for ORDExpedited with cur_ind=1
+            params = new Object[] { proposalNumber, ordExp?YES:NO, GlobalVariables.getUserSession().getPrincipalName() };
+
+            try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ) {
+                dbc.executeUpdate(ADD_ORD_EXPEDITED_QUERY, params);
+            }
 
         } catch (SQLException sqle) {
             LOG.error("SQLException: " + sqle.getMessage(), sqle);
@@ -306,18 +306,9 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         } catch (LookupException le) {
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
-        } finally {
-            closeDatabaseObjects(rs, ps1, conn, broker);
-            if ( ps2 != null ){
-                try {
-                    ps2.close();
-                } catch (SQLException ex) {
-                    LOG.warn("Failed to close PreparedStatement.", ex);
-                }
-            }
         }
-        LOG.debug("setORDExpedited:Finished");
 
+        LOG.debug("setORDExpedited:Finished");
     }
 
 
@@ -328,21 +319,12 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         if (StringUtils.isEmpty(proposalNumber)){
             throw new IllegalArgumentException("PropDevRoutingStateDaoOjb: getSPSReviewer with a null proposalNumber!");
         }
-
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         String spsReviewerId = null;
-        PersistenceBroker broker = null;
-        try {
+        Object[] params = new Object[] { proposalNumber };
+        try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
 
-            broker = this.getPersistenceBroker(true);
-            conn = broker.serviceConnectionManager().getConnection();
-
-            ps = conn.prepareStatement(SPS_REVIEWER_QUERY);
-            ps.setString(1, proposalNumber);
-            rs = ps.executeQuery();
-            if (rs.next()) { 
+            ResultSet rs = dbc.executeQuery(SPS_REVIEWER_QUERY, params);
+            if (rs.next()) {
                 spsReviewerId = rs.getString(COL_SPS_REVIEWER_ID);
             }
 
@@ -352,9 +334,8 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         } catch (LookupException le) {
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
-        } finally {
-            closeDatabaseObjects(rs, ps, conn, broker);
         }
+
         LOG.debug("getSPSReviewer Result={}.",spsReviewerId);
         return spsReviewerId;
     }
@@ -368,26 +349,21 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
             throw new IllegalArgumentException("PropDevRoutingStateDaoOjb: setSPSReviewer with null args!");
         }
 
-        String currentUserName = GlobalVariables.getUserSession().getPrincipalName();
-        Connection conn = null;
-        PreparedStatement ps1 = null, ps2 = null;
-        ResultSet rs = null;
-        String curIndQuery = CUR_IND_UPDATE_STMT.replace("$tablename", SPS_REV_TABLE_NAME);
-        PersistenceBroker broker = null;
         try {
-            broker = this.getPersistenceBroker(true);
-            conn = broker.serviceConnectionManager().getConnection();
-            //first 'remove' last active version by setting cur_ind to 0
-            ps1 = conn.prepareStatement(curIndQuery);
-            ps1.setString(1, proposalNumber);
-            ps1.executeUpdate();
-            //insert new vale with cur_ind=1
-            ps2 = conn.prepareStatement(ADD_SPS_REVIEWER_QUERY);
-            ps2.setString(1, proposalNumber);
-            ps2.setString(2, kcPersonId);
-            ps2.setString(3, fullName);
-            ps2.setString(4, currentUserName);
-            ps2.executeUpdate();
+            //first 'remove' last active version of the spsReviewer by setting its cur_ind to 0
+            String curIndQuery = CUR_IND_UPDATE_STMT.replace("$tablename", SPS_REV_TABLE_NAME);
+            Object[] params = new Object[] { proposalNumber };
+
+            try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ) {
+                dbc.executeUpdate(curIndQuery, params);
+            }
+
+            //insert updated new value for sps reviewer with cur_ind=1
+            params = new Object[] { proposalNumber, kcPersonId, fullName, GlobalVariables.getUserSession().getPrincipalName() };
+
+            try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ) {
+                dbc.executeUpdate(ADD_SPS_REVIEWER_QUERY, params);
+            }
 
         } catch (SQLException sqle) {
             LOG.error("SQLException: " + sqle.getMessage(), sqle);
@@ -395,15 +371,6 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         } catch (LookupException le) {
             LOG.error("LookupException: " + le.getMessage(), le);
             throw le;
-        } finally {
-            closeDatabaseObjects(rs, ps1, conn, broker);
-            if ( ps2 != null ){
-                try {
-                    ps2.close();
-                } catch (SQLException ex) {
-                    LOG.warn("Failed to close PreparedStatement.", ex);
-                }
-            }
         }
         LOG.debug("setSPSReviewer:Finished.");
 
@@ -420,19 +387,12 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
                 query.append("'"+id+"',");
             }
             //remove last comma
-            query.setLength(query.length()-1);
+            query.deleteCharAt(query.length()-1);
             query.append(")");
             LOG.debug("findSPSReviewers: query={}",query);
-            Connection conn = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-            PersistenceBroker broker = null;
-            try {         
-                broker = this.getPersistenceBroker(true);
 
-                conn = broker.serviceConnectionManager().getConnection();
-                ps = conn.prepareStatement(query.toString());
-                rs = ps.executeQuery();
+            try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
+                ResultSet rs = dbc.executeQuery(query.toString(), null);
                 while (rs.next()){
                     SPSReviewer person = new SPSReviewer();
                     person.setPrincipalId(rs.getString(COL_SPS_REVIEWER_ID));
@@ -445,8 +405,6 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
             } catch (LookupException le) {
                 LOG.error("LookupException: " + le.getMessage(), le);
                 throw le;
-            } finally {
-                closeDatabaseObjects(rs, ps, conn, broker);
             }
         }       
         LOG.debug("findSPSReviewers: Finished result size={}.",result.size());
@@ -454,38 +412,85 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
     }
 
 
-    protected void closeDatabaseObjects(ResultSet rs, PreparedStatement ps, Connection conn, PersistenceBroker broker) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (Exception ex) {
-                LOG.warn("Failed to close ResultSet.", ex);
+    /**
+     * Searches the proposals associated with the given list of unitNumbers in either the cost sharing part of the budget or
+     * by the proposal persons that are assigned a role in the proposal
+     * and returns a list of unique proposalNumbers corresponding to those proposals
+     *
+     * @param workflowUnits - list of unitNumbers
+     * @return
+     * @throws SQLException
+     * @throws LookupException
+     */
+    protected List<String> findProposalsForWorkflowUnits(List<String> workflowUnits) throws SQLException, LookupException{
+        LOG.debug("findProposalsForWorkflowUnits: workflowUnits {}.",workflowUnits);
+        List<String> proposalNumbers = new ArrayList<String>();
+        if ( workflowUnits != null && !workflowUnits.isEmpty()){
+            //create the subquery containing unitNumbers
+            StringBuffer unitNumbersList = new StringBuffer("(");
+            for (String unitNumber: workflowUnits) {
+                unitNumbersList.append("'"+unitNumber+"',");
+            }
+            //remove last hanging comma
+            unitNumbersList.deleteCharAt(unitNumbersList.length()-1);
+            unitNumbersList.append(") ");
+
+            StringBuffer query = new StringBuffer(WORKFLOW_UNITS_PROPOSALS_QUERY);
+            query.append(unitNumbersList);
+            query.append(WORKFLOW_UNITS_PROPOSALS_QUERY_CONT);
+            query.append(unitNumbersList);
+            query.append(WORKFLOW_UNITS_PROPOSALS_QUERY_FIN);
+
+            try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
+                ResultSet rs = dbc.executeQuery(query.toString(), null);
+                while (rs.next()){
+                    proposalNumbers.add( rs.getString(1) );
+                }
+            } catch (SQLException sqle) {
+                LOG.error("SQLException: " + sqle.getMessage(), sqle);
+                throw sqle;
+            } catch (LookupException le) {
+                LOG.error("LookupException: " + le.getMessage(), le);
+                throw le;
             }
         }
-        if ( ps != null ){
-            try {
-                ps.close();
-            } catch (Exception ex) {
-                LOG.warn("Failed to close PreparedStatement.", ex);
-            }
-        }
-        if ( conn != null ){
-            try {
-                conn.close();
-            } catch (Exception ex) {
-                LOG.warn("Failed to close Connection.", ex);
-            }
-        }
-        if (broker != null) {
-            try {
-                OjbFactoryUtils.releasePersistenceBroker(broker, this.getPersistenceBrokerTemplate().getPbKey());
-            } catch (Exception e) {
-                LOG.error("Failed closing connection: " + e.getMessage(), e);
-            }
-        }
+        LOG.debug("findProposalsForWorkflowUnits: Finished results size={}.",proposalNumbers.size());
+        LOG.debug("PROPOSAL NUMBERS: {}",proposalNumbers.toString());
+        return proposalNumbers;
     }
 
-
+    /**
+     * Searches in the Unit table all the units hierarchically associated with the giver unitNumber (parent units and children units)
+     * and returns a list of unique unitNumbers corresponding to that hierarchy (which will also include the original unitNumber ofcourse)
+     *
+     * @param unitNumber
+     * @return
+     * @throws SQLException
+     * @throws LookupException
+     */
+    protected List<String> findWorkflowUnitNumbers(String unitNumber) throws SQLException, LookupException {
+        LOG.debug("findWorkflowUnitNumbers: unitNumber {}.",unitNumber);
+        List<String> unitNumbers = new ArrayList<String>();
+        if ( StringUtils.isNotEmpty(unitNumber)){
+            //there should two unitNumber parameters in the query - no error here...
+            Object[] params = new Object[] { unitNumber, unitNumber };
+            try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
+                ResultSet rs = dbc.executeQuery(WORKFLOW_UNIT_HIERARCHY_QUERY, params);
+                while (rs.next()){
+                    unitNumbers.add( rs.getString(1) );
+                }
+            } catch (SQLException sqle) {
+                LOG.error("SQLException: " + sqle.getMessage(), sqle);
+                throw sqle;
+            } catch (LookupException le) {
+                LOG.error("LookupException: " + le.getMessage(), le);
+                throw le;
+            }
+        }
+        LOG.debug("findWorkflowUnitNumbers: Finished results size={}.",unitNumbers.size());
+        LOG.debug("WORKFLOW UNITS: {}",unitNumbers.toString());
+        return unitNumbers;
+    }
 
 
 }
