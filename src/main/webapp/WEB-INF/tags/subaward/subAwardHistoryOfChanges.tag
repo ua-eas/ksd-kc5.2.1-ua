@@ -72,9 +72,9 @@
                 
                      <kul:htmlControlAttribute property="document.subAwardList[0].performanceStartDate" disabled="true" attributeEntry="${subAwardAttributes.performanceStartDate}" datePicker="false"/>           
                 </td>
-				<th><kul:htmlAttributeLabel attributeEntry="${subAwardAttributes.performanceEnddate}" /></th>
+				<th><kul:htmlAttributeLabel attributeEntry="${subAwardAttributes.performanceEndDate}" /></th>
                 <td colspan="2">
-                      <kul:htmlControlAttribute property="document.subAwardList[0].performanceEnddate" disabled="true" attributeEntry="${subAwardAttributes.performanceEnddate}" datePicker="false"/>           
+                      <kul:htmlControlAttribute property="document.subAwardList[0].performanceEndDate" disabled="true" attributeEntry="${subAwardAttributes.performanceEndDate}" datePicker="false"/>
                 </td>
             </tr> 
             

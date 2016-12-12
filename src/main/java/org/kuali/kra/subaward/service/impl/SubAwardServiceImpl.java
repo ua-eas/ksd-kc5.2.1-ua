@@ -229,7 +229,7 @@ public class SubAwardServiceImpl implements SubAwardService {
                     subAward.setPerformanceStartDate(subAwardAmountInfo.getPeriodofPerformanceStartDate());
                 }
                 if (subAwardAmountInfo.getPeriodofPerformanceEndDate() != null) {
-                    subAward.setPerformanceEnddate(subAwardAmountInfo.getPeriodofPerformanceEndDate());
+                    subAward.setPerformanceEndDate(subAwardAmountInfo.getPeriodofPerformanceEndDate());
                 }
             }
             for (SubAwardAmountReleased subAwardAmountReleased: subAwardAmountReleasedList) {
@@ -370,6 +370,18 @@ public class SubAwardServiceImpl implements SubAwardService {
             LOG.error(e);
         }
         return linkedSubawards;
+    }
+
+    @Override
+    public Collection<String> getLinkedSubAwardsIds(String awardNumber){
+        List <String> linkedSubAwardIds = new ArrayList<String>();
+        try {
+            linkedSubAwardIds = getSubAwardFundingSourceDao().getLinkedSubAwardsIds(awardNumber);
+        } catch (Exception e){
+            e.printStackTrace();
+            LOG.error(e);
+        }
+        return linkedSubAwardIds;
     }
 
 

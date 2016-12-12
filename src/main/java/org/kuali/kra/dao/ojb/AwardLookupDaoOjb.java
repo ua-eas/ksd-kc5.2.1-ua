@@ -12,22 +12,13 @@
  */
 package org.kuali.kra.dao.ojb;
 
-import org.apache.ojb.broker.query.Criteria;
-import org.apache.ojb.broker.query.QueryByCriteria;
-import org.apache.ojb.broker.query.QueryFactory;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.dao.AwardLookupDao;
 import org.kuali.kra.dao.VersionHistoryLookupDao;
-import org.kuali.kra.timeandmoney.document.TimeAndMoneyDocument;
-import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.krad.bo.BusinessObject;
-import org.kuali.rice.krad.bo.DocumentHeader;
 import org.kuali.rice.krad.dao.impl.LookupDaoOjb;
-import org.kuali.rice.krad.lookup.CollectionIncomplete;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,12 +32,7 @@ public class AwardLookupDaoOjb extends LookupDaoOjb implements AwardLookupDao {
 		//only search for 'active' versions of the award, avoiding the post-search filtering
 		fieldValues.put("awardSequenceStatus", VersionStatus.ACTIVE.name());
 
-		return getVersionHistoryLookupDao().getSequenceOwnerSearchResults( Award.class, fieldValues, usePrimaryKeys );
-	}
-
-
-	public VersionHistoryLookupDao getVersionHistoryLookupDao() {
-		return versionHistoryLookupDao;
+		return versionHistoryLookupDao.getSequenceOwnerSearchResults( Award.class, fieldValues, usePrimaryKeys );
 	}
 
 	public void setVersionHistoryLookupDao( VersionHistoryLookupDao versionHistoryLookupDao ) {
