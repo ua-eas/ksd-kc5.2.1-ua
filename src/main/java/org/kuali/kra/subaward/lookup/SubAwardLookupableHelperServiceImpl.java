@@ -65,10 +65,8 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
      * @param pkNames
      */
     @Override
-    public List<HtmlData> getCustomActionUrls(
-            BusinessObject businessObject, List pkNames) {
-        List<HtmlData> htmlDataList =
-                super.getCustomActionUrls(businessObject, pkNames);
+    public List<HtmlData> getCustomActionUrls(BusinessObject businessObject, List pkNames) {
+        List<HtmlData> htmlDataList = super.getCustomActionUrls(businessObject, pkNames);
         htmlDataList.add(getOpenLink((SubAward) businessObject, false));
         htmlDataList.add(getMedusaLink((SubAward) businessObject, false));
         return htmlDataList;
@@ -87,18 +85,14 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
         AnchorHtmlData htmlData = new AnchorHtmlData();
         htmlData.setDisplayText("open");
         Properties parameters = new Properties();
-        parameters.put(KRADConstants.DISPATCH_REQUEST_PARAMETER,
-                KRADConstants.DOC_HANDLER_METHOD);
-        parameters.put(KRADConstants.PARAMETER_COMMAND,
-                KewApiConstants.DOCSEARCH_COMMAND);
+        parameters.put(KRADConstants.DISPATCH_REQUEST_PARAMETER, KRADConstants.DOC_HANDLER_METHOD);
+        parameters.put(KRADConstants.PARAMETER_COMMAND, KewApiConstants.DOCSEARCH_COMMAND);
         parameters.put(KRADConstants.DOCUMENT_TYPE_NAME, getDocumentTypeName());
         parameters.put("viewDocument", viewOnly.toString());
         parameters.put("docOpenedFromAwardSearch", "true");
         parameters.put("docId", subAwardDocument.getDocumentNumber());
-        parameters.put("placeHolderAwardId",
-                subAward.getSubAwardId().toString());
-        String href = UrlFactory.parameterizeUrl(
-                "../" + getHtmlAction(), parameters);
+        parameters.put("placeHolderAwardId", subAward.getSubAwardId().toString());
+        String href = UrlFactory.parameterizeUrl("../" + getHtmlAction(), parameters);
         htmlData.setHref(href);
         return htmlData;
     }
@@ -117,17 +111,13 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
         htmlData.setDisplayText(MEDUSA);
         Properties parameters = new Properties();
         parameters.put(KRADConstants.DISPATCH_REQUEST_PARAMETER, "medusa");
-        parameters.put(KRADConstants.PARAMETER_COMMAND,
-                KewApiConstants.DOCSEARCH_COMMAND);
+        parameters.put(KRADConstants.PARAMETER_COMMAND, KewApiConstants.DOCSEARCH_COMMAND);
         parameters.put(KRADConstants.DOCUMENT_TYPE_NAME, getDocumentTypeName());
         parameters.put("viewDocument", readOnly.toString());
-        parameters.put("docId", subAward.
-                getSubAwardDocument().getDocumentNumber());
+        parameters.put("docId", subAward.getSubAwardDocument().getDocumentNumber());
         parameters.put("docOpenedFromAwardSearch", "true");
-        parameters.put("placeHolderAwardId",
-                subAward.getSubAwardId().toString());
-        String href = UrlFactory.parameterizeUrl(
-                "../" + getHtmlAction(), parameters);
+        parameters.put("placeHolderAwardId", subAward.getSubAwardId().toString());
+        String href = UrlFactory.parameterizeUrl("../" + getHtmlAction(), parameters);
         htmlData.setHref(href);
         return htmlData;
     }
