@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.negotiations.lookup;
 
+import edu.arizona.kra.negotiations.dao.NegotiationLookupDao;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
 import org.kuali.kra.negotiations.bo.Negotiation;
@@ -28,7 +29,6 @@ import org.kuali.rice.kns.web.ui.Field;
 import org.kuali.rice.kns.web.ui.ResultRow;
 import org.kuali.rice.kns.web.ui.Row;
 import org.kuali.rice.krad.bo.BusinessObject;
-import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.util.BeanPropertyComparator;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
@@ -45,7 +45,7 @@ public class NegotiationLookupableHelperServiceImpl extends KraLookupableHelperS
     private static final long serialVersionUID = -5559605739121335896L;
     private static final String USER_ID = "userId";
    
-    private NegotiationDao negotiationDao;
+    private NegotiationLookupDao negotiationLookupDao;
 
 
     @SuppressWarnings("unchecked")
@@ -142,14 +142,14 @@ public class NegotiationLookupableHelperServiceImpl extends KraLookupableHelperS
 
 
 
-    public NegotiationDao getNegotiationDao() {
-        return negotiationDao;
+    public NegotiationLookupDao getNegotiationDao() {
+        return negotiationLookupDao;
     }
 
 
 
-    public void setNegotiationDao(NegotiationDao negotiationDao) {
-        this.negotiationDao = negotiationDao;
+    public void setNegotiationDao(NegotiationLookupDao negotiationLookupDao) {
+        this.negotiationLookupDao = negotiationLookupDao;
     }
     
     /**
