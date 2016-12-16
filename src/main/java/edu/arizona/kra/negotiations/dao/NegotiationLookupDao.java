@@ -15,8 +15,11 @@
  */
 package edu.arizona.kra.negotiations.dao;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.ojb.broker.accesslayer.LookupException;
 import org.kuali.kra.negotiations.bo.Negotiation;
 
 /**
@@ -24,6 +27,6 @@ import org.kuali.kra.negotiations.bo.Negotiation;
  */
 public interface NegotiationLookupDao {
 
-    Collection<Negotiation> getNegotiationResults(Map<String, String> var1);
+    Collection<Negotiation> getNegotiationResults(Map<String, String> var1) throws LookupException;
 
 }
