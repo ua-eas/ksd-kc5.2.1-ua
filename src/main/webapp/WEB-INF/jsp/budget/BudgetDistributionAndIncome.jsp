@@ -13,34 +13,37 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 --%>
+<%@ page import="org.kuali.kra.infrastructure.Constants"%>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
+
+<link rel="stylesheet" href="css/jquery/new_kuali.css" type="text/css" />
 
 <kra-b:swapProposalDevelopmentEditModes/>
 
-	
+
 <kra-b:swapProposalDevelopmentEditModes/>
 <c:set var="readOnly" value="${(not KualiForm.editingMode['modifyBudgets']) && ( not parentReadOnlyFlag )}" scope="request" />
 <c:set var="viewOnly" value="${readOnly}" scope="request" />
 <bean:define id="proposalBudgetFlag" name="KualiForm" property="document.proposalBudgetFlag"/>
 
 <kul:documentPage
-	showDocumentInfo="true"
-	htmlFormAction="${KualiForm.actionPrefix}DistributionAndIncome"
-	documentTypeName="${KualiForm.docTypeName}"
-  	headerDispatch="${KualiForm.headerDispatch}"
-  	headerTabActive="distributionAndIncome"
-  	extraTopButtons="${KualiForm.extraTopButtons}"
-  	showTabButtons="true">
-  	
-	 <c:choose>
-		 <c:when test="${proposalBudgetFlag}">
-        	<div align="right"><kul:help parameterNamespace="KC-B" parameterDetailType="Document" parameterName="budgetDistributionAndIncomeHelp" altText="help"/></div>
-         </c:when>
-         <c:otherwise>
-        	<div align="right"><kul:help parameterNamespace="KC-AB" parameterDetailType="Document" parameterName="awardBudgetDistributionAndIncomeHelpUrl" altText="help"/></div>
-        </c:otherwise>
-    </c:choose>
-	
+		showDocumentInfo="true"
+		htmlFormAction="${KualiForm.actionPrefix}DistributionAndIncome"
+		documentTypeName="${KualiForm.docTypeName}"
+		headerDispatch="${KualiForm.headerDispatch}"
+		headerTabActive="distributionAndIncome"
+		extraTopButtons="${KualiForm.extraTopButtons}"
+		showTabButtons="true">
+
+	<c:choose>
+		<c:when test="${proposalBudgetFlag}">
+			<div align="right"><kul:help parameterNamespace="KC-B" parameterDetailType="Document" parameterName="budgetDistributionAndIncomeHelp" altText="help"/></div>
+		</c:when>
+		<c:otherwise>
+			<div align="right"><kul:help parameterNamespace="KC-AB" parameterDetailType="Document" parameterName="awardBudgetDistributionAndIncomeHelpUrl" altText="help"/></div>
+		</c:otherwise>
+	</c:choose>
+
 	<div align="center">
 		<kra-b:budgetCostSharing />
 		<kra-b:budgetUnrecoveredFandA />
@@ -48,15 +51,23 @@
 		<kul:panelFooter />
 	</div>
 
-	<kul:documentControls 
-		transactionalDocument="false"
-		suppressRoutingControls="true"
-		extraButtonSource="${extraButtonSource}"
-		extraButtonProperty="${extraButtonProperty}"
-		extraButtonAlt="${extraButtonAlt}"
-		viewOnly="${readOnly}"
-		suppressCancelButton="true"
-		/>
+	<kul:documentControls
+			transactionalDocument="false"
+			suppressRoutingControls="true"
+			extraButtonSource="${extraButtonSource}"
+			extraButtonProperty="${extraButtonProperty}"
+			extraButtonAlt="${extraButtonAlt}"
+			viewOnly="${readOnly}"
+			suppressCancelButton="true"
+	/>
 
+	<SCRIPT type="text/javascript">
+		var kualiForm = document.forms['KualiForm'];
+		var kualiElements = kualiForm.elements;
+		var $j = jQuery.noConflict();
+	</SCRIPT>
+	<script language="javascript" src="scripts/kuali_application.js"></script>
+	<script language="javascript" src="dwr/interface/SponsorService.js"></script>
+	<script language="javascript" src="dwr/interface/UnitService.js"></script>
 </kul:documentPage>
 <kra-b:swapProposalDevelopmentEditModes/>
