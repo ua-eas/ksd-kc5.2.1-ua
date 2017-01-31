@@ -86,6 +86,8 @@ public class NegotiationLookupDaoOjb extends LookupDaoOjb implements Negotiation
                 LOG.debug("getNegotiationResults matchingResultsCount={}",matchingResultsCount);
 
                 LookupUtils.applySearchResultsLimit(Negotiation.class, searchCriteria, getDbPlatform());
+            } else {
+                LOG.warn("Negotiation Lookup: SearchResultsLimit for Business Object and Application is undefined!");
             }
             if ((matchingResultsCount == null) || (matchingResultsCount.intValue() <= searchResultsLimit.intValue())) {
                 matchingResultsCount = new Long(0);
