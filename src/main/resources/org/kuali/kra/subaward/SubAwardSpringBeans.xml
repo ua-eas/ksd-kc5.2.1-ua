@@ -214,7 +214,10 @@ R
         <property name="serviceName" value="versionHistoryLookupDao" />
     </bean>
 
-    <bean id="subAwardLookupDao" parent="platformAwareDao" class="org.kuali.kra.subaward.dao.impl.SubAwardLookupDaoOjb" />
+    <bean id="subAwardLookupDao" parent="platformAwareDao" class="org.kuali.kra.subaward.dao.impl.SubAwardLookupDaoOjb" >
+        <property name="dateTimeService" ref="dateTimeService" />
+        <property name="subAwardService" ref="subAwardService" />
+    </bean>
 
     <bean id="subAwardLookupableHelperService" class="org.kuali.kra.subaward.lookup.SubAwardLookupableHelperServiceImpl" parent="parentLookupableHelperService" scope="prototype">
         <property name="subAwardLookupDao" ref="subAwardLookupDao" />

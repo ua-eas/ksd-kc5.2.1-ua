@@ -193,18 +193,24 @@ public class SubAwardLookupDaoOjb extends LookupDaoOjb implements SubAwardLookup
 
 
     public SubAwardService getSubAwardService(){
-        if (this.subAwardService == null) {
-            this.subAwardService = KraServiceLocator.getService(SubAwardService.class);
-        }
         return this.subAwardService;
+    }
+
+    public void setSubAwardService(SubAwardService subAwardService){
+        this.subAwardService = subAwardService;
     }
 
 
     public PersonService getPersonService() {
+        //PersonService is not injectable through Spring config
         if (this.personService == null) {
             this.personService = KraServiceLocator.getService(PersonService.class);
         }
         return this.personService;
+    }
+
+    public void setPersonService(PersonService personService) {
+        this.personService = personService;
     }
 
 }
