@@ -34,7 +34,6 @@ import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
 import org.kuali.rice.kns.web.ui.Field;
 import org.kuali.rice.kns.web.ui.Row;
 import org.kuali.rice.krad.bo.BusinessObject;
-import org.kuali.rice.krad.lookup.CollectionIncomplete;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
@@ -56,12 +55,12 @@ class AwardLookupableHelperServiceImpl extends KraLookupableHelperServiceImpl {
     
     private transient KcPersonService kcPersonService;
     private AwardLookupDao awardLookupDao;
+    private AwardDocumentAuthorizer awardDocumentAuthorizer;
+
     @SuppressWarnings({ "deprecation", "unchecked" })
     @Override
     public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
-//        if (this.getParameters().containsKey(USER_ID)) {
-//            fieldValues.put("projectPersons.personId", ((String[]) this.getParameters().get(USER_ID))[0]);
-//        }
+
         Map<String, String> formProps = new HashMap<String, String>();
         if (!StringUtils.isEmpty(fieldValues.get("lookupOspAdministratorName"))) {
             formProps.put("fullName", fieldValues.get("lookupOspAdministratorName"));
@@ -87,35 +86,11 @@ class AwardLookupableHelperServiceImpl extends KraLookupableHelperServiceImpl {
         setReferencesToRefresh(fieldValues.get(KRADConstants.REFERENCES_TO_REFRESH));
         
         List<Award> unboundedResults = (List<Award>)getAwardLookupDao().getAwardSearchResults(fieldValues, usePrimaryKeys);
-        
-        List<Award> filteredResults = new ArrayList<Award>();
-        
-        filteredResults = (List<Award>) filterForPermissions(unboundedResults);
-        if (unboundedResults instanceof CollectionIncomplete) {
-            filteredResults = new CollectionIncomplete<Award>(
-                    filteredResults, ((CollectionIncomplete)unboundedResults).getActualSizeIfTruncated());
-        }
-        return filteredResults;
+
+        return unboundedResults;
     }
 
 
-    /**
-     * This method filters results based so that the person doing the lookup only gets back the documents he has permission view.
-     * @param results
-     * @return
-     */
-    public List<Award> filterForPermissions(List<Award> results) {
-        Person user = GlobalVariables.getUserSession().getPerson();
-        AwardDocumentAuthorizer authorizer = new AwardDocumentAuthorizer();
-        List<Award> filteredResults = new ArrayList<Award>();
-        // if the user has permission.
-        for (Award award : results) {
-            if (award!=null && authorizer.canOpen(award.getAwardDocument(), user)) {
-                filteredResults.add(award);
-            }
-        }
-        return filteredResults;
-    }
     /**
      * add open, copy and medusa links to actions list
      * @see org.kuali.kra.lookup.KraLookupableHelperServiceImpl#getCustomActionUrls(org.kuali.rice.krad.bo.BusinessObject, java.util.List)
@@ -123,11 +98,15 @@ class AwardLookupableHelperServiceImpl extends KraLookupableHelperServiceImpl {
     @Override
     @SuppressWarnings("unchecked")
     public List<HtmlData> getCustomActionUrls(BusinessObject businessObject, List pkNames) {
-        List<HtmlData> htmlDataList = super.getCustomActionUrls(businessObject, pkNames);
+        List<HtmlData> htmlDataList = new ArrayList<HtmlData>();
+        // add open,copy and medusa links to the resulted row if the user has rights to open the award, otherwise leave empty
+        Person user = GlobalVariables.getUserSession().getPerson();
         AwardDocument document = ((Award) businessObject).getAwardDocument();
-        htmlDataList.add(getOpenLink((Award) businessObject, false));
-        htmlDataList.add(getCopyLink((Award) businessObject, false));
-        htmlDataList.add(getMedusaLink((Award) businessObject, false));
+        if ( getAwardDocumentAuthorizer().canOpen(document, user) ) {
+            htmlDataList.add(getOpenLink((Award) businessObject, false));
+            htmlDataList.add(getCopyLink((Award) businessObject, false));
+            htmlDataList.add(getMedusaLink((Award) businessObject, false));
+        }
         return htmlDataList;
     }
 
@@ -306,5 +285,11 @@ class AwardLookupableHelperServiceImpl extends KraLookupableHelperServiceImpl {
         this.awardLookupDao = awardLookupDao;
     }
 
+    protected AwardDocumentAuthorizer getAwardDocumentAuthorizer(){
+        if (awardDocumentAuthorizer == null ){
+            awardDocumentAuthorizer = new AwardDocumentAuthorizer();
+        }
+        return awardDocumentAuthorizer;
+    }
 
 }

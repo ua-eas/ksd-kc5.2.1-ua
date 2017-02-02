@@ -58,10 +58,9 @@ public class InstitutionalProposalLookupableHelperServiceImpl extends KraLookupa
     private boolean includeMergeCustomActionUrls;
     private DocumentService documentService;
     private InstitutionalProposalService institutionalProposalService;
+    private InstitutionalProposalDocumentAuthorizer ipDocumentAuthorizer;
 
-    public void setDocumentService(DocumentService documentService) {
-        this.documentService = documentService;
-    }
+
     /* 
      * Overriding this to only return the currently Active version of a proposal 
      */
@@ -104,55 +103,35 @@ public class InstitutionalProposalLookupableHelperServiceImpl extends KraLookupa
             filterInvalidProposalStatus(searchResults);
         }
 
-        List<InstitutionalProposal> filteredResults = filterForPermissions(searchResults);
-        
-        if(searchResults instanceof CollectionIncomplete) {
-        	filteredResults = new CollectionIncomplete<InstitutionalProposal>(filteredResults, ((CollectionIncomplete)searchResults).getActualSizeIfTruncated());
-        }
-
-        return filteredResults;
+        return searchResults;
     }
 
-    /**
-     * This method filters results so that the person doing the lookup only gets back the documents he can view.
-     * @param results
-     * @return
-     */
-    protected List<InstitutionalProposal> filterForPermissions(List<InstitutionalProposal> results) {
-        Person user = GlobalVariables.getUserSession().getPerson();
-        InstitutionalProposalDocumentAuthorizer authorizer = new InstitutionalProposalDocumentAuthorizer();
-        List<InstitutionalProposal> filteredResults = new ArrayList<InstitutionalProposal>();
-        
-        for (InstitutionalProposal institutionalProposal : results) {
-            
-            String documentNumber = institutionalProposal.getInstitutionalProposalDocument().getDocumentNumber();
-            try {
-                InstitutionalProposalDocument document = (InstitutionalProposalDocument) documentService.getByDocumentHeaderId(documentNumber);
-                
-                if (authorizer.canOpen(document, user)) {
-                    filteredResults.add(institutionalProposal);
-                }
-            } catch (WorkflowException e) {
-                LOG.warn("Cannot find Document with header id " + documentNumber);
-            }
-        }
-
-        
-        return filteredResults;
-    }
-    
     
     @SuppressWarnings("unchecked")
     @Override
     public List<HtmlData> getCustomActionUrls(BusinessObject businessObject, List pkNames) {
         List<HtmlData> htmlDataList = new ArrayList<HtmlData>();
-        if (includeMainSearchCustomActionUrls) {
-            htmlDataList.add(getOpenLink(((InstitutionalProposal) businessObject).getInstitutionalProposalDocument()));
-        } 
-        if (includeMergeCustomActionUrls) {
-            htmlDataList.add(getSelectLink((InstitutionalProposal) businessObject));
+
+        // add open,select? and medusa links to the resulted row if the user has rights to open the IP, otherwise leave empty
+        Person user = GlobalVariables.getUserSession().getPerson();
+        String documentNumber = ((InstitutionalProposal) businessObject).getInstitutionalProposalDocument().getDocumentNumber();
+
+        // unfortunately we need to retrieve the FULL DocumentHeader for the IP to determine Authorization
+        try {
+            InstitutionalProposalDocument document = (InstitutionalProposalDocument) getDocumentService().getByDocumentHeaderId(documentNumber);
+
+            if (getInstitutionalProposalDocumentAuthorizer().canOpen(document, user)) {
+                if (includeMainSearchCustomActionUrls) {
+                    htmlDataList.add(getOpenLink(((InstitutionalProposal) businessObject).getInstitutionalProposalDocument()));
+                }
+                if (includeMergeCustomActionUrls) {
+                    htmlDataList.add(getSelectLink((InstitutionalProposal) businessObject));
+                }
+                htmlDataList.add(getMedusaLink(((InstitutionalProposal) businessObject).getInstitutionalProposalDocument(), false));
+            }
+        } catch (WorkflowException e) {
+            LOG.error("Cannot find Document with header id " + documentNumber);
         }
-        htmlDataList.add(getMedusaLink(((InstitutionalProposal) businessObject).getInstitutionalProposalDocument(), false));
         return htmlDataList;
     }
     
@@ -324,6 +303,21 @@ public class InstitutionalProposalLookupableHelperServiceImpl extends KraLookupa
     }
     public void setInstitutionalProposalService(InstitutionalProposalService institutionalProposalService) {
         this.institutionalProposalService = institutionalProposalService;
+    }
+
+    protected InstitutionalProposalDocumentAuthorizer getInstitutionalProposalDocumentAuthorizer(){
+        if ( ipDocumentAuthorizer == null ){
+            ipDocumentAuthorizer = new InstitutionalProposalDocumentAuthorizer();
+        }
+        return ipDocumentAuthorizer;
+    }
+
+    public void setDocumentService(DocumentService documentService) {
+        this.documentService = documentService;
+    }
+
+    protected DocumentService getDocumentService(){
+        return documentService;
     }
 
 }
