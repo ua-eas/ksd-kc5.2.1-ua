@@ -57,9 +57,7 @@ function loadLeadUnitName(unitNumberFieldName, leadUnitNameFieldName ) {
 	var unitNumber = dwr.util.getValue( unitNumberFieldName );
 	clearRecipients( leadUnitNameFieldName, "" );
 
-	if (unitNumber=='') {
-		clearRecipients( leadUnitNameFieldName, "" );
-	} else {
+	if (unitNumber && unitNumber.trim().length > 0) {
 		var dwrReply = {
 			callback:function(data) {
 				if ( data != null ) {

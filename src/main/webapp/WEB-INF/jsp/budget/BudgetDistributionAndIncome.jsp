@@ -66,8 +66,6 @@
 		var kualiElements = kualiForm.elements;
 		var $j = jQuery.noConflict();
 	</SCRIPT>
-	<script language="javascript" src="scripts/kuali_application.js"></script>
-	<script language="javascript" src="dwr/interface/SponsorService.js"></script>
 	<script language="javascript" src="dwr/interface/UnitService.js"></script>
 </kul:documentPage>
 <kra-b:swapProposalDevelopmentEditModes/>
