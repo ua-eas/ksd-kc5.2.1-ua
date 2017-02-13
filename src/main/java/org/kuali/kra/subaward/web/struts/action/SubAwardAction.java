@@ -662,11 +662,14 @@ protected void checkSubAwardTemplateCode(SubAward subAward){
      protected List<SubAwardFundingSourceBean> findSFSForDisplay(SubAwardDocument subAwardDocument){
          List<SubAwardFundingSourceBean> sfs = new ArrayList<SubAwardFundingSourceBean>();
          SubAward subAward = subAwardDocument.getSubAward();
-         Collection<Award> linkedAwards = getSubAwardService().getLinkedAwards(subAward);
-         int idx=0;
-         for (Award award:linkedAwards){
-             SubAwardFundingSourceBean sfsForDisplay = new SubAwardFundingSourceBean(String.valueOf(idx++),subAward, award);
-             sfs.add(sfsForDisplay);
+         // avoid querying for newly created Subawards that weren't saved to the DB and don't have a subawardId yet
+         if (subAward.getSubAwardId() != null){
+             Collection<Award> linkedAwards = getSubAwardService().getLinkedAwards(subAward);
+             int idx = 0;
+             for (Award award : linkedAwards) {
+                 SubAwardFundingSourceBean sfsForDisplay = new SubAwardFundingSourceBean(String.valueOf(idx++), subAward, award);
+                 sfs.add(sfsForDisplay);
+             }
          }
     
          return sfs;
