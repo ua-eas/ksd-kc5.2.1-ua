@@ -92,7 +92,6 @@ public class BudgetParametersAction extends BudgetAction {
             // jira-1848 : force to calc budget after sync
             getBudgetSummaryService().calculateBudget(budget);
         }
-        save(mapping, form, request, response);
         return forward;
     }
 
