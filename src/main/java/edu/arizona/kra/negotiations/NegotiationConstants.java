@@ -14,6 +14,7 @@ public final class NegotiationConstants {
     public static final String NEGOTIATION_TYPE_ATTR = "negotiationAssociationTypeId";
     public static final String ASSOCIATED_DOC_ID_ATTR = "associatedDocumentId";
     public static final String INVALID_COLUMN_NAME = "NaN";
+    public static final String PRINCIPAL_INVESTIGATOR = "projectPersons.fullName";
 
     public static final String NEGOTIATION_AGE_QUERY="select negotiation_id from (" +
             " select negotiation_id, NEGOTIATION_START_DATE, (case when NEGOTIATION_END_DATE IS NULL then SYSDATE else NEGOTIATION_END_DATE end) AS NEGOTIATION_END_DATE from negotiation )" +
