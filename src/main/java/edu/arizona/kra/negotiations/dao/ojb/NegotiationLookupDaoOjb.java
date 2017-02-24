@@ -8,7 +8,6 @@ import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
-import org.kuali.kra.institutionalproposal.proposallog.ProposalLog;
 import org.kuali.kra.negotiations.bo.Negotiation;
 import org.kuali.kra.negotiations.bo.NegotiationAssociationType;
 import org.kuali.kra.negotiations.bo.NegotiationUnassociatedDetail;
@@ -22,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import static edu.arizona.kra.negotiations.NegotiationConstants.*;
 
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -177,6 +175,10 @@ public class NegotiationLookupDaoOjb extends LookupDaoOjb implements Negotiation
         }
 
         Criteria associatedCriteria = getCollectionCriteriaFromMap(bo, filters);
+        //awards and institutional proposals don't handle this field correctly so we need the special case below.
+        if ( filters.keySet().contains(PRINCIPAL_INVESTIGATOR)){
+            associatedCriteria.addAndCriteria(getProjectPersonsCriteria(filters.get(PRINCIPAL_INVESTIGATOR)));
+        }
         //add active or pending VersionHistory criteria to the subquery
         if ( addActivePendingVersion && !(bo instanceof InstitutionalProposal) ){
                 associatedCriteria.addAndCriteria(getActiveOrPendingVersionCriteria());
@@ -271,6 +273,12 @@ public class NegotiationLookupDaoOjb extends LookupDaoOjb implements Negotiation
         Criteria activeOrPendingCriteria = new Criteria();
         activeOrPendingCriteria.addIn("versionHistory.statusForOjb", statuses);
         return activeOrPendingCriteria;
+    }
+
+    private Criteria getProjectPersonsCriteria(String investigatorName){
+        Criteria projectPersonsCriteria = new Criteria();
+        projectPersonsCriteria.addLike("projectPersons.fullName", investigatorName);
+        return projectPersonsCriteria;
     }
 
 
