@@ -1697,15 +1697,25 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	@Override
 	public ActionForward blanketApprove( ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response )
 			throws Exception {
+		ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
+		int status = isValidSubmission( proposalDevelopmentForm );
 
-		ActionForward returnForward = super.blanketApprove( mapping, form, request, response );
+		if ( status == ERROR && proposalDevelopmentForm.isAuditActivated() ) {
+			GlobalVariables.getMessageMap().clearErrorMessages(); // clear error from isValidSubmission()
+			GlobalVariables.getMessageMap().putError( "datavalidation", KeyConstants.ERROR_WORKFLOW_SUBMISSION, new String[] {} );
 
-		String routeHeaderId = ( (ProposalDevelopmentForm) form ).getDocument().getDocumentNumber();
-		String returnLocation = buildActionUrl( routeHeaderId, Constants.MAPPING_PROPOSAL_ACTIONS, "ProposalDevelopmentDocument" );
+			ActionForward forward = mapping.findForward( ( Constants.MAPPING_BASIC ) );
+			return forward;
+		}else {
+			ActionForward returnForward = super.blanketApprove(mapping, form, request, response);
 
-		ActionForward forward = mapping.findForward( KRADConstants.MAPPING_PORTAL );
-		ActionForward holdingPageForward = mapping.findForward( Constants.MAPPING_HOLDING_PAGE );
-		return routeToHoldingPage( forward, returnForward, holdingPageForward, returnLocation );
+			String routeHeaderId = ((ProposalDevelopmentForm) form).getDocument().getDocumentNumber();
+			String returnLocation = buildActionUrl(routeHeaderId, Constants.MAPPING_PROPOSAL_ACTIONS, "ProposalDevelopmentDocument");
+
+			ActionForward forward = mapping.findForward(KRADConstants.MAPPING_PORTAL);
+			ActionForward holdingPageForward = mapping.findForward(Constants.MAPPING_HOLDING_PAGE);
+			return routeToHoldingPage(forward, returnForward, holdingPageForward, returnLocation);
+		}
 	}
 
 	@Override
@@ -2029,7 +2039,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
 		ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
 		ProposalDevelopmentDocument pdDoc = proposalDevelopmentForm.getProposalDevelopmentDocument();
-
+		int status = isValidSubmission( proposalDevelopmentForm );
 		Object question = request.getParameter( KRADConstants.QUESTION_INST_ATTRIBUTE_NAME );
 		Object buttonClicked = request.getParameter( KRADConstants.QUESTION_CLICKED_BUTTON );
 		String methodToCall = ( (KualiForm) form ).getMethodToCall();
@@ -2038,7 +2048,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
 		if ( !pdDoc.getDocumentHeader().getWorkflowDocument().isEnroute() ) {
 			proposalDevelopmentForm.setAuditActivated( true );
-			int status = isValidSubmission( proposalDevelopmentForm );
+			//int status = isValidSubmission( proposalDevelopmentForm );
 			boolean userSaysOk = false;
 
 			if ( status == WARNING ) {
@@ -2094,13 +2104,20 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			}
 		}
 		else {
-			switch ( actionName ) {
-			case SUPER_USER_APPROVE:
-				forward = super.superUserApprove( mapping, proposalDevelopmentForm, request, response );
-				break;
-			case TAKE_SUPER_USER_ACTIONS:
-				forward = super.takeSuperUserActions( mapping, proposalDevelopmentForm, request, response );
-				break;
+			if ( status == ERROR && proposalDevelopmentForm.isAuditActivated()) {
+				GlobalVariables.getMessageMap().clearErrorMessages(); // clear error from isValidSubmission()
+				GlobalVariables.getMessageMap().putError( "datavalidation", KeyConstants.ERROR_WORKFLOW_SUBMISSION, new String[] {} );
+
+				forward = mapping.findForward( ( Constants.MAPPING_BASIC ) );
+			}else {
+				switch (actionName) {
+					case SUPER_USER_APPROVE:
+						forward = super.superUserApprove(mapping, proposalDevelopmentForm, request, response);
+						break;
+					case TAKE_SUPER_USER_ACTIONS:
+						forward = super.takeSuperUserActions(mapping, proposalDevelopmentForm, request, response);
+						break;
+				}
 			}
 		}
 		return forward;
