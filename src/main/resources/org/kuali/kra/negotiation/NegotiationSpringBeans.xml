@@ -192,6 +192,7 @@
     <bean id="negotiationLookupDao" class="edu.arizona.kra.negotiations.dao.ojb.NegotiationLookupDaoOjb" parent="platformAwareDao">
         <property name="negotiationService" ref="negotiationService" />
         <property name="dateTimeService" ref="dateTimeService" />
+        <property name="persistenceStructureService" ref="persistenceStructureService" />
     </bean>
     
     <bean id="negotiationNotificationRenderer" class="org.kuali.kra.negotiations.notifications.NegotiationNotificationRenderer" scope="prototype"/>

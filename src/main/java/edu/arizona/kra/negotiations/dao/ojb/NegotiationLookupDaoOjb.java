@@ -71,8 +71,8 @@ public class NegotiationLookupDaoOjb extends LookupDaoOjb implements Negotiation
         LOG.debug("Final search criteria: {}", searchCriteria);
 
         try {
-            //add orderBy NegotiationId to show the newest on top to query
-            QueryByCriteria query = QueryFactory.newQuery(Negotiation.class, searchCriteria);
+            //add orderBy NegotiationId to show the newest on top to query and DISTINCT = true to avoid duplicate results.
+            QueryByCriteria query = QueryFactory.newQuery(Negotiation.class, searchCriteria, Boolean.TRUE);
             query.addOrderByDescending(NEGOTIATION_ID);
 
             Long matchingResultsCount = null;
@@ -175,10 +175,7 @@ public class NegotiationLookupDaoOjb extends LookupDaoOjb implements Negotiation
         }
 
         Criteria associatedCriteria = getCollectionCriteriaFromMap(bo, filters);
-        //awards and institutional proposals don't handle this field correctly so we need the special case below.
-        if ( filters.keySet().contains(PRINCIPAL_INVESTIGATOR)){
-            associatedCriteria.addAndCriteria(getProjectPersonsCriteria(filters.get(PRINCIPAL_INVESTIGATOR)));
-        }
+
         //add active or pending VersionHistory criteria to the subquery
         if ( addActivePendingVersion && !(bo instanceof InstitutionalProposal) ){
                 associatedCriteria.addAndCriteria(getActiveOrPendingVersionCriteria());
@@ -273,12 +270,6 @@ public class NegotiationLookupDaoOjb extends LookupDaoOjb implements Negotiation
         Criteria activeOrPendingCriteria = new Criteria();
         activeOrPendingCriteria.addIn("versionHistory.statusForOjb", statuses);
         return activeOrPendingCriteria;
-    }
-
-    private Criteria getProjectPersonsCriteria(String investigatorName){
-        Criteria projectPersonsCriteria = new Criteria();
-        projectPersonsCriteria.addLike("projectPersons.fullName", investigatorName);
-        return projectPersonsCriteria;
     }
 
 
