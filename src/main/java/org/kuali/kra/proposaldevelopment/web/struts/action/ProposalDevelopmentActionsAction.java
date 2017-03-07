@@ -2043,12 +2043,10 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 		Object question = request.getParameter( KRADConstants.QUESTION_INST_ATTRIBUTE_NAME );
 		Object buttonClicked = request.getParameter( KRADConstants.QUESTION_CLICKED_BUTTON );
 		String methodToCall = ( (KualiForm) form ).getMethodToCall();
-
+		proposalDevelopmentForm.setAuditActivated( true );
 		ActionForward forward = mapping.findForward( Constants.MAPPING_BASIC );
 
 		if ( !pdDoc.getDocumentHeader().getWorkflowDocument().isEnroute() ) {
-			proposalDevelopmentForm.setAuditActivated( true );
-			//int status = isValidSubmission( proposalDevelopmentForm );
 			boolean userSaysOk = false;
 
 			if ( status == WARNING ) {
