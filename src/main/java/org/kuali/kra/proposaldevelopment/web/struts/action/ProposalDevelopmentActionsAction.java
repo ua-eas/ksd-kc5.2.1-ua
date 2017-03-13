@@ -1698,6 +1698,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	public ActionForward blanketApprove( ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response )
 			throws Exception {
 		ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
+		proposalDevelopmentForm.setAuditActivated( true );
 		int status = isValidSubmission( proposalDevelopmentForm );
 
 		if ( status == ERROR && proposalDevelopmentForm.isAuditActivated() ) {
