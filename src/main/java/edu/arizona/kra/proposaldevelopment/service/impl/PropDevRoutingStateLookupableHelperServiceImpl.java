@@ -60,6 +60,7 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
     private static final String SEARCH_RESULT_PROPERTY_NAME_LEAD_UNIT_NAME = "leadUnitName";
     private static final String SEARCH_RESULT_PROPERTY_NAME_ORD_EXPEDITED = "ORDExpedited";
     private static final String SEARCH_RESULT_PROPERTY_NAME_SPS_REVIEWER = "SPSReviewerName";
+    private static final String SEARCH_RESULT_PROPERTY_NAME_RECEIVED_TIME = "finalProposalReceivedTime";
     
     private static final String PROPDEV_DOCUMENT = "ProposalDevelopmentDocument";
     private static final String PROPDEV_NUMBER = "proposalNumber";
@@ -118,6 +119,8 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
                     column.setEscapeXMLValue(false);
                 } else if ( SEARCH_RESULT_PROPERTY_NAME_SPS_REVIEWER.equalsIgnoreCase(column.getPropertyName()) && canAssignSPSReviewer()){
                     setSPSReviewerAnchor(column, (ProposalDevelopmentRoutingState)resultRow.getBusinessObject());  
+                } else if ( SEARCH_RESULT_PROPERTY_NAME_RECEIVED_TIME.equalsIgnoreCase(column.getPropertyName())){
+                    setReceivedTime(column, (ProposalDevelopmentRoutingState)resultRow.getBusinessObject());
                 }
             }
         }
@@ -289,6 +292,12 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
         column.setColumnAnchor(anchor);
         column.setPropertyURL(anchor.getHref());
         column.setPropertyValue(anchor.getDisplayText());
+    }
+
+    protected void setReceivedTime(Column column, ProposalDevelopmentRoutingState propDevRoutingState){
+        if ( !propDevRoutingState.isFinalProposalReceived() ) {
+            column.setPropertyValue("No");
+        }
     }
     
     protected HtmlData.AnchorHtmlData generateSPSReviewerUrl(ProposalDevelopmentRoutingState propDevRoutingState) {

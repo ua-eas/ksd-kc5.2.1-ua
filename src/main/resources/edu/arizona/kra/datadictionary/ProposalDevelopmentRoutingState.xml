@@ -38,6 +38,7 @@
                 <ref bean="ProposalDevelopmentRoutingState-routeStopCollege"/>
                 <ref bean="ProposalDevelopmentRoutingState-routeLog"/> 
                 <ref bean="ProposalDevelopmentRoutingState-finalProposalReceived"/>
+                <ref bean="ProposalDevelopmentRoutingState-finalProposalReceivedTime"/>
                 <ref bean="ProposalDevelopmentRoutingState-spsReviewerName"/>
                 <ref bean="ProposalDevelopmentRoutingState-ordExpedited"/>
                 <ref bean="ProposalDevelopmentRoutingState-workflowUnit.unitNumber"/>
@@ -369,6 +370,15 @@
         <property name="displayLabelAttribute" value="finalProposalReceived" />
     </bean>
 
+    <bean id="ProposalDevelopmentRoutingState-finalProposalReceivedTime" parent="ProposalDevelopmentRoutingState-finalProposalReceivedTime-parentBean" />
+    <bean id="ProposalDevelopmentRoutingState-finalProposalReceivedTime-parentBean" abstract="true" parent="AttributeReferenceDummy-genericDate">
+        <property name="name" value="finalProposalReceivedTime" />
+        <property name="label" value="Final Proposal Received" />
+        <property name="shortLabel" value="Final Proposal Received" />
+        <property name="formatterClass" value="org.kuali.rice.core.web.format.TimestampAMPMFormatter"/>
+        <property name="displayLabelAttribute" value="finalProposalReceived" />
+    </bean>
+
     <bean id="ProposalDevelopmentRoutingState-workflowUnit.unitNumber" parent="ProposalDevelopmentRoutingState-workflowUnit.unitNumber-parentBean" />
     <bean id="ProposalDevelopmentRoutingState-workflowUnit.unitNumber-parentBean" abstract="true" parent="AttributeDefinition">
         <property name="name" value="workflowUnit.unitNumber" />
@@ -456,7 +466,7 @@
                 <bean parent="FieldDefinition" p:attributeName="leadUnitNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="leadUnitName"/>
                 <bean parent="FieldDefinition" p:attributeName="routeLog"/>
-                <bean parent="FieldDefinition" p:attributeName="finalProposalReceived"/>
+                <bean parent="FieldDefinition" p:attributeName="finalProposalReceivedTime"/>
                 <bean parent="FieldDefinition" p:attributeName="SPSReviewerName"/>
                 <bean parent="FieldDefinition" p:attributeName="ORDExpedited"/>
             </list>
