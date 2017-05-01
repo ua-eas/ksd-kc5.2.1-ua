@@ -92,21 +92,17 @@
 	            p:cols="40"/> 
         </property>
 	</bean>
-	
+
 	<bean id="ProtocolAttachmentPersonnel-personId" parent="ProtocolAttachmentPersonnel-personId-parentBean" />
 	<bean id="ProtocolAttachmentPersonnel-personId-parentBean" abstract="true" parent="ProtocolPerson-protocolPersonId" >
 		<property name="name" value="personId" />
 		<property name="label" value="Person" />
 		<property name="shortLabel" value="Person" />
-	    <property name="control" >
-	      <bean parent="SelectControlDefinition"
-	            p:businessObjectClass="org.kuali.kra.irb.personnel.ProtocolPerson"
-	            p:valuesFinderClass="org.kuali.kra.lookup.keyvalue.ExtendedPersistableBusinessObjectValuesFinder"
-	            p:includeKeyInLabel="false"
-            	p:includeBlankRow="false"
-	            p:keyAttribute="protocolPersonId"
-	            p:labelAttribute="personName" />
-	    </property>
+		<property name="required" value="true"/>
+		<property name="control" >
+			<bean parent="TextControlDefinition"
+				  p:size="20" />
+		</property>
 		<property name="summary" value="Person" />
 		<property name="description" value="Person" />
 	</bean>
