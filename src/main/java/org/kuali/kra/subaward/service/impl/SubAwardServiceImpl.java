@@ -47,8 +47,8 @@ import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.Collections;
 
 /**
  * This class is service impl for subAward...
