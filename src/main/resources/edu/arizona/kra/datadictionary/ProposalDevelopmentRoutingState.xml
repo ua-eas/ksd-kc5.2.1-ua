@@ -351,12 +351,12 @@
     <bean id="ProposalDevelopmentRoutingState-ordExpedited" parent="ProposalDevelopmentRoutingState-ordExpedited-parentBean" />
     <bean id="ProposalDevelopmentRoutingState-ordExpedited-parentBean" abstract="true" parent="AttributeDefinition">
         <property name="name" value="ORDExpedited" />
-        <property name="label" value="ORD Expedited" />
-        <property name="shortLabel" value="ORDExpedited" />
+        <property name="label" value="Expedited" />
+        <property name="shortLabel" value="Expedited" />
         <property name="control">
             <bean parent="HiddenControlDefinition" />
         </property>
-        <property name="displayLabelAttribute" value="ORD Expedited" />
+        <property name="displayLabelAttribute" value="Expedited" />
     </bean>
     
     <bean id="ProposalDevelopmentRoutingState-finalProposalReceived" parent="ProposalDevelopmentRoutingState-finalProposalReceived-parentBean" />
@@ -466,7 +466,7 @@
                 <bean parent="FieldDefinition" p:attributeName="leadUnitNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="leadUnitName"/>
                 <bean parent="FieldDefinition" p:attributeName="routeLog"/>
-                <bean parent="FieldDefinition" p:attributeName="finalProposalReceivedTime"/>
+                <bean parent="FieldDefinition" p:attributeName="finalProposalReceivedTime" />
                 <bean parent="FieldDefinition" p:attributeName="SPSReviewerName"/>
                 <bean parent="FieldDefinition" p:attributeName="ORDExpedited"/>
             </list>

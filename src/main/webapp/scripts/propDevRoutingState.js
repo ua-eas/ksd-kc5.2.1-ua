@@ -241,7 +241,7 @@ function setORDExpedited( ordExpeditedId ) {
     var res = ordExpeditedId.split("_");
     var proposalNumber = res[1];
 
-    var userConfirmation = confirm("Please confirm setting ORDExpedited to "+ordExp.toUpperCase()+ " for proposal "+proposalNumber+".\n");
+    var userConfirmation = confirm("Please confirm setting Expedited to "+ordExp.toUpperCase()+ " for proposal "+proposalNumber+".\n");
     if (userConfirmation == true) {
 	var dwrReply = {
 		callback:function(data) {
@@ -259,7 +259,7 @@ function setORDExpedited( ordExpeditedId ) {
 		    selectProcessing = false;
 		    resetSelectState(ordExpeditedId);
 		    deleteHiddenCtrl(ordExpeditedId);
-		    alert( "Error at setting ORDExpedited to "+ordExp.toUpperCase()+ " for proposal "+proposalNumber+".\n" );
+		    alert( "Error at setting Expedited to "+ordExp.toUpperCase()+ " for proposal "+proposalNumber+".\n" );
 		    console.error(errorMessage);
 		}
 	};
