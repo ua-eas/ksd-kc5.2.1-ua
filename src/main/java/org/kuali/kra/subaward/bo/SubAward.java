@@ -1857,7 +1857,7 @@ public class SubAward extends KraPersistableBusinessObjectBase implements Permis
         return performanceEndDate;
     }
 
-    public void setPerformanceEndDate(Date performanceEndDateate) {
+    public void setPerformanceEndDate(Date performanceEndDate) {
         this.performanceEndDate = performanceEndDate;
     }
 
