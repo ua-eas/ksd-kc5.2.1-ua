@@ -101,21 +101,9 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
                                 return 1;
                             }
 
-                            // secondary sort desc by Final Proposal Received
-                            if ( pd1.isFinalProposalReceived() ){
-                                if (pd2.isFinalProposalReceived()){
-                                    // at this point, both should have a final proposal received date not null to compare on
-                                    if ( pd1.getFinalProposalReceivedTime() != pd2.getFinalProposalReceivedTime() ){
-                                        return pd1.getFinalProposalReceivedTime().compareTo( pd2.getFinalProposalReceivedTime() );
-                                    }
-                                } else {
-                                    return -1;
-                                }
-                            } else if ( pd2.isFinalProposalReceived() ){
-                                    return 1;
-                            }
-                            // tertiary sort desc by SPS Approve Route Stop date
+                            //secondary sort asc by Route Stop Date
                             return pd1.getRouteStopDate().compareTo(pd2.getRouteStopDate());
+
                         }
                         return 0;
                     }});
@@ -145,8 +133,6 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
                     column.setEscapeXMLValue(false);
                 } else if ( SEARCH_RESULT_PROPERTY_NAME_SPS_REVIEWER.equalsIgnoreCase(column.getPropertyName()) && canAssignSPSReviewer()){
                     setSPSReviewerAnchor(column, (ProposalDevelopmentRoutingState)resultRow.getBusinessObject());  
-                } else if ( SEARCH_RESULT_PROPERTY_NAME_RECEIVED_TIME.equalsIgnoreCase(column.getPropertyName())){
-                    setReceivedTime(column, (ProposalDevelopmentRoutingState)resultRow.getBusinessObject());
                 }
             }
         }
@@ -320,11 +306,6 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
         column.setPropertyValue(anchor.getDisplayText());
     }
 
-    protected void setReceivedTime(Column column, ProposalDevelopmentRoutingState propDevRoutingState){
-        if ( !propDevRoutingState.isFinalProposalReceived() ) {
-            column.setPropertyValue("No");
-        }
-    }
     
     protected HtmlData.AnchorHtmlData generateSPSReviewerUrl(ProposalDevelopmentRoutingState propDevRoutingState) {
         String id = "spsrew_"+propDevRoutingState.getProposalNumber();
