@@ -508,7 +508,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
 
 
     /**
-     * 
      * @return
      */
     public Integer getStatusCode() {
@@ -516,7 +515,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     /**
-     * 
      * @param statusCode
      */
     public void setStatusCode(Integer statusCode) {
@@ -524,7 +522,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     /**
-     * 
      * @return
      */
     public String getAccountNumber() {
@@ -532,7 +529,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     /**
-     * 
      * @param accountNumber
      */
     public void setAccountNumber(String accountNumber) {
@@ -540,7 +536,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     /**
-     * 
      * @return
      */
     public List<AwardApprovedEquipment> getApprovedEquipmentItems() {

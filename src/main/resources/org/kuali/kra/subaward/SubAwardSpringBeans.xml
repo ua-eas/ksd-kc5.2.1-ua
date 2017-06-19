@@ -203,17 +203,27 @@ R
         <property name="versionHistoryService" ref="versionHistoryService" />
         <property name="subAwardFundingSourceDao" ref="subAwardFundingSourceDao" />
     </bean>
-    
-	<bean id="subAwardLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
-  		<property name="lookupableHelperService" ref="subAwardLookupableHelperService" />  
-	</bean>
-	
-	<bean id="subAwardLookupableHelperService" class="org.kuali.kra.subaward.lookup.SubAwardLookupableHelperServiceImpl" parent="parentLookupableHelperService" 
-	      scope="prototype">
-		<property name="versionHistoryService" ref="versionHistoryService" />
-  	</bean>
-  	
-    <bean id ="subAwardFundingSourceDao" parent="platformAwareDao" class="org.kuali.kra.subaward.dao.impl.SubAwardFundingSourceDaoOjb" />
+
+    <bean id="subAwardLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
+        <property name="lookupableHelperService" ref="subAwardLookupableHelperService" />
+    </bean>
+
+    <bean id ="subAwardFundingSourceDao" parent="platformAwareDao" class="org.kuali.kra.subaward.dao.impl.SubAwardFundingSourceDaoOjb"  scope="prototype" />
+
+    <bean id="versionHistoryLookupDao" class="org.kuali.rice.core.framework.resourceloader.GlobalResourceLoaderServiceFactoryBean">
+        <property name="serviceName" value="versionHistoryLookupDao" />
+    </bean>
+
+    <bean id="subAwardLookupDao" parent="platformAwareDao" class="org.kuali.kra.subaward.dao.impl.SubAwardLookupDaoOjb" >
+        <property name="dateTimeService" ref="dateTimeService" />
+        <property name="subAwardService" ref="subAwardService" />
+    </bean>
+
+    <bean id="subAwardLookupableHelperService" class="org.kuali.kra.subaward.lookup.SubAwardLookupableHelperServiceImpl" parent="parentLookupableHelperService" scope="prototype">
+        <property name="subAwardLookupDao" ref="subAwardLookupDao" />
+    </bean>
+
+
     
   	<!-- SubAward Task Authorizers -->
   	

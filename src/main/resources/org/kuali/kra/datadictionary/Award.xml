@@ -44,7 +44,7 @@
         <ref bean="Award-sponsorCode" />
         <ref bean="Award-primeSponsorCode" />
         <ref bean="Award-nsfCode" />
-		<ref bean="Award-awardNumber" />
+		    <ref bean="Award-awardNumber" />
         <ref bean="Award-sponsorName" />
         <ref bean="Award-awardId" />
         <ref bean="Award-accountNumber" />
@@ -79,7 +79,8 @@
         <ref bean="Award-financialAccountCreationDate" />
         <ref bean="Award-financialChartOfAccountsCode" />
         <ref bean="Award-awardDocument.documentNumber" />
-        <ref bean="Award-awardStatus.description" /> 
+        <ref bean="Award-awardStatus.description" />
+        <ref bean="Award-awardSequenceStatus" />
         <ref bean="Award-awardAmountInfo.obligationExpirationDate" />
         <ref bean="Award-awardAmountInfo.amountObligatedToDate" />
         <ref bean="Award-sponsor.sponsorName" />
@@ -1049,10 +1050,22 @@
 
     <bean id="Award-awardStatus.description" parent="Award-awardStatus.description-parentBean" />
     <bean id="Award-awardStatus.description-parentBean" abstract="true" parent="AwardStatus-description">
-        <property name="name" value="awardStatus.description" />
-        <property name="label" value="Description" />
+      <property name="name" value="awardStatus.description" />
+      <property name="label" value="Description" />
+      <property name="shortLabel" value="Description" />
+      <property name="required" value="false" />
+    </bean>
+
+    <bean id="Award-awardSequenceStatus" parent="Award-awardSequenceStatus-parentBean" />
+    <bean id="Award-awardSequenceStatus-parentBean" abstract="true"  parent="AttributeDefinition">
+        <property name="name" value="awardSequenceStatus" />
+        <property name="label" value="Award Sequence Status" />
         <property name="shortLabel" value="Description" />
-        <property name="required" value="false" />    
+        <property name="required" value="false" />
+        <property name="control" >
+          <bean parent="TextControlDefinition"
+                p:size="12" />
+        </property>
     </bean>
     
     <bean id="Award-awardAmountInfo.obligationExpirationDate" parent="Award-awardAmountInfo.obligationExpirationDate-parentBean" />
@@ -1125,13 +1138,13 @@
 		</property>
 		<property name="lookupFields" >
 		  <list>
-            <bean p:attributeName="awardNumber" parent="FieldDefinition" />
+        <bean p:attributeName="awardNumber" parent="FieldDefinition" />
 		  	<bean p:attributeName="sponsorAwardNumber" parent="FieldDefinition" />
 		    <bean p:attributeName="accountNumber" parent="FieldDefinition" />
 		    <bean p:attributeName="statusCode" parent="FieldDefinition" />
 		    <bean p:attributeName="sponsorCode" parent="FieldDefinition" />
 		    <bean p:attributeName="title" parent="FieldDefinition" />
-			<bean p:attributeName="projectPersons.fullName" parent="FieldDefinition" />
+			  <bean p:attributeName="projectPersons.fullName" parent="FieldDefinition" />
 		    <bean p:attributeName="unitNumber" parent="FieldDefinition" />
 		    <bean p:attributeName="leadUnit.unitName" parent="FieldDefinition" />
 		    <bean p:attributeName="lookupOspAdministratorName" parent="FieldDefinition" />
@@ -1149,20 +1162,20 @@
 		    <bean p:attributeName="unitNumber" parent="FieldDefinition" />
 		    <bean p:attributeName="leadUnit.unitName" parent="FieldDefinition" />
 		    <bean p:attributeName="accountNumber" parent="FieldDefinition" />
-			<bean p:attributeName="statusDescription" parent="FieldDefinition" />	    
-			<bean p:attributeName="title" parent="FieldDefinition" />
-			<bean p:attributeName="sponsorCode" parent="FieldDefinition" />
-			<bean p:attributeName="sponsorName" parent="FieldDefinition" />
-			<bean p:attributeName="principalInvestigatorName" parent="FieldDefinition" />
-			<bean p:attributeName="ospAdministratorName" parent="FieldDefinition" />
-			<bean p:attributeName="awardEffectiveDate"  parent="FieldDefinition" />
-			<bean p:attributeName="projectEffectiveEndDate" parent="FieldDefinition" />
-			<bean p:attributeName="archiveLocation" parent="FieldDefinition" />
+        <bean p:attributeName="statusDescription" parent="FieldDefinition" />
+        <bean p:attributeName="title" parent="FieldDefinition" />
+        <bean p:attributeName="sponsorCode" parent="FieldDefinition" />
+        <bean p:attributeName="sponsorName" parent="FieldDefinition" />
+        <bean p:attributeName="principalInvestigatorName" parent="FieldDefinition" />
+        <bean p:attributeName="ospAdministratorName" parent="FieldDefinition" />
+        <bean p:attributeName="awardEffectiveDate"  parent="FieldDefinition" />
+        <bean p:attributeName="projectEffectiveEndDate" parent="FieldDefinition" />
+        <bean p:attributeName="archiveLocation" parent="FieldDefinition" />
 		    <bean p:attributeName="closeoutDate" parent="FieldDefinition" />
 			
 		  </list>
 		</property>
-		<property name="resultSetLimit" value="50" />
+
 	</bean>
   
 </beans>
