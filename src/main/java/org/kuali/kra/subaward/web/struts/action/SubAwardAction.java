@@ -237,8 +237,8 @@ public class SubAwardAction extends KraTransactionalDocumentActionBase{
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         SubAwardForm subAwardForm = (SubAwardForm) form;
-
         SubAward subAward = subAwardForm.getSubAwardDocument().getSubAward();
+        subAward = getSubAwardService().getAmountInfo(subAward);
         checkSubAwardCode(subAward);
         checkSubAwardTemplateCode(subAward);
         String userId = GlobalVariables.getUserSession().getPrincipalName();

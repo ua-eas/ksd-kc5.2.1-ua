@@ -46,7 +46,6 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
     @Override
     public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
         super.setBackLocationDocFormKey(fieldValues);
-
         try {
             return (List<SubAward>)subAwardLookupDao.findSubAwards(fieldValues);
         } catch (Exception e){
