@@ -55,10 +55,9 @@ jQuery( document ).ready(function() {
  */
 function loadLeadUnitName(unitNumberFieldName, leadUnitNameFieldName ) {
 	var unitNumber = dwr.util.getValue( unitNumberFieldName );
+	clearRecipients( leadUnitNameFieldName, "" );
 
-	if (unitNumber=='') {
-		clearRecipients( leadUnitNameFieldName, "" );
-	} else {
+	if (unitNumber && unitNumber.trim().length > 0) {
 		var dwrReply = {
 			callback:function(data) {
 				if ( data != null ) {
@@ -73,7 +72,7 @@ function loadLeadUnitName(unitNumberFieldName, leadUnitNameFieldName ) {
 			},
 			errorHandler:function( errorMessage ) {
 				window.status = errorMessage;
-				setRecipientValue( leadUnitNameFieldName, wrapError( "not found" ), true );
+				//setRecipientValue( leadUnitNameFieldName, wrapError( "not found" ), true );
 			}
 		};
 		UnitService.getUnitName(unitNumber,dwrReply);

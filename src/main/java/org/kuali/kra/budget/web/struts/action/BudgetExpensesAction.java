@@ -67,7 +67,6 @@ public class BudgetExpensesAction extends BudgetAction {
         if(StringUtils.isNotBlank(budgetForm.getActivePanelName())) {
             populateTabState(budgetForm, budgetForm.getActivePanelName());
         }
-        
         return forward;
         
     }

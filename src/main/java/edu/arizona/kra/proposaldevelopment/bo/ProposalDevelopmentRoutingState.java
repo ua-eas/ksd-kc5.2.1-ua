@@ -56,6 +56,7 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     private String routeStopCollege;
     private Timestamp routeStopDate;
     private Boolean finalProposalReceived;
+    private Timestamp finalProposalReceivedTime;
     private Boolean ordExpedited;
     private String spsReviewerName;
     private String spsPersonId;
@@ -194,6 +195,14 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
 
     public void setFinalProposalReceived(Boolean finalProposalReceived) {
         this.finalProposalReceived = finalProposalReceived;
+    }
+
+    public Timestamp getFinalProposalReceivedTime() {
+        return finalProposalReceivedTime;
+    }
+
+    public void setFinalProposalReceivedTime(Timestamp finalProposalReceivedTime) {
+        this.finalProposalReceivedTime = finalProposalReceivedTime;
     }
 
     public SPSReviewer getSPSReviewer() {

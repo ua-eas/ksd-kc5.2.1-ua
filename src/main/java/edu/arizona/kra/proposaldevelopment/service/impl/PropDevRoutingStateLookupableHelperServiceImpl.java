@@ -15,12 +15,7 @@
  */
 package edu.arizona.kra.proposaldevelopment.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,6 +55,7 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
     private static final String SEARCH_RESULT_PROPERTY_NAME_LEAD_UNIT_NAME = "leadUnitName";
     private static final String SEARCH_RESULT_PROPERTY_NAME_ORD_EXPEDITED = "ORDExpedited";
     private static final String SEARCH_RESULT_PROPERTY_NAME_SPS_REVIEWER = "SPSReviewerName";
+    private static final String SEARCH_RESULT_PROPERTY_NAME_RECEIVED_TIME = "finalProposalReceivedTime";
     
     private static final String PROPDEV_DOCUMENT = "ProposalDevelopmentDocument";
     private static final String PROPDEV_NUMBER = "proposalNumber";
@@ -88,10 +84,29 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
         List <ProposalDevelopmentRoutingState> results = new ArrayList<ProposalDevelopmentRoutingState>();
         try {
             results = getPropDevRoutingStateService().findPropDevRoutingState(fieldValues);
-            // sort list DESC by ORDExpedited so 'Yes' rows will be shown first
-            List defaultSortColumns = getDefaultSortColumns();
-            if (defaultSortColumns.size() > 0) {
-                Collections.sort(results, Collections.reverseOrder(new BeanPropertyComparator(defaultSortColumns, true)));
+            // sort list by expedited, then SPS Approve route stop then Final Proposal Received Date
+            if (results.size() > 1) {
+                Collections.sort(results, new Comparator(){
+                    public int compare(Object o1, Object o2) {
+                        if(o1 instanceof ProposalDevelopmentRoutingState && o2 instanceof ProposalDevelopmentRoutingState) {
+                            ProposalDevelopmentRoutingState pd1 = (ProposalDevelopmentRoutingState)o1;
+                            ProposalDevelopmentRoutingState pd2 = (ProposalDevelopmentRoutingState)o2;
+
+                            // outmost important: OrdExpedited
+                            if ( pd1.isORDExpedited() ){
+                                if (!pd2.isORDExpedited()) {
+                                    return -1;
+                                }
+                            } else if ( pd2.isORDExpedited() ){
+                                return 1;
+                            }
+
+                            //secondary sort asc by Route Stop Date
+                            return pd1.getRouteStopDate().compareTo(pd2.getRouteStopDate());
+
+                        }
+                        return 0;
+                    }});
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -290,6 +305,7 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
         column.setPropertyURL(anchor.getHref());
         column.setPropertyValue(anchor.getDisplayText());
     }
+
     
     protected HtmlData.AnchorHtmlData generateSPSReviewerUrl(ProposalDevelopmentRoutingState propDevRoutingState) {
         String id = "spsrew_"+propDevRoutingState.getProposalNumber();

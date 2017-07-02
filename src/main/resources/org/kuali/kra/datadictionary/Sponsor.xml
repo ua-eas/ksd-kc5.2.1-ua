@@ -471,7 +471,5 @@
       </list>
     </property>
     
-    <property name="resultSetLimit" value="8000" />
-    
   </bean>
 </beans>

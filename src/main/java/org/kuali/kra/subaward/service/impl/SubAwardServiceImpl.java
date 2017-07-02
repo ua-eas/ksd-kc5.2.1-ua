@@ -47,6 +47,8 @@ import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
+import java.util.Comparator;
+import java.util.Collections;
 
 /**
  * This class is service impl for subAward...
@@ -227,7 +229,7 @@ public class SubAwardServiceImpl implements SubAwardService {
                     subAward.setPerformanceStartDate(subAwardAmountInfo.getPeriodofPerformanceStartDate());
                 }
                 if (subAwardAmountInfo.getPeriodofPerformanceEndDate() != null) {
-                    subAward.setPerformanceEnddate(subAwardAmountInfo.getPeriodofPerformanceEndDate());
+                    subAward.setPerformanceEndDate(subAwardAmountInfo.getPeriodofPerformanceEndDate());
                 }
             }
             for (SubAwardAmountReleased subAwardAmountReleased: subAwardAmountReleasedList) {
@@ -249,6 +251,21 @@ public class SubAwardServiceImpl implements SubAwardService {
         subAward.setTotalAmountReleased(totalAmountReleased);
         subAward.setTotalAvailableAmount(totalObligatedAmount.subtract(totalAmountReleased));
 
+        List<SubAwardAmountInfo> sortedlist = subAward.getSubAwardAmountInfoList();
+
+        if ( sortedlist.size() > 1 ) {
+            Collections.sort(sortedlist, new Comparator<SubAwardAmountInfo>() {
+                public int compare(SubAwardAmountInfo o1, SubAwardAmountInfo o2) {
+                    if((o1.getSubAwardAmountInfoId() != null) && (o2.getSubAwardAmountInfoId() != null)) {
+                        return o1.getSubAwardAmountInfoId() - o2.getSubAwardAmountInfoId();
+                    }else{
+                        return 0;
+                    }
+                }
+            });
+        }
+
+        subAward.setSubAwardAmountInfoList(sortedlist);
         return subAward;
     }
     /**.
@@ -353,6 +370,18 @@ public class SubAwardServiceImpl implements SubAwardService {
             LOG.error(e);
         }
         return linkedSubawards;
+    }
+
+    @Override
+    public Collection<String> getLinkedSubAwardsIds(String awardNumber){
+        List <String> linkedSubAwardIds = new ArrayList<String>();
+        try {
+            linkedSubAwardIds = getSubAwardFundingSourceDao().getLinkedSubAwardsIds(awardNumber);
+        } catch (Exception e){
+            e.printStackTrace();
+            LOG.error(e);
+        }
+        return linkedSubAwardIds;
     }
 
 
