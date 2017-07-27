@@ -93,16 +93,40 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
                             ProposalDevelopmentRoutingState pd2 = (ProposalDevelopmentRoutingState)o2;
 
                             // outmost important: OrdExpedited
-                            if ( pd1.isORDExpedited() ){
-                                if (!pd2.isORDExpedited()) {
-                                    return -1;
+                            if ( pd1.isORDExpedited() || pd2.isORDExpedited()) {
+                                if (pd1.isORDExpedited()) {
+                                    if (!pd2.isORDExpedited()) {
+                                        return -1;
+                                    }
+                                } else if (pd2.isORDExpedited()) {
+                                    return 1;
                                 }
-                            } else if ( pd2.isORDExpedited() ){
-                                return 1;
-                            }
 
-                            //secondary sort asc by Route Stop Date
-                            return pd1.getRouteStopDate().compareTo(pd2.getRouteStopDate());
+                                //secondary sort asc by Route Stop Date
+                                return pd1.getRouteStopDate().compareTo(pd2.getRouteStopDate());
+                            } else {
+                                //neither of them is OrdExpedited, see if there's a FinalProposalReceived date
+                                if ( pd1.isFinalProposalReceived() || pd2.isFinalProposalReceived() ) {
+                                    if (pd1.isFinalProposalReceived()) {
+                                        if (!pd2.isFinalProposalReceived()) {
+                                            return -1;
+                                        }
+                                    } else if (pd2.isFinalProposalReceived()) {
+                                        return 1;
+                                    }
+
+                                    //both of them hare FPR date
+                                    if (pd1.getFinalProposalReceivedTime().equals(pd2.getFinalProposalReceivedTime())){
+                                        //secondary sort asc by Route Stop Date
+                                        return pd1.getRouteStopDate().compareTo(pd2.getRouteStopDate());
+                                    }
+
+                                    return pd1.getFinalProposalReceivedTime().compareTo(pd2.getFinalProposalReceivedTime());
+                                }
+
+                                //none of them are OrdExp or FPR so just sort asc by Route Stop Date
+                                return pd1.getRouteStopDate().compareTo(pd2.getRouteStopDate());
+                            }
 
                         }
                         return 0;
