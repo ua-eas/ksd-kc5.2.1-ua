@@ -355,7 +355,7 @@ public class ProtocolPersonnelAction extends ProtocolAction {
                     // Assign the PI the AGGREGATOR role.
                     KraAuthorizationService kraAuthService = KraServiceLocator.getService(KraAuthorizationService.class);
                     kraAuthService.addRole(protocolPerson.getPersonId(), RoleConstants.PROTOCOL_APPROVER, protocol);
-                    protocolForm.getPermissionsHelper().resetUserStates();
+                    protocolForm.resetUserPermissionStates();
 
                 }
             }
@@ -366,13 +366,13 @@ public class ProtocolPersonnelAction extends ProtocolAction {
                     // Assign the Other Role To Viewer the AGGREGATOR role.
                     KraAuthorizationService kraAuthService = KraServiceLocator.getService(KraAuthorizationService.class);
                     kraAuthService.addRole(protocolPerson.getPersonId(), RoleConstants.PROTOCOL_VIEWER, protocol);
-                    protocolForm.getPermissionsHelper().resetUserStates();
+                    protocolForm.resetUserPermissionStates();
                 }
             }
 
             // we need to rebuild the user states if affiliations have been modified
             if(protocolPerson.isAffiliationTypeCodeChanged()) {
-                protocolForm.getPermissionsHelper().resetUserStates();
+                protocolForm.resetUserPermissionStates();
             }
         }
 
