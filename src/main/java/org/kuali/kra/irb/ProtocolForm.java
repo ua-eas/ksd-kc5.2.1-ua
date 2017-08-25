@@ -249,6 +249,7 @@ public class ProtocolForm extends ProtocolFormBase {
         return (PersonnelHelper) super.getPersonnelHelper();
     }
     
+//Removed for RESKC-1123:Prevent NPE from occuring when permissions helper has not yet been inititialized
 //    public PermissionsHelper getPermissionsHelper() {
 //        return (PermissionsHelper) super.getPermissionsHelper();
 //    }

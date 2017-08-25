@@ -125,7 +125,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
      */
     public void initialize() throws Exception {
         if ( !initialized) {
-            LOG.debug("initialize()");
+            LOG.debug("ProtocolFormBase: initialize()");
             setProtocolHelper(createNewProtocolHelperInstanceHook(this));
             setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
             setCustomDataHelper(createNewCustomDataHelperInstanceHook(this));
@@ -136,7 +136,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
             setNotificationHelper(getNotificationHelperHook());
             setMedusaBean(new MedusaBean());
             initialized = true;
-            LOG.debug("initialize() exit...");
+            LOG.debug("ProtocolFormBase: initialize() exit...");
         }
     }
        
@@ -146,6 +146,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
         LOG.debug("initializePermission() exit");
 
     }
+
 
     public void initializeNotesAttachments() throws Exception {
         LOG.debug("initializeNotesAttachments()");
@@ -245,6 +246,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     public PermissionsHelperBase getPermissionsHelper() {
         if (permissionsHelper == null ){
             try {
+                LOG.debug("ProtocolFormBase: PermissionsHelper needs initialization: initializingPermissions()...");
                 this.initializePermission();
             } catch (Exception e){
                 throw new RuntimeException(e);
@@ -254,9 +256,11 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     }
 
     public void resetUserPermissionStates() {
+        LOG.debug("resetUserPermissionStates ENTER");
         if (permissionsHelper != null) {
             permissionsHelper.resetUserStates();
         }
+        LOG.debug("resetUserPermissionStates EXIT");
     }
     
     public void setNewProtocolReferenceBean(ProtocolReferenceBeanBase newProtocolReferenceBean) {

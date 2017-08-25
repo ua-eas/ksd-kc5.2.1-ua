@@ -119,11 +119,8 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     }
 
     public ActionForward permissions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-        LOG.debug("permissions()");
         ProtocolFormBase protocolForm = (ProtocolFormBase)form;
-        protocolForm.initializePermission();
         protocolForm.getPermissionsHelper().prepareView();
-        LOG.debug("permissions() exit...");
         return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolPermissionsForwardNameHook());
     }
 
@@ -222,6 +219,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     }
 
     protected void saveQuestionnaire(ProtocolFormBase protocolForm) {
+        LOG.debug("protocolActions() saveQuestionnaire() Start...");
         //When a user selects the Questionnaires tab, empty answerHeaders are generated and saved to the database so that subsequent methods relying
         //on that persisted data have it available to render panels.  Make Protocol Actions tab work in this same manner so it's sub-tab
         //Print ==> Questionnaires will render when a user enters a protocol but does not select the Questionnaire tab to answer the questions.
@@ -232,8 +230,11 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         List<AnswerHeader> answerHeaders = protocolForm.getQuestionnaireHelper().getAnswerHeaders();
         if (applyRules(new SaveQuestionnaireAnswerEvent(document, answerHeaders)) && applyRules(new SaveProtocolQuestionnaireEvent(document, answerHeaders))) {
             protocolForm.getQuestionnaireHelper().preSave();
+            LOG.debug("protocolActions() saveQuestionnaire() Saving Action Headers...");
             getBusinessObjectService().save(answerHeaders);
+
         }
+        LOG.debug("protocolActions() saveQuestionnaire() Exit...");
     }
     
     public ActionForward customData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {

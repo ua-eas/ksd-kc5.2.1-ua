@@ -379,6 +379,7 @@ public abstract class ActionHelperBase implements Serializable {
 
         protocolManageReviewCommentsBean = buildProtocolGenericActionBean(getProtocolActionTypeCodeForManageReviewCommentsHook(), 
                 Constants.PROTOCOL_MANAGE_REVIEW_COMMENTS_KEY);
+        LOG.debug("ActionHelperBase: refreshing references for ProtocolSubmission...");
         ProtocolBase protocol = getProtocol();
         protocol.getProtocolSubmission().refreshReferenceObject("reviewAttachments");
         protocol.refreshReferenceObject(PROTOCOL_ACTIONS_REF_OBJECT_NAME);
@@ -493,6 +494,7 @@ public abstract class ActionHelperBase implements Serializable {
         
  
     protected ProtocolApproveBean buildProtocolApproveBean(String actionTypeCode, String errorPropertyKey) {
+        LOG.debug("ActionHelperBase:  buildProtocolApproveBean ENTER");
         ProtocolApproveBean bean = getNewProtocolApproveBeanInstanceHook(this, errorPropertyKey);       
         bean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         
@@ -504,6 +506,7 @@ public abstract class ActionHelperBase implements Serializable {
         bean.setApprovalDate(buildApprovalDate(getProtocol()));
         bean.setExpirationDate(buildExpirationDate(getProtocol(), bean.getApprovalDate()));
         bean.setDefaultExpirationDateDifference(this.getDefaultExpirationDateDifference());
+        LOG.debug("ActionHelperBase:  buildProtocolApproveBean EXIT");
         return bean;
     }
 
@@ -1338,6 +1341,7 @@ public abstract class ActionHelperBase implements Serializable {
     
     public ProtocolAssignToAgendaBean getAssignToAgendaBean(){
         if ( assignToAgendaBean == null) {
+            LOG.debug("ActionHelperBase: getAssignToAgendaBean() - initializing assignToAgendaBean.");
             assignToAgendaBean = getNewProtocolAssignToAgendaBeanInstanceHook(this);
         }
         return this.assignToAgendaBean;
@@ -1345,7 +1349,7 @@ public abstract class ActionHelperBase implements Serializable {
     
     public ProtocolApproveBean getProtocolFullApprovalBean() {
         if ( protocolFullApprovalBean == null ){
-            LOG.debug("ActionHelperBase: getProtocolFullApprovalBean() - initializing ProtocolFullApprovalBean.");
+            LOG.debug("ActionHelperBase: getProtocolFullApprovalBean() - initializing protocolFullApprovalBean.");
             protocolFullApprovalBean = buildProtocolApproveBean(getFullApprovalProtocolActionTypeHook(), Constants.PROTOCOL_FULL_APPROVAL_ACTION_PROPERTY_KEY);
         }
         return protocolFullApprovalBean;

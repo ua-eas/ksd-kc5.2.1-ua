@@ -132,7 +132,6 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     }    
 
     /**
-     * @see org.kuali.core.web.struts.action.KualiDocumentActionBase#docHandler(org.apache.struts.action.ActionMapping,
      * org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
@@ -431,8 +430,6 @@ public abstract class ProtocolAction extends ProtocolActionBase {
     /**
      * 
      * This method for set the attachment with the watermark which selected  by the client .
-     * @param ProtocolForm form
-     * @param ProtocolAttachmentProtocol attachment
      * @return attachment file
      */
     protected byte[] getProtocolAttachmentFile(ProtocolForm form, ProtocolAttachmentProtocol attachment){
