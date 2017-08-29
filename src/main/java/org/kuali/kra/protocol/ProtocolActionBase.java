@@ -458,6 +458,8 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
             request.setAttribute(KRADConstants.PARAMETER_DOC_ID, docIdRequestParameter);
             loadDocument(protocolForm);
         } else {
+            LOG.debug("ProtocolActionBase: docHandler: loading document before calling super.docHandler() docId=docIdRequestParameter");
+            loadDocument(protocolForm);
             forward = super.docHandler(mapping, form, request, response);
         }
 

@@ -136,13 +136,13 @@ public abstract class ProtocolAction extends ProtocolActionBase {
      */
     @Override
     public ActionForward docHandler(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        LOG.debug("docHandler()");
+        LOG.debug("docHandler() ENTER");
         ActionForward forward = null;
 
         ProtocolForm protocolForm = (ProtocolForm) form;
         String command = protocolForm.getCommand();
         String detailId;
-
+        LOG.debug("docHandler() ENTER command="+command);
         if (command.startsWith(KewApiConstants.DOCSEARCH_COMMAND+"detailId")) {
             detailId = command.substring((KewApiConstants.DOCSEARCH_COMMAND+"detailId").length());
             protocolForm.setDetailId(detailId);
@@ -163,6 +163,7 @@ public abstract class ProtocolAction extends ProtocolActionBase {
             request.setAttribute(KRADConstants.PARAMETER_DOC_ID, docIdRequestParameter);
             loadDocument(protocolForm);
         } else {
+            LOG.debug("docHandler() calling super.docHandler()");
             forward = super.docHandler(mapping, form, request, response);
         }
 

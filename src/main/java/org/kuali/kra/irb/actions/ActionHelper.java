@@ -212,7 +212,7 @@ public class ActionHelper extends ActionHelperBase {
 
     @Override
     public void initializeProtocolActions() throws Exception {
-        LOG.debug("ActionHelper initializeProtocolActions()");
+        LOG.debug("ActionHelper initializeProtocolActions() ENTER");
         super.initializeProtocolActions();
         protocolNotifyIrbBean = new ProtocolNotifyIrbBean(this, "protocolNotifyIrbBean");
         // setting the attachment here so new files can be attached to newActionAttachment
@@ -260,6 +260,7 @@ public class ActionHelper extends ActionHelperBase {
         toAnswerSubmissionQuestionnaire = hasSubmissionQuestionnaire();
 
         initIRBSpecificActionBeanTaskMap();
+        LOG.debug("ActionHelper initializeProtocolActions() EXIT");
     }
     
     /**
@@ -267,7 +268,7 @@ public class ActionHelper extends ActionHelperBase {
      * The reason TaskName (a text code) is used and ProtocolActionType (a number code) is not is because not every task is mapped to a ProtocolActionType.
      */    
     private void initIRBSpecificActionBeanTaskMap() {
-        LOG.debug("initIRBSpecificActionBeanTaskMap()");
+        LOG.debug("initIRBSpecificActionBeanTaskMap() ENTER");
         actionBeanTaskMap.put(TaskName.ASSIGN_TO_COMMITTEE_SCHEDULE, assignCmtSchedBean);
         actionBeanTaskMap.put(TaskName.ASSIGN_REVIEWERS, protocolAssignReviewersBean);  
         actionBeanTaskMap.put(TaskName.CLOSE_PROTOCOL, protocolCloseBean);
@@ -297,6 +298,7 @@ public class ActionHelper extends ActionHelperBase {
         actionBeanTaskMap.put(TaskName.PROTOCOL_REQUEST_SUSPENSION, protocolSuspendRequestBean);
         actionBeanTaskMap.put(TaskName.PROTOCOL_REQUEST_TERMINATE, protocolTerminateRequestBean);
         actionBeanTaskMap.put(TaskName.PROTOCOL_UNDO_LAST_ACTION, undoLastActionBean);
+        LOG.debug("initIRBSpecificActionBeanTaskMap() EXIT");
     }
     
     /**

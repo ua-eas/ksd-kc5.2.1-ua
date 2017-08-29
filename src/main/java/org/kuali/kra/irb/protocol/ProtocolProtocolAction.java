@@ -80,12 +80,15 @@ import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The ProtocolProtocolAction corresponds to the Protocol tab (web page). It is responsible for handling all user requests from that
  * tab (web page).
  */
 public class ProtocolProtocolAction extends ProtocolAction {
+    private static final Logger LOG = LoggerFactory.getLogger(ProtocolProtocolAction.class);
     
     private static final String CONFIRM_DELETE_PROTOCOL_FUNDING_SOURCE_KEY = "confirmDeleteProtocolFundingSource";
 
@@ -96,13 +99,13 @@ public class ProtocolProtocolAction extends ProtocolAction {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-        
+        LOG.debug("execute() ENTER -> super.execute(...)");
         ActionForward actionForward = super.execute(mapping, form, request, response);
-
+        LOG.debug("execute() Returned from super.execute(...)");
         // Following is for protocol lookup - edit protocol
         ProtocolForm protocolForm = (ProtocolForm) form;
         String commandParam = request.getParameter(KRADConstants.PARAMETER_COMMAND);
-
+        LOG.debug("execute() commandParam="+commandParam);
         if (StringUtils.isNotBlank(commandParam) && commandParam.equals(KewApiConstants.DOCSEARCH_COMMAND)
                 && StringUtils.isNotBlank(request.getParameter("submissionId"))) {
             // protocolsubmission lookup
@@ -116,9 +119,10 @@ public class ProtocolProtocolAction extends ProtocolAction {
                 }
             }
         }
-
+        LOG.debug("execute() before  protocolForm.getProtocolHelper().prepareView()");
         protocolForm.getProtocolHelper().prepareView();
 
+        LOG.debug("execute() EXIT");
         return actionForward;
     }
 
@@ -129,13 +133,13 @@ public class ProtocolProtocolAction extends ProtocolAction {
 
         String command = request.getParameter("command");
         String docId = request.getParameter("docId");
-
+        LOG.debug("headerTab() ENTER command=  "+command+" docId="+docId);
         if (StringUtils.isNotEmpty(command) && command.equals("displayDocSearchView") && StringUtils.isNotEmpty(docId)) {
             // copy link from protocol lookup - Copy Action
             Document retrievedDocument = KRADServiceLocatorWeb.getDocumentService().getByDocumentHeaderId(docId);
             protocolform.setDocument(retrievedDocument);
         }
-
+        LOG.debug("headerTab() _> calling super.headerTab(...)");
         return super.headerTab(mapping, form, request, response);
     }
 

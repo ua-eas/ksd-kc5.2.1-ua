@@ -15,6 +15,8 @@
  */
 package org.kuali.kra.irb;
 
+import edu.arizona.kra.irb.CustomProtocolForm;
+import edu.arizona.kra.irb.actions.CustomActionHelper;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
 import org.kuali.kra.bo.CoeusModule;
@@ -82,7 +84,6 @@ public class ProtocolForm extends ProtocolFormBase {
     
     public ProtocolForm() throws Exception {
         super();
-        LOG.debug("constructor()");
     }
   
     
@@ -105,8 +106,6 @@ public class ProtocolForm extends ProtocolFormBase {
      */
     @Override
     public HeaderNavigation[] getHeaderNavigationTabs() {
-        LOG.debug("getHeaderNavigationTabs()");
-        
         HeaderNavigation[] navigation = super.getHeaderNavigationTabs();
         
         ProtocolOnlineReviewService onlineReviewService = getProtocolOnlineReviewService();
@@ -122,8 +121,8 @@ public class ProtocolForm extends ProtocolFormBase {
                     && onlineReviewService.isProtocolInStateToBeReviewed((Protocol) getProtocolDocument().getProtocol());
         }
         
-            //We have to copy the HeaderNavigation elements into a new collection as the 
-            //List returned by DD is it's cached copy of the header navigation list.
+        //We have to copy the HeaderNavigation elements into a new collection as the
+        //List returned by DD is it's cached copy of the header navigation list.
         for (HeaderNavigation nav : navigation) {
             if (StringUtils.equals(nav.getHeaderTabNavigateTo(),ONLINE_REVIEW_NAV_TO)) {
                 nav.setDisabled(!onlineReviewTabEnabled);
@@ -143,7 +142,6 @@ public class ProtocolForm extends ProtocolFormBase {
         
         HeaderNavigation[] result = new HeaderNavigation[resultList.size()];
         resultList.toArray(result);
-        LOG.debug("getHeaderNavigationTabs() exit...");
         return result;
     }
     
@@ -161,7 +159,6 @@ public class ProtocolForm extends ProtocolFormBase {
     @SuppressWarnings("deprecation")
     @Override
     public void populate(HttpServletRequest request) {
-        LOG.debug("populate()");
         initAnswerList(request);
         super.populate(request);
         
@@ -169,7 +166,6 @@ public class ProtocolForm extends ProtocolFormBase {
         if (getActionFormUtilMap() instanceof ActionFormUtilMap) {
             ((ActionFormUtilMap) getActionFormUtilMap()).clear();
         }
-        LOG.debug("populate() exit...");
     }
     
     /*
@@ -177,7 +173,6 @@ public class ProtocolForm extends ProtocolFormBase {
      * so, it has to be retrieved, then populate with the new data.
      */
     private void initAnswerList(HttpServletRequest request) {
-        LOG.debug("initAnswerList()");
         String protocolNumber = request.getParameter("questionnaireHelper.protocolNumber");
         String submissionNumber = request.getParameter("questionnaireHelper.submissionNumber");
         if (StringUtils.isNotBlank(protocolNumber) && protocolNumber.endsWith("T")) {
@@ -185,7 +180,6 @@ public class ProtocolForm extends ProtocolFormBase {
             this.getQuestionnaireHelper().setAnswerHeaders(
                     getQuestionnaireAnswerService().getQuestionnaireAnswer(moduleQuestionnaireBean));
         }
-        LOG.debug("initAnswerList() exit...");
     }
 
     private QuestionnaireAnswerService getQuestionnaireAnswerService() {
@@ -195,7 +189,6 @@ public class ProtocolForm extends ProtocolFormBase {
     @SuppressWarnings("deprecation")
     @Override
     public void populateHeaderFields(WorkflowDocument workflowDocument) {
-        LOG.debug("populateHeaderFields()");
         super.populateHeaderFields(workflowDocument);
         ProtocolDocument pd = (ProtocolDocument) getProtocolDocument();
         
@@ -237,22 +230,19 @@ public class ProtocolForm extends ProtocolFormBase {
         
         HeaderField expirationDate = new HeaderField("DataDictionary.Protocol.attributes.expirationDate", expirationDateStr);
         getDocInfo().add(expirationDate);
-        LOG.debug("populateHeaderFields() exit...");
     }
 
     public ProtocolHelper getProtocolHelper() {
-
         return (ProtocolHelper) super.getProtocolHelper();
     }
     
     public PersonnelHelper getPersonnelHelper() {
         return (PersonnelHelper) super.getPersonnelHelper();
     }
-    
-//Removed for RESKC-1123:Prevent NPE from occuring when permissions helper has not yet been inititialized
-//    public PermissionsHelper getPermissionsHelper() {
-//        return (PermissionsHelper) super.getPermissionsHelper();
-//    }
+
+    public PermissionsHelper getPermissionsHelper() {
+        return (PermissionsHelper) super.getPermissionsHelper();
+    }
     
     public ProtocolReferenceBean getNewProtocolReferenceBean() {
         return (ProtocolReferenceBean) super.getNewProtocolReferenceBean();
@@ -336,14 +326,20 @@ public class ProtocolForm extends ProtocolFormBase {
 
 
     @Override
-    protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions) throws Exception {
-        ActionHelper actionHelper = new ActionHelper((ProtocolForm) protocolForm);
-        if(initializeActions) {
-            actionHelper.initializeProtocolActions();
+    protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions) {
+        LOG.debug("createNewActionHelperInstanceHook: initializeActions={}",initializeActions);
+        ActionHelper actionHelper = null;
+        try {
+            actionHelper = new CustomActionHelper((CustomProtocolForm) protocolForm);
+            if (initializeActions) {
+                actionHelper.initializeProtocolActions();
+            }
+        } catch (Exception e){
+            LOG.error("Exception in createNewActionHelperInstanceHook:"+e.getMessage());
+            throw new RuntimeException(e);
         }
         return actionHelper;
     }
-
 
 
     @Override
@@ -370,6 +366,7 @@ public class ProtocolForm extends ProtocolFormBase {
 
     @Override
     protected ProtocolHelperBase createNewProtocolHelperInstanceHook(ProtocolFormBase protocolForm) {
+        LOG.debug("createNewProtocolHelperInstanceHook() ENTER");
         return new ProtocolHelper((ProtocolForm) protocolForm);
     }
 

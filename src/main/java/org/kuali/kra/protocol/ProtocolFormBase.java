@@ -48,6 +48,7 @@ import org.kuali.rice.kew.api.WorkflowDocumentFactory;
 import org.kuali.rice.kew.api.action.ActionRequest;
 import org.kuali.rice.kew.api.document.DocumentStatus;
 import org.kuali.rice.kns.web.ui.ExtraButton;
+import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.ObjectUtils;
@@ -107,13 +108,13 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     private transient List<ProtocolFundingSourceBase> deletedProtocolFundingSources;
  
     private boolean showNotificationEditor = false;  // yep, it's a hack
-    
+    private boolean initialized = false;
+
+
     public ProtocolFormBase() throws Exception {
         super();
-        LOG.debug("ProtocolFormBase constructor() -> initialize() ");
         initialize();
         this.registerEditableProperty("methodToCall");
-        LOG.debug("ProtocolFormBase constructor() exit... ");
     }
     
 
@@ -123,39 +124,38 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
      * @throws Exception 
      */
     public void initialize() throws Exception {
-            LOG.debug("ProtocolFormBase: initialize()");
-            setProtocolHelper(createNewProtocolHelperInstanceHook(this));
-            setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
-            setCustomDataHelper(createNewCustomDataHelperInstanceHook(this));
-            setSpecialReviewHelper(createNewSpecialReviewHelperInstanceHook(this));
-            setQuestionnaireHelper(createNewQuestionnaireHelperInstanceHook(this));
-            setNewProtocolReferenceBean(createNewProtocolReferenceBeanInstance());
-            setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
-            setNotificationHelper(getNotificationHelperHook());
-            setMedusaBean(new MedusaBean());
-            LOG.debug("ProtocolFormBase: initialize() exit...");
+        LOG.debug("ProtocolFormBase: initialize() ENTER initialized =" + initialized);
+        synchronized (this) {
+            if (!initialized) {
+
+                setProtocolHelper(createNewProtocolHelperInstanceHook(this));
+                setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
+                setCustomDataHelper(createNewCustomDataHelperInstanceHook(this));
+                setSpecialReviewHelper(createNewSpecialReviewHelperInstanceHook(this));
+                setQuestionnaireHelper(createNewQuestionnaireHelperInstanceHook(this));
+                setNewProtocolReferenceBean(createNewProtocolReferenceBeanInstance());
+                setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
+                setNotificationHelper(getNotificationHelperHook());
+                setMedusaBean(new MedusaBean());
+
+                initialized = true;
+            }
+        }
+        LOG.debug("ProtocolFormBase: initialize() EXIT...");
     }
        
     public void initializePermission() throws Exception{
-        LOG.debug("initializePermission()");
         setPermissionsHelper(createNewPermissionsHelperInstanceHook(this));
-        LOG.debug("initializePermission() exit");
-
     }
 
 
     public void initializeNotesAttachments() throws Exception {
-        LOG.debug("initializeNotesAttachments()");
         setNotesAttachmentsHelper(createNewNotesAttachmentsHelperInstanceHook(this));
         this.notesAttachmentsHelper.prepareView();
-        LOG.debug("initializeNotesAttachments() exit");
-
     }
 
     public void initializeProtocolAction() throws Exception {
-        LOG.debug("initializeProtocolAction() TRUE");
         setActionHelper(createNewActionHelperInstanceHook(this, true));
-        LOG.debug("initializeProtocolAction() TRUE exit...");
     }
 
     protected abstract NotificationHelper<? extends ProtocolNotificationContextBase> getNotificationHelperHook();
@@ -163,7 +163,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     protected abstract ProtocolReferenceBeanBase createNewProtocolReferenceBeanInstance();
 
     protected abstract QuestionnaireHelperBase createNewQuestionnaireHelperInstanceHook(ProtocolFormBase protocolForm);
-    protected abstract ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions) throws Exception;
+    protected abstract ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions);
     protected abstract ProtocolSpecialReviewHelperBase createNewSpecialReviewHelperInstanceHook(ProtocolFormBase protocolForm);
     protected abstract ProtocolCustomDataHelperBase createNewCustomDataHelperInstanceHook(ProtocolFormBase protocolForm);
     protected abstract OnlineReviewsActionHelperBase createNewOnlineReviewsActionHelperInstanceHook(ProtocolFormBase protocolForm);
@@ -193,10 +193,11 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
      */
     @Override
     public void reset(ActionMapping mapping, HttpServletRequest request) {
-        LOG.debug("reset()");
+        LOG.debug("reset() ENTER");
         super.reset(mapping, request);
         this.setLookupResultsSequenceNumber(null);
         this.setLookupResultsBOClassName(null);
+        this.initialized = false;
         
         onlineReviewsActionHelper.init(true);
         LOG.debug("reset() exit..");
@@ -224,6 +225,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     }
 
     public ProtocolHelperBase getProtocolHelper() {
+
         return protocolHelper;
     }
     
@@ -321,6 +323,9 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     }
     
     public ActionHelperBase getActionHelper() {
+        if ( actionHelper == null ){
+            actionHelper = createNewActionHelperInstanceHook(this, false);
+        }
         return actionHelper;
     }
     
@@ -454,7 +459,6 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     // At non-terminal nodes however we will not restrict the list of available requested actions in any way.
     @SuppressWarnings("deprecation")
     public List<ActionRequest> getActionRequests() {
-        LOG.debug("getActionRequests() ");
         List<ActionRequest> retVal;
         List<ActionRequest> allAvailableRequests = super.getActionRequests(); 
         if(!isDocumentAtTerminalNode()) {
@@ -469,7 +473,6 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
                 }
             }
         }
-        LOG.debug("getActionRequests() exit...");
         return retVal;
     }
     

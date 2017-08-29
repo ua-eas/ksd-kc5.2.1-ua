@@ -494,7 +494,7 @@ public abstract class ActionHelperBase implements Serializable {
         
  
     protected ProtocolApproveBean buildProtocolApproveBean(String actionTypeCode, String errorPropertyKey) {
-        LOG.debug("ActionHelperBase:  buildProtocolApproveBean ENTER");
+        LOG.debug("ActionHelperBase:  buildProtocolApproveBean ENTER actionTypeCode="+actionTypeCode +" errorPropertyKey="+errorPropertyKey);
         ProtocolApproveBean bean = getNewProtocolApproveBeanInstanceHook(this, errorPropertyKey);       
         bean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         
@@ -1349,7 +1349,7 @@ public abstract class ActionHelperBase implements Serializable {
     
     public ProtocolApproveBean getProtocolFullApprovalBean() {
         if ( protocolFullApprovalBean == null ){
-            LOG.debug("ActionHelperBase: getProtocolFullApprovalBean() - initializing protocolFullApprovalBean.");
+            LOG.debug("ActionHelperBase: getProtocolFullApprovalBean() - Lazy initializer for protocolFullApprovalBean.");
             protocolFullApprovalBean = buildProtocolApproveBean(getFullApprovalProtocolActionTypeHook(), Constants.PROTOCOL_FULL_APPROVAL_ACTION_PROPERTY_KEY);
         }
         return protocolFullApprovalBean;

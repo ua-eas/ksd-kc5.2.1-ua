@@ -15,34 +15,15 @@
  */
 package edu.arizona.kra.irb;
 
-import org.kuali.kra.irb.actions.ActionHelper;
-import org.kuali.kra.protocol.ProtocolFormBase;
-import org.kuali.kra.protocol.actions.ActionHelperBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import edu.arizona.kra.irb.actions.CustomActionHelper;
 
 /**
  * This is the custom code for the protocol form class for UofA
  */
 public class CustomProtocolForm extends org.kuali.kra.irb.ProtocolForm {
 	private static final long serialVersionUID = -9117901812636757211L;
-    private static final Logger LOG = LoggerFactory.getLogger(CustomProtocolForm.class);
 
 	public CustomProtocolForm() throws Exception {
         super();
-        LOG.debug("constructor()");
-    }
-
-    @Override
-    protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions) throws Exception {
-        LOG.debug("createNewActionHelperInstanceHook: initializeActions={}",initializeActions);
-        ActionHelper actionHelper = new CustomActionHelper((CustomProtocolForm) protocolForm);
-        if(initializeActions) {
-            actionHelper.initializeProtocolActions();
-        }
-        return actionHelper;
     }
  
 
