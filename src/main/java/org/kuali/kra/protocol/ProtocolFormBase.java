@@ -107,7 +107,6 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
     private transient List<ProtocolFundingSourceBase> deletedProtocolFundingSources;
  
     private boolean showNotificationEditor = false;  // yep, it's a hack
-    private boolean initialized = false;
     
     public ProtocolFormBase() throws Exception {
         super();
@@ -124,7 +123,6 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
      * @throws Exception 
      */
     public void initialize() throws Exception {
-        if ( !initialized) {
             LOG.debug("ProtocolFormBase: initialize()");
             setProtocolHelper(createNewProtocolHelperInstanceHook(this));
             setPersonnelHelper(createNewPersonnelHelperInstanceHook(this));
@@ -135,9 +133,7 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
             setOnlineReviewsActionHelper(createNewOnlineReviewsActionHelperInstanceHook(this));
             setNotificationHelper(getNotificationHelperHook());
             setMedusaBean(new MedusaBean());
-            initialized = true;
             LOG.debug("ProtocolFormBase: initialize() exit...");
-        }
     }
        
     public void initializePermission() throws Exception{
