@@ -15,7 +15,9 @@
  */
 package org.kuali.kra.negotiations.lookup;
 
+import edu.arizona.kra.negotiations.dao.NegotiationLookupDao;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ojb.broker.accesslayer.LookupException;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
 import org.kuali.kra.negotiations.bo.Negotiation;
 import org.kuali.rice.kew.api.KewApiConstants;
@@ -28,10 +30,9 @@ import org.kuali.rice.kns.web.ui.Field;
 import org.kuali.rice.kns.web.ui.ResultRow;
 import org.kuali.rice.kns.web.ui.Row;
 import org.kuali.rice.krad.bo.BusinessObject;
-import org.kuali.rice.krad.document.Document;
-import org.kuali.rice.krad.util.BeanPropertyComparator;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
+
 
 import java.util.*;
 
@@ -43,7 +44,7 @@ public class NegotiationLookupableHelperServiceImpl extends KraLookupableHelperS
     private static final long serialVersionUID = -5559605739121335896L;
     private static final String USER_ID = "userId";
    
-    private NegotiationDao negotiationDao;
+    private NegotiationLookupDao negotiationLookupDao;
 
 
     @SuppressWarnings("unchecked")
@@ -54,15 +55,14 @@ public class NegotiationLookupableHelperServiceImpl extends KraLookupableHelperS
             fieldValues.put("associatedNegotiable.piId", ((String[]) this.getParameters().get(USER_ID))[0]);
             fieldValues.put("negotiatorPersonId", ((String[]) this.getParameters().get(USER_ID))[0]);
         }
-        List<Negotiation> searchResults = new ArrayList<Negotiation>();
-        searchResults.addAll(getNegotiationDao().getNegotiationResults(fieldValues));
-
-        List defaultSortColumns = getDefaultSortColumns();
-        if (defaultSortColumns.size() > 0) {
-            Collections.sort(searchResults, new BeanPropertyComparator(defaultSortColumns, true));
+        List<Negotiation> searchResults = new ArrayList<Negotiation>(0);
+        try {
+            searchResults = (List<Negotiation>) getNegotiationLookupDao().getNegotiationResults(fieldValues);
+        } catch (LookupException e){
+            LOG.error("Lookup exception ", e);
         }
+
         return searchResults;
-        
     }
     
     @SuppressWarnings("unchecked")
@@ -130,14 +130,14 @@ public class NegotiationLookupableHelperServiceImpl extends KraLookupableHelperS
 
 
 
-    public NegotiationDao getNegotiationDao() {
-        return negotiationDao;
+    public NegotiationLookupDao getNegotiationLookupDao() {
+        return negotiationLookupDao;
     }
 
 
 
-    public void setNegotiationDao(NegotiationDao negotiationDao) {
-        this.negotiationDao = negotiationDao;
+    public void setNegotiationLookupDao(NegotiationLookupDao negotiationLookupDao) {
+        this.negotiationLookupDao = negotiationLookupDao;
     }
     
     /**

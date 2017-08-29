@@ -114,6 +114,15 @@ public interface SubAwardService {
      * @return List<SubAward>
      */
      public Collection<SubAward> getLinkedSubAwards(Award award);
+
+    /**
+     *
+     * This method finds all the linked SubAward Ids through SubAwardFundingSource for an Award identified by the given awardNumber
+     * It returns only the 'Active' or 'Pending' versions of the corresponding SubAwards (no 'Archived' etc).
+     * Each linked SubAward is returned only once.
+     * @return List<SubAward>
+     */
+    public Collection<String> getLinkedSubAwardsIds(String awardNumber);
      
      /**
      *

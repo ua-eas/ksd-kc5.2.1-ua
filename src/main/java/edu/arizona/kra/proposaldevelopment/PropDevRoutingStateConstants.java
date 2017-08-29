@@ -37,12 +37,15 @@ public final class PropDevRoutingStateConstants {
     
     public static final String SQL_LOOKUP =  "select actions.nodeStopDate AS stop_date, rn.NM AS node_name, prop.PROPOSAL_NUMBER AS proposal_number, doc.DOC_HDR_ID AS document_number, prop.TITLE AS proposal_title,"
             +" s.SPONSOR_NAME AS sponsor_name, s.SPONSOR_CODE AS sponsor_code, prop.DEADLINE_DATE AS sponsor_deadline_date, prop.DEADLINE_TIME AS sponsor_deadline_time, pers.FULL_NAME AS principal_investigator, prop.OWNED_BY_UNIT AS lead_unit, "
-            +" u.UNIT_NAME AS lead_unit_name, actions.annot AS annotation, CASE WHEN tmp.ord_expedited IS NULL THEN 'N' ELSE tmp.ord_expedited END AS ord_expedited, tmp.full_name as sps_reviewer, tmp.person_id as sps_id, CASE WHEN tmp.fpr IS NULL THEN 'N' ELSE tmp.fpr END as final_prop_received"
+            +" u.UNIT_NAME AS lead_unit_name, actions.annot AS annotation, CASE WHEN tmp.ord_expedited IS NULL THEN 'N' ELSE tmp.ord_expedited END AS ord_expedited, tmp.full_name as sps_reviewer, tmp.person_id as sps_id, tmp.received_time as final_prop_received"
             +" FROM krew_doc_hdr_t doc, krew_rte_node_t rn, krew_rte_node_instn_t rni, "
-            + " eps_proposal prop LEFT OUTER JOIN (select COALESCE(ordexp.proposal_number, sps.proposal_number, notes.proposal_number) AS proposal_nbr, ord_expedited, full_name, person_id,"
-            + " CASE WHEN notes_count IS NULL THEN 'N' ELSE 'Y' END AS fpr FROM"
+            + " eps_proposal prop LEFT OUTER JOIN (select COALESCE(ordexp.proposal_number, sps.proposal_number, notes.proposal_number) AS proposal_nbr, ord_expedited, full_name, person_id, received_time FROM"
             + " (SELECT * FROM eps_prop_ord_expedited WHERE eps_prop_ord_expedited.cur_ind=1) ordexp FULL OUTER JOIN (SELECT * FROM eps_prop_sps_reviewer WHERE eps_prop_sps_reviewer.cur_ind=1) sps ON ordexp.proposal_number = sps.proposal_number"
-            + " FULL OUTER JOIN (select proposal_number, count(*) AS notes_count FROM eps_prop_sps_notes where eps_prop_sps_notes.ACTV_IND='Y' group by proposal_number) notes ON notes.proposal_number = coalesce(ordexp.PROPOSAL_NUMBER, sps.proposal_number)) tmp"
+            + " FULL OUTER JOIN (SELECT proposal_number, received_time FROM ( SELECT proposal_number, TO_TIMESTAMP(PROPOSAL_RECEIVED_DATE || ' ' ||PROPOSAL_RECEIVED_TIME, 'DD-MON-YY HH:MI AM') as received_time,"
+            + "    RANK() OVER (PARTITION BY proposal_number ORDER BY TO_TIMESTAMP(PROPOSAL_RECEIVED_DATE || ' ' ||PROPOSAL_RECEIVED_TIME, 'DD-MON-YY HH:MI AM') DESC) latest_received"
+            + "    FROM eps_prop_sps_notes where eps_prop_sps_notes.ACTV_IND='Y'"
+            + "  ) where latest_received = 1) notes"
+            + " ON notes.proposal_number = coalesce(ordexp.PROPOSAL_NUMBER, sps.proposal_number)) tmp"
             + " ON prop.proposal_number = tmp.proposal_nbr, sponsor s, unit u, eps_prop_person pers,"
             +" ( SELECT actnRteNodeInstanceId, annot, nodeStopDate, adHocIndicator, Row_Number() OVER (PARTITION BY actnRteNodeInstanceId ORDER BY adHocIndicator, nodeStopDate) AS ord"
             +"   FROM ( SELECT actn.RTE_NODE_INSTN_ID actnRteNodeInstanceId, actn.ACTN_RQST_ANNOTN_TXT annot, actn.CRTE_DT nodeStopDate," 
@@ -63,6 +66,23 @@ public final class PropDevRoutingStateConstants {
     public static final String SPS_REVIEWER_QUERY = "select person_id AS sps_id FROM eps_prop_sps_reviewer WHERE cur_ind=1 AND proposal_number=?";
     public static final String SPS_REVIEWERS_QUERY = "select prncpl_id AS sps_id, (COALESCE(first_nm, '')||' '||COALESCE(middle_nm, '')||' '||COALESCE(last_nm, '')) AS sps_reviewer FROM krim_entity_cache_t WHERE prncpl_id IN (";
 
+    public static final String WORKFLOW_UNITS_PROPOSALS_QUERY = "SELECT DISTINCT proposal_number FROM ("+
+            " SELECT DISTINCT e.PROPOSAL_NUMBER FROM EPS_PROP_PERSON_UNITS e WHERE e.UNIT_NUMBER IN ";
+    public static final String WORKFLOW_UNITS_PROPOSALS_QUERY_CONT = "UNION SELECT distinct p.PROPOSAL_NUMBER FROM EPS_PROP_COST_SHARING ecs"+
+            " JOIN BUDGET b ON b.BUDGET_ID = ecs.BUDGET_ID "+
+            " JOIN BUDGET_DOCUMENT bd ON bd.DOCUMENT_NUMBER=b.DOCUMENT_NUMBER "+
+            " JOIN EPS_PROPOSAL_DOCUMENT epd on bd.PARENT_DOCUMENT_KEY= epd.DOCUMENT_NUMBER "+
+            " JOIN EPS_PROPOSAL p on p.DOCUMENT_NUMBER = epd.DOCUMENT_NUMBER "+
+            " WHERE bd.PARENT_DOCUMENT_TYPE_CODE='PRDV' AND b.FINAL_VERSION_FLAG='Y' AND p.STATUS_CODE in (1,2,5,12) " +
+            " AND ecs.SOURCE_UNIT IS NOT NULL and ecs.SOURCE_UNIT IN ";
+    public static final String WORKFLOW_UNITS_PROPOSALS_QUERY_FIN = ")";
+
+    public static final String WORKFLOW_UNIT_HIERARCHY_QUERY="SELECT DISTINCT unit_number FROM (" +
+            " SELECT unit_number FROM unit u WHERE u.ACTIVE_FLAG='Y' START WITH u.UNIT_NUMBER=? CONNECT BY PRIOR u.UNIT_NUMBER = u.PARENT_UNIT_NUMBER " +
+            " UNION " +
+            " SELECT unit_number FROM unit u WHERE ACTIVE_FLAG='Y' START WITH u.UNIT_NUMBER=? CONNECT BY u.UNIT_NUMBER = PRIOR u.PARENT_UNIT_NUMBER)";
+
+
     public static final String CUR_IND_UPDATE_STMT = "UPDATE $tablename SET cur_ind=0 where proposal_number=? and cur_ind=1";
     public static final String ORD_EXP_TABLE_NAME = "eps_prop_ord_expedited";
     public static final String SPS_REV_TABLE_NAME = "eps_prop_sps_reviewer"; 
@@ -71,6 +91,7 @@ public final class PropDevRoutingStateConstants {
             +" VALUES(eps_prop_ord_expedited_seq.NEXTVAL, ?, ?, 1, SYS_GUID(), CURRENT_TIMESTAMP, ?)";
     public static final String ADD_SPS_REVIEWER_QUERY = "INSERT INTO eps_prop_sps_reviewer (ID, PROPOSAL_NUMBER, PERSON_ID, FULL_NAME, CUR_IND, OBJ_ID, UPDATE_TIMESTAMP, UPDATE_USER)"
             +" VALUES(eps_prop_sps_reviewer_seq.NEXTVAL, ?, ?, ?, 1, SYS_GUID(), CURRENT_TIMESTAMP, ?)";
+
 
     public static final String COL_STOP_DATE = "stop_date";
     public static final String COL_NODE_NAME = "node_name";
@@ -104,6 +125,7 @@ public final class PropDevRoutingStateConstants {
     public static final String PROPOSAL_PERSON_NAME = "proposalPersonName";
     public static final String LEAD_UNIT = "leadUnit.unitNumber";
     public static final String LEAD_COLLEGE = "leadUnit.parentUnitNumber";
+    public static final String WORKFLOW_UNIT = "workflowUnit.unitNumber";
 
     public static final String NODE_NAME_CRITERIA = " AND rn.NM = '";
     public static final String SPONSOR_NAME_CRITERIA = " AND lower(s.SPONSOR_NAME) LIKE '%";
@@ -119,7 +141,8 @@ public final class PropDevRoutingStateConstants {
     public static final String LEAD_COLLEGE_CRITERIA = " AND prop.owned_by_unit IN (SELECT unit_number FROM unit u START WITH u.UNIT_NUMBER='";
     public static final String LEAD_COLLEGE_CRITERIA_CONT = "' CONNECT BY PRIOR u.UNIT_NUMBER = u.PARENT_UNIT_NUMBER)";
     public static final String ORDER_CRITERIA = " ORDER BY stop_date";
-
+    public static final String WORKFLOW_UNITS_CRITERIA = " AND prop.owned_by_unit IN (";
+    public static final String WORKFLOW_UNITS_CRITERIA_CONT = ") ";
 
     public static final String DATE_QUERY_PREFIX = "to_date('";
     public static final String DATE_FORMAT_STR = "','MM/DD/RRRR')";

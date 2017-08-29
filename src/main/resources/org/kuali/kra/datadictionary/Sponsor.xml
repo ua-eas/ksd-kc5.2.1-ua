@@ -367,12 +367,17 @@
   </bean>
   
   <bean id="Sponsor-active" parent="Sponsor-active-parentBean"/>
-   <bean id="Sponsor-active-parentBean" abstract="true" parent="AttributeReferenceDummy-genericBoolean"> 
-		<property name="name" value="active" />
-		<property name="label" value="Active" />
-		<property name="shortLabel" value="Active" />
-		<property name="summary" value="Active" />
-		<property name="description" value="Active" />
+   <bean id="Sponsor-active-parentBean" abstract="true" parent="AttributeDefinition">
+     <property name="name" value="active" />
+     <property name="forceUppercase" value="false" />
+     <property name="label" value="Active" />
+     <property name="shortLabel" value="Active" />
+     <property name="maxLength" value="1" />
+     <property name="control" >
+       <bean parent="CheckboxControlDefinition" />
+     </property>
+     <property name="summary" value="Active" />
+     <property name="description" value="Active" />
    </bean>
 
 <!-- Business Object Inquiry Definition -->
@@ -402,6 +407,7 @@
               <bean parent="FieldDefinition" p:attributeName="sponsorName" />
               <bean parent="FieldDefinition" p:attributeName="sponsorType.description" />
               <bean parent="FieldDefinition" p:attributeName="state" />
+              <bean parent="FieldDefinition" p:attributeName="active" />
             </list>
           </property>
         </bean>
@@ -447,6 +453,7 @@
         <bean parent="FieldDefinition" p:attributeName="auditReportSentForFy" />
         <bean parent="FieldDefinition" p:attributeName="ownedByUnit" />
         <bean parent="FieldDefinition" p:attributeName="rolodexId" />
+        <bean parent="FieldDefinition" p:attributeName="active" p:defaultValue="Y" />
       </list>
     </property>
     <property name="resultFields" >
@@ -460,10 +467,9 @@
         <bean parent="FieldDefinition" p:attributeName="cageNumber" />
         <bean parent="FieldDefinition" p:attributeName="state" />
         <bean parent="FieldDefinition" p:attributeName="countryCode" />
+        <bean parent="FieldDefinition" p:attributeName="active" />
       </list>
     </property>
-    
-    <property name="resultSetLimit" value="8000" />
     
   </bean>
 </beans>
