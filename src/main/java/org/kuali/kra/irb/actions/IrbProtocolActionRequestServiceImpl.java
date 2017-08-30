@@ -182,7 +182,7 @@ public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestSe
      */
     public boolean isExpeditedApprovalAuthorized(ProtocolForm protocolForm) {
         ProtocolDocument document = (ProtocolDocument) protocolForm.getProtocolDocument();
-        ProtocolExpeditedApproveBean expeditedActionBean = (ProtocolExpeditedApproveBean) ((ActionHelper) protocolForm.getActionHelper()).getProtocolExpeditedApprovalBean();
+        ProtocolExpeditedApproveBean expeditedActionBean = (ProtocolExpeditedApproveBean) ((ActionHelper) protocolForm.getActionHelper()).getProtocolExpeditedApproveBean();
         boolean requestAuthorized = false;
         if (hasPermission(TaskName.EXPEDITE_APPROVAL, (Protocol) document.getProtocol())) {
             requestAuthorized = applyRules(new ProtocolExpeditedApproveEvent(document, expeditedActionBean));
@@ -566,7 +566,7 @@ public class IrbProtocolActionRequestServiceImpl extends ProtocolActionRequestSe
         // set the task name to prevent entered data from being overwritten (in case of user errors) due to bean refresh in the action helper's prepare view 
         protocolForm.getActionHelper().setCurrentTask(TaskName.EXPEDITE_APPROVAL);
         ProtocolDocument document = (ProtocolDocument) protocolForm.getProtocolDocument();
-        ProtocolExpeditedApproveBean expeditedActionBean = (ProtocolExpeditedApproveBean) ((ActionHelper) protocolForm.getActionHelper()).getProtocolExpeditedApprovalBean();
+        ProtocolExpeditedApproveBean expeditedActionBean = (ProtocolExpeditedApproveBean) ((ActionHelper) protocolForm.getActionHelper()).getProtocolExpeditedApproveBean();
         
         if (expeditedActionBean.isAssignToAgenda()) {
             ProtocolAssignCmtSchedBean cmtAssignBean = protocolForm.getActionHelper().getAssignCmtSchedBean();

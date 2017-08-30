@@ -223,7 +223,6 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
         initializeSpecialReviews();
         initializeProtocolActions();
         initializeProtocolSubmissions();
-        initializeProtocolSubmissions();
         initializeProtocolAmendRenewals();
         initializeProtocolAttachmentFilter();
     }

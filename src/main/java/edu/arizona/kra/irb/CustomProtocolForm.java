@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Copyright 2005-2016 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,6 @@
  */
 package edu.arizona.kra.irb;
 
-import org.kuali.kra.protocol.ProtocolFormBase;
-import org.kuali.kra.protocol.actions.ActionHelperBase;
-
-import edu.arizona.kra.irb.actions.CustomActionHelper;
 
 /**
  * This is the custom code for the protocol form class for UofA
@@ -28,11 +24,6 @@ public class CustomProtocolForm extends org.kuali.kra.irb.ProtocolForm {
 
 	public CustomProtocolForm() throws Exception {
         super();
-    }
-
-    @Override
-    protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm) throws Exception {
-        return new CustomActionHelper((CustomProtocolForm)protocolForm);
     }
  
 
