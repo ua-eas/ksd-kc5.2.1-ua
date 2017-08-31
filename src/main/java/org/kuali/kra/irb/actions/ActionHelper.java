@@ -190,7 +190,7 @@ public class ActionHelper extends ActionHelperBase {
     private ProtocolModifySubmissionBean protocolModifySubmissionBean;    
     private ProtocolGenericActionBean protocolDeferBean;
     private ProtocolReviewNotRequiredBean protocolReviewNotRequiredBean;
-    private ProtocolGenericActionBean protocolClosedBean;
+    private ProtocolGenericActionBean protocolCloseBean;
     private transient ProtocolSubmitActionService protocolSubmitActionService;
 
     private boolean currentUserAuthorizedToAssignCommittee = true;
@@ -232,7 +232,7 @@ public class ActionHelper extends ActionHelperBase {
                 Constants.PROTOCOL_CLOSE_ENROLLMENT_ACTION_PROPERTY_KEY);
         protocolSuspendByDsmbBean = buildProtocolGenericActionBean(ProtocolActionType.SUSPENDED_BY_DSMB, 
                 Constants.PROTOCOL_SUSPEND_BY_DSMB_ACTION_PROPERTY_KEY);
-        protocolClosedBean = buildProtocolGenericActionBean(ProtocolActionType.CLOSED_ADMINISTRATIVELY_CLOSED,
+        protocolCloseBean = buildProtocolGenericActionBean(ProtocolActionType.CLOSED_ADMINISTRATIVELY_CLOSED,
                 Constants.PROTOCOL_CLOSE_ACTION_PROPERTY_KEY);
         protocolPermitDataAnalysisBean = buildProtocolGenericActionBean(ProtocolActionType.DATA_ANALYSIS_ONLY, 
                 Constants.PROTOCOL_PERMIT_DATA_ANALYSIS_ACTION_PROPERTY_KEY);
@@ -602,7 +602,7 @@ public class ActionHelper extends ActionHelperBase {
         getProtocolReopenEnrollmentBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         getProtocolCloseEnrollmentBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         getProtocolSuspendByDsmbBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        getProtocolClosedBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
+        getProtocolCloseBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         getProtocolPermitDataAnalysisBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         getProtocolDeferBean().getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
     }
@@ -1062,14 +1062,6 @@ public class ActionHelper extends ActionHelperBase {
         return protocolSuspendByDsmbBean;
     }
 
-    protected ProtocolGenericActionBean getProtocolClosedBean() {
-        if ( protocolClosedBean == null ){
-            protocolClosedBean = buildProtocolGenericActionBean(ProtocolActionType.CLOSED_ADMINISTRATIVELY_CLOSED,
-                    Constants.PROTOCOL_CLOSE_ACTION_PROPERTY_KEY);
-        }
-        return protocolClosedBean;
-    }
-    
     public ProtocolGenericActionBean getProtocolPermitDataAnalysisBean() {
         if ( protocolPermitDataAnalysisBean == null ){
             protocolPermitDataAnalysisBean = buildProtocolGenericActionBean(ProtocolActionType.DATA_ANALYSIS_ONLY,

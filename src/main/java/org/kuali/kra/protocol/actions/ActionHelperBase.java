@@ -2794,7 +2794,6 @@ public abstract class ActionHelperBase implements Serializable {
                 if (correctAmendment != null) {
                     description = correctAmendment.getSummary();
                     versionNumber = String.valueOf(protocol.getSequenceNumber());
-                    versionNumberUrl = buildForwardUrl(protocol.getProtocolDocument().getDocumentNumber());
                 } else {
                     description = "";
                     versionNumber = "";
