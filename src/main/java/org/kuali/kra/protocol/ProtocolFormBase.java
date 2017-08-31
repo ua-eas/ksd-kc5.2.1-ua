@@ -197,7 +197,8 @@ public abstract class ProtocolFormBase extends KraTransactionalDocumentFormBase 
         super.reset(mapping, request);
         this.setLookupResultsSequenceNumber(null);
         this.setLookupResultsBOClassName(null);
-        this.initialized = false;
+
+        //TODO: is this necessary??? Make sure... this.initialized = false;
         
         onlineReviewsActionHelper.init(true);
         LOG.debug("reset() exit..");

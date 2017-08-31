@@ -112,7 +112,9 @@ public class ProtocolForm extends ProtocolFormBase {
         List<HeaderNavigation> resultList = new ArrayList<HeaderNavigation>();
         boolean onlineReviewTabEnabled = false;
 
-        if (getProtocolDocument() != null && getProtocolDocument().getProtocol() != null) {
+        if (getProtocolDocument() != null && getProtocolDocument().getProtocol() != null && getProtocolDocument().getDocumentNumber() != null ) {
+            LOG.debug("getHeaderNavigationTabs(): getProtocolDocument().getDocumentNumber()= "+getProtocolDocument().getDocumentNumber());
+            LOG.debug("getHeaderNavigationTabs(): docHdrId= "+getProtocolDocument().getProtocol().getProtocolDocument().getDocumentNumber());
             String principalId = GlobalVariables.getUserSession().getPrincipalId();
             ProtocolSubmission submission = (ProtocolSubmission) getProtocolDocument().getProtocol().getProtocolSubmission();
             boolean isUserOnlineReviewer = onlineReviewService.isProtocolReviewer(principalId, false, submission);
