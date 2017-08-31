@@ -98,7 +98,6 @@
 		<property name="name" value="personId" />
 		<property name="label" value="Person" />
 		<property name="shortLabel" value="Person" />
-		<property name="required" value="true"/>
 		<property name="control" >
 			<bean parent="TextControlDefinition"
 				  p:size="20" />

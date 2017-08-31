@@ -139,5 +139,20 @@ limitations under the License.
 		<property name="protocolActionCorrespondenceService" ref="protocolActionCorrespondenceService" />
 	</bean>
 
+  <bean id = "protocolOnlineReviewService" class = "edu.arizona.kra.irb.onlinereview.CustomProtocolOnlineReviewServiceImpl">
+    <property name = "kraAuthorizationService" ref = "kraAuthorizationService"/>
+    <property name = "businessObjectService" ref = "businessObjectService"/>
+    <property name = "documentService" ref = "documentService"/>
+    <property name = "protocolAssignReviewersService" ref = "protocolAssignReviewersService"/>
+    <property name = "personService" ref = "personService"/>
+    <property name = "identityManagementService" ref = "identityService"/>
+    <property name = "committeeService" ref = "committeeService"/>
+    <property name = "reviewerApproveNodeName" value = "OnlineReviewer"/>
+    <property name = "kraDocumentRejectionService" ref = "kraDocumentRejectionService"/>
+    <property name = "reviewCommentsService" ref = "reviewCommentsService"/>
+    <property name="protocolFinderDao" ref="protocolFinderDao" />
+    <property name="workflowDocumentService" ref="kradWorkflowDocumentService" />
+  </bean>
+
 </beans>
 

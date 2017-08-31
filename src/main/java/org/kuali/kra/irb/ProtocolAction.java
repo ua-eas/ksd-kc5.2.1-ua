@@ -157,11 +157,13 @@ public abstract class ProtocolAction extends ProtocolActionBase {
             forward = mapping.findForward(Constants.MAPPING_COPY_PROPOSAL_PAGE);
             forward = new ActionForward(forward.getPath()+ "?" + KRADConstants.PARAMETER_DOC_ID + "=" + docIdRequestParameter);  
         } else if (Constants.MAPPING_PROTOCOL_ACTIONS.equals(command) || Constants.MAPPING_PROTOCOL_ONLINE_REVIEW.equals(command)) {
+            LOG.error("ProtocolAction: docHAndler before loading Document and protocol#");
             String docIdRequestParameter = request.getParameter(KRADConstants.PARAMETER_DOC_ID);
             Document retrievedDocument = KRADServiceLocatorWeb.getDocumentService().getByDocumentHeaderId(docIdRequestParameter);
             protocolForm.setDocument(retrievedDocument);
             request.setAttribute(KRADConstants.PARAMETER_DOC_ID, docIdRequestParameter);
             loadDocument(protocolForm);
+            LOG.error("ProtocolAction: AFTER loading Document "+docIdRequestParameter);
         } else {
             LOG.debug("docHandler() calling super.docHandler()");
             forward = super.docHandler(mapping, form, request, response);

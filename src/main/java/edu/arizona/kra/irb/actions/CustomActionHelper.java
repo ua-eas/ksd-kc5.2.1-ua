@@ -50,8 +50,6 @@ public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
 
 
 
-	
-	
 	/**
      * Constructs an ActionHelper.
      * @param form the protocol form
@@ -61,10 +59,6 @@ public class CustomActionHelper extends org.kuali.kra.irb.actions.ActionHelper {
         super(form);
     }
 
-	@Override
-	public void initializeProtocolActions() throws Exception {
-		super.initializeProtocolActions();
-	}
 
     @Override
     protected ProtocolAmendmentBean getNewProtocolAmendmentBeanInstanceHook(ActionHelperBase actionHelper) {

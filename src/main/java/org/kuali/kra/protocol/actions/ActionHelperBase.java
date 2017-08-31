@@ -376,7 +376,7 @@ public abstract class ActionHelperBase implements Serializable {
         committeeDecision = getNewCommitteeDecisionInstanceHook(this);
         committeeDecision.init();
         committeeDecision.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-
+        LOG.debug("ActionHelperBase: before initializing protocolManageReviewCommentsBean");
         protocolManageReviewCommentsBean = buildProtocolGenericActionBean(getProtocolActionTypeCodeForManageReviewCommentsHook(), 
                 Constants.PROTOCOL_MANAGE_REVIEW_COMMENTS_KEY);
         LOG.debug("ActionHelperBase: refreshing references for ProtocolSubmission...");
@@ -500,7 +500,9 @@ public abstract class ActionHelperBase implements Serializable {
         
         ProtocolActionBase protocolAction = findProtocolAction(actionTypeCode, getProtocol().getProtocolActions(), getProtocol().getProtocolSubmission());
         if (protocolAction != null) {
+            LOG.debug("ActionHelperBase:  befoore    bean.setComments(protocolAction.getComments())");
             bean.setComments(protocolAction.getComments());
+            LOG.debug("ActionHelperBase:  after    bean.setComments(protocolAction.getComments())");
             bean.setActionDate(new Date(protocolAction.getActionDate().getTime()));
         }
         bean.setApprovalDate(buildApprovalDate(getProtocol()));
@@ -562,9 +564,11 @@ public abstract class ActionHelperBase implements Serializable {
     protected ProtocolActionBase findProtocolAction(String actionTypeCode, List<ProtocolActionBase> protocolActions, ProtocolSubmissionBase currentSubmission) {
         LOG.debug("ActionHelperBase: findProtocolAction()");
         for (ProtocolActionBase pa : protocolActions) {
-            if (pa.getProtocolActionType().getProtocolActionTypeCode().equals(actionTypeCode)
-                    && (pa.getProtocolSubmission() == null || pa.getProtocolSubmission().equals(currentSubmission))) {
-                return pa;
+            if (pa.getProtocolActionType().getProtocolActionTypeCode().equals(actionTypeCode)) {
+                ProtocolSubmissionBase protocolSubmission = pa.getProtocolSubmission();
+                if (pa.getProtocolSubmission() == null || pa.getProtocolSubmission().equals(currentSubmission)) {
+                    return pa;
+                }
             }
         }
         return null;
@@ -932,12 +936,15 @@ public abstract class ActionHelperBase implements Serializable {
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected List<CommitteeScheduleMinuteBase> getReviewCommentsUsingScheduleOrSubmission() {
+        LOG.debug("ENTER: getReviewCommentsUsingScheduleOrSubmission()");
         List<CommitteeScheduleMinuteBase> minutes;
         Long scheduleIdFk = getProtocol().getProtocolSubmission().getScheduleIdFk();
         // if the schedule has not yet been selected, then use the review comment service to get the reviews, 
         if(scheduleIdFk == null) {
-            int lastSubmissionNumber = getTotalSubmissions();
-            minutes = getReviewerCommentsService().getReviewerComments(getProtocol().getProtocolNumber(), lastSubmissionNumber);
+            //int lastSubmissionNumber = getTotalSubmissions();
+            LOG.debug("BEFORE: getReviewerCommentsService().getReviewerComments(getProtocol().getProtocolNumber(), lastSubmissionNumber)");
+            minutes = getReviewerCommentsService().getReviewerComments(getProtocol().getProtocolNumber(), currentSubmissionNumber);
+            LOG.debug("AFTER: getReviewerCommentsService().getReviewerComments(getProtocol().getProtocolNumber(), lastSubmissionNumber)");
             // sort the minutes by entry number, so that all review comments beans show the same ordered listing
             Collections.sort(minutes, new Comparator<CommitteeScheduleMinuteBase>() {
 
@@ -954,8 +961,10 @@ public abstract class ActionHelperBase implements Serializable {
         }
         // otherwise just use the committeesSchedule service to get the reviews for the selected schedule
         else {
+            LOG.debug(" getReviewCommentsUsingScheduleOrSubmission(): getCommitteeScheduleService().getMinutesBySchedule(scheduleIdFk);");
             minutes = getCommitteeScheduleService().getMinutesBySchedule(scheduleIdFk);
         }
+        LOG.debug("EXIT: getReviewCommentsUsingScheduleOrSubmission()");
         return minutes;
     }
     

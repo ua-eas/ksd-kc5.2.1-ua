@@ -177,8 +177,9 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         ActionForward actionForward = super.execute(mapping, form, request, response);
         protocolForm.getActionHelper().prepareView();
         // submit action may change "submission details", so re-initializa it
+        LOG.debug("ProtocolProtocolActionsAction: execute() ..before initSubmissionDetails()");
         protocolForm.getActionHelper().initSubmissionDetails();
-        LOG.debug("ProtocolProtocolActionsAction: execute() exit...{}",actionForward.toString());
+        LOG.debug("ProtocolProtocolActionsAction: execute() exit...{}",actionForward);
         return actionForward;
     }
 

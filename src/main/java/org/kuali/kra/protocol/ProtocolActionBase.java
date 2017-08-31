@@ -96,7 +96,6 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     }
 
 
-
     //invoke these hooks at appropriate points in action methods to get the actual forward name from the subclasses
     protected abstract String getProtocolForwardNameHook();
     protected abstract String getQuestionnaireForwardNameHook();
@@ -196,7 +195,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
      * @return
      */
     public ActionForward protocolActions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
-        LOG.debug("protocolActions()");
+        LOG.debug("ENTER protocolActions()");
         // for protocol lookup copy link - rice 1.1 need this
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
 
@@ -214,7 +213,7 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
        protocolForm.getActionHelper().prepareCommentsView();
 
        saveQuestionnaire(protocolForm);
-       LOG.debug("protocolActions() exit...");
+       LOG.debug("EXIT protocolActions()");
        return branchToPanelOrNotificationEditor(mapping, protocolForm, getProtocolActionsForwardNameHook());
     }
 
