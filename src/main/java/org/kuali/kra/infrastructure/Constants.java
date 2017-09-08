@@ -157,6 +157,8 @@ public interface Constants {
     public static final String PROPOSAL_NUMBER = "proposalNumber";
     public static final String BUDGET_VERSION_PANEL_NAME = "Budget Versions";
 
+    public static final String ALTERNATE_NOTIFY_IACUC_ACTION_PARAM = "ALTERNATE_NOTIFY_IACUC_ACTION_PARAM";
+    public static final String ALTERNATE_NOTIFY_IRB_ACTION_PARAM = "ALTERNATE_NOTIFY_IRB_ACTION_PARAM";
     // Key Personnel Mojo
     public static final String KEY_PERSONNEL_PAGE = "keyPersonnel";
     public static final String PROPOSAL_PERSON_INVESTIGATOR = "investigator";
@@ -836,7 +838,8 @@ public interface Constants {
     // Iacuc - exceptionDescription length
     public static final Integer IACUC_PROTOCOL_EXCEPTION_DESC_LENGTH = 40;
     public static final String MAPPING_IACUC_PROTOCOL_ACTIONS = "iacucProtocolActions";
-    
+    public static final String MAPPING_IACUC_PROTOCOL_HISTORY = "iacucProtocolHistory";
+
     public static final String IACUC_PROCEDURE_PERSON_RESPONSIBLE_DELIMITER = "|";
 
     public static final int IACUC_PROCEDURE_CUSTOM_DATA_SMALL_STRING_MAX_LENGTH = 1000;

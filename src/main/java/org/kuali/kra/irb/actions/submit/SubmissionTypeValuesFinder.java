@@ -17,11 +17,15 @@ package org.kuali.kra.irb.actions.submit;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.irb.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.irb.ProtocolDocument;
-import org.kuali.kra.irb.actions.IrbActionsKeyValuesBase;
-import org.kuali.kra.irb.actions.ProtocolStatus;
+import org.kuali.kra.irb.actions.*;
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
 import org.kuali.rice.core.api.util.KeyValue;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.iacuc.IacucProtocolDocument;
+import org.kuali.kra.iacuc.actions.IacucProtocolStatus;
+import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionStatus;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -146,17 +150,40 @@ public class SubmissionTypeValuesFinder extends IrbActionsKeyValuesBase {
     private boolean hasRenewalProtocolNumber(String protocolNumber) {
         return protocolNumber.contains("R");
     }
-    
+
+    private boolean hasFyiProtocolNumber(String protocolNumber) {
+        return protocolNumber.contains("F");
+    }
+
     private boolean displayResubmission(String currentStatus) {
         String validStatuses[] = {ProtocolStatus.WITHDRAWN, ProtocolStatus.SUBMITTED_TO_IRB, ProtocolStatus.RETURN_TO_PI};
         return validateCurrentStatus(currentStatus, validStatuses);
     }
-    
+
     protected boolean displayNotifyIrb(String currentStatus, Protocol protocol) {
-        String validStatuses[] = { ProtocolStatus.ACTIVE_OPEN_TO_ENROLLMENT };
-        String validSumissionStatuses[] = { ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE};        
-        String currentSubmissionStatus = protocol.getProtocolSubmission().getSubmissionStatusCode();
-        return validateCurrentStatus(currentStatus, validStatuses)  && validateCurrentSubmissionStatus(currentSubmissionStatus, validSumissionStatuses);
+        boolean useAlternateNotifyIrbAction = getParameterService().getParameterValueAsBoolean(ProtocolDocument.class, Constants.ALTERNATE_NOTIFY_IRB_ACTION_PARAM, false);
+        if (useAlternateNotifyIrbAction) {
+            String validStatuses[] = {ProtocolStatus.WITHDRAWN, ProtocolStatus.FYI_IN_PROGRESS, ProtocolStatus.SUBMITTED_TO_IRB};
+            return validateCurrentStatus(currentStatus, validStatuses) && hasFyiProtocolNumber(protocol.getProtocolNumber());
+        } else {
+            String validStatuses[] = { ProtocolStatus.ACTIVE_OPEN_TO_ENROLLMENT };
+            String validSumissionStatuses[] = { ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE};
+            String currentSubmissionStatus = protocol.getProtocolSubmission().getSubmissionStatusCode();
+            return validateCurrentStatus(currentStatus, validStatuses)  && validateCurrentSubmissionStatus(currentSubmissionStatus, validSumissionStatuses);
+        }
+    }
+
+    protected boolean displayNotifyIacuc(String currentStatus, ProtocolBase protocol) {
+        boolean useAlternateNotifyIacucAction = getParameterService().getParameterValueAsBoolean(IacucProtocolDocument.class, Constants.ALTERNATE_NOTIFY_IACUC_ACTION_PARAM, false);
+        if (useAlternateNotifyIacucAction) {
+            String validStatuses[] = {IacucProtocolStatus.WITHDRAWN, IacucProtocolStatus.FYI_IN_PROGRESS, IacucProtocolStatus.SUBMITTED_TO_IACUC};
+            return validateCurrentStatus(currentStatus, validStatuses) && hasFyiProtocolNumber(protocol.getProtocolNumber());
+        } else {
+            String validStatuses[] = { IacucProtocolStatus.ACTIVE,  IacucProtocolStatus.ADMINISTRATIVELY_APPROVED };
+            String validSumissionStatuses[] = { IacucProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE, IacucProtocolSubmissionStatus.PENDING};
+            String currentSubmissionStatus = protocol.getProtocolSubmission().getSubmissionStatusCode();
+            return validateCurrentStatus(currentStatus, validStatuses)  && validateCurrentSubmissionStatus(currentSubmissionStatus, validSumissionStatuses);
+        }
     }
     
     private boolean validateCurrentStatus(String currentStatus, String[] validStatuses) {

@@ -717,13 +717,15 @@ public class IacucProtocol extends ProtocolBase {
             type = "Renewal";
         }else if(protocolAmend.isContinuation()) {
             type = "Continuation";
+        }else if(protocolAmend.isFYI()) {
+            type = "FYI";
         }
         return type;
     }
 
     @Override
     public boolean isNew() {
-        return !isAmendment() && !isRenewal() && !isContinuation();
+        return !isAmendment() && !isRenewal() && !isContinuation() && !isFYI();
     }
     
     public boolean isContinuationWithoutAmendment() {
@@ -741,6 +743,8 @@ public class IacucProtocol extends ProtocolBase {
         } else if (isContinuation()) {
             return StringUtils.substringBefore(getProtocolNumber(), CONTINUATION_LETTER.toString());
                 
+        } else if (isFYI()) {
+            return StringUtils.substringBefore(getProtocolNumber(), FYI_LETTER.toString());
         } else {
             return null;
         }

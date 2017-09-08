@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionRedirect;
 import org.kuali.kra.authorization.ApplicationTask;
 import org.kuali.kra.bo.AttachmentFile;
 import org.kuali.kra.committee.bo.Committee;
@@ -61,16 +62,13 @@ import org.kuali.kra.irb.actions.modifysubmission.ProtocolModifySubmissionEvent;
 import org.kuali.kra.irb.actions.modifysubmission.ProtocolModifySubmissionService;
 import org.kuali.kra.irb.actions.notification.ProtocolNotificationRequestBean;
 import org.kuali.kra.irb.actions.notifyirb.ProtocolNotifyIrbBean;
+import org.kuali.kra.irb.actions.print.*;
 import org.kuali.kra.irb.actions.print.ProtocolActionPrintEvent;
 import org.kuali.kra.irb.actions.print.ProtocolPrintType;
 import org.kuali.kra.irb.actions.request.ProtocolRequestBean;
 import org.kuali.kra.irb.actions.reviewcomments.*;
 import org.kuali.kra.irb.actions.risklevel.*;
-import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
-import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
-import org.kuali.kra.irb.actions.submit.ProtocolSubmitAction;
-import org.kuali.kra.irb.actions.submit.ProtocolSubmitActionEvent;
-import org.kuali.kra.irb.actions.submit.ValidProtocolActionAction;
+import org.kuali.kra.irb.actions.submit.*;
 import org.kuali.kra.irb.actions.undo.UndoLastActionBean;
 import org.kuali.kra.irb.actions.undo.UndoLastActionService;
 import org.kuali.kra.irb.auth.ProtocolTask;
@@ -90,9 +88,12 @@ import org.kuali.kra.printing.print.PrintableAttachment;
 import org.kuali.kra.printing.util.PrintingUtils;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.ProtocolFormBase;
 import org.kuali.kra.protocol.actions.ProtocolOnlineReviewCommentable;
+import org.kuali.kra.protocol.actions.ProtocolSubmissionDocBase;
 import org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment;
 import org.kuali.kra.protocol.actions.print.ProtocolSummaryPrintOptions;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolNotepadBase;
 import org.kuali.kra.protocol.summary.AttachmentSummary;
@@ -413,7 +414,55 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         ProtocolForm protocolForm = (ProtocolForm) form;
         String forwardTo = getProtocolActionRequestService().notifyIrbProtocol(protocolForm);
         forward = mapping.findForward(forwardTo);
+        loadDocument(protocolForm);
+        protocolForm.getProtocolHelper().prepareView();
         return forward;
+    }
+
+    public ActionForward addSubmissionDoc(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+                                          HttpServletResponse response) throws Exception {
+        Protocol protocol = ((ProtocolForm) form).getActionHelper().getProtocol();
+        int actionIndex = getSelectedLine(request);
+        if (((ProtocolForm) form).getActionHelper().validFile(protocol.getProtocolActions().get(actionIndex).getNewActionAttachment(), "protocolNotifyIrbBean")) {
+            ProtocolSubmissionDoc fyiAttachment = null;
+            ProtocolActionAttachment newAttachment = protocol.getProtocolActions().get(actionIndex).getNewActionAttachment();
+            Long submissionId = protocol.getProtocolActions().get(actionIndex).getSubmissionIdFk();
+            for(ProtocolSubmissionBase fyiSubmission : protocol.getProtocolSubmissions()) {
+                if(fyiSubmission.getSubmissionId().longValue() == submissionId.longValue()) {
+                    fyiAttachment = ProtocolSubmissionBuilder.createProtocolSubmissionDoc((ProtocolSubmission) fyiSubmission, newAttachment.getFile().getFileName(),
+                            newAttachment.getFile().getContentType(), newAttachment.getFile().getFileData(), newAttachment.getDescription());
+                    break;
+                }
+            }
+
+            if(fyiAttachment != null) {
+                getBusinessObjectService().save(fyiAttachment);
+                ((ProtocolForm) form).getActionHelper().getProtocolNotifyIrbBean().setNewActionAttachment(new ProtocolActionAttachment());
+            }
+        }
+        //return mapping.findForward(getProtocolHistoryForwardNameHook());
+        return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+
+    public ActionForward deleteSubmissionDoc(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+                                             HttpServletResponse response) throws Exception {
+        ProtocolFormBase protocolForm = (ProtocolForm) form;
+        int actionIndex = getSelectedLine(request);
+        int attachmentIndex = getSelectedAttachment(request);
+        org.kuali.kra.protocol.actions.ProtocolActionBase protocolAction = protocolForm.getActionHelper().getProtocol().getProtocolActions().get(actionIndex);
+        ProtocolSubmissionDocBase attachment = protocolAction.getProtocolSubmissionDocs().get(attachmentIndex);
+
+        if (attachment == null) {
+            LOG.info("The attachment was not found for protocolAction: " + actionIndex + ", protocolSubmissionDoc: " + attachmentIndex);
+            // may want to tell the user the selection was invalid.
+            //return mapping.findForward(getProtocolHistoryForwardNameHook());
+            return mapping.findForward(Constants.MAPPING_BASIC);
+        }
+
+        getBusinessObjectService().delete(attachment);
+
+        //return mapping.findForward(getProtocolHistoryForwardNameHook());
+        return mapping.findForward(Constants.MAPPING_BASIC);
     }
 
     /**

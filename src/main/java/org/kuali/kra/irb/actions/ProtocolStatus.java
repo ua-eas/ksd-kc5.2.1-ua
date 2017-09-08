@@ -37,7 +37,9 @@ public class ProtocolStatus extends ProtocolStatusBase {
     public static final String AMENDMENT_IN_PROGRESS = "105";
 
     public static final String RENEWAL_IN_PROGRESS = "106";
-    
+
+    public static final String FYI_IN_PROGRESS = "900";
+
     public static final String RETURN_TO_PI = "107";
 
     public static final String ACTIVE_OPEN_TO_ENROLLMENT = "200";
@@ -73,6 +75,8 @@ public class ProtocolStatus extends ProtocolStatusBase {
     public static final String AMENDMENT_MERGED = "400";
 
     public static final String RENEWAL_MERGED = "401";
-    
+
+    public static final String FYI_MERGED = "901";
+
     public static final String RECALLED_IN_ROUTING = "402";
 }

@@ -51,7 +51,7 @@ public class ProtocolApproveServiceImpl extends ProtocolApproveServiceImplBase i
         if (protocol.getApprovalDate() == null) {
             protocol.setApprovalDate(actionBean.getApprovalDate());
         }
-        if (protocol.isRenewal() || protocol.isAmendment()) {
+        if (!protocol.isNew()) {
             protocol.setLastApprovalDate(actionBean.getApprovalDate());
         }
         String exemptProtocolTypeCode = parameterService.getParameterValueAsString(ProtocolDocument.class, Constants.PROTOCOL_TYPE_CODE_EXEMPT);
@@ -72,7 +72,7 @@ public class ProtocolApproveServiceImpl extends ProtocolApproveServiceImplBase i
         
         protocol.setApprovalDate(actionBean.getApprovalDate());
         protocol.setExpirationDate(actionBean.getExpirationDate());
-        if (protocol.isRenewal() || protocol.isAmendment()) {
+        if (!protocol.isNew()) {
             protocol.setLastApprovalDate(actionBean.getApprovalDate());
         }
         finalizeReviewsAndSave(protocol, ProtocolActionType.EXPEDITE_APPROVAL, EXPEDITED_APPROVAL_FINALIZE_OLR_ANNOTATION);
@@ -86,7 +86,7 @@ public class ProtocolApproveServiceImpl extends ProtocolApproveServiceImplBase i
         if (protocol.getApprovalDate() == null) {
             protocol.setApprovalDate(actionBean.getApprovalDate());
         }
-        if (protocol.isRenewal() || protocol.isAmendment()) {
+        if (!protocol.isNew()) {
             protocol.setLastApprovalDate(actionBean.getApprovalDate());
         }
         protocol.setExpirationDate(actionBean.getExpirationDate());

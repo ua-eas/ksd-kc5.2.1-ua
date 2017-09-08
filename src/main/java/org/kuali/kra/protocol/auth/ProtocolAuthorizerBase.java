@@ -86,7 +86,8 @@ public abstract class ProtocolAuthorizerBase extends TaskAuthorizerImpl {
         return protocol.getProtocolNumber() != null &&
                (protocol.getProtocolNumber().contains("A") ||
                 protocol.getProtocolNumber().contains("R") ||
-                protocol.getProtocolNumber().contains("C"));
+                protocol.getProtocolNumber().contains("C") ||
+                protocol.getProtocolNumber().contains("F"));
     }
     
     /**

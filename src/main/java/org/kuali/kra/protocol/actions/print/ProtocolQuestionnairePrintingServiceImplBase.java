@@ -176,7 +176,7 @@ public abstract class ProtocolQuestionnairePrintingServiceImplBase implements Pr
      */
     private boolean isCurrentRegularQn(AnswerHeader answerHeader) {
         boolean isCurrentQn = false;
-        if ((getProtocol().isAmendment() || getProtocol().isRenewal()) && !answerHeader.getModuleItemKey().equals(getProtocol().getProtocolNumber())) {
+        if (!getProtocol().isNew() && !answerHeader.getModuleItemKey().equals(getProtocol().getProtocolNumber())) {
             Map keyValues = new HashMap();
             keyValues.put("protocolNumber", answerHeader.getModuleItemKey());
             ProtocolBase prevProtocol = null;
@@ -228,8 +228,8 @@ public abstract class ProtocolQuestionnairePrintingServiceImplBase implements Pr
      */
     private boolean isCurrentAorRQn(AnswerHeader answerHeader) {
         boolean isCurrentQn = false;
-        if (getProtocol().isAmendment() || getProtocol().isRenewal()) {
-            // if this is A/R, then just match sequencenumber and modulesubitemkey
+        if (!getProtocol().isNew()) {
+            // if this is A/R/F, then just match sequencenumber and modulesubitemkey
             isCurrentQn = answerHeader.getModuleSubItemKey().equals(getProtocol().getSequenceNumber().toString());
         } else {
             // if this is a regular protocol, then get this A/R associated this this Qn and see if

@@ -52,17 +52,8 @@ import org.kuali.kra.iacuc.actions.followup.IacucFollowupActionService;
 import org.kuali.kra.iacuc.actions.genericactions.IacucProtocolGenericActionBean;
 import org.kuali.kra.iacuc.actions.print.IacucProtocolPrintingService;
 import org.kuali.kra.iacuc.actions.request.IacucProtocolRequestBean;
-import org.kuali.kra.iacuc.actions.reviewcomments.IacucProtocolAddReviewAttachmentEvent;
-import org.kuali.kra.iacuc.actions.reviewcomments.IacucProtocolAddReviewCommentEvent;
-import org.kuali.kra.iacuc.actions.reviewcomments.IacucProtocolManageReviewAttachmentEvent;
-import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewAttachmentsBean;
-import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewCommentsBean;
-import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewCommentsService;
-import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewerBean;
-import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
-import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmitAction;
-import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmitActionEvent;
-import org.kuali.kra.iacuc.actions.submit.IacucValidProtocolActionAction;
+import org.kuali.kra.iacuc.actions.reviewcomments.*;
+import org.kuali.kra.iacuc.actions.submit.*;
 import org.kuali.kra.iacuc.actions.undo.IacucProtocolUndoLastActionService;
 import org.kuali.kra.iacuc.auth.IacucProtocolTask;
 import org.kuali.kra.iacuc.committee.meeting.IacucCommitteeScheduleMinute;
@@ -99,6 +90,7 @@ import org.kuali.kra.protocol.actions.ProtocolSubmissionDocBase;
 import org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment;
 import org.kuali.kra.protocol.actions.print.ProtocolActionPrintEvent;
 import org.kuali.kra.protocol.actions.submit.ProtocolReviewerBeanBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.kra.protocol.actions.undo.UndoLastActionBean;
 import org.kuali.kra.protocol.correspondence.ProtocolCorrespondence;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentBase;
@@ -459,7 +451,56 @@ public class IacucProtocolActionsAction extends IacucProtocolAction {
         IacucProtocolForm protocolForm = (IacucProtocolForm) form;
         String forwardTo = getProtocolActionRequestService().notifyProtocol(protocolForm);
         forward = mapping.findForward(forwardTo);
+        loadDocument(protocolForm);
+        protocolForm.getProtocolHelper().prepareView();
         return forward;
+    }
+
+    public ActionForward addSubmissionDoc(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+                                          HttpServletResponse response) throws Exception {
+        IacucProtocolForm protocolForm = (IacucProtocolForm) form;
+        ProtocolBase protocol = protocolForm.getActionHelper().getProtocol();
+        int actionIndex = getSelectedLine(request);
+        if (((IacucActionHelper) protocolForm.getActionHelper()).validFile((protocol.getProtocolActions().get(actionIndex)).getNewActionAttachment(), "protocolNotifyIrbBean")) {
+            IacucProtocolSubmissionDoc fyiAttachment = null;
+            ProtocolActionAttachment newAttachment = (protocol.getProtocolActions().get(actionIndex)).getNewActionAttachment();
+            Long submissionId = protocol.getProtocolActions().get(actionIndex).getSubmissionIdFk();
+            for(ProtocolSubmissionBase fyiSubmission : protocol.getProtocolSubmissions()) {
+                if(fyiSubmission.getSubmissionId().longValue() == submissionId.longValue()) {
+                    fyiAttachment = IacucProtocolSubmissionBuilder.createProtocolSubmissionDoc((IacucProtocolSubmission) fyiSubmission, newAttachment.getFile().getFileName(),
+                            newAttachment.getFile().getContentType(), newAttachment.getFile().getFileData(), newAttachment.getDescription());
+                    break;
+                }
+            }
+
+            if(fyiAttachment != null) {
+                getBusinessObjectService().save(fyiAttachment);
+                ((IacucActionHelper) ((IacucProtocolForm) form).getActionHelper()).getIacucProtocolNotifyIacucBean().setNewActionAttachment(new ProtocolActionAttachment());
+            }
+        }
+        //return mapping.findForward(getProtocolHistoryForwardNameHook());
+        return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+
+    public ActionForward deleteSubmissionDoc(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+                                             HttpServletResponse response) throws Exception {
+        IacucProtocolForm protocolForm = (IacucProtocolForm) form;
+        int actionIndex = getSelectedLine(request);
+        int attachmentIndex = getSelectedAttachment(request);
+        org.kuali.kra.protocol.actions.ProtocolActionBase protocolAction = protocolForm.getActionHelper().getProtocol().getProtocolActions().get(actionIndex);
+        ProtocolSubmissionDocBase attachment = protocolAction.getProtocolSubmissionDocs().get(attachmentIndex);
+
+        if (attachment == null) {
+            LOG.info("The attachment was not found for protocolAction: " + actionIndex + ", protocolSubmissionDoc: " + attachmentIndex);
+            // may want to tell the user the selection was invalid.
+            //return mapping.findForward(getProtocolHistoryForwardNameHook());
+            return mapping.findForward(Constants.MAPPING_BASIC);
+        }
+
+        getBusinessObjectService().delete(attachment);
+
+        //return mapping.findForward(getProtocolHistoryForwardNameHook());
+        return mapping.findForward(Constants.MAPPING_BASIC);
     }
 
     /**

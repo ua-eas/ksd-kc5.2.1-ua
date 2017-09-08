@@ -28,9 +28,11 @@ public abstract class UndoLastActionBeanHelperBase implements Serializable {
     
     protected static final String AMEND = "A";
     protected static final String RENEW = "R";
+    protected static final String FYI = "F";
     protected static final String AMEND_COMMENT = "Amendment-";
     protected static final String RENEW_COMMENT = "Renewal-";
-    
+    protected static final String FYI_COMMENT = "FYI-";
+
     protected abstract String[] getNotUndoableActions();
     
     protected abstract String getApprovedActionTypeCodeHook();
@@ -42,7 +44,7 @@ public abstract class UndoLastActionBeanHelperBase implements Serializable {
         if(action != null){
             // filter out protocol merged from renewal/amendment
             if (StringUtils.isBlank(action.getComments()) || !(action.getProtocolActionTypeCode().equals(getApprovedActionTypeCodeHook())
-                    && (action.getComments().startsWith(RENEW_COMMENT) || action.getComments().startsWith(AMEND_COMMENT)))) {
+                    && (action.getComments().startsWith(RENEW_COMMENT) || action.getComments().startsWith(AMEND_COMMENT) || action.getComments().startsWith(FYI_COMMENT)))) {
                 return isActionUndoable(action.getProtocolActionTypeCode()) || isActionProtocolApproval(action, action.getProtocolNumber()) || isProtocolDeleted(protocol);
             }
         }
@@ -73,7 +75,7 @@ public abstract class UndoLastActionBeanHelperBase implements Serializable {
     
     protected boolean isActionProtocolApproval(ProtocolActionBase action, String protocolNumber) {
         String protocolNumberUpper = protocolNumber.toUpperCase();
-        boolean amendmentOrRenewal = protocolNumberUpper.contains(AMEND) || protocolNumberUpper.contains(RENEW);
+        boolean amendmentOrRenewal = protocolNumberUpper.contains(AMEND) || protocolNumberUpper.contains(RENEW) || protocolNumberUpper.contains(FYI);
         return getApprovedActionTypeCodeHook().equals(action.getProtocolActionTypeCode()) && !amendmentOrRenewal;
     }
     

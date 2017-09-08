@@ -77,11 +77,7 @@ import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.infrastructure.TaskName;
-import org.kuali.kra.protocol.ProtocolBase;
-import org.kuali.kra.protocol.ProtocolDocumentBase;
-import org.kuali.kra.protocol.ProtocolFormBase;
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
-import org.kuali.kra.protocol.ProtocolVersionService;
+import org.kuali.kra.protocol.*;
 import org.kuali.kra.protocol.actions.ActionHelperBase;
 import org.kuali.kra.protocol.actions.ProtocolActionBean;
 import org.kuali.kra.protocol.actions.ProtocolEditableBean;
@@ -394,8 +390,12 @@ public class IacucActionHelper extends ActionHelperBase {
         
 
     }
- 
-    
+
+    @Override
+    protected void initializeAlternateNotifyActionFlag() {
+        useAlternateNotifyAction = getParameterService().getParameterValueAsBoolean(getProtocolDocumentBOClassHook(), Constants.ALTERNATE_NOTIFY_IACUC_ACTION_PARAM, false);
+    }
+
     /**
      * Refreshes the comments for all the beans from the database.  Use sparingly since this will erase non-persisted comments.
      */
@@ -1486,8 +1486,7 @@ public class IacucActionHelper extends ActionHelperBase {
     protected ProtocolAmendmentBean configureAmendmentBean(ProtocolAmendmentBean amendmentBean) throws Exception {
         List<String> moduleTypeCodes;
 
-        if (StringUtils.isNotEmpty(getProtocol().getProtocolNumber()) && (getProtocol().isAmendment() || getProtocol().isRenewal() || 
-                getProtocol().isContinuation())) {
+        if (StringUtils.isNotEmpty(getProtocol().getProtocolNumber()) && !getProtocol().isNew()) {
             moduleTypeCodes = getProtocolAmendRenewServiceHook().getAvailableModules(getProtocol().getAmendedProtocolNumber());
             populateExistingAmendmentBean(amendmentBean, moduleTypeCodes);
         } else {

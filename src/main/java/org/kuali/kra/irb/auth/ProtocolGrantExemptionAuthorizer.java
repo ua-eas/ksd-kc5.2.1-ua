@@ -27,7 +27,7 @@ public class ProtocolGrantExemptionAuthorizer extends ProtocolAuthorizer {
      * @see org.kuali.kra.irb.auth.ProtocolAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.irb.auth.ProtocolTask)
      */
     public boolean isAuthorized(String userId, ProtocolTask task) {
-        return !task.getProtocol().isAmendment() && !task.getProtocol().isRenewal() &&
+        return task.getProtocol().isNew() &&
                canExecuteAction(task.getProtocol(), ProtocolActionType.GRANT_EXEMPTION) &&
                hasPermission(userId, task.getProtocol(), PermissionConstants.MAINTAIN_PROTOCOL_SUBMISSIONS);
     }

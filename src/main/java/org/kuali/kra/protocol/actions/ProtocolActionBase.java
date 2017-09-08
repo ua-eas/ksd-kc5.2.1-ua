@@ -24,6 +24,7 @@ import org.kuali.kra.common.notification.bo.KcNotification;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.protocol.ProtocolAssociateBase;
 import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment;
 import org.kuali.kra.protocol.actions.print.QuestionnairePrintOption;
 import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.kra.protocol.correspondence.ProtocolCorrespondence;
@@ -49,6 +50,7 @@ public abstract class ProtocolActionBase extends ProtocolAssociateBase {
     protected static final String PROTOCOL_NUMBER_FIELD_KEY = "protocolNumber";
     protected static final String COMMENT_PREFIX_RENEWAL = "Renewal-";
     protected static final String COMMENT_PREFIX_AMMENDMENT = "Amendment-";
+    protected static final String COMMENT_PREFIX_FYI = "FYI-";
 
     //not thread safe cannot be static  
     private transient SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -101,6 +103,8 @@ public abstract class ProtocolActionBase extends ProtocolAssociateBase {
     private transient CommitteeServiceBase committeeService;
 
     private transient QuestionnairePrintOption questionnairePrintOption;
+
+    private transient ProtocolActionAttachment newActionAttachment;
 
     public ProtocolActionBase() {
     }
@@ -467,7 +471,7 @@ public abstract class ProtocolActionBase extends ProtocolAssociateBase {
         Map<String, String> fieldValues = new HashMap<String, String>();
         fieldValues.put("moduleItemCode", getCoeusModule());
         fieldValues.put("moduleItemKey", moduleItemKey);
-        if (!moduleItemKey.contains("A") && !moduleItemKey.contains("R") && !getProtocol().isAmendment() && !getProtocol().isRenewal()) {
+        if (!moduleItemKey.contains("A") && !moduleItemKey.contains("R") && !moduleItemKey.contains("F") && getProtocol().isNew()) {
             fieldValues.put("moduleSubItemCode", moduleSubItemCode);
         }
         fieldValues.put("moduleSubItemKey", moduleSubItemKey);
@@ -477,8 +481,10 @@ public abstract class ProtocolActionBase extends ProtocolAssociateBase {
     
     protected String getAmendmentRenewalNumber(String comment) {
         String retVal="";
-        if (comment.startsWith("Amendment-")) {
+        if (comment.startsWith(COMMENT_PREFIX_AMMENDMENT)) {
             retVal = "A" + comment.substring(10, 13);
+        } else if (comments.startsWith(COMMENT_PREFIX_FYI)) {
+            retVal = "F" + comment.substring(4,7);
         } else {
             retVal = "R" + comment.substring(8, 11);
                      
@@ -590,5 +596,12 @@ public abstract class ProtocolActionBase extends ProtocolAssociateBase {
             return null;
         }
     }
-    
+
+    public ProtocolActionAttachment getNewActionAttachment() {
+        return newActionAttachment;
+    }
+
+    public void setNewActionAttachment(ProtocolActionAttachment newActionAttachment) {
+        this.newActionAttachment = newActionAttachment;
+    }
 }

@@ -73,7 +73,8 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
     
     protected static final CharSequence AMENDMENT_LETTER = "A";
     protected static final CharSequence RENEWAL_LETTER = "R";
-    
+    protected static final CharSequence FYI_LETTER = "F";
+
     protected static final String NEXT_ACTION_ID_KEY = "actionId";
      
     
@@ -1238,7 +1239,13 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
      * @param amendment
      */
     public void merge(ProtocolBase amendment) {
-        merge(amendment, true);
+        if (amendment.isFYI()) {
+            mergeProtocolSubmission(amendment);
+            mergeProtocolAction(amendment);
+        }
+        else {
+            merge(amendment, true);
+        }
     }
     
     // this method was modified during IRB backfit merge with the assumption that these changes are applicable to both IRB and IACUC
@@ -1743,7 +1750,7 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
     
     
     public boolean isNew() {
-        return !isAmendment() && !isRenewal();
+        return !isAmendment() && !isRenewal() && !isFYI();
     }
     
    
@@ -1754,7 +1761,9 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
     public boolean isRenewal() {
         return protocolNumber != null && protocolNumber.contains(RENEWAL_LETTER);
     }
-    
+
+    public boolean isFYI() { return protocolNumber != null && protocolNumber.contains(FYI_LETTER); }
+
     public boolean isRenewalWithAmendment() {
         return isRenewal() && CollectionUtils.isNotEmpty(this.getProtocolAmendRenewal().getModules());
     }
@@ -1779,7 +1788,10 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
         } else if (isRenewal()) {
             return StringUtils.substringBefore(getProtocolNumber(), RENEWAL_LETTER.toString());
                 
-        } else {
+        } else if (isFYI()) {
+            return StringUtils.substringBefore(getProtocolNumber(), FYI_LETTER.toString());
+        }
+        else {
             return null;
         }
     }
@@ -2129,6 +2141,7 @@ public abstract class ProtocolBase extends KraPersistableBusinessObjectBase impl
             if(action.getSubmissionNumber() != null && !action.getSubmissionNumber().equals(0)) {
                 if(submissionNumberMap.get(action.getSubmissionNumber()) != null) {
                     action.setSubmissionIdFk(submissionNumberMap.get(action.getSubmissionNumber()).getSubmissionId());
+                    action.setProtocolSubmission(submissionNumberMap.get(action.getSubmissionNumber()));
                 }
             }
         }

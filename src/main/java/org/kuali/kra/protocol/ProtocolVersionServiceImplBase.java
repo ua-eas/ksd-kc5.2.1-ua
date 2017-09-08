@@ -143,11 +143,7 @@ public abstract class ProtocolVersionServiceImplBase implements ProtocolVersionS
         newProtocol.setProtocolDocument(newProtocolDocument);
         protocolDocument.getProtocol().setActive(false);
         
-        if (! (
-                (protocolDocument.getProtocol().isAmendment() && newProtocol.isAmendment()) ||
-                (protocolDocument.getProtocol().isRenewal() && newProtocol.isRenewal()) || 
-                (protocolDocument.getProtocol().isRenewalWithoutAmendment() && newProtocol.isRenewalWithoutAmendment())
-           )) {
+        if (!(!protocolDocument.getProtocol().isNew() && !newProtocol.isNew())) {
             finalizeAttachmentProtocol(protocolDocument.getProtocol());
         }
         
@@ -155,20 +151,16 @@ public abstract class ProtocolVersionServiceImplBase implements ProtocolVersionS
         businessObjectService.save(protocolDocument.getProtocol());        
         documentService.saveDocument(newProtocolDocument);
         newProtocol.resetForeignKeys();
-        
-        if (! (
-                (protocolDocument.getProtocol().isAmendment() && newProtocol.isAmendment()) ||
-                (protocolDocument.getProtocol().isRenewal() && newProtocol.isRenewal()) || 
-                (protocolDocument.getProtocol().isRenewalWithoutAmendment() && newProtocol.isRenewalWithoutAmendment())
-           )) {                
-            finalizeAttachmentProtocol(newProtocol);
+
+        if (!(!protocolDocument.getProtocol().isNew() && !newProtocol.isNew())) {
+            finalizeAttachmentProtocol(protocolDocument.getProtocol());
         }
         
         businessObjectService.save(newProtocol);
         // versioning questionnaire answer
         List<AnswerHeader> newAnswerHeaders = questionnaireAnswerService.versioningQuestionnaireAnswer(getNewInstanceProtocolModuleQuestionnaireBeanHook(protocolDocument.getProtocol())
             , newProtocol.getSequenceNumber());
-        if (newProtocol.isAmendment() || (newProtocol.isRenewal() && !newProtocol.isRenewalWithoutAmendment())) {
+        if (newProtocol.isAmendment() || newProtocol.isRenewalWithAmendment()) {
             ProtocolModuleQuestionnaireBeanBase moduleBean = getNewInstanceProtocolModuleQuestionnaireBeanHook(protocolDocument.getProtocol());
             moduleBean.setModuleSubItemCode(CoeusSubModule.ZERO_SUBMODULE);
             List<AnswerHeader> newAmendAnswerHeaders = questionnaireAnswerService.versioningQuestionnaireAnswer(moduleBean

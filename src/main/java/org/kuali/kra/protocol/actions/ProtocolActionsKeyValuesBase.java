@@ -22,6 +22,7 @@ import org.kuali.kra.service.KcPersonService;
 import org.kuali.kra.service.RolodexService;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.KeyValuesService;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 
 /**
  * 
@@ -39,7 +40,8 @@ public abstract class ProtocolActionsKeyValuesBase extends FormViewAwareUifKeyVa
     private RolodexService rolodexService;
     private CommitteeServiceBase committeeService;
     private KeyValuesService keyValuesService;
-    
+    private ParameterService parameterService;
+
     /**
      * This method returns an instance of BusinessObjectServe from the KraServiceLocator.
      * @return BusinessObjectService
@@ -100,5 +102,12 @@ public abstract class ProtocolActionsKeyValuesBase extends FormViewAwareUifKeyVa
             this.keyValuesService = KraServiceLocator.getService(KeyValuesService.class);
         }
         return this.keyValuesService;
+    }
+
+    protected ParameterService getParameterService() {
+        if (this.parameterService == null) {
+            this.parameterService = KraServiceLocator.getService(ParameterService.class);
+        }
+        return this.parameterService;
     }
 }

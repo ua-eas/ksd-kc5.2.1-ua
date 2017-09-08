@@ -51,6 +51,8 @@ import com.google.common.collect.Lists;
  */
 public abstract class ProtocolActionServiceImplBase implements ProtocolActionService {
 
+    protected static final String FYI = "F";
+
     protected static final String AMEND = "A";
 
     protected static final String RENEW = "R";
@@ -205,7 +207,7 @@ public abstract class ProtocolActionServiceImplBase implements ProtocolActionSer
      */
     public void updateProtocolStatus(ProtocolActionBase protocolActionBo, ProtocolBase protocol) {
         String protocolNumberUpper = protocol.getProtocolNumber().toUpperCase();
-        String specialCondition = protocolNumberUpper.contains(AMEND) ? AMEND : (protocolNumberUpper.contains(RENEW) ? RENEW : NONE);
+        String specialCondition = protocolNumberUpper.contains(AMEND) ? AMEND : (protocolNumberUpper.contains(RENEW) ? RENEW : (protocolNumberUpper.contains(FYI) ? FYI : NONE));
 
         ProtocolActionUpdateMapping protocolAction = getNewProtocolActionUpdateMappingHook(protocolActionBo.getProtocolActionTypeCode(),
             protocol.getProtocolSubmission().getProtocolSubmissionType().getSubmissionTypeCode(), protocol.getProtocolStatusCode(),
