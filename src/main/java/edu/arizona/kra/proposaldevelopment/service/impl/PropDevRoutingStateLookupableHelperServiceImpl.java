@@ -86,27 +86,11 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
             results = getPropDevRoutingStateService().findPropDevRoutingState(fieldValues);
             // sort list by expedited, then SPS Approve route stop then Final Proposal Received Date
             if (results.size() > 1) {
-                Collections.sort(results, new Comparator(){
-                    public int compare(Object o1, Object o2) {
-                        if(o1 instanceof ProposalDevelopmentRoutingState && o2 instanceof ProposalDevelopmentRoutingState) {
-                            ProposalDevelopmentRoutingState pd1 = (ProposalDevelopmentRoutingState)o1;
-                            ProposalDevelopmentRoutingState pd2 = (ProposalDevelopmentRoutingState)o2;
-
-                            // outmost important: OrdExpedited
-                            if ( pd1.isORDExpedited() ){
-                                if (!pd2.isORDExpedited()) {
-                                    return -1;
-                                }
-                            } else if ( pd2.isORDExpedited() ){
-                                return 1;
-                            }
-
-                            //secondary sort asc by Route Stop Date
-                            return pd1.getRouteStopDate().compareTo(pd2.getRouteStopDate());
-
-                        }
-                        return 0;
-                    }});
+                // sort list DESC by ORDExpedited so 'Yes' rows will be shown first
+                List defaultSortColumns = getDefaultSortColumns();
+                if (defaultSortColumns.size() > 0) {
+                    Collections.sort(results, Collections.reverseOrder(new BeanPropertyComparator(defaultSortColumns, true)));
+                }
             }
         } catch (Exception e){
             e.printStackTrace();
