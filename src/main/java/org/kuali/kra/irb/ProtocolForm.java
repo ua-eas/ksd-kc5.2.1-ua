@@ -106,17 +106,23 @@ public class ProtocolForm extends ProtocolFormBase {
      */
     @Override
     public HeaderNavigation[] getHeaderNavigationTabs() {
+        LOG.debug("ENTER ProtocolForm: getHeaderNavigationTabs()");
         HeaderNavigation[] navigation = super.getHeaderNavigationTabs();
         
         ProtocolOnlineReviewService onlineReviewService = getProtocolOnlineReviewService();
         List<HeaderNavigation> resultList = new ArrayList<HeaderNavigation>();
         boolean onlineReviewTabEnabled = false;
 
-        if (getProtocolDocument() != null && getProtocolDocument().getProtocol() != null) {
+        if (getProtocolDocument() != null && getProtocolDocument().getProtocol() != null && getProtocolDocument().getDocumentNumber() != null ) {
+            LOG.debug("getHeaderNavigationTabs(): getProtocolDocument().getDocumentNumber()= "+getProtocolDocument().getDocumentNumber());
+            LOG.debug("getHeaderNavigationTabs(): docHdrId= "+getProtocolDocument().getProtocol().getProtocolDocument().getDocumentNumber());
             String principalId = GlobalVariables.getUserSession().getPrincipalId();
             ProtocolSubmission submission = (ProtocolSubmission) getProtocolDocument().getProtocol().getProtocolSubmission();
             boolean isUserOnlineReviewer = onlineReviewService.isProtocolReviewer(principalId, false, submission);
-            boolean isUserIrbAdmin = getKraAuthorizationService().hasRole(GlobalVariables.getUserSession().getPrincipalId(), "KC-UNT", "IRB Administrator"); 
+            boolean isUserIrbAdmin = getKraAuthorizationService().hasRole(GlobalVariables.getUserSession().getPrincipalId(), "KC-UNT", "IRB Administrator");
+            //making sure the protocol document is set inside the protocol because it's used by certain services
+            getProtocolDocument().getProtocol().setProtocolDocument(this.getProtocolDocument());
+            this.setDocument(this.getProtocolDocument());
             onlineReviewTabEnabled = (isUserOnlineReviewer || isUserIrbAdmin) 
                     && onlineReviewService.isProtocolInStateToBeReviewed((Protocol) getProtocolDocument().getProtocol());
         }
@@ -142,6 +148,7 @@ public class ProtocolForm extends ProtocolFormBase {
         
         HeaderNavigation[] result = new HeaderNavigation[resultList.size()];
         resultList.toArray(result);
+        LOG.debug("EXIT ProtocolForm: getHeaderNavigationTabs()");
         return result;
     }
     
@@ -327,18 +334,17 @@ public class ProtocolForm extends ProtocolFormBase {
 
     @Override
     protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions) {
-        LOG.debug("createNewActionHelperInstanceHook: initializeActions={}",initializeActions);
-        ActionHelper actionHelper = null;
+        LOG.debug("ProtocolForm: createNewActionHelperInstanceHook: initializeActions={}",initializeActions);
         try {
-            actionHelper = new CustomActionHelper((CustomProtocolForm) protocolForm);
-            if (initializeActions) {
+            ActionHelper actionHelper = new ActionHelper((ProtocolForm) protocolForm);
+            if(initializeActions) {
                 actionHelper.initializeProtocolActions();
             }
+            return actionHelper;
         } catch (Exception e){
-            LOG.error("Exception in createNewActionHelperInstanceHook:"+e.getMessage());
+            LOG.error("ProtocolForm: Exception in createNewActionHelperInstanceHook:"+e.getMessage());
             throw new RuntimeException(e);
         }
-        return actionHelper;
     }
 
 
@@ -346,7 +352,6 @@ public class ProtocolForm extends ProtocolFormBase {
     protected ProtocolSpecialReviewHelperBase createNewSpecialReviewHelperInstanceHook(ProtocolFormBase protocolForm) {
         return new SpecialReviewHelper((ProtocolForm) protocolForm);
     }
-
 
 
     @SuppressWarnings("rawtypes")

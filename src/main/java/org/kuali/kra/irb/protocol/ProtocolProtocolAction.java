@@ -101,7 +101,7 @@ public class ProtocolProtocolAction extends ProtocolAction {
             throws Exception {
         LOG.debug("execute() ENTER -> super.execute(...)");
         ActionForward actionForward = super.execute(mapping, form, request, response);
-        LOG.debug("execute() Returned from super.execute(...)");
+        LOG.debug("execute() Returned from super.execute(...) actionForward="+(actionForward==null?"NULL":actionForward.getName()));
         // Following is for protocol lookup - edit protocol
         ProtocolForm protocolForm = (ProtocolForm) form;
         String commandParam = request.getParameter(KRADConstants.PARAMETER_COMMAND);
@@ -121,6 +121,13 @@ public class ProtocolProtocolAction extends ProtocolAction {
         }
         LOG.debug("execute() before  protocolForm.getProtocolHelper().prepareView()");
         protocolForm.getProtocolHelper().prepareView();
+
+        if ( Constants.MAPPING_PROTOCOL_ONLINE_REVIEW.equals(commandParam) || (actionForward!=null && actionForward.getName().contains(Constants.MAPPING_PROTOCOL_ONLINE_REVIEW))){
+            //force OnlineReview helper initialization
+            LOG.debug("execute() COMMAND=" + commandParam + " BEFORE initializing online review helper...");
+            ((ProtocolForm) form).getOnlineReviewsActionHelper().init(true);
+            LOG.debug("execute() COMMAND=" + commandParam + " AFTER initializing online review helper...");
+        }
 
         LOG.debug("execute() EXIT");
         return actionForward;
@@ -483,8 +490,7 @@ public class ProtocolProtocolAction extends ProtocolAction {
     /**
      * Exposing this to be used in ProtocolFundingSource Service so we can avoid stacking funding source conditional logic in the
      * action
-     * 
-     * @see org.kuali.kra.web.struts.action.KraTransactionalDocumentActionBase#buildForwardUrl(java.lang.Long)
+     *
      */
     @Override
     public String buildForwardUrl(String routeHeaderId) {
