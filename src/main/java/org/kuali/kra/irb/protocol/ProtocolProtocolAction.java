@@ -119,10 +119,11 @@ public class ProtocolProtocolAction extends ProtocolAction {
                 }
             }
         }
+        String actionForwardName = actionForward==null?"NULL":actionForward.getName();
         LOG.debug("execute() before  protocolForm.getProtocolHelper().prepareView()");
         protocolForm.getProtocolHelper().prepareView();
 
-        if ( Constants.MAPPING_PROTOCOL_ONLINE_REVIEW.equals(commandParam) || (actionForward!=null && actionForward.getName().contains(Constants.MAPPING_PROTOCOL_ONLINE_REVIEW))){
+        if ( Constants.MAPPING_PROTOCOL_ONLINE_REVIEW.equals(commandParam) || (actionForwardName!=null && actionForwardName.contains(Constants.MAPPING_PROTOCOL_ONLINE_REVIEW))){
             //force OnlineReview helper initialization
             LOG.debug("execute() COMMAND=" + commandParam + " BEFORE initializing online review helper...");
             ((ProtocolForm) form).getOnlineReviewsActionHelper().init(true);
