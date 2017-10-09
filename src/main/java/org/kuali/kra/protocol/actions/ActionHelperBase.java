@@ -908,7 +908,7 @@ public abstract class ActionHelperBase implements Serializable {
         assignToAgendaBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         
         protocolFullApprovalBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
-        
+
         protocolDisapproveBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());         
         protocolSMRBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
         protocolSRRBean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
@@ -1324,6 +1324,7 @@ public abstract class ActionHelperBase implements Serializable {
     public ProtocolNotifyCommitteeBean getProtocolNotifyCommitteeBean() {
         if ( protocolNotifyCommitteeBean == null){
             protocolNotifyCommitteeBean = getNewProtocolNotifyCommitteeBeanInstanceHook(this);
+            actionBeanTaskMap.put(TaskName.NOTIFY_COMMITTEE, protocolNotifyCommitteeBean);
         }
         return protocolNotifyCommitteeBean;
     }
@@ -1963,7 +1964,6 @@ public abstract class ActionHelperBase implements Serializable {
     }
 
     protected void setReviewComments(List<CommitteeScheduleMinuteBase> reviewComments) {
-        LOG.debug("ActionHelperBase: setReviewComments()");
         this.reviewComments = reviewComments;
     }
 
@@ -2121,6 +2121,7 @@ public abstract class ActionHelperBase implements Serializable {
     }
     
     public String getCurrentTask() {
+        LOG.debug("ActionHelperBase: getCurrentTask{}",currentTaskName);
         return currentTaskName;
     }
     

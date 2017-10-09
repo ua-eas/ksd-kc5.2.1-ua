@@ -25,6 +25,7 @@ import org.kuali.kra.common.notification.service.KcNotificationService;
 import org.kuali.kra.common.permissions.Permissionable;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.ProtocolForm;
 import org.kuali.kra.krms.service.KrmsRulesExecutionService;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.protocol.auth.ProtocolTaskBase;
@@ -82,8 +83,9 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-        LOG.debug("execute()");
+        LOG.debug("ProtocolActionBase: execute()");
         final ActionForward forward = super.execute(mapping, form, request, response);
+        LOG.debug("ProtocolActionBase: execute() AFTER super.execute() forward="+forward.toString());
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
         if (protocolForm.isAuditActivated()) {
             protocolForm.setUnitRulesMessages(getUnitRulesMessages(protocolForm.getProtocolDocument()));
@@ -91,7 +93,16 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
         if(KNSGlobalVariables.getAuditErrorMap().isEmpty()) {
             new AuditActionHelper().auditConditionally((ProtocolFormBase) form);
         }
-        LOG.debug("execute() exit... forward={}",forward);
+        String actionForwardName = forward==null?"NULL":forward.getName();
+        LOG.debug("ProtocolActionBase execute() forward="+actionForwardName);
+        if ( actionForwardName!=null && actionForwardName.contains(Constants.MAPPING_PROTOCOL_ONLINE_REVIEW)){
+            //force OnlineReview helper initialization
+            LOG.debug("ProtocolActionBase:execute() BEFORE initializing online review helper...");
+            ((ProtocolForm) form).getOnlineReviewsActionHelper().init(true);
+            LOG.debug("ProtocolActionBase:execute() AFTER initializing online review helper...");
+        }
+
+        LOG.debug("ProtocolActionBase: execute() exit... forward={}",forward);
         return forward;
     }
 

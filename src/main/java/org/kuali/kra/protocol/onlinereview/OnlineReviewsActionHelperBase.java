@@ -86,6 +86,9 @@ public abstract class OnlineReviewsActionHelperBase implements Serializable {
     }
     
     public void init(boolean force) {
+        if (LOG.isDebugEnabled()){
+            LOG.debug("Enter OnlineReviewsActionHelperBase: init force="+force+" initComplete="+initComplete);
+        }
         if (!initComplete || force) {
             ProtocolSubmissionBase currentSubmission = form.getProtocolDocument().getProtocol().getProtocolSubmission();
             if (currentSubmission != null) {
