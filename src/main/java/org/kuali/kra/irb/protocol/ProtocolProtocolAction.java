@@ -120,7 +120,7 @@ public class ProtocolProtocolAction extends ProtocolAction {
             }
         }
         String actionForwardName = actionForward==null?"NULL":actionForward.getName();
-        LOG.debug("execute() before  protocolForm.getProtocolHelper().prepareView()");
+        LOG.debug("execute() before  protocolForm.getProtocolHelper().prepareView() actionForwardName="+actionForwardName);
         protocolForm.getProtocolHelper().prepareView();
 
         if ( Constants.MAPPING_PROTOCOL_ONLINE_REVIEW.equals(commandParam) || (actionForwardName!=null && actionForwardName.contains(Constants.MAPPING_PROTOCOL_ONLINE_REVIEW))){
@@ -713,7 +713,6 @@ public class ProtocolProtocolAction extends ProtocolAction {
         ProtocolForm protocolForm = (ProtocolForm) form;
         ProtocolDocument document = protocolForm.getProtocolDocument();
         ProtocolRiskLevel newProtocolRiskLevel = protocolForm.getProtocolHelper().getNewProtocolRiskLevel();
-
         if (applyRules(new ProtocolAddRiskLevelEvent(document, "protocolHelper", newProtocolRiskLevel))) {
         	getProtocolRiskLevelService().addRiskLevel(newProtocolRiskLevel, document.getProtocol());
             protocolForm.getProtocolHelper().setNewProtocolRiskLevel(new ProtocolRiskLevel());

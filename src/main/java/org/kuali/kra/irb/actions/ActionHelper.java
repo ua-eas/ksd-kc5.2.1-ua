@@ -176,7 +176,7 @@ public class ActionHelper extends ActionHelperBase {
     private ProtocolAssignReviewersBean protocolAssignReviewersBean;
     private ProtocolGrantExemptionBean protocolGrantExemptionBean;
     private ProtocolExpeditedApproveBean protocolExpeditedApproveBean;
-    private ProtocolApproveBean protocolResponseApprovalBean; // = (ProtocolApproveBean) buildProtocolApproveBean(ProtocolActionType.RESPONSE_APPROVAL, Constants.PROTOCOL_RESPONSE_APPROVAL_ACTION_PROPERTY_KEY);
+    private ProtocolApproveBean protocolResponseApprovalBean;
     private ProtocolGenericActionBean protocolReopenEnrollmentBean;
     private ProtocolGenericActionBean protocolCloseEnrollmentBean;
     private ProtocolGenericActionBean protocolSuspendByDsmbBean;
@@ -240,7 +240,6 @@ public class ActionHelper extends ActionHelperBase {
         toAnswerSubmissionQuestionnaire = hasSubmissionQuestionnaire();
 
         initIRBSpecificActionBeanTaskMap();
-        LOG.debug("ActionHelper initializeProtocolActions() EXIT");
     }
     
     /**
@@ -304,7 +303,6 @@ public class ActionHelper extends ActionHelperBase {
     }
 
     private ProtocolExpeditedApproveBean buildProtocolExpeditedApproveBean(String actionTypeCode) {
-        
         ProtocolExpeditedApproveBean bean = new ProtocolExpeditedApproveBean(this);
         
         bean.getReviewCommentsBean().setReviewComments(getCopiedReviewComments());
@@ -997,6 +995,7 @@ public class ActionHelper extends ActionHelperBase {
     public ProtocolAssignReviewersBean getProtocolAssignReviewersBean() {
         if ( protocolAssignReviewersBean == null ){
             protocolAssignReviewersBean = new ProtocolAssignReviewersBean(this);
+            actionBeanTaskMap.put(TaskName.ASSIGN_REVIEWERS, protocolAssignReviewersBean);
         }
         return protocolAssignReviewersBean;
     }
@@ -1010,8 +1009,10 @@ public class ActionHelper extends ActionHelperBase {
     }
 
     public ProtocolExpeditedApproveBean getProtocolExpeditedApproveBean() {
+
         if ( protocolExpeditedApproveBean == null ){
             protocolExpeditedApproveBean = buildProtocolExpeditedApproveBean(ProtocolActionType.EXPEDITE_APPROVAL);
+            actionBeanTaskMap.put(TaskName.EXPEDITE_APPROVAL, protocolExpeditedApproveBean);
         }
         return protocolExpeditedApproveBean;
     }
@@ -1020,6 +1021,7 @@ public class ActionHelper extends ActionHelperBase {
         if ( protocolResponseApprovalBean == null ){
             protocolResponseApprovalBean =(ProtocolApproveBean) buildProtocolApproveBean(ProtocolActionType.RESPONSE_APPROVAL,
                     Constants.PROTOCOL_RESPONSE_APPROVAL_ACTION_PROPERTY_KEY);
+            actionBeanTaskMap.put(TaskName.RESPONSE_APPROVAL, protocolResponseApprovalBean);
         }
         return protocolResponseApprovalBean;
     }
@@ -1028,6 +1030,7 @@ public class ActionHelper extends ActionHelperBase {
         if ( protocolReopenEnrollmentBean == null ){
             protocolReopenEnrollmentBean = buildProtocolGenericActionBean(ProtocolActionType.REOPEN_ENROLLMENT,
                     Constants.PROTOCOL_REOPEN_ENROLLMENT_ACTION_PROPERTY_KEY);
+            actionBeanTaskMap.put(TaskName.REOPEN_PROTOCOL, protocolReopenEnrollmentBean);
         }
         return protocolReopenEnrollmentBean;
     }
@@ -1036,6 +1039,7 @@ public class ActionHelper extends ActionHelperBase {
         if ( protocolCloseEnrollmentBean == null ){
             protocolCloseEnrollmentBean =  buildProtocolGenericActionBean(ProtocolActionType.CLOSED_FOR_ENROLLMENT,
                     Constants.PROTOCOL_CLOSE_ENROLLMENT_ACTION_PROPERTY_KEY);
+            actionBeanTaskMap.put(TaskName.CLOSE_ENROLLMENT_PROTOCOL, protocolCloseEnrollmentBean);
         }
         return protocolCloseEnrollmentBean;
     }
@@ -1044,6 +1048,7 @@ public class ActionHelper extends ActionHelperBase {
         if ( protocolSuspendByDsmbBean == null ){
             protocolSuspendByDsmbBean = buildProtocolGenericActionBean(ProtocolActionType.SUSPENDED_BY_DSMB,
                     Constants.PROTOCOL_SUSPEND_BY_DSMB_ACTION_PROPERTY_KEY);
+            actionBeanTaskMap.put(TaskName.SUSPEND_PROTOCOL_BY_DSMB, protocolSuspendByDsmbBean);
         }
         return protocolSuspendByDsmbBean;
     }
@@ -1052,6 +1057,7 @@ public class ActionHelper extends ActionHelperBase {
         if ( protocolPermitDataAnalysisBean == null ){
             protocolPermitDataAnalysisBean = buildProtocolGenericActionBean(ProtocolActionType.DATA_ANALYSIS_ONLY,
                     Constants.PROTOCOL_PERMIT_DATA_ANALYSIS_ACTION_PROPERTY_KEY);
+            actionBeanTaskMap.put(TaskName.PERMIT_DATA_ANALYSIS, protocolPermitDataAnalysisBean);
         }
         return protocolPermitDataAnalysisBean;
     }
@@ -1060,6 +1066,7 @@ public class ActionHelper extends ActionHelperBase {
         if ( protocolIrbAcknowledgementBean == null ){
             protocolIrbAcknowledgementBean = buildProtocolGenericActionBean(ProtocolActionType.IRB_ACKNOWLEDGEMENT,
                     Constants.PROTOCOL_IRB_ACKNOWLEDGEMENT_ACTION_PROPERTY_KEY);
+            actionBeanTaskMap.put(TaskName.IRB_ACKNOWLEDGEMENT, protocolIrbAcknowledgementBean);
         }
         return protocolIrbAcknowledgementBean;
     }

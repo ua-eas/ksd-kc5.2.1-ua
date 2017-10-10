@@ -175,10 +175,13 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
             protocolForm.getActionHelper().setCurrentTask("");
         }
         ActionForward actionForward = super.execute(mapping, form, request, response);
+
+
         protocolForm.getActionHelper().prepareView();
         // submit action may change "submission details", so re-initializa it
         LOG.debug("ProtocolProtocolActionsAction: execute() ..before initSubmissionDetails()");
         protocolForm.getActionHelper().initSubmissionDetails();
+
         LOG.debug("ProtocolProtocolActionsAction: execute() exit...{}",actionForward);
         return actionForward;
     }
@@ -1837,10 +1840,13 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
      * @return the forward to the current page
      */
     public ActionForward addRiskLevel(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        LOG.debug("ProtocolProtocolActionsAction: addRiskLevel ENTER");
         ProtocolForm protocolForm = (ProtocolForm) form;
         ProtocolDocument document = protocolForm.getProtocolDocument();
+
+
         ProtocolRiskLevelBean protocolRiskLevelBean = getProtocolRiskLevelBean(mapping, form, request, response);
-        
+        LOG.debug("ProtocolProtocolActionsAction:  protocolRiskLevelBean=" + protocolRiskLevelBean);
         if (protocolRiskLevelBean != null) {
             String errorPropertyName = protocolRiskLevelBean.getErrorPropertyKey();
             ProtocolRiskLevel newProtocolRiskLevel = protocolRiskLevelBean.getNewProtocolRiskLevel();
@@ -1848,11 +1854,10 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
             
             if (applyRules(new ProtocolAddRiskLevelEvent(document, errorPropertyName, newProtocolRiskLevel))) {
                 getProtocolRiskLevelService().addRiskLevel(newProtocolRiskLevel, protocol);
-                
                 protocolRiskLevelBean.setNewProtocolRiskLevel(new ProtocolRiskLevel());
             }
         }
-        
+
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
 
@@ -1929,10 +1934,11 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
      * @return the forward to the current page
      */
     public ActionForward addReviewComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        LOG.debug("ProtocolProtocolActionsAction: addReviewComment ENTER");
         ProtocolForm protocolForm = (ProtocolForm) form;
         ProtocolDocument document = protocolForm.getProtocolDocument();
         ReviewCommentsBean reviewCommentsBean = getReviewCommentsBean(mapping, form, request, response);
-        
+        LOG.debug("ProtocolProtocolActionsAction: reviewCommentsBean="+reviewCommentsBean);
         if (reviewCommentsBean != null) {
             String errorPropertyName = reviewCommentsBean.getErrorPropertyName();
             CommitteeScheduleMinute newReviewComment = (CommitteeScheduleMinute) reviewCommentsBean.getNewReviewComment();
@@ -1941,12 +1947,11 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
             
             if (applyRules(new ProtocolAddReviewCommentEvent(document, errorPropertyName, newReviewComment))) {
                 getReviewCommentsService().addReviewComment(newReviewComment, reviewComments, protocol);
-                
                 reviewCommentsBean.setNewReviewComment(new CommitteeScheduleMinute(MinuteEntryType.PROTOCOL));
             }
             reviewCommentsBean.setHideReviewerName(getReviewCommentsService().setHideReviewerName(reviewCommentsBean.getReviewComments()));            
         }
-        
+
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
@@ -2048,20 +2053,20 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         if (protocolActionBean != null && protocolActionBean instanceof ProtocolOnlineReviewCommentable) {
             reviewCommentsBean = (ReviewCommentsBean) ((ProtocolOnlineReviewCommentable) protocolActionBean).getReviewCommentsBean();
         }
-        
         return reviewCommentsBean;
     }
     
     private ProtocolActionBean getActionBean(ActionForm form, HttpServletRequest request) {
+
         ProtocolForm protocolForm = (ProtocolForm) form;
 
         String taskName = getTaskName(request);
-        
+        LOG.debug("ProtocolProtocolActionsAction: getActionBean for taskName="+taskName);
         ProtocolActionBean protocolActionBean = null;
         if (StringUtils.isNotBlank(taskName)) {
             protocolActionBean = (ProtocolActionBean) protocolForm.getActionHelper().getActionBean(taskName);
         }
-
+        LOG.debug("ProtocolProtocolActionsAction: getActionBean foundBean="+protocolActionBean);
         return protocolActionBean;
     }
     

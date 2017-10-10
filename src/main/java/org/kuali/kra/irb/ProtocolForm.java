@@ -116,6 +116,7 @@ public class ProtocolForm extends ProtocolFormBase {
         if (getProtocolDocument() != null && getProtocolDocument().getProtocol() != null && getProtocolDocument().getDocumentNumber() != null ) {
             LOG.debug("getHeaderNavigationTabs(): getProtocolDocument().getDocumentNumber()= "+getProtocolDocument().getDocumentNumber());
             LOG.debug("getHeaderNavigationTabs(): docHdrId= "+getProtocolDocument().getProtocol().getProtocolDocument().getDocumentNumber());
+            LOG.debug("getHeaderNavigationTabs(): risklevels= "+getProtocolDocument().getProtocol().getProtocolRiskLevels().toString());
             String principalId = GlobalVariables.getUserSession().getPrincipalId();
             ProtocolSubmission submission = (ProtocolSubmission) getProtocolDocument().getProtocol().getProtocolSubmission();
             boolean isUserOnlineReviewer = onlineReviewService.isProtocolReviewer(principalId, false, submission);
