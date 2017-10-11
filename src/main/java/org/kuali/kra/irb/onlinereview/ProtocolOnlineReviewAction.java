@@ -105,8 +105,6 @@ public class ProtocolOnlineReviewAction extends ProtocolAction implements AuditM
         LOG.debug("ProtocolOnlineReviewAction after super.execute() actionForward="+actionForward.toString());
 
         ((ProtocolForm) form).getActionHelper().prepareView();
-        LOG.warn("ProtocolOnlineReviewAction: execute() ->  ((ProtocolForm) form).getOnlineReviewsActionHelper().init(true);");
-        ((ProtocolForm) form).getOnlineReviewsActionHelper().init(true);
         return actionForward;
     }
 
