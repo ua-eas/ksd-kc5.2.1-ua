@@ -399,9 +399,10 @@ public abstract class ProtocolActionBase extends KraTransactionalDocumentActionB
     public ActionForward refresh(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         super.refresh(mapping, form, request, response);
-        LOG.debug("refresh()");
+
         ProtocolFormBase protocolForm = (ProtocolFormBase) form;
         ProtocolDocumentBase protocolDocument = protocolForm.getProtocolDocument();
+        LOG.debug("PROTOCOL ACTION BASE refresh() refreshCaller="+protocolForm.getRefreshCaller());
                      
         // KNS UI hook for lookup resultset, check to see if we are coming back from a lookup
         if (Constants.MULTIPLE_VALUE.equals(protocolForm.getRefreshCaller())) {
