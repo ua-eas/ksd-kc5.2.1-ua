@@ -294,9 +294,10 @@ public class ProtocolOnlineReviewAction extends ProtocolAction implements AuditM
             throws Exception {
         Map<String, String> fieldValues = new HashMap<String, String>();
         String protocolDocumentNumber = request.getParameter(PROTOCOL_DOCUMENT_NUMBER);
-        ((ProtocolForm) form).setDocument(getDocumentService().getByDocumentHeaderId(
-                protocolDocumentNumber));
-        ((ProtocolForm) form).initialize();
+        ProtocolForm protocolForm =  (ProtocolForm) form;
+        protocolForm.setDocument(getDocumentService().getByDocumentHeaderId(protocolDocumentNumber));
+        protocolForm.initialize();
+        protocolForm.getOnlineReviewsActionHelper().init(true);
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
