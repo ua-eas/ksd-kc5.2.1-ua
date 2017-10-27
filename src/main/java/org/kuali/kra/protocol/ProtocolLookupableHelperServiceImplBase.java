@@ -15,30 +15,52 @@
  */
 package org.kuali.kra.protocol;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ojb.broker.query.Criteria;
+import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.Organization;
+import org.kuali.kra.bo.OrganizationCorrespondent;
 import org.kuali.kra.bo.Rolodex;
 import org.kuali.kra.bo.Unit;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.PermissionConstants;
+import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.ResearchArea;
+import org.kuali.kra.irb.personnel.ProtocolUnit;
+import org.kuali.kra.irb.protocol.location.ProtocolLocation;
+import org.kuali.kra.kim.service.impl.IrbCorrespondentDerivedRoleTypeServiceImpl;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
 import org.kuali.kra.protocol.auth.ProtocolTaskBase;
 import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
+import org.kuali.kra.protocol.personnel.ProtocolUnitBase;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.TaskAuthorizationService;
+import org.kuali.kra.service.UnitService;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
+import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.kew.api.KewApiConstants;
-import org.kuali.rice.kew.api.exception.WorkflowException;
+import org.kuali.rice.kew.service.KEWServiceLocator;
+import org.kuali.rice.kim.api.identity.Person;
+import org.kuali.rice.kim.api.identity.PersonService;
+import org.kuali.rice.kim.api.permission.PermissionService;
+import org.kuali.rice.kim.api.role.RoleService;
+import org.kuali.rice.kim.api.services.KimApiServiceLocator;
+import org.kuali.rice.kim.service.KIMServiceLocatorInternal;
 import org.kuali.rice.kns.lookup.HtmlData;
 import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
 import org.kuali.rice.kns.lookup.LookupUtils;
 import org.kuali.rice.kns.service.DictionaryValidationService;
 import org.kuali.rice.kns.service.KNSServiceLocator;
+import org.kuali.rice.kns.web.struts.form.LookupForm;
+import org.kuali.rice.kns.web.ui.Column;
 import org.kuali.rice.kns.web.ui.Field;
+import org.kuali.rice.kns.web.ui.ResultRow;
 import org.kuali.rice.kns.web.ui.Row;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.lookup.CollectionIncomplete;
@@ -46,6 +68,7 @@ import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
+import org.kuali.rice.kew.api.exception.WorkflowException;
 
 import java.text.ParseException;
 import java.util.*;
@@ -80,14 +103,182 @@ public abstract class ProtocolLookupableHelperServiceImplBase<GenericProtocol ex
     protected TaskAuthorizationService taskAuthorizationService;
     protected DocumentService documentService;
 
+    /** Begin IU Customization: UITSRA-2288 */
+    protected static final String[] PRIVILEGED_IRB_ROLES = new String[] { "IRB Administrator", "HSO Staff", "ORC Other", "ORC Other Advanced" };
+    protected static final String[] COLUMNS_TO_HIDE = new String[] { "title", "description" };
+
+    protected boolean hideTitleAndSummaryColumns = false;
+	protected Set<String> viewProtocolNumbers;
+	/** End IU Customization */
+
+	/** Begin IU Customization: UITSRA-2765 */
+	protected static final String[] MY_PROTOCOLS_ROLES = new String[] { "Protocol Aggregator", "Protocol Viewer", "Protocol Deleter", "Study Manager / Correspondent" };
+	/** End UITSRA-2765 */
+
+
     @Override
     public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
         validateSearchParameters(fieldValues);
+        initializeUserPerms();
+
         // need to set backlocation & docformkey here. Otherwise, they are empty
         super.setBackLocationDocFormKey(fieldValues);
-        return getSearchResultsFilteredByTask(fieldValues); //filterProtocols(fieldValues);
+
+        /** Begin IU Customization: UITSRA-2288 */
+        List<? extends BusinessObject> returnedProtocols = getSearchResultsFilteredByTask(fieldValues); //filterProtocols(fieldValues);
+
+        /*
+        if(CollectionUtils.isNotEmpty(viewProtocolNumbers)) {
+	        Set<String> returnedProtocolNumbers = new HashSet<String>();
+
+	        for(BusinessObject result : returnedProtocols) {
+	       	    returnedProtocolNumbers.add(((Protocol) result).getProtocolNumber().substring(0, 10));
+	        }
+
+	        viewProtocolNumbers = new HashSet<String>(CollectionUtils.intersection(returnedProtocolNumbers, viewProtocolNumbers));
+        }*/
+
+        return returnedProtocols;
+        /** End IU Customization */
     }
-    
+
+
+    /** Begin IU Customization: UITSRA-2288 */
+    private void addViewableProtocolNumber(String protocolNumber) {
+    	viewProtocolNumbers.add(protocolNumber.substring(0, 10));
+    }
+
+    private void addViewableProtocolNumbers(Collection<String> protocolNumbers) {
+    	for(String protocolNumber : protocolNumbers) {
+    		viewProtocolNumbers.add(protocolNumber.substring(0, 10));
+    	}
+    }
+
+    private boolean isProtocolNumberViewable(String protocolNumber) {
+    	return viewProtocolNumbers.contains(protocolNumber.substring(0, 10));
+    }
+
+    //private void initializeUserPerms(LookupForm lookupForm) {
+    private void initializeUserPerms() {
+    	hideTitleAndSummaryColumns = false;
+    	String userId = GlobalVariables.getUserSession().getPrincipalId();
+    	RoleService roleService = KimApiServiceLocator.getRoleService();
+    	PermissionService permService = KimApiServiceLocator.getPermissionService();
+    	final Map<String,String> NO_QUALIFIERS = new HashMap<String, String>();
+    	boolean canView = permService.hasPermission(userId, Constants.MODULE_NAMESPACE_PROTOCOL, PermissionConstants.VIEW_PROTOCOL);
+
+    	// Check for any protocols the user is listed on as Personnel (all should have view access)
+		//Map<String,String> protocolRoleFields = new HashMap<String,String>();
+		//protocolRoleFields.put("personId",userId);
+    	//Collection<String> personnelProtocolNumbers = ((ProtocolDaoOjbBase) getProtocolDaoHook()).getProtocolNumbersForPersonnelRole(userId, null);
+    	//canView |= personnelProtocolNumbers.size() > 0;
+
+    	// Check if user is an Organization Correspondent for any protocols
+    	//Collection<String> organizationProtocolNumbers = new ArrayList<String>();
+    	//protocolRoleFields.clear();
+    	//protocolRoleFields.put("personId", userId);
+
+        /*
+		for(OrganizationCorrespondent corresp : getBusinessObjectService().findMatching(OrganizationCorrespondent.class, protocolRoleFields)) {
+			protocolRoleFields.clear();
+			protocolRoleFields.put("organizationId", corresp.getOrganizationId());
+			for(ProtocolLocation location : getBusinessObjectService().findMatching(ProtocolLocation.class, protocolRoleFields)) {
+				Collection<String> validProtocolOrgTypeCodes = getParameterService().getParameterValuesAsString(Constants.MODULE_NAMESPACE_PROTOCOL,
+							ParameterConstants.DOCUMENT_COMPONENT, IrbCorrespondentDerivedRoleTypeServiceImpl.PROTOCOL_ORG_TYPE_PARAMETER_NAME);
+				if(validProtocolOrgTypeCodes.contains(location.getProtocolOrganizationTypeCode())) {
+					organizationProtocolNumbers.add(location.getProtocolNumber());
+					canView = true;
+				}
+			}
+		}*/
+
+    	if(!canView) {
+    		// Don't display actions column
+    		//lookupForm.setSuppressActions(true);
+    		hideTitleAndSummaryColumns = true;
+    	}
+    	else {
+    		//lookupForm.setSuppressActions(false);
+    		List<String> roleIdsToCheck = new ArrayList<String>();
+
+    		for(String roleDesc : PRIVILEGED_IRB_ROLES) {
+    			String roleId = roleService.getRoleIdByNamespaceCodeAndName("KC-UNT", roleDesc);
+
+    			if(!StringUtils.isBlank(roleId)) {
+    				roleIdsToCheck.add(roleId);
+    			}
+    		}
+
+    		Map<String,String> unitQualifier = new HashMap<String, String>();
+    		boolean userHasPrivilegedProtocolRoles = roleService.principalHasRole(userId, roleIdsToCheck, unitQualifier, false);
+
+    		// If the user doesn't have a privileged Protocol role, then we have to derive the Protocol's they have permission to view
+    		if(!userHasPrivilegedProtocolRoles) {
+    			hideTitleAndSummaryColumns = true;
+
+    			//viewProtocolNumbers = new HashSet<String>();
+    			//roleIdsToCheck = new ArrayList<String>(permService.getRoleIdsForPermission(Constants.MODULE_NAMESPACE_PROTOCOL, PermissionConstants.VIEW_PROTOCOL));
+
+    			// Add in Protocols where user is listed as Personnel
+    			//addViewableProtocolNumbers(personnelProtocolNumbers);
+
+    			// Add in Protocols that have a Performing Organization for which user is listed as Organization Correspondent
+    			//addViewableProtocolNumbers(organizationProtocolNumbers);
+
+    			// Check if the user has any protocol-qualified role memberships
+    			/*IUCustomRoleDao customRoleDao = (IUCustomRoleDao) KIMServiceLocatorInternal.getService("iuCustomRoleDAO");
+    			if(customRoleDao != null) {
+    				addViewableProtocolNumbers(customRoleDao.getQualifiersForMemberAndAttributeName(roleIdsToCheck, userId, "protocol").values());
+
+    				// Check if the user has any unit-number qualified role memberships
+    				UnitService unitService = KraServiceLocator.getService(UnitService.class);
+    				Set<String> validUnits = new HashSet<String>();
+    				Map<String,String> unitQualifiers = customRoleDao.getQualifiersForMemberAndAttributeName(roleIdsToCheck, userId, "unitNumber");
+    				Map<String,String> subunits = customRoleDao.getQualifiersForMemberAndAttributeName(roleIdsToCheck, userId, "subunits");
+    				for(Map.Entry<String,String> unitNumber : unitQualifiers.entrySet()) {
+    					validUnits.add(unitNumber.getValue());
+    					String descendsHierarchy = subunits.get(unitNumber.getKey());
+    					if(!StringUtils.isBlank(descendsHierarchy) && descendsHierarchy.equals("Yes")) {
+	    					for(Unit subUnit : unitService.getAllSubUnits(unitNumber.getValue())) {
+	    						validUnits.add(subUnit.getUnitNumber());
+	    					}
+    					}
+    				}
+    				if(validUnits != null && validUnits.size() > 0) {
+	    				Map<String,Object> protocolUnitFields = new HashMap<String,Object>();
+	    				protocolUnitFields.put("leadUnitFlag", "Y");
+	    				protocolUnitFields.put("unitNumber", validUnits);
+	    				for(ProtocolUnitBase leadUnit : getBusinessObjectService().findMatching(ProtocolUnit.class, protocolUnitFields)) {
+	    					addViewableProtocolNumber(leadUnit.getProtocolNumber());
+	    				}
+    				}
+    			}*/
+    		}
+    	}
+    }
+
+    @Override
+    public List<Column> getColumns() {
+    	List<Column> columns = super.getColumns();
+    	if(hideTitleAndSummaryColumns && CollectionUtils.isEmpty(viewProtocolNumbers)) {
+	    	List<Column> filteredColumns = new ArrayList<Column>();
+	    	for(Column column : columns) {
+	    		boolean hideColumn = false;
+	    		for(String columnToHide : COLUMNS_TO_HIDE) {
+	    			if(column.getColumnTitle().equals(getDataDictionaryService().getAttributeShortLabel(getBusinessObjectClass(), columnToHide))
+	    					|| column.getColumnTitle().equals(getDataDictionaryService().getAttributeLabel(getBusinessObjectClass(), columnToHide))) {
+	    				hideColumn = true;
+	    			}
+	    		}
+	    		if(!hideColumn) {
+	    			filteredColumns.add(column);
+	    		}
+	    	}
+	    	return filteredColumns;
+    	}
+    	return columns;
+    }
+    /** End IU Customization */
     
     /**
      * Filters the unbounded list of protocols by the given field values and protocol tasks.
@@ -321,6 +512,13 @@ public abstract class ProtocolLookupableHelperServiceImplBase<GenericProtocol ex
         if (kraAuthorizationService.hasPermission(getUserIdentifier(), (ProtocolBase) businessObject, PermissionConstants.MODIFY_PROTOCOL)) {
             //htmlDataList = super.getCustomActionUrls(businessObject, pkNames);
             // Chnage "edit" to edit same document, NOT initializing a new Doc
+            /** Begin IU Customization: UITSRA-2288 */
+            if(hideTitleAndSummaryColumns && CollectionUtils.isNotEmpty(viewProtocolNumbers)) {
+                if(!isProtocolNumberViewable(((ProtocolBase) businessObject).getProtocolNumber())) {
+                    return htmlDataList;
+                }
+            }
+            /** End IU Customization */
             AnchorHtmlData editHtmlData = getViewLink(((ProtocolBase) businessObject).getProtocolDocument());
             String href = editHtmlData.getHref();
             href = href.replace("viewDocument=true", "viewDocument=false");
@@ -407,7 +605,15 @@ public abstract class ProtocolLookupableHelperServiceImplBase<GenericProtocol ex
                 }
             }
         }
-        return super.getInquiryUrl(inqBo, inqPropertyName);
+        /** Begin IU Customization: UITSRA-2288 */
+        HtmlData inqUrl = super.getInquiryUrl(inqBo, inqPropertyName);
+        if(inqPropertyName.equals("protocolNumber") && hideTitleAndSummaryColumns) {
+        	if(hideTitleAndSummaryColumns && (CollectionUtils.isEmpty(viewProtocolNumbers) || !isProtocolNumberViewable(((GenericProtocol) bo).getProtocolNumber()))) {
+	        	inqUrl = new AnchorHtmlData(null, "Protocol Number");
+        	}
+        }
+        return inqUrl;
+        /** End IU Customization */
     }
 
     @Override
