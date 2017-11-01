@@ -56,6 +56,13 @@
 
     <bean id="protocolCustomDataService" class="edu.arizona.kra.protocol.ProtocolCustomDataServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
-    </bean> 
+    </bean>
+
+    <!-- Overriding Authorization Services for derived roles filtering -->
+    <bean id="systemAuthorizationService" class="edu.arizona.kra.service.impl.UASystemAuthorizationServiceImpl">
+        <property name="roleManagementService" ref="roleService" />
+        <property name="permissionService" ref="permissionService" />
+        <property name="kimTypeInfoService" ref="kimTypeInfoService" />
+    </bean>
      
 </beans>
