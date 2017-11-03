@@ -37,6 +37,12 @@
         <property name="committeeDao" ref="committeeDao" />
     </bean>
 
+		<bean id="irbPrintXmlUtilService"	class="edu.arizona.kra.committee.print.CustomIrbPrintXmlUtilServiceImpl" >
+			<property name="businessObjectService" ref="businessObjectService" />
+			<property name="dateTimeService" ref="dateTimeService" />
+			<property name="reviewCommentsService" ref="reviewCommentsService" />
+		</bean>
+
     <bean id="scheduleXmlStream" class="edu.arizona.kra.committee.print.CustomScheduleXmlStream" parent="printBaseXmlStream">
 		<property name="irbPrintXmlUtilService">
 			<ref bean="irbPrintXmlUtilService" />
