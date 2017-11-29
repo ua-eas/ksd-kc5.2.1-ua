@@ -8,13 +8,29 @@ import java.util.Map;
  * @author nataliac
  */
 public final class NegotiationConstants {
+
+
+    public static final String AWARD_ID = "awardId";
+    public static final String AWARD_NUMBER = "awardNumber";
+    public static final String MAX_AWARD_ID = "max(awardId)";
+    public static final String MAX_SUBAWARD_CODE = "max(subAwardCode)";
+    public static final String PROPOSAL_NUMBER = "proposalNumber";
+
+
+    public static final String AWARD_SEQUENCE_STATUS = "awardSequenceStatus";
+    public static final String PROPOSAL_SEQUENCE_STATUS = "proposalSequenceStatus";
+    public static final String SUBAWARD_SEQUENCE_STATUS = "subawardSequenceStatus";
     public static final String NEGOTIATION_ID = "negotiationId";
+    public static final String SUBAWARD_ID = "subAwardId";
+    public static final String SUBAWARD_CODE = "subAwardCode";
+    public static final String UNASSOCIATED_ID = "negotiationUnassociatedDetailId";
     public static final String NEGOTIATION_AGE = "negotiationAge";
     public static final String ASSOC_PREFIX = "associatedNegotiable";
     public static final String NEGOTIATION_TYPE_ATTR = "negotiationAssociationTypeId";
     public static final String ASSOCIATED_DOC_ID_ATTR = "associatedDocumentId";
     public static final String INVALID_COLUMN_NAME = "NaN";
     public static final String PRINCIPAL_INVESTIGATOR = "projectPersons.fullName";
+    public static final String VERSION_HISTORY_STATUS = "versionHistory.statusForOjb";
 
     public static final String NEGOTIATION_AGE_QUERY="select negotiation_id from (" +
             " select negotiation_id, NEGOTIATION_START_DATE, (case when NEGOTIATION_END_DATE IS NULL then SYSDATE else NEGOTIATION_END_DATE end) AS NEGOTIATION_END_DATE from negotiation )" +
