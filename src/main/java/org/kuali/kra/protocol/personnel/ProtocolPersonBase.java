@@ -21,6 +21,7 @@ import org.kuali.kra.bo.AbstractProjectPerson;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.PersonEditableInterface;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.protocol.ProtocolAssociateBase;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentPersonnelBase;
@@ -564,7 +565,15 @@ public abstract class ProtocolPersonBase extends ProtocolAssociateBase implement
     }
 
     public boolean isPrincipalInvestigator() {
-        if (StringUtils.equals(protocolPersonRoleId, "PI")) {
+        if (StringUtils.equals(protocolPersonRoleId, Constants.PRINCIPAL_INVESTIGATOR_ROLE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isCoInvestigator() {
+        if (StringUtils.equals(protocolPersonRoleId, Constants.CO_INVESTIGATOR_ROLE)) {
             return true;
         } else {
             return false;

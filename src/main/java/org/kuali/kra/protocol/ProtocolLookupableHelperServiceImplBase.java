@@ -27,6 +27,7 @@ import org.kuali.kra.irb.ResearchArea;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
 import org.kuali.kra.protocol.auth.ProtocolTaskBase;
 import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.TaskAuthorizationService;
@@ -38,7 +39,9 @@ import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
 import org.kuali.rice.kns.lookup.LookupUtils;
 import org.kuali.rice.kns.service.DictionaryValidationService;
 import org.kuali.rice.kns.service.KNSServiceLocator;
+import org.kuali.rice.kns.web.ui.Column;
 import org.kuali.rice.kns.web.ui.Field;
+import org.kuali.rice.kns.web.ui.ResultRow;
 import org.kuali.rice.kns.web.ui.Row;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.lookup.CollectionIncomplete;
@@ -64,6 +67,7 @@ public abstract class ProtocolLookupableHelperServiceImplBase<GenericProtocol ex
     protected static final String PENDING_PROTOCOL_LOOKUP = "lookupPendingProtocol";
     protected static final String PENDING_PI_ACTION_PROTOCOL_LOOKUP = "lookupPendingPIActionProtocol";
     protected static final String PROTOCOL_PERSON_ID_LOOKUP = "lookupProtocolPersonId";
+    protected static final String[] COLUMNS_TO_HIDE = new String[] { "title", "description" };
     
     private static final String PROTOCOL_LOOKUP_KEY_FIELD = "protocolNumber";
     
@@ -79,16 +83,62 @@ public abstract class ProtocolLookupableHelperServiceImplBase<GenericProtocol ex
     protected KraAuthorizationService kraAuthorizationService;
     protected TaskAuthorizationService taskAuthorizationService;
     protected DocumentService documentService;
+    protected boolean hideTitleAndSummaryColumns = false;
 
     @Override
     public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
         validateSearchParameters(fieldValues);
+        String userId = GlobalVariables.getUserSession().getPrincipalId();
+        String personId = "";
+        int viewableProtocolCount = 0;
+
         // need to set backlocation & docformkey here. Otherwise, they are empty
         super.setBackLocationDocFormKey(fieldValues);
-        return getSearchResultsFilteredByTask(fieldValues); //filterProtocols(fieldValues);
+
+        List<? extends BusinessObject> returnedProtocols = getSearchResultsFilteredByTask(fieldValues); //filterProtocols(fieldValues);
+
+        for(BusinessObject protocol : returnedProtocols) {
+            for(ProtocolPersonBase person : ((ProtocolBase) protocol).getProtocolPersons()) {
+                if (person.getPersonId() != null) {
+                    personId = person.getPersonId();
+                    if (StringUtils.equals(personId, userId)) {
+                        if (person.isPrincipalInvestigator() || person.isCoInvestigator()) {
+                            viewableProtocolCount++;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (viewableProtocolCount < returnedProtocols.size()) {
+            hideTitleAndSummaryColumns = true;
+        }
+
+        return returnedProtocols;
     }
-    
-    
+
+    @Override
+    public List<Column> getColumns() {
+        List<Column> columns = super.getColumns();
+        if(hideTitleAndSummaryColumns) {
+            List<Column> filteredColumns = new ArrayList<Column>();
+            for(Column column : columns) {
+                boolean hideColumn = false;
+                for(String columnToHide : COLUMNS_TO_HIDE) {
+                    if(column.getColumnTitle().equals(getDataDictionaryService().getAttributeShortLabel(getBusinessObjectClass(), columnToHide))
+                            || column.getColumnTitle().equals(getDataDictionaryService().getAttributeLabel(getBusinessObjectClass(), columnToHide))) {
+                        hideColumn = true;
+                    }
+                }
+                if(!hideColumn) {
+                    filteredColumns.add(column);
+                }
+            }
+            return filteredColumns;
+        }
+        return columns;
+    }
+
     /**
      * Filters the unbounded list of protocols by the given field values and protocol tasks.
      * @param fieldValues the field values that form a normal protocol search
