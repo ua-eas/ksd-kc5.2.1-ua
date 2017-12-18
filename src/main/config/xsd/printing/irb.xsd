@@ -926,6 +926,7 @@
                     </xs:simpleType>
                 </xs:element>
                 <xs:element name="PrivateCommentFlag" type="xs:boolean" />
+                <xs:element name="FinalFlag" type="xs:boolean" />
                 <xs:element minOccurs="0" name="ProtocolContingencyCode">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">

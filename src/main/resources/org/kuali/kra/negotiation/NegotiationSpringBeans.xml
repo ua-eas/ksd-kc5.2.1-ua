@@ -186,13 +186,13 @@
     
     <bean id="negotiationLookupableHelperService" class="org.kuali.kra.negotiations.lookup.NegotiationLookupableHelperServiceImpl" 
           parent="parentLookupableHelperService" scope="prototype">
-        <property name="negotiationLookupDao" ref="negotiationLookupDao" />
+        <property name="negotiationDao" ref="negotiationDao" />
     </bean>
-        
-    <bean id="negotiationLookupDao" class="edu.arizona.kra.negotiations.dao.ojb.NegotiationLookupDaoOjb" parent="platformAwareDao">
+
+    <bean id="negotiationDao" class="org.kuali.kra.negotiations.lookup.NegotiationDaoOjb" parent="platformAwareDao"  scope="prototype">
         <property name="negotiationService" ref="negotiationService" />
-        <property name="dateTimeService" ref="dateTimeService" />
         <property name="persistenceStructureService" ref="persistenceStructureService" />
+        <property name="dateTimeService" ref="dateTimeService" />
     </bean>
     
     <bean id="negotiationNotificationRenderer" class="org.kuali.kra.negotiations.notifications.NegotiationNotificationRenderer" scope="prototype"/>

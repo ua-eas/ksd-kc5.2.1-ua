@@ -42,6 +42,14 @@ import java.util.*;
 public class NegotiationServiceImpl implements NegotiationService {
     
     private static final String PARAMETER_DELIMITER = ",";
+
+    protected static final Map<String, NegotiationAssociationType> negotiationAssociationTypesCache;
+    protected static final Map<String, NegotiationStatus> negotiationStausCache;
+
+    static {
+        negotiationAssociationTypesCache = new HashMap<String, NegotiationAssociationType>();
+        negotiationStausCache = new HashMap<String, NegotiationStatus>();
+    }
     
     private ParameterService parameterService;
     private AwardBudgetService awardBudgetService;
@@ -185,16 +193,26 @@ public class NegotiationServiceImpl implements NegotiationService {
     
     @SuppressWarnings("unchecked")
     public NegotiationAssociationType getNegotiationAssociationType(String associationTypeCode) {
-        Map params = new HashMap();
-        params.put("code", associationTypeCode);
-        return (NegotiationAssociationType) this.getBusinessObjectService().findMatching(NegotiationAssociationType.class, params).iterator().next();
+        NegotiationAssociationType result =  negotiationAssociationTypesCache.get(associationTypeCode);
+        if ( result == null ) {
+            Map params = new HashMap();
+            params.put("code", associationTypeCode);
+            result = (NegotiationAssociationType) this.getBusinessObjectService().findMatching(NegotiationAssociationType.class, params).iterator().next();
+            negotiationAssociationTypesCache.put(associationTypeCode, result);
+        }
+        return result;
     }
     
     @SuppressWarnings("unchecked")
     public NegotiationStatus getNegotiationStatus(String statusCode) {
-        Map params = new HashMap();
-        params.put("code", statusCode);
-        return (NegotiationStatus) this.getBusinessObjectService().findMatching(NegotiationStatus.class, params).iterator().next();
+        NegotiationStatus result =  negotiationStausCache.get(statusCode);
+        if ( result == null ) {
+            Map params = new HashMap();
+            params.put("code", statusCode);
+            result = (NegotiationStatus) this.getBusinessObjectService().findMatching(NegotiationStatus.class, params).iterator().next();
+            negotiationStausCache.put(statusCode,result);
+        }
+        return result;
     }
 
     @Override
@@ -257,8 +275,8 @@ public class NegotiationServiceImpl implements NegotiationService {
     }
     
     /**
-     * 
-     * @see org.kuali.kra.negotiations.service.NegotiationService#findAndLoadNegotiationUnassociatedDetail(org.kuali.kra.negotiations.bo.Negotiation, boolean)
+     *
+     * @see org.kuali.kra.negotiations.service.NegotiationService#findAndLoadNegotiationUnassociatedDetail(org.kuali.kra.negotiations.bo.Negotiation)
      */
     public NegotiationUnassociatedDetail findAndLoadNegotiationUnassociatedDetail(Negotiation negotiation) {
         if (negotiation.getNegotiationAssociationType() != null 

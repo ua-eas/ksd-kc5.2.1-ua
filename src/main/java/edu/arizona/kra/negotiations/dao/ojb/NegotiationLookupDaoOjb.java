@@ -90,11 +90,12 @@ public class NegotiationLookupDaoOjb extends LookupDaoOjb implements Negotiation
             if ((matchingResultsCount == null) || (matchingResultsCount.intValue() <= searchResultsLimit.intValue())) {
                 matchingResultsCount = new Long(0);
             }
+
             searchResults = getPersistenceBrokerTemplate().getCollectionByQuery(query);
 
             return new CollectionIncomplete(searchResults, matchingResultsCount);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage());
             throw new LookupException(e);
         }

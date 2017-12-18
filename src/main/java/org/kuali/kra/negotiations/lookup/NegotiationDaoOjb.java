@@ -1,24 +1,26 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
- * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.opensource.org/licenses/ecl1.php
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ *
+ * Copyright 2005-2016 Kuali, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.kra.negotiations.lookup;
 
+import edu.arizona.kra.negotiations.dao.ojb.NegotiationLookupDaoOjb;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ojb.broker.query.Criteria;
-import org.apache.ojb.broker.query.QueryFactory;
-import org.apache.ojb.broker.query.ReportQueryByCriteria;
+import org.apache.ojb.broker.query.*;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
@@ -28,394 +30,247 @@ import org.kuali.kra.negotiations.bo.NegotiationAssociationType;
 import org.kuali.kra.negotiations.bo.NegotiationUnassociatedDetail;
 import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.subaward.bo.SubAward;
-import org.kuali.rice.core.api.util.RiceKeyConstants;
-import org.kuali.rice.krad.lookup.LookupUtils;
-import org.kuali.rice.krad.bo.BusinessObject;
+import org.kuali.rice.kns.lookup.LookupUtils;
 import org.kuali.rice.krad.dao.impl.LookupDaoOjb;
 import org.kuali.rice.krad.lookup.CollectionIncomplete;
-import org.kuali.rice.krad.util.GlobalVariables;
-import org.kuali.rice.krad.util.KRADConstants;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springmodules.orm.ojb.OjbOperationException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import static edu.arizona.kra.negotiations.NegotiationConstants.*;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Negotiation Dao to assist with lookups. This implements looking up associated document information
  * as well as just negotiation info.
  */
 public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
+    private static final Logger LOG = LoggerFactory.getLogger(NegotiationLookupDaoOjb.class);
 
-    private static final String ASSOC_PREFIX = "associatedNegotiable";
-    private static final String NEGOTIATION_TYPE_ATTR = "negotiationAssociationTypeId";
-    private static final String ASSOCIATED_DOC_ID_ATTR = "associatedDocumentId";
-    private static final String INVALID_COLUMN_NAME = "NaN";
-    
-    private static Map<String, String> awardTransform;
-    private static Map<String, String> proposalTransform;
-    private static Map<String, String> proposalLogTransform;
-    private static Map<String, String> unassociatedTransform;
-    private static Map<String, String> subAwardTransform;
-    
-    private static Integer maxSearchResults;
-    
     private NegotiationService negotiationService;
-    
-    static {
-        awardTransform = new HashMap<String, String>();
-        awardTransform.put("sponsorName", "sponsor.sponsorName");
-        awardTransform.put("piName", "projectPersons.fullName");
-        //proposal type code doesn't exist on the award so make sure we don't find awards when
-        //search for proposal type
-        awardTransform.put("negotiableProposalTypeCode", INVALID_COLUMN_NAME);
-        awardTransform.put("leadUnitNumber", "unitNumber");
-        awardTransform.put("leadUnitName", "leadUnit.unitName");
-        awardTransform.put("subAwardRequisitionerId", INVALID_COLUMN_NAME);
-                
-        proposalTransform = new HashMap<String, String>();
-        proposalTransform.put("sponsorName", "sponsor.sponsorName");
-        proposalTransform.put("piName", "projectPersons.fullName");
-        proposalTransform.put("leadUnitNumber", "unitNumber");
-        proposalTransform.put("leadUnitName", "leadUnit.unitName");
-        proposalTransform.put("negotiableProposalTypeCode", "proposalTypeCode");
-        proposalTransform.put("subAwardRequisitionerId", INVALID_COLUMN_NAME);
-        
-        proposalLogTransform = new HashMap<String, String>();
-        proposalLogTransform.put("sponsorName", "sponsor.sponsorName");
-        proposalLogTransform.put("leadUnitNumber", "leadUnit");
-        proposalLogTransform.put("leadUnitName", "unit.unitName");
-        proposalLogTransform.put("negotiableProposalTypeCode", "proposalTypeCode");
-        proposalLogTransform.put("subAwardRequisitionerId", INVALID_COLUMN_NAME);
+    private String negotiationAge;
+    private Criteria negotiationAgeCriteria;
+    private Integer maxSearchResults;
 
-        unassociatedTransform = new HashMap<String, String>();
-        unassociatedTransform.put("sponsorName", "sponsor.sponsorName");
-        unassociatedTransform.put("piName", "piName");
-        //proposal type code doesn't exist here either so make sure we don't find then when
-        //searching for proposal type
-        unassociatedTransform.put("negotiableProposalTypeCode", INVALID_COLUMN_NAME);
-        unassociatedTransform.put("leadUnitName", "leadUnit.unitName");
-        unassociatedTransform.put("subAwardRequisitionerId", INVALID_COLUMN_NAME);
-        
-        subAwardTransform = new HashMap<String, String>();
-        subAwardTransform.put("sponsorName", INVALID_COLUMN_NAME);
-        subAwardTransform.put("sponsorCode", INVALID_COLUMN_NAME);
-        subAwardTransform.put("piName", INVALID_COLUMN_NAME);
-        subAwardTransform.put("negotiableProposalTypeCode", INVALID_COLUMN_NAME);
-        subAwardTransform.put("leadUnitNumber", "unitNumber");
-        subAwardTransform.put("leadUnitName", "leadUnit.unitName");
-        subAwardTransform.put("subAwardRequisitionerId", "requisitionerId");
 
-        
-    }
-    
-    @SuppressWarnings("unchecked")
+
     @Override
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public Collection<Negotiation> getNegotiationResults(Map<String, String> fieldValues) {
-        Map<String, String> associationDetails = new HashMap<String, String>();
-        Iterator<Map.Entry<String, String>> iter = fieldValues.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, String> entry = iter.next();
-            if (StringUtils.startsWith(entry.getKey(), ASSOC_PREFIX)) {
-                iter.remove();
-                if (!StringUtils.isEmpty(entry.getValue())) {
-                    associationDetails.put(entry.getKey().replaceFirst(ASSOC_PREFIX + ".", ""), entry.getValue());
-                }
-            }
-        }
-        
-        Collection<Negotiation> result = new ArrayList<Negotiation>();
+        LOG.debug("getNegotiationResults fieldValues={}",fieldValues);
+        CollectionIncomplete<Negotiation> searchResults = new CollectionIncomplete<>(new ArrayList(0), 0L);
+
+        //negotiation Age filtering done as a special case
+        negotiationAge = fieldValues.get(NEGOTIATION_AGE);
+        fieldValues.remove(NEGOTIATION_AGE);
+
+        Map<String, String> associationDetails = getAssociationFilters( fieldValues );
+
+
+        //add additional criteria related to associated objects - if any
         if (!associationDetails.isEmpty()) {
-            addListToList(result, getNegotiationsLinkedToAward(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToProposal(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToProposalLog(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsUnassociated(fieldValues, associationDetails));
-            addListToList(result, getNegotiationsLinkedToSubAward(fieldValues, associationDetails));
+            addListToList(searchResults, getNegotiationsLinkedToAward(fieldValues, associationDetails));
+            addListToList(searchResults, getNegotiationsLinkedToProposal(fieldValues, associationDetails, searchResults.size()>=getMaxSearchResultLimit()));
+            addListToList(searchResults, getNegotiationsUnassociated(fieldValues, associationDetails, searchResults.size()>=getMaxSearchResultLimit()));
+            addListToList(searchResults, getNegotiationsLinkedToSubAward(fieldValues, associationDetails, searchResults.size()>=getMaxSearchResultLimit()));
+
         } else {
-            result = findCollectionBySearchHelper(Negotiation.class, fieldValues, false, false);
+            //generate negotiation query criteria from user filters
+            Criteria negotiationSearchCriteria = getCollectionCriteriaFromMap(new Negotiation(), fieldValues);
+            LOG.debug("Negotiation search criteria: {}", negotiationSearchCriteria);
+            searchResults = executeSearch(negotiationSearchCriteria, false);
         }
-        if (result != null && !result.isEmpty() && StringUtils.isNotBlank(fieldValues.get("negotiationAge"))) {
-            try {
-                result = filterByNegotiationAge(fieldValues.get("negotiationAge"), result);
-            } catch (NumberFormatException e) {
-                GlobalVariables.getMessageMap().putError(KRADConstants.DOCUMENT_ERRORS, RiceKeyConstants.ERROR_CUSTOM, new String[] { "Invalid Numeric Input: " + fieldValues.get("negotiationAge")});
-                result = new ArrayList<Negotiation>();
-            }
-        } return result;
+
+
+        LOG.debug("getNegotiationResults exit getNegotiationResults");
+        return searchResults;
     }
 
-    /*
-     * used to filter the Negotitations returned from getNegotiationResults
+    
+
+
+    /**
+     * Search for awards linked to negotiation using both award and negotiation values.
      */
-    private Collection<Negotiation> filterNegotitations(Collection<Negotiation> negotiations,String title,String unitNumber,String unitName,String requisitionerId)
-    {
-    	Iterator<Negotiation> iter = negotiations.iterator();
-	    while (iter.hasNext())
-	    {
-	        Negotiation negotiation = iter.next();
-	        if (title != null && !title.isEmpty() && (negotiation.getAssociatedNegotiable() == null || negotiation.getAssociatedNegotiable().getTitle() == null || !isMatching(title,negotiation.getAssociatedNegotiable().getTitle())))
-	        {
-	        	iter.remove();
-	        	continue;
-	        }
-	        if (unitNumber != null && !unitNumber.isEmpty() && !unitNumber.equals(negotiation.getAssociatedNegotiable().getLeadUnitNumber()))
-	        {
-	        	iter.remove();
-	        	continue;
-	        }
-	        if (unitName != null && !unitName.isEmpty() && (negotiation.getAssociatedNegotiable().getLeadUnitName() == null || !isMatching(unitName,negotiation.getAssociatedNegotiable().getLeadUnitName())))
-	        {
-	        	iter.remove();
-	        	continue;
-	        }
-	        if (requisitionerId != null && !requisitionerId.isEmpty() && !requisitionerId.equals(negotiation.getAssociatedNegotiable().getSubAwardRequisitionerId()))
-	        {
-	        	iter.remove();
-	        	continue;
-	        }
-	    }
-	    return negotiations;
+    protected CollectionIncomplete<Negotiation> getNegotiationsLinkedToAward(Map<String, String> negotiationFilters, Map<String, String> associatedValues) {
+        Map<String, String> values = transformMap(associatedValues, awardTransform);
+
+        if (values == null)  {
+            return new CollectionIncomplete<>(new ArrayList(0),0L);
+        }
+
+        Long negotiationTypeId = getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.AWARD_ASSOCIATION).getId();
+        String negotiationTypeIdFilter = negotiationFilters.get(NEGOTIATION_TYPE_ATTR);
+        if ( StringUtils.isNotEmpty(negotiationTypeIdFilter) && !negotiationTypeId.equals( Long.parseLong(negotiationTypeIdFilter)) )  {
+            LOG.debug("getNegotiationsLinkedToAward: Skipping search as found different type filter="+negotiationTypeIdFilter);
+            return new CollectionIncomplete<>(new ArrayList(0),0L);
+        }
+
+        Criteria criteria = getCollectionCriteriaFromMap(new Award(), values);
+
+        //filter only active/pending awards
+        Criteria activeAwardSubCriteria = new Criteria();
+        activeAwardSubCriteria.addIn(AWARD_SEQUENCE_STATUS, Arrays.asList(VersionStatus.ACTIVE.toString(), VersionStatus.PENDING.toString()));
+        ReportQueryByCriteria activeAwardIdsQuery = QueryFactory.newReportQuery(Award.class, activeAwardSubCriteria);
+        activeAwardIdsQuery.setAttributes(new String[]{MAX_AWARD_ID});
+        activeAwardIdsQuery.addGroupBy(AWARD_NUMBER);
+
+        criteria.addIn(AWARD_ID, activeAwardIdsQuery);
+
+        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(Award.class, criteria);
+        subQuery.setAttributes(new String[] {AWARD_NUMBER});
+
+        Criteria negotiationsLinkedToAwardCriteria =  getCollectionCriteriaFromMap(new Negotiation(), negotiationFilters);
+        negotiationsLinkedToAwardCriteria.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
+        negotiationsLinkedToAwardCriteria.addEqualTo(NEGOTIATION_TYPE_ATTR, negotiationTypeId);
+
+        return executeSearch(negotiationsLinkedToAwardCriteria, false);
     }
 
-    /*
-     * using reg expression to check if pattern matched
+    /**
+     * Search for institutional proposals linked to negotiations using both criteria.
      */
-    private boolean isMatching(String patternString, String value) {
-        boolean isMatch = false;
-        if (StringUtils.isBlank(patternString)) {
-            isMatch = true;
+    protected CollectionIncomplete<Negotiation> getNegotiationsLinkedToProposal(Map<String, String> negotiationFilters, Map<String, String> associatedValues, boolean rowCountOnly) {
+        LOG.debug("ENTER getNegotiationsLinkedToProposal rowCountOnly="+rowCountOnly);
+        Map<String, String> values = transformMap(associatedValues, institutionalProposalTransform);
+        CollectionIncomplete<Negotiation> result =  new CollectionIncomplete<>(new ArrayList(0),0L);
+        if (values == null) {
+            return result;
         }
-        else {
-            patternString = patternString.replaceAll("\\?", "\\\\?");
-            patternString = patternString.replaceAll("\\.", "\\\\.");
-            if (patternString.indexOf("*") == 0) {
-                patternString = patternString.replaceFirst("\\*", "^*");
-            }
-            if (!patternString.endsWith("*")) {
-                patternString = patternString + "$";
-            }
-            Pattern p = Pattern.compile(patternString.toUpperCase());
-            Matcher m = p.matcher(value.toUpperCase());
-            isMatch = m.find();
+
+        Long negotiationTypeId = getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.INSTITUATIONAL_PROPOSAL_ASSOCIATION).getId();
+        String negotiationTypeIdFilter = negotiationFilters.get(NEGOTIATION_TYPE_ATTR);
+        if ( StringUtils.isNotEmpty(negotiationTypeIdFilter) && !negotiationTypeId.equals( Long.parseLong(negotiationTypeIdFilter)) )  {
+            LOG.debug("getNegotiationsLinkedToProposal: Skipping search as found different type filter="+negotiationTypeIdFilter);
+            return result;
         }
-        return isMatch;
+
+
+        values.put(PROPOSAL_SEQUENCE_STATUS, VersionStatus.ACTIVE.name());
+        Criteria criteria = getCollectionCriteriaFromMap(new InstitutionalProposal(), values);
+
+        Criteria negotiationsLinkedToIPCriteria = getCollectionCriteriaFromMap(new Negotiation(), negotiationFilters);
+
+        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(InstitutionalProposal.class, criteria);
+        subQuery.setAttributes(new String[] {PROPOSAL_NUMBER});
+        negotiationsLinkedToIPCriteria.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
+        negotiationsLinkedToIPCriteria.addEqualTo(NEGOTIATION_TYPE_ATTR, negotiationTypeId);
+
+        return executeSearch(negotiationsLinkedToIPCriteria, rowCountOnly);
 
     }
 
-    private void addListToList(Collection<Negotiation> fullResultList, Collection<Negotiation> listToAdd) {
-        if (fullResultList != null && listToAdd != null) {
-            Integer max = getNegotiatonSearchResultsLimit();
-            if (max == null) {
-                max = 500;
-            }
-            if (fullResultList.size() < max) {
-                int fullResultListPlusListToAddSize = fullResultList.size() + listToAdd.size();
-                if (fullResultListPlusListToAddSize <= max) {
-                    fullResultList.addAll(listToAdd);
-                } else {
-                    int numberOfNewEntriesToAdd = max - fullResultList.size();
-                    int counter = 1;
-                    for (Negotiation neg : listToAdd) {
-                        if (counter < numberOfNewEntriesToAdd) {
-                            fullResultList.add(neg);
-                        }
-                        counter++;
-                    }
-                }
-            }
-        }
-    }
-    
-    public Collection findCollectionBySearchHelper(Class businessObjectClass, Map formProps, boolean unbounded, boolean usePrimaryKeyValuesOnly, Object additionalCriteria ) {
-        BusinessObject businessObject = checkBusinessObjectClass(businessObjectClass);
-        if (usePrimaryKeyValuesOnly) {
-            return executeSearch(businessObjectClass, getCollectionCriteriaFromMapUsingPrimaryKeysOnly(businessObjectClass, formProps), unbounded);
-        }
-        
-        Criteria crit = getCollectionCriteriaFromMap(businessObject, formProps);
-        if (additionalCriteria != null && additionalCriteria instanceof Criteria) {
-            crit.addAndCriteria((Criteria) additionalCriteria);
+
+    /**
+     *
+     * This method returns Negotiations linked to subawards based on search.
+     */
+    protected CollectionIncomplete<Negotiation> getNegotiationsLinkedToSubAward(Map<String, String> negotiationFilters, Map<String, String> associatedValues, boolean rowCountOnly) {
+        LOG.debug("ENTER getNegotiationsLinkedToSubAward rowCountOnly="+rowCountOnly);
+        Map<String, String> values = transformMap(associatedValues, subAwardTransform);
+
+        CollectionIncomplete<Negotiation> result =  new CollectionIncomplete<>(new ArrayList(0),0L);
+        if (values == null) {
+            return result;
         }
 
-        return executeSearch(businessObjectClass, crit, unbounded);
+        Long negotiationTypeId = getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.SUB_AWARD_ASSOCIATION).getId();
+        String negotiationTypeIdFilter = negotiationFilters.get(NEGOTIATION_TYPE_ATTR);
+        if ( StringUtils.isNotEmpty(negotiationTypeIdFilter) && !negotiationTypeId.equals( Long.parseLong(negotiationTypeIdFilter)) )  {
+            LOG.debug("getNegotiationsLinkedToProposal: Skipping search as found different type filter="+negotiationTypeIdFilter);
+            return result;
+        }
+
+        Criteria subAwardCriteria = getCollectionCriteriaFromMap(new SubAward(), values);
+
+        //filter only active/pending subAwards
+        Criteria activeSubAwardCriteria = getActiveOrPendingVersionCriteria();
+        ReportQueryByCriteria activeSubAwardCodesQuery = QueryFactory.newReportQuery(SubAward.class, activeSubAwardCriteria);
+        activeSubAwardCodesQuery.setAttributes(new String[]{MAX_SUBAWARD_CODE});
+        activeSubAwardCodesQuery.addGroupBy(SUBAWARD_CODE);
+
+        subAwardCriteria.addIn(SUBAWARD_CODE, activeSubAwardCodesQuery);
+        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(SubAward.class, subAwardCriteria);
+        subQuery.setAttributes(new String[] {SUBAWARD_CODE});
+
+
+        Criteria negotiationsLinedToSubAwardsCriteria =  getCollectionCriteriaFromMap(new Negotiation(), negotiationFilters);
+        negotiationsLinedToSubAwardsCriteria.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
+        negotiationsLinedToSubAwardsCriteria.addEqualTo(NEGOTIATION_TYPE_ATTR, negotiationTypeId);
+
+        LOG.debug("getNegotiationsLinkedToSubAward criteria="+negotiationsLinedToSubAwardsCriteria.toString());
+
+        return executeSearch(negotiationsLinedToSubAwardsCriteria, rowCountOnly);
+
     }
-    
-    private BusinessObject checkBusinessObjectClass(Class businessObjectClass) {
-        if (businessObjectClass == null) {
-            throw new IllegalArgumentException("BusinessObject class passed to LookupDaoOjb findCollectionBySearchHelper... method was null");
+
+    /**
+     * Search for unassociated negotiations using criteria from the unassociated detail.
+     */
+    protected CollectionIncomplete<Negotiation> getNegotiationsUnassociated(Map<String, String> negotiationFilters, Map<String, String> associatedValues, boolean rowCountOnly) {
+        LOG.debug("ENTER getNegotiationsUnassociated rowCountOnly="+rowCountOnly);
+        Map<String, String> values = transformMap(associatedValues, unassociatedTransform);
+
+        CollectionIncomplete<Negotiation> result =  new CollectionIncomplete<>(new ArrayList(0),0L);
+        if (values == null) {
+            return result;
         }
-        BusinessObject businessObject = null;
-        try {
-            businessObject = (BusinessObject) businessObjectClass.newInstance();
+
+        Long negotiationTypeId = getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.NONE_ASSOCIATION).getId();
+        String negotiationTypeIdFilter = negotiationFilters.get(NEGOTIATION_TYPE_ATTR);
+        if ( StringUtils.isNotEmpty(negotiationTypeIdFilter) && !negotiationTypeId.equals( Long.parseLong(negotiationTypeIdFilter)) )  {
+            LOG.debug("getNegotiationsLinkedToProposal: Skipping search as found different type filter="+negotiationTypeIdFilter);
+            return result;
         }
-        catch (IllegalAccessException e) {
-            throw new RuntimeException("LookupDaoOjb could not get instance of " + businessObjectClass.getName(), e);
-        }
-        catch (InstantiationException e) {
-            throw new RuntimeException("LookupDaoOjb could not get instance of " + businessObjectClass.getName(), e);
-        }
-        return businessObject;
+
+
+        Criteria negotiationsUnassociatedCriteria = getCollectionCriteriaFromMap(new NegotiationUnassociatedDetail(), values);
+        Criteria negotiationCrit = getCollectionCriteriaFromMap(new Negotiation(), negotiationFilters);
+        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(NegotiationUnassociatedDetail.class, negotiationsUnassociatedCriteria);
+        subQuery.setAttributes(new String[] {UNASSOCIATED_ID});
+
+        negotiationCrit.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
+        negotiationCrit.addEqualTo(NEGOTIATION_TYPE_ATTR, negotiationTypeId);
+
+        return executeSearch(negotiationCrit, rowCountOnly);
     }
-    
-    private Collection executeSearch(Class businessObjectClass, Criteria criteria, boolean unbounded) {
-        Collection searchResults = new ArrayList();
-        Long matchingResultsCount = null;
-        try {
-            Integer searchResultsLimit = getNegotiatonSearchResultsLimit();
-            if (!unbounded && (searchResultsLimit != null)) {
-                matchingResultsCount = new Long(getPersistenceBrokerTemplate().getCount(QueryFactory.newQuery(businessObjectClass, criteria)));
-                getDbPlatform().applyLimit(searchResultsLimit, criteria);
+
+    private Integer getMaxSearchResultLimit() {
+        if (maxSearchResults == null){
+            maxSearchResults = LookupUtils.getSearchResultsLimit(Negotiation.class);
+            if (maxSearchResults == null) {
+                LOG.warn("Negotiation Lookup: SearchResultsLimit for Business Object and Application is undefined!");
+                //CAP Negotiation lookup at 300 forcefully:
+                maxSearchResults = 300;
             }
-            if ((matchingResultsCount == null) || (matchingResultsCount.intValue() <= searchResultsLimit.intValue())) {
-                matchingResultsCount = new Long(0);
-            }
-            searchResults = getPersistenceBrokerTemplate().getCollectionByQuery(QueryFactory.newQuery(businessObjectClass, criteria));
-            // populate Person objects in business objects
-            List bos = new ArrayList();
-            bos.addAll(searchResults);
-            searchResults = bos;
-        }
-        catch (OjbOperationException e) {
-            throw new RuntimeException("NegotiationDaoOjb encountered exception during executeSearch", e);
-        }
-        catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("NegotiationDaoOjb encountered exception during executeSearch", e);
-        }
-        return new CollectionIncomplete(searchResults, matchingResultsCount);
-    }
-    
-    private Integer getNegotiatonSearchResultsLimit(){
-        if (maxSearchResults == null) {
-            maxSearchResults = LookupUtils.getApplicationSearchResultsLimit();
+
         }
         return maxSearchResults;
     }
-    
-    /**
-     * Search for awards linked to negotiation using both award and negotiation values.
-     * @param negotiationValues
-     * @param associatedValues
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    protected Collection<Negotiation> getNegotiationsLinkedToAward(Map<String, String> negotiationValues, Map<String, String> associatedValues) {
-        Map<String, String> values = transformMap(associatedValues, awardTransform);
-        if (values == null) {
-            return new ArrayList<Negotiation>();
-        }
-        values.put("awardSequenceStatus", VersionStatus.ACTIVE.name());
-        Criteria criteria = getCollectionCriteriaFromMap(new Award(), values);
-        Criteria negotiationCrit = new Criteria();
-        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(Award.class, criteria);
-        subQuery.setAttributes(new String[] {"awardNumber"});
-        negotiationCrit.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
-        negotiationCrit.addEqualTo(NEGOTIATION_TYPE_ATTR, 
-                getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.AWARD_ASSOCIATION).getId());
-        Collection<Negotiation> result = this.findCollectionBySearchHelper(Negotiation.class, negotiationValues, false, false, negotiationCrit);
-        return result;
-    }
-    
-    /**
-     * Search for institutional proposals linked to negotiations using both criteria.
-     * @param negotiationValues
-     * @param associatedValues
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    protected Collection<Negotiation> getNegotiationsLinkedToProposal(Map<String, String> negotiationValues, Map<String, String> associatedValues) {
-        Map<String, String> values = transformMap(associatedValues, proposalTransform);
-        if (values == null) {
-            return new ArrayList<Negotiation>();
-        }
-        values.put("proposalSequenceStatus", VersionStatus.ACTIVE.name());
-        Criteria criteria = getCollectionCriteriaFromMap(new InstitutionalProposal(), values);
-        Criteria negotiationCrit = new Criteria();
-        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(InstitutionalProposal.class, criteria);
-        subQuery.setAttributes(new String[] {"proposalNumber"});
-        negotiationCrit.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
-        negotiationCrit.addEqualTo(NEGOTIATION_TYPE_ATTR, 
-                getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.INSTITUATIONAL_PROPOSAL_ASSOCIATION).getId());
-        Collection<Negotiation> result = this.findCollectionBySearchHelper(Negotiation.class, negotiationValues, false, false, negotiationCrit);
-        return result;
-    }
-    
-    /**
-     * Search for proposal logs linked to negotiations using both criteria.
-     * @param negotiationValues
-     * @param associatedValues
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    protected Collection<Negotiation> getNegotiationsLinkedToProposalLog(Map<String, String> negotiationValues, Map<String, String> associatedValues) {
-        Map<String, String> values = transformMap(associatedValues, proposalLogTransform);
-        if (values == null) {
-            return new ArrayList<Negotiation>();
-        }
-        Criteria criteria = getCollectionCriteriaFromMap(new ProposalLog(), values);
-        Criteria negotiationCrit = new Criteria();
-        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(ProposalLog.class, criteria);
-        subQuery.setAttributes(new String[] {"proposalNumber"});
-        negotiationCrit.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
-        negotiationCrit.addEqualTo(NEGOTIATION_TYPE_ATTR, 
-                getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.PROPOSAL_LOG_ASSOCIATION).getId());
-        Collection<Negotiation> result = this.findCollectionBySearchHelper(Negotiation.class, negotiationValues, false, false, negotiationCrit);
-        return result;
-    } 
-    
-    /**
-     * 
-     * This method returns Negotiations linked to subawards based on search.
-     * @param negotiationValues
-     * @param associatedValues
-     * @return
-     */
-    protected Collection<Negotiation> getNegotiationsLinkedToSubAward(Map<String, String> negotiationValues, Map<String, String> associatedValues) {
-        //List<Negotiation> result = new ArrayList<Negotiation>();
-        
-        Map<String, String> values = transformMap(associatedValues, subAwardTransform);
-        if (values != null && values.containsKey("title"))// Removing title because there is a bug in the base query, if title is put in the query no results are returned
-        	values.remove("title");
-        if (values == null) {
-            return new ArrayList<Negotiation>();
-        }
-        Criteria criteria = getCollectionCriteriaFromMap(new SubAward(), values);
-        Criteria negotiationCrit = new Criteria();
-        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(SubAward.class, criteria);
-        subQuery.setAttributes(new String[] {"subAwardId"});
-        negotiationCrit.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
-        negotiationCrit.addEqualTo(NEGOTIATION_TYPE_ATTR, 
-                getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.SUB_AWARD_ASSOCIATION).getId());
 
-        Collection<Negotiation> result = this.findCollectionBySearchHelper(Negotiation.class, negotiationValues, false, false, negotiationCrit);
-        if (result != null && !result.isEmpty())
-        	result = filterNegotitations(result,associatedValues.get("title"),associatedValues.get("leadUnitNumber"),associatedValues.get("leadUnitName"),associatedValues.get("subAwardRequisitionerId"));
-        return result;
-    }  
-    
-    /**
-     * Search for unassociated negotiations using criteria from the unassociated detail.
-     * @param negotiationValues
-     * @param associatedValues
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    protected Collection<Negotiation> getNegotiationsUnassociated(Map<String, String> negotiationValues, Map<String, String> associatedValues) {
-        Map<String, String> values = transformMap(associatedValues, unassociatedTransform);
-        if (values == null) {
-            return new ArrayList<Negotiation>();
-        }
-        Criteria criteria = getCollectionCriteriaFromMap(new NegotiationUnassociatedDetail(), values);
-        Criteria negotiationCrit = new Criteria();
-        ReportQueryByCriteria subQuery = QueryFactory.newReportQuery(NegotiationUnassociatedDetail.class, criteria);
-        subQuery.setAttributes(new String[] {"negotiationUnassociatedDetailId"});
-        negotiationCrit.addIn(ASSOCIATED_DOC_ID_ATTR, subQuery);
-        negotiationCrit.addEqualTo(NEGOTIATION_TYPE_ATTR, 
-                getNegotiationService().getNegotiationAssociationType(NegotiationAssociationType.NONE_ASSOCIATION).getId());
-        Collection<Negotiation> result = this.findCollectionBySearchHelper(Negotiation.class, negotiationValues, false, false, negotiationCrit);
-        return result;
-    }    
-    
+    private void addListToList(CollectionIncomplete<Negotiation> fullResultList, CollectionIncomplete<Negotiation> listToAdd) {
+            if (listToAdd.size() > 0) {
+                if (fullResultList.getActualSizeIfTruncated() < getMaxSearchResultLimit()) {
+                    int fullResultListPlusListToAddSize = fullResultList.size() + listToAdd.size();
+                    if (fullResultListPlusListToAddSize <= getMaxSearchResultLimit()) {
+                        fullResultList.addAll(listToAdd);
+                    } else {
+                        int numberOfNewEntriesToAdd = getMaxSearchResultLimit() - fullResultList.size();
+
+                        Collection<Negotiation> truncatedList = listToAdd.subList(0, numberOfNewEntriesToAdd);
+                        fullResultList.addAll(truncatedList);
+                    }
+                }
+            }
+
+            //set the actual count of objects found by search
+            fullResultList.setActualSizeIfTruncated(fullResultList.getActualSizeIfTruncated() + listToAdd.getActualSizeIfTruncated());
+    }
+
+
     /**
      * Take the associated field values and convert them to document specific values using the provided
      * transform key.
@@ -438,58 +293,46 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
             return result;
         }
     }
-    
-    /**
-     * Since the negotiation age is not persisted filter negotiations based on age.
-     * @param value
-     * @param negotiations
-     * @return
-     */
-    protected Collection<Negotiation> filterByNegotiationAge(String value, Collection<Negotiation> negotiations) {
-        int lowValue = 0;
-        int highValue = 0;
-        boolean greaterThan = false;
-        boolean lessThan = false;
-        boolean between = false;
-        if (value.contains(">")) {
-            greaterThan = true;
-            lowValue = Integer.parseInt(value.replace(">", ""));
-        } else if (value.contains("<")) {
-            lessThan = true;
-            highValue = Integer.parseInt(value.replace("<", ""));
-        } else if (value.contains("..")) {
-            between = true;
-            String[] values = value.split("\\.\\.");
-            lowValue = Integer.parseInt(values[0]);
-            highValue = Integer.parseInt(values[1]);
-        } else {
-            lowValue = Integer.parseInt(value);
-        }
-        Iterator<Negotiation> iter = negotiations.iterator();
-        while (iter.hasNext()) {
-            Negotiation negotiation = iter.next();
-            if (greaterThan) {
-                if (negotiation.getNegotiationAge() <= lowValue) {
-                    iter.remove();
-                }
-            } else if (lessThan) {
-                if (negotiation.getNegotiationAge() >= highValue) {
-                    iter.remove();
-                }
-            } else if (between) {
-                if (negotiation.getNegotiationAge() < lowValue
-                        || negotiation.getNegotiationAge() > highValue) {
-                    iter.remove();
-                }
-            } else {
-                if (negotiation.getNegotiationAge() != lowValue) {
-                    iter.remove();
-                }
+
+
+
+    private CollectionIncomplete<Negotiation> executeSearch(Criteria searchCriteria, boolean justResultsCount ) {
+        LOG.debug("ENTER executeSearch searchCriteria= "+searchCriteria +" justResultsCount="+justResultsCount);
+        Collection <Negotiation> searchResults = new ArrayList();
+        Long matchingResultsCount = null;
+        try {
+            if ( StringUtils.isNotEmpty(negotiationAge) ) {
+                //add additional criteria related to negotiation age - if any
+                searchCriteria.addAndCriteria( getNegotiationAgeCriteria(negotiationAge) );
             }
+            LOG.debug("ExecuteSearch: searchCriteria= "+searchCriteria);
+
+            //add orderBy NegotiationId to show the newest on top to query and DISTINCT = true to avoid duplicate results.
+            QueryByCriteria query = QueryFactory.newQuery(Negotiation.class, searchCriteria, Boolean.TRUE);
+            query.addOrderByDescending(NEGOTIATION_ID);
+
+            LOG.debug("ExecuteSearch: final search Query= "+query.toString());
+
+            matchingResultsCount = new Long(getPersistenceBrokerTemplate().getCount(query));
+            LOG.debug("getNegotiationResults matchingResultsCount={}",matchingResultsCount);
+
+            LookupUtils.applySearchResultsLimit(Negotiation.class, searchCriteria, getDbPlatform());
+
+            //don't execute the query if we only want a count...
+            if ( !justResultsCount ) {
+                    searchResults = getPersistenceBrokerTemplate().getCollectionByQuery(query);
+            }
+
         }
-        
-        return negotiations;
+        catch (Exception e) {
+            LOG.error(e.getMessage());
+            throw new RuntimeException("NegotiationDaoOjb encountered exception during executeSearch", e);
+        }
+
+        return new CollectionIncomplete(searchResults, matchingResultsCount);
     }
+
+
 
     public NegotiationService getNegotiationService() {
         return negotiationService;
@@ -497,6 +340,115 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
 
     public void setNegotiationService(NegotiationService negotiationService) {
         this.negotiationService = negotiationService;
+    }
+
+
+    /**
+     * Method that removes the associated objects filters from the negotiation filters and only if they have values
+     * returns them with the appropriate name in a HashMap<String, String>
+     * The key name will be modified to remove the ASSOC_PREFIX from it for consistency in compiling the associated object search criteria
+     *
+     * @param fieldValues
+     * @return HashMap<String, String>
+     */
+    protected Map<String, String> getAssociationFilters(Map<String, String>fieldValues) {
+        Map<String, String> associationDetails = new HashMap<String, String>();
+
+        for (Iterator<Map.Entry<String, String>> fieldIter = fieldValues.entrySet().iterator(); fieldIter.hasNext(); ) {
+            Map.Entry<String, String> field = fieldIter.next();
+            if (StringUtils.startsWith(field.getKey(), ASSOC_PREFIX)) {
+                fieldIter.remove();
+                //add the associated filter to the result ONLY if it contains some value
+                if (!StringUtils.isEmpty(field.getValue())) {
+                    associationDetails.put(field.getKey().replaceFirst(ASSOC_PREFIX + ".", ""), field.getValue());
+                }
+            }
+        }
+
+        return associationDetails;
+    }
+
+    private Criteria getActiveOrPendingVersionCriteria(){
+        List<String> statuses = new ArrayList<String>(2);
+        statuses.add(VersionStatus.ACTIVE.name());
+        statuses.add(VersionStatus.PENDING.name());
+        Criteria activeOrPendingCriteria = new Criteria();
+        activeOrPendingCriteria.addIn(VERSION_HISTORY_STATUS, statuses);
+        return activeOrPendingCriteria;
+    }
+
+
+
+    /**
+     * Parses the user input for negotiation Age and returns the appropriate Criteria for it.
+     * If the input is empty or cannot be parsed, will return an empty Criteria.
+     *
+     * @param ageFilter Valid examples: integer, >minvalue, <maxvalue, minvalue..maxvalue
+     * @return
+     */
+    private Criteria getNegotiationAgeCriteria( String ageFilter ) {
+        //lazy instantiation of the Criteria
+        if (negotiationAgeCriteria == null) {
+            negotiationAgeCriteria = new Criteria();
+            if (StringUtils.isEmpty(ageFilter)) {
+                LOG.debug("getCriteria: No additional filters for ageFilter.");
+                return negotiationAgeCriteria;
+            }
+
+            LOG.debug("Add negotiation age filter={}", ageFilter);
+
+            //Parse the ageFilter to find out what operation we need and what are the limits
+            //TODO refactor this old code...
+            int lowValue = 0;
+            int highValue = 0;
+            int equalValue = 0;
+            boolean greaterThan = false;
+            boolean lessThan = false;
+            boolean between = false;
+
+            try {
+                if (ageFilter.contains(">")) {
+                    greaterThan = true;
+                    lowValue = Integer.parseInt(ageFilter.replace(">", ""));
+                } else if (ageFilter.contains("<")) {
+                    lessThan = true;
+                    highValue = Integer.parseInt(ageFilter.replace("<", ""));
+                } else if (ageFilter.contains("..")) {
+                    between = true;
+                    String[] values = ageFilter.split("\\.\\.");
+                    lowValue = Integer.parseInt(values[0]);
+                    highValue = Integer.parseInt(values[1]);
+                } else {
+                    equalValue = Integer.parseInt(ageFilter);
+                }
+            } catch (NumberFormatException e) {
+                LOG.warn("Negotiation age criteria unParsable={} ignoring...", ageFilter, e);
+                return negotiationAgeCriteria;
+            }
+
+            //create subquery for the associated object with the above criteria
+            StringBuffer negotiationAgeSqlQuery = new StringBuffer(NEGOTIATION_AGE_QUERY);
+            if (equalValue != 0) {
+                negotiationAgeSqlQuery.append(NEGOTIATION_AGE_CONDITION + "=" + equalValue);
+            } else if (greaterThan) {
+                negotiationAgeSqlQuery.append(NEGOTIATION_AGE_CONDITION + ">=" + lowValue);
+            } else if (lessThan) {
+                negotiationAgeSqlQuery.append(NEGOTIATION_AGE_CONDITION + "<=" + highValue);
+            } else if (between) {
+                negotiationAgeSqlQuery.append(NEGOTIATION_AGE_CONDITION + ">=" + lowValue);
+                negotiationAgeSqlQuery.append(" AND ");
+                negotiationAgeSqlQuery.append(NEGOTIATION_AGE_CONDITION + "<=" + highValue);
+            } else {
+                LOG.warn("Negotiation age criteria: Uncharted territory!!! {} Ignoring...", ageFilter);
+                return negotiationAgeCriteria;
+            }
+
+            QueryBySQL sqlSubQuery = QueryFactory.newQuery(Negotiation.class, negotiationAgeSqlQuery.toString());
+
+            negotiationAgeCriteria.addIn(NEGOTIATION_ID, sqlSubQuery);
+            LOG.debug("Exit getNegotiationAgeCriteria={}", negotiationAgeCriteria);
+        }
+        return negotiationAgeCriteria;
     }
 
 }
