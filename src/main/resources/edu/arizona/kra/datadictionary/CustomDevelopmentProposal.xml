@@ -71,8 +71,8 @@
 	<bean id="DevelopmentProposal-deadlineTime" parent="DevelopmentProposal-deadlineTime-parentBean" />
 	<bean id="DevelopmentProposal-deadlineTime-parentBean" abstract="true" parent="AttributeDefinition">
 		<property name="name" value="deadlineTime" />
-		<property name="label" value="Sponsor Deadline Time (Eastern Time)" />
-		<property name="shortLabel" value="Sponsor Deadline Time (Eastern Time)" />
+		<property name="label" value="Sponsor Deadline Time (Arizona Time)" />
+		<property name="shortLabel" value="Sponsor Deadline Time (Arizona Time)" />
 		<property name="required" value="false" />
 		<property name="maxLength" value="15" />
 		<property name="control">
