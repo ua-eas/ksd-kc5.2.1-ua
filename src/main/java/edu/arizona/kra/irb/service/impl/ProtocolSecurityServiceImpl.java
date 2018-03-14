@@ -90,6 +90,16 @@ public class ProtocolSecurityServiceImpl implements ProtocolSecurityService {
         return roleService.principalHasRole(userId, getPrivilegedProtocolRolesIds(), NO_QUALIFIERS, false);
     }
 
+
+    public boolean userHasUnrestrictedViewPermission(String userId){
+        boolean hasUnrestrictedViewPermission = getProtocolDao().hasUnqualifiedRoles(userId, getRoleIdsWithProtocolViewPermission());
+        if (!hasUnrestrictedViewPermission){
+            hasUnrestrictedViewPermission =  getProtocolDao().hasViewPermissionOnAllUnitHierarchy(userId, getRoleIdsWithProtocolViewPermission());
+        }
+        return hasUnrestrictedViewPermission;
+    };
+
+
     public Collection<String> findProtocolNumbersForProtocolQualifiedRoles(String userId) {
         Map<String,String> protocolRoleQualifiers = getProtocolDao().getQualifiersForMemberAndAttributeName(getRoleIdsWithProtocolViewPermission(), userId, ROLE_QUALIFIER_PROTOCOL);
         if ( protocolRoleQualifiers!=null && !protocolRoleQualifiers.isEmpty()){
@@ -97,6 +107,8 @@ public class ProtocolSecurityServiceImpl implements ProtocolSecurityService {
         }
         return new ArrayList<String>(0);
     }
+
+
 
 
     public Collection<String> findProtocolNumbersByUserPermissions(String userId) {
