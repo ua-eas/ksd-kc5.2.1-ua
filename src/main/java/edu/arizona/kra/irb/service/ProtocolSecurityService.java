@@ -63,5 +63,12 @@ public interface ProtocolSecurityService {
     public boolean userHasPrivilegedProtocolRoles(String userId);
 
 
+    /**
+     * Check if the user has any roles with view permission without any qualifications (i.e. specific unit number or specific protocol number etc)
+     * @param userId
+     * @return
+     */
+    public boolean userHasUnrestrictedViewPermission(String userId);
+
 
 }

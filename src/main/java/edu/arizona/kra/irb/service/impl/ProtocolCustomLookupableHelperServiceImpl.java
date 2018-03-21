@@ -56,6 +56,8 @@ public class ProtocolCustomLookupableHelperServiceImpl<GenericProtocol extends P
 
 
     protected boolean userHasPrivilegedProtocolRoles = false;
+    protected boolean userHasUnrestrictedViewPermission = false;
+
     protected Set<String> visibleProtocolNumbers =  new HashSet<String>();
     protected Set<String> visibleLeadUnitNumbers =  new HashSet<String>();
 
@@ -65,12 +67,12 @@ public class ProtocolCustomLookupableHelperServiceImpl<GenericProtocol extends P
         initializeUserPerms(lookupForm);
         Collection lookupResults = super.performLookup(lookupForm, resultTable, bounded);
 
-        if ( !userHasPrivilegedProtocolRoles ) {
+        if ( !(userHasPrivilegedProtocolRoles || userHasUnrestrictedViewPermission) ) {
             for (Object result : resultTable) {
                 ResultRow row = (ResultRow) result;
                 for (Column col : row.getColumns()) {
                     if (PROTOCOL_NUMBER_COL_NAME.equals(col.getPropertyName())) {
-                        String currentRowProtocolNumber = col.getPropertyValue().substring(0, 10);
+                        String currentRowProtocolNumber = col.getPropertyValue();
                         if (isProtocolNumberVisible(currentRowProtocolNumber)) {
                             LOG.debug("Visible=true: currentRowProtocolNumber=" + currentRowProtocolNumber);
                             break;
@@ -101,12 +103,13 @@ public class ProtocolCustomLookupableHelperServiceImpl<GenericProtocol extends P
         if(CollectionUtils.isNotEmpty(visibleProtocolNumbers) || CollectionUtils.isNotEmpty(visibleLeadUnitNumbers)) {
             Set<String> returnedProtocolNumbers = new HashSet<String>();
             for(BusinessObject result : returnedProtocols) {
-                returnedProtocolNumbers.add(((Protocol) result).getProtocolNumber().substring(0, 10));
+                String protocolNumber = ((Protocol) result).getProtocolNumber();
+                returnedProtocolNumbers.add( protocolNumber.length()>10?protocolNumber.substring(0, 10):protocolNumber );
                 //if user has unit qualified view permissions, add the protocols with the corresponding lead units to visible
                 if ( CollectionUtils.isNotEmpty(visibleLeadUnitNumbers) ){
                     Protocol protocol = (Protocol) result;
                     if (visibleLeadUnitNumbers.contains(protocol.getLeadUnitNumber())){
-                        visibleProtocolNumbers.add(protocol.getProtocolNumber());
+                        visibleProtocolNumbers.add(protocolNumber.length()>10?protocolNumber.substring(0, 10):protocolNumber);
                     }
                 }
             }
@@ -120,6 +123,7 @@ public class ProtocolCustomLookupableHelperServiceImpl<GenericProtocol extends P
     private void initializeUserPerms(LookupForm lookupForm) {
         String userId = GlobalVariables.getUserSession().getPrincipalId();
 
+        // check first if the user has direct assignment of the view permission.
         boolean canView = protocolSecurityService.hasViewPermission(userId);
 
         // Check for any protocols the user is listed on as Personnel (all should have view access)
@@ -133,6 +137,8 @@ public class ProtocolCustomLookupableHelperServiceImpl<GenericProtocol extends P
             if(protocolSecurityService.userHasPrivilegedProtocolRoles(userId)) {
                 userHasPrivilegedProtocolRoles = true;
 
+            } else if ( protocolSecurityService.userHasUnrestrictedViewPermission(userId)) {
+                userHasUnrestrictedViewPermission = true;
             } else {
 
                 // Add in Protocols where user is listed as Personnel
@@ -152,19 +158,19 @@ public class ProtocolCustomLookupableHelperServiceImpl<GenericProtocol extends P
     }
 
     private boolean isProtocolNumberVisible(String protocolNumber) {
-        if ( userHasPrivilegedProtocolRoles)
+        if ( userHasPrivilegedProtocolRoles || userHasUnrestrictedViewPermission)
             return true;
 
         if ( CollectionUtils.isEmpty(visibleProtocolNumbers)){
             return false;
         }
-
-        return visibleProtocolNumbers.contains(protocolNumber.substring(0, 10));
+        String truncatedProtocolNumber = protocolNumber.length()>10?protocolNumber.substring(0, 10):protocolNumber;
+        return visibleProtocolNumbers.contains(truncatedProtocolNumber);
     }
 
     private void addVisibleProtocolNumbers(Collection<String> protocolNumbers) {
         for(String protocolNumber : protocolNumbers) {
-            visibleProtocolNumbers.add(protocolNumber.substring(0, 10));
+            visibleProtocolNumbers.add(protocolNumber.length()>10?protocolNumber.substring(0, 10):protocolNumber);
         }
     }
 
@@ -183,29 +189,33 @@ public class ProtocolCustomLookupableHelperServiceImpl<GenericProtocol extends P
 
     protected List<HtmlData> getEditCopyViewLinks(BusinessObject businessObject, List pkNames) {
         List<HtmlData> htmlDataList = new ArrayList<HtmlData>();
+        ProtocolBase protocol = (ProtocolBase) businessObject;
 
-        if(!isProtocolNumberVisible(((ProtocolBase) businessObject).getProtocolNumber())) {
-                return htmlDataList;
+        if( isProtocolNumberVisible(protocol.getProtocolNumber()) ) {
+
+            if (this.kraAuthorizationService.hasPermission(this.getUserIdentifier(), protocol, "Modify Protocol")) {
+                // Change "edit" to edit same document, NOT initializing a new Doc
+                HtmlData.AnchorHtmlData editHtmlData = getViewLink(protocol.getProtocolDocument());
+                String href = editHtmlData.getHref();
+                href = href.replace("viewDocument=true", "viewDocument=false");
+                editHtmlData.setHref(href);
+                editHtmlData.setDisplayText("edit");
+                htmlDataList.add(editHtmlData);
+                // DocCopyHandler doesn't actually load the document properly... which is fine for copying, but bad if you want to do anything else
+                HtmlData.AnchorHtmlData htmlData = getViewLink(protocol.getProtocolDocument());
+                htmlData.setHref(href.replace("protocolProtocol.do?", "protocolProtocolActions.do?"));
+                htmlData.setDisplayText("copy");
+                htmlDataList.add(htmlData);
+
+            }
+
+            htmlDataList.add(getViewLink(protocol.getProtocolDocument()));
         }
-
-        // Change "edit" to edit same document, NOT initializing a new Doc
-        HtmlData.AnchorHtmlData editHtmlData = getViewLink(((ProtocolBase) businessObject).getProtocolDocument());
-        String href = editHtmlData.getHref();
-        href = href.replace("viewDocument=true", "viewDocument=false");
-        editHtmlData.setHref(href);
-        editHtmlData.setDisplayText("edit");
-        htmlDataList.add(editHtmlData);
-        // DocCopyHandler doesn't actually load the document properly... which is fine for copying, but bad if you want to do anything else
-        HtmlData.AnchorHtmlData htmlData = getViewLink(((ProtocolBase) businessObject).getProtocolDocument());
-        htmlData.setHref(href.replace("protocolProtocol.do?", "protocolProtocolActions.do?"));
-        htmlData.setDisplayText("copy");
-        htmlDataList.add(htmlData);
-
-        //add the protocol id to request params
-        htmlDataList.add(getViewLink(((ProtocolBase) businessObject).getProtocolDocument()));
 
         return htmlDataList;
     }
+
+
 
     /**
      * Separates the list of protocols into pageable results.

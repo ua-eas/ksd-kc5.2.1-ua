@@ -170,6 +170,60 @@ public class UaProtocolDaoOjb extends ProtocolDaoOjbBase<Protocol> implements Ua
 
     }
 
+    public boolean hasUnqualifiedRoles(String userId, List<String> roleIds) {
+        LOG.debug("ENTER hasUnqualifiedRoles userid="+userId );
+        StringBuffer sqlQuery = new StringBuffer(ROLE_WITHOUT_QUALIFIERS_FOR_MEMBER_QUERY_PART1);
+        for (String roleId:roleIds){
+            sqlQuery.append("'"+roleId+"',");
+        }
+        sqlQuery.deleteCharAt(sqlQuery.length()-1);
+        sqlQuery.append(ROLE_WITHOUT_QUALIFIERS_FOR_MEMBER_QUERY_PART2);
+        LOG.debug(" hasUnqualifiedRoles sqlQuery="+sqlQuery );
+        Object[] params = new Object[] { userId };
+        try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
+            ResultSet rs = dbc.executeQuery(sqlQuery.toString(), params);
+            if (rs.next()){
+                LOG.info("User "+ userId+" has unqualified role: "+ rs.getString(1));
+                return true;
+            }
+        } catch (SQLException sqle) {
+            LOG.error("SQLException: " + sqle.getMessage(), sqle);
+        } catch (Exception le) {
+            LOG.error("Exception: " + le.getMessage(), le);
+        }
+
+        return false;
+    }
+
+    public boolean hasViewPermissionOnAllUnitHierarchy(String userId, List<String> roleIds){
+        LOG.debug("ENTER hasViewPermissionOnAllUnitHierarchy roleIds={}"+roleIds.toString()+" userid="+userId);
+
+        StringBuffer sqlQuery = new StringBuffer(ROLE_QUALIFIERS_FOR_ROOT_UNIT_QUERY_PART1);
+        for (String roleId:roleIds){
+            sqlQuery.append("'"+roleId+"',");
+        }
+        sqlQuery.deleteCharAt(sqlQuery.length()-1);
+        sqlQuery.append(ROLE_QUALIFIERS_FOR_ROOT_UNIT_QUERY_PART2);
+
+        Map<String,String> qualifiers = new HashMap<String, String>();
+        Object[] params = new Object[] {userId };
+        try (DBConnection dbc = new DBConnection(this.getPersistenceBroker(true)) ){
+            ResultSet rs = dbc.executeQuery(sqlQuery.toString(), params);
+            if (rs.next()){
+                LOG.info("User "+ userId+" has root unit view permission! ");
+                return true;
+            }
+        } catch (SQLException sqle) {
+            LOG.error("SQLException: " + sqle.getMessage(), sqle);
+
+        } catch (LookupException le) {
+            LOG.error("LookupException: " + le.getMessage(), le);
+        }
+
+        return false;
+    }
+
+
 
     public Map<String,String> getQualifiersForMemberAndAttributeName(List<String> roleIds, String userId, String qualifierName){
         LOG.debug("ENTER getQualifiersForMemberAndAttributeName roleIds={}"+roleIds.toString()+" userid="+userId +" qualifierName="+qualifierName);

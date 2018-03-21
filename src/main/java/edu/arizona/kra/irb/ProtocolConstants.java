@@ -47,13 +47,24 @@ public final class ProtocolConstants {
     public static final String PROTOCOL_DOC_NUMBER = "documentNumber";
 
     public static final String PROTOCOL_NUMBERS_FOR_PERSONNEL_QUERY = "select unique protocol_number from protocol_persons where PERSON_ID=?";
+    public static final String ROLE_WITHOUT_QUALIFIERS_FOR_MEMBER_QUERY_PART1 =
+            "select r.role_id from KRIM_ROLE_MBR_T r left join KRIM_ROLE_MBR_ATTR_DATA_T a on r.ROLE_MBR_ID = a.ROLE_MBR_ID "+
+            " where r.mbr_id=? and ROLE_ID in (";
+    public static final String ROLE_WITHOUT_QUALIFIERS_FOR_MEMBER_QUERY_PART2 = ") and (r.actv_to_dt IS NULL OR sysdate <= r.actv_to_dt) and a.ROLE_MBR_ID IS NULL";
 
     public static final String ROLE_QUALIFIERS_FOR_MEMBER_AND_ATTRIBUTE_QUERY_PART1 = " select r.role_mbr_id, a.attr_val from KRIM_ROLE_MBR_T r left join KRIM_ROLE_MBR_ATTR_DATA_T a on "+
-            "r.ROLE_MBR_ID = a.ROLE_MBR_ID "+
-            "where r.ROLE_ID in (";
+            "r.ROLE_MBR_ID = a.ROLE_MBR_ID where r.ROLE_ID in (";
+
     public static final String ROLE_QUALIFIERS_FOR_MEMBER_AND_ATTRIBUTE_QUERY_PART2 = ") and (r.actv_to_dt IS NULL OR sysdate <= r.actv_to_dt) "+
             "and r.MBR_ID=? and a.KIM_ATTR_DEFN_ID in ("+
             "select kim_attr_defn_id from krim_attr_defn_t where ACTV_IND='Y' and NM=?)" ;
+
+    public static final String ROLE_QUALIFIERS_FOR_ROOT_UNIT_QUERY_PART1= "select r.role_mbr_id, r.MBR_ID, r.ROLE_ID, a.attr_val, b.attr_val from KRIM_ROLE_MBR_T r inner join KRIM_ROLE_MBR_ATTR_DATA_T a on r.ROLE_MBR_ID = a.ROLE_MBR_ID inner join KRIM_ROLE_MBR_ATTR_DATA_T b on a.role_mbr_id = b.role_mbr_id "
+    +" where r.ROLE_ID in (";
+    public static final String ROLE_QUALIFIERS_FOR_ROOT_UNIT_QUERY_PART2 = ") and (r.actv_to_dt IS NULL OR sysdate <= r.actv_to_dt) and r.MBR_ID=? "
+    +" and a.KIM_ATTR_DEFN_ID in (select KIM_ATTR_DEFN_ID from krim_attr_defn_t where ACTV_IND='Y' and NM='unitNumber') and a.ATTR_VAL='000001' "
+    +" and b.KIM_ATTR_DEFN_ID in (select KIM_ATTR_DEFN_ID from krim_attr_defn_t where ACTV_IND='Y' and NM='subunits') and b.ATTR_VAL='Y'";
+
 
     public static final String PROTOCOL_NUMBER_WITH_LEAD_UNIT_QUERY = "select unique protocol_number from protocol_units where LEAD_UNIT_FLAG='Y' and UNIT_NUMBER in (";
 
