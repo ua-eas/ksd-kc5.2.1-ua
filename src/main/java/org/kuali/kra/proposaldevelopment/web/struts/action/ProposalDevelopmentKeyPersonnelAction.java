@@ -170,6 +170,11 @@ public class ProposalDevelopmentKeyPersonnelAction extends ProposalDevelopmentAc
 
         debug(INV_SIZE_MSG, pdform.getProposalDevelopmentDocument().getDevelopmentProposal().getInvestigators().size());
 
+        pdform.getQuestionnaireHelper().prepareView();
+        pdform.getQuestionnaireHelper().populateAnswers();
+        pdform.getQuestionnaireHelper().findRevenueQuestionIndex();
+
+
         try {
             boolean creditSplitEnabled = this.getParameterService().getParameterValueAsBoolean(ProposalDevelopmentDocument.class, CREDIT_SPLIT_ENABLED_RULE_NAME)
                     && pdform.getProposalDevelopmentDocument().getDevelopmentProposal().getInvestigators().size() > 0;

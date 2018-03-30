@@ -15,63 +15,38 @@
 --%>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
-<%@ attribute name="bean" required="true" type="org.kuali.kra.questionnaire.QuestionnaireHelperBase" %>
+<%@ attribute name="bean" required="true" type="org.kuali.kra.proposaldevelopment.questionnaire.ProposalDevelopmentQuestionnaireHelper" %>
 <%@ attribute name="property" required="true" %>
-<%@ attribute name="answerHeaderIndex" required="true" %>
-<%@ attribute name="forceNonTransparent" required="false" %>
-<%@ attribute name="readOnly" required="false" %>
-<%@ attribute name="printLineIndex" required="false" %>
-<%@ attribute name="defaultOpen" required="false" %>
 
-<c:if test = "${empty forceNonTransparent}">
-	<c:set var = "forceNonTransparent" value = "false"/>
-</c:if> 
 
-    <c:set var="transparent" value="false" />
-
-    <c:if test="${answerHeaderIndex == 0 && !forceNonTransparent}">
-      <c:set var="transparent" value="true" />
-    </c:if> 
-    <c:set var="questReadOnly" value="${!bean.answerQuestionnaire || readOnly}" scope = "request"/>
-   	<c:if test="${not bean.answerHeaders[answerHeaderIndex].activeQuestionnaire}">
-           <c:set var="inactivate" value="- This Questionnaire has been deactivated." />
-           <c:set var="questReadOnly" value="true" scope="request"/>
-    </c:if>
-    
-    
-    <c:choose>
-    <c:when test="${bean.answerHeaders[answerHeaderIndex].completed && bean.answerHeaders[answerHeaderIndex].hasVisibleQuestion}">
-     	<c:set var="tabTitle" value="${bean.headerLabels[answerHeaderIndex]} (Complete) ${inactivate}" />
-     	<c:set var="defaultOpen" value="true" />
-    </c:when>
-    <c:when test="${bean.answerHeaders[answerHeaderIndex].hasVisibleQuestion}">
-     	<c:set var="tabTitle" value="${bean.headerLabels[answerHeaderIndex]} (Incomplete) ${inactivate}" />
-     	<c:set var="defaultOpen" value="true" />
-    </c:when>
-    <c:otherwise>
-			<c:set var="tabTitle" value="${bean.headerLabels[answerHeaderIndex]} ${inactivate}" />    
-    </c:otherwise> 
-    </c:choose>
-    <c:set var="showQuestions" value="false" />
-    <c:if test="${!empty bean.answerHeaders[answerHeaderIndex].showQuestions and bean.answerHeaders[answerHeaderIndex].showQuestions == 'Y'}">
-      <c:set var="showQuestions" value="true" />
-    </c:if> 
-    <c:if test="${empty printLineIndex}">
-    	<c:set var="printLineIndex" value="${answerHeaderIndex}"/>
-    </c:if>
-
-	<kul:tab tabTitle="${tabTitle}"
-						 tabErrorKey="${property}.answerHeaders[${answerHeaderIndex}]*"
-						 auditCluster="${property}${bean.headerLabels[answerHeaderIndex]}${answerHeaderIndex}" 
-						 tabAuditKey="${property}.answerHeaders[${answerHeaderIndex}]*" 
-						 useRiceAuditMode="true"
-				         tabDescription=""
-				         defaultOpen="${defaultOpen || showQuestions || !bean.answerHeaders[answerHeaderIndex].hasVisibleQuestion}" 
-						 useCurrentTabIndexAsKey="true"
-				         transparentBackground="${transparent}">
-			         
-	<div class="tab-container" align="center">
-		<kra-questionnaire:questionnaireAnswersBody  answerHeaderIndex="${answerHeaderIndex}" bean="${bean}" 
-			property="${property}" readOnly="${questReadOnly}" printLineIndex="${answerHeaderIndex}"/>	
-    </div>
-</kul:tab>
+ <c:set var="answerHeaderIndex" value="${bean.revenueDistributionAnswerHeaderIndex}"/>
+ <c:set var="questionIndex" value="${bean.revenueDistributionQuestionIndex}"/>
+ <c:if test="${fn:length(bean.answerHeaders) > 0 and questionIndex > 0}">
+     <c:if test="${bean.answerHeaders[answerHeaderIndex]!=null and  bean.answerHeaders[answerHeaderIndex].answers!=null and bean.answerHeaders[answerHeaderIndex].answers[questionIndex]!= null }">
+         <c:set var="answer" value="${bean.answerHeaders[answerHeaderIndex].answers[questionIndex]}" />
+         <div class="questionnaireContent">
+             <table class="content_table question">
+                 <tr>
+                     <td class="content_questionnaire">
+                         <div class="Qdiv" >
+                             <div class="Qquestiondiv">
+                                 <span class="Qquestion">${answer.question.question}</span>
+                             </div>
+                             <c:choose>
+                                 <c:when test = "${answer.answer == 'Y'}" >
+                                     Yes
+                                 </c:when>
+                                 <c:when test = "${answer.answer == 'N'}" >
+                                     No
+                                 </c:when>
+                                 <c:otherwise>
+                                     N/A
+                                 </c:otherwise>
+                             </c:choose>
+                         </div>
+                     </td>
+                 </tr>
+             </table>
+         </div>
+     </c:if>
+ </c:if>

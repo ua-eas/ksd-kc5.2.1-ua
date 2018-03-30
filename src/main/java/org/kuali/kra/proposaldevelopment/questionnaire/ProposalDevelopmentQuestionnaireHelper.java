@@ -21,14 +21,23 @@ import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.document.authorization.ProposalTask;
 import org.kuali.kra.proposaldevelopment.web.struts.form.ProposalDevelopmentForm;
 import org.kuali.kra.questionnaire.QuestionnaireHelperBase;
+import org.kuali.kra.questionnaire.answer.Answer;
+import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.kra.questionnaire.answer.ModuleQuestionnaireBean;
 
 public class ProposalDevelopmentQuestionnaireHelper extends QuestionnaireHelperBase {
 
     private static final long serialVersionUID = 8595107639632039291L;
 
+    protected static final String REVENUE_DISTRIBUTION_QUESTION_ID="11018";
+
     private ProposalDevelopmentForm proposalDevelopmentForm;
-    
+
+
+    private int revenueDistributionAnswerHeaderIndex = 0;
+    private int revenueDistributionQuestionIndex = 0;
+
+
     public ProposalDevelopmentQuestionnaireHelper(ProposalDevelopmentForm form) {
         this.proposalDevelopmentForm = form;
     }
@@ -40,7 +49,7 @@ public class ProposalDevelopmentQuestionnaireHelper extends QuestionnaireHelperB
 
     @Override
     public ModuleQuestionnaireBean getModuleQnBean() {
-        ProposalDevelopmentDocument propDevDoc = getProposalDevelopmentDocument(); 
+        ProposalDevelopmentDocument propDevDoc = getProposalDevelopmentDocument();
         ModuleQuestionnaireBean moduleQuestionnaireBean = new ProposalDevelopmentModuleQuestionnaireBean(propDevDoc.getDevelopmentProposal());
         return moduleQuestionnaireBean;
     }
@@ -86,6 +95,31 @@ public class ProposalDevelopmentQuestionnaireHelper extends QuestionnaireHelperB
         ProposalTask task = new ProposalTask(TaskName.ANSWER_PROPOSAL_QUESTIONNAIRE, proposalDevelopmentDocument);
         setAnswerQuestionnaire(getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task));
     }
+
+
+    /**
+     *Finds the right question and answer header indexes for displaying this question in the Personnel Tab.
+     * @return
+     */
+    public void findRevenueQuestionIndex(){
+        if ( getAnswerHeaders().size() > 0 ) {
+            //pick the first answer header
+            revenueDistributionAnswerHeaderIndex = 0;
+            int i = 0; AnswerHeader header = getAnswerHeaders().get(revenueDistributionAnswerHeaderIndex);
+            for(Answer answer : header.getAnswers()) {
+                if (answer.getQuestion().getQuestionId().equalsIgnoreCase(REVENUE_DISTRIBUTION_QUESTION_ID)) {
+                    revenueDistributionQuestionIndex = i;
+                    break;
+                }
+                i++;
+            }
+        }
+    }
+
+
+    public int getRevenueDistributionAnswerHeaderIndex(){return revenueDistributionAnswerHeaderIndex;}
+
+    public int getRevenueDistributionQuestionIndex(){return revenueDistributionQuestionIndex;}
 
     
 }
