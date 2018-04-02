@@ -139,5 +139,42 @@ limitations under the License.
 		<property name="protocolActionCorrespondenceService" ref="protocolActionCorrespondenceService" />
 	</bean>
 
+
+  <bean id="protocolDao" parent="platformAwareDao" class="edu.arizona.kra.irb.dao.ojb.UaProtocolDaoOjb">
+    <property name="lookupDao">
+      <ref bean="lookupDao" />
+    </property>
+    <property name="dataDictionaryService">
+      <ref bean="dataDictionaryService" />
+    </property>
+  </bean>
+
+  <bean id="protocolSecurityService" class="edu.arizona.kra.irb.service.impl.ProtocolSecurityServiceImpl">
+    <property name="protocolDao">
+      <ref bean="protocolDao" />
+    </property>
+  </bean>
+
+  <bean id="protocolLookupableHelperService" class="edu.arizona.kra.irb.service.impl.ProtocolCustomLookupableHelperServiceImpl" scope="prototype" parent="parentLookupableHelperService">
+    <property name="protocolDao">
+      <ref bean="protocolDao" />
+    </property>
+    <property name="kcPersonService">
+      <ref bean="kcPersonService" />
+    </property>
+    <property name="kraAuthorizationService">
+      <ref bean="kraAuthorizationService" />
+    </property>
+    <property name="taskAuthorizationService">
+      <ref bean="taskAuthorizationService" />
+    </property>
+    <property name="documentService">
+      <ref bean="documentService" />
+    </property>
+    <property name="protocolSecurityService">
+      <ref bean="protocolSecurityService" />
+    </property>
+  </bean>
+
 </beans>
 
