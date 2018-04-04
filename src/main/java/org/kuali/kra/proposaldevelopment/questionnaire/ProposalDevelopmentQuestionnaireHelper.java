@@ -17,6 +17,7 @@ package org.kuali.kra.proposaldevelopment.questionnaire;
 
 import org.kuali.kra.bo.CoeusModule;
 import org.kuali.kra.infrastructure.TaskName;
+import org.kuali.kra.proposaldevelopment.bo.ProposalYnq;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.document.authorization.ProposalTask;
 import org.kuali.kra.proposaldevelopment.web.struts.form.ProposalDevelopmentForm;
@@ -30,12 +31,14 @@ public class ProposalDevelopmentQuestionnaireHelper extends QuestionnaireHelperB
     private static final long serialVersionUID = 8595107639632039291L;
 
     protected static final String REVENUE_DISTRIBUTION_QUESTION_ID="11018";
+    protected static final String OLD_REVENUE_DISTRIBUTION_QUESTION_ID="FA03";
 
     private ProposalDevelopmentForm proposalDevelopmentForm;
 
 
     private int revenueDistributionAnswerHeaderIndex = 0;
     private int revenueDistributionQuestionIndex = 0;
+    private boolean oldQuestionnaireVersion = false;
 
 
     public ProposalDevelopmentQuestionnaireHelper(ProposalDevelopmentForm form) {
@@ -102,17 +105,33 @@ public class ProposalDevelopmentQuestionnaireHelper extends QuestionnaireHelperB
      * @return
      */
     public void findRevenueQuestionIndex(){
+        int questionIndex = 0;
         if ( getAnswerHeaders().size() > 0 ) {
+
+            //has post 5.2.1 questionnaire version
+            oldQuestionnaireVersion = false;
+
             //pick the first answer header
             revenueDistributionAnswerHeaderIndex = 0;
-            int i = 0; AnswerHeader header = getAnswerHeaders().get(revenueDistributionAnswerHeaderIndex);
+            AnswerHeader header = getAnswerHeaders().get(revenueDistributionAnswerHeaderIndex);
             for(Answer answer : header.getAnswers()) {
-                if (answer.getQuestion().getQuestionId().equalsIgnoreCase(REVENUE_DISTRIBUTION_QUESTION_ID)) {
-                    revenueDistributionQuestionIndex = i;
+                if (answer.getQuestion().getQuestionId().equalsIgnoreCase(REVENUE_DISTRIBUTION_QUESTION_ID) ||
+                        answer.getQuestion().getQuestionId().equalsIgnoreCase(OLD_REVENUE_DISTRIBUTION_QUESTION_ID) ) {
+                    revenueDistributionQuestionIndex = questionIndex;
                     break;
                 }
-                i++;
+                questionIndex++;
             }
+        } else if (!getProposalDevelopmentDocument().getDevelopmentProposalList().isEmpty() && !getProposalDevelopmentDocument().getDevelopmentProposalList().get(0).getProposalYnqs().isEmpty()){
+            oldQuestionnaireVersion = true;
+            for (ProposalYnq proposalYnq: getProposalDevelopmentDocument().getDevelopmentProposalList().get(0).getProposalYnqs()){
+                if ( proposalYnq.getQuestionId().equalsIgnoreCase(OLD_REVENUE_DISTRIBUTION_QUESTION_ID)){
+                    revenueDistributionQuestionIndex = questionIndex;
+                    break;
+                }
+                questionIndex++;
+            }
+
         }
     }
 
@@ -121,5 +140,8 @@ public class ProposalDevelopmentQuestionnaireHelper extends QuestionnaireHelperB
 
     public int getRevenueDistributionQuestionIndex(){return revenueDistributionQuestionIndex;}
 
-    
+    public boolean hasOldQuestionnaireVersion(){return oldQuestionnaireVersion;}
+
+    public boolean isOldQuestionnaireVersion(){return oldQuestionnaireVersion;}
+
 }

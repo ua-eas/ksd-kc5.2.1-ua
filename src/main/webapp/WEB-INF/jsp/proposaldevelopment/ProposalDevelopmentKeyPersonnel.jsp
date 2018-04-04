@@ -154,6 +154,8 @@
 
     <br/>
       <kra-pd:keyPersons/>
+
+
   <c:if test="${not empty KualiForm.questionnaireHelper}">
       <kra-questionnaire:revenueDistributionAnswer bean="${KualiForm.questionnaireHelper}" property="questionnaireHelper"  />
   </c:if>
