@@ -19,24 +19,54 @@
 <%@ attribute name="property" required="true" %>
 
 
- <c:set var="answerHeaderIndex" value="${bean.revenueDistributionAnswerHeaderIndex}"/>
+
  <c:set var="questionIndex" value="${bean.revenueDistributionQuestionIndex}"/>
- <c:if test="${fn:length(bean.answerHeaders) > 0 and questionIndex > 0}">
-     <c:if test="${bean.answerHeaders[answerHeaderIndex]!=null and  bean.answerHeaders[answerHeaderIndex].answers!=null and bean.answerHeaders[answerHeaderIndex].answers[questionIndex]!= null }">
-         <c:set var="answer" value="${bean.answerHeaders[answerHeaderIndex].answers[questionIndex]}" />
+ <c:if test="${bean.revenueDistributionQuestionIndex > 0}">
+     <c:if test="${not bean.oldQuestionnaireVersion}">
+         <c:set var="answerHeaderIndex" value="${bean.revenueDistributionAnswerHeaderIndex}"/>
+         <c:if test="${bean.answerHeaders[answerHeaderIndex]!=null and  bean.answerHeaders[answerHeaderIndex].answers!=null and bean.answerHeaders[answerHeaderIndex].answers[questionIndex]!= null }">
+             <c:set var="answer" value="${bean.answerHeaders[answerHeaderIndex].answers[questionIndex]}" />
+             <div class="questionnaireContent">
+                 <table class="content_table question">
+                     <tr>
+                         <td class="content_questionnaire">
+                             <div class="Qdiv" >
+                                 <div class="Qquestiondiv">
+                                     <span class="Qquestion">${answer.question.question}</span>
+                                 </div>
+                                 <c:choose>
+                                     <c:when test = "${answer.answer == 'Y'}" >
+                                         Yes
+                                     </c:when>
+                                     <c:when test = "${answer.answer == 'N'}" >
+                                         No
+                                     </c:when>
+                                     <c:otherwise>
+                                         N/A
+                                     </c:otherwise>
+                                 </c:choose>
+                             </div>
+                         </td>
+                     </tr>
+                 </table>
+             </div>
+         </c:if>
+     </c:if>
+     <c:if test="${bean.oldQuestionnaireVersion }">
+         <c:set var="proposalYnq" value="${KualiForm.document.developmentProposalList[0].proposalYnqs[questionIndex]}" />
          <div class="questionnaireContent">
              <table class="content_table question">
                  <tr>
                      <td class="content_questionnaire">
                          <div class="Qdiv" >
                              <div class="Qquestiondiv">
-                                 <span class="Qquestion">${answer.question.question}</span>
+                                 <span class="Qquestion">${proposalYnq.ynq.description}</span>
                              </div>
                              <c:choose>
-                                 <c:when test = "${answer.answer == 'Y'}" >
+                                 <c:when test = "${proposalYnq.answer == 'Y'}" >
                                      Yes
                                  </c:when>
-                                 <c:when test = "${answer.answer == 'N'}" >
+                                 <c:when test = "${proposalYnq.answer == 'N'}" >
                                      No
                                  </c:when>
                                  <c:otherwise>
@@ -48,5 +78,5 @@
                  </tr>
              </table>
          </div>
-     </c:if>
- </c:if>
+    </c:if>
+</c:if>
