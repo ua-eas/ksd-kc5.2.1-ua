@@ -60,7 +60,7 @@
 	<c:set var="isOpen" value="${hasErrors ? true : isOpen}"/>
 			
 	<kul:tab tabTitle="${fn:substring(person.fullName, 0, 22)}"
-         tabDescription="${person.investigatorRoleDescription}${extraButtonSource}"
+         tabDescription="${person.role.description}${extraButtonSource}"
          leftSideHtmlProperty="${leftSideHtmlProperty}" 
          leftSideHtmlAttribute="${proposalPersonAttributes.delete}" 
      	 leftSideHtmlDisabled="false"
