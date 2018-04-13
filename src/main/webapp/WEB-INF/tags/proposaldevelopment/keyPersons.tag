@@ -59,7 +59,7 @@
 		auditMatch="document.developmentProposalList[0].proposalPersons[${status.index}]*"/>
 	<c:set var="isOpen" value="${hasErrors ? true : isOpen}"/>
 			
-	<kul:tab tabTitle="${fn:substring(person.fullName, 0, 22)}
+	<kul:tab tabTitle="${fn:substring(person.fullName, 0, 22)}"
          tabDescription="${person.role.description}${extraButtonSource}"
          leftSideHtmlProperty="${leftSideHtmlProperty}" 
          leftSideHtmlAttribute="${proposalPersonAttributes.delete}" 
