@@ -75,7 +75,7 @@
 							<div align=center>${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].fullName}&nbsp;</div>
 						</td>
 						<td>
-							<div align=center>${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].role.description}
+							<div align=center>${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].investigatorRoleDescription}
 							<c:if test="${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].role.proposalPersonRoleId == keypersonrole }">
 							(${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].projectRole})
 							</c:if>
