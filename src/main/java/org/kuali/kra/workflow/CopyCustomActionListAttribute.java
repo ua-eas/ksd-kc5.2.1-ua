@@ -42,7 +42,7 @@ public class CopyCustomActionListAttribute implements CustomActionListAttribute 
     @Override
     public ActionSet getLegalActions(String principalId, ActionItem actionItem) throws Exception {
     	ActionSet as = ActionSet.Builder.create().build();
-    	as.addAction("P");
+    	as.addFyi();
     	return as;
     }
 }
