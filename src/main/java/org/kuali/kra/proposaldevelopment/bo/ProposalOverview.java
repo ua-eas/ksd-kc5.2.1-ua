@@ -87,6 +87,8 @@ public class ProposalOverview extends KraPersistableBusinessObjectBase {
 
     private String creationStatusCode;
 
+    private String deadlineTime;
+
     public String getProposalNumber() {
         return proposalNumber;
     }
@@ -349,5 +351,13 @@ public class ProposalOverview extends KraPersistableBusinessObjectBase {
 
     public void setDocumentNumber(String documentNumber) {
         this.documentNumber = documentNumber;
+    }
+
+    public String getDeadlineTime() {
+        return deadlineTime;
+    }
+
+    public void setDeadlineTime(String deadlineTime) {
+        this.deadlineTime = deadlineTime;
     }
 }
