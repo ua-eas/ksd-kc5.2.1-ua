@@ -19,6 +19,7 @@
                 <ref bean="ProposalDevelopmentRoutingState-developmentProposal.proposalNumber"/>
                 <ref bean="ProposalDevelopmentRoutingState-documentNumber"/>
                 <ref bean="ProposalDevelopmentRoutingState-document.documentNumber"/>
+                <ref bean="ProposalDevelopmentRoutingState-initiatorPrincipalName"/>
                 <ref bean="ProposalDevelopmentRoutingState-proposalTitle"/>
                 <ref bean="ProposalDevelopmentRoutingState-sponsorName"/>
                 <ref bean="ProposalDevelopmentRoutingState-sponsorCode"/>
@@ -26,6 +27,8 @@
                 <ref bean="ProposalDevelopmentRoutingState-sponsor.sponsorCode" />
                 <ref bean="ProposalDevelopmentRoutingState-deadlineDate"/>
                 <ref bean="ProposalDevelopmentRoutingState-deadlineTime"/>
+                <ref bean="ProposalDevelopmentRoutingState-deadlineDateTime"/>
+                <ref bean="ProposalDevelopmentRoutingState-deadlineType"/>
                 <ref bean="ProposalDevelopmentRoutingState-principalInvestigatorName"/>      
                 <ref bean="ProposalDevelopmentRoutingState-proposalPersonName"/>           
                 <ref bean="ProposalDevelopmentRoutingState-leadUnit.unitNumber"/>
@@ -103,6 +106,14 @@
                 </list>
               </property>
             </bean>
+              <bean parent="RelationshipDefinition">
+                  <property name="objectAttributeName" value="initiatorPerson"/>
+                  <property name="supportAttributes">
+                      <list>
+                          <bean parent="SupportAttributeDefinition" p:identifier="true" p:sourceName="initiatorPrincipalName" p:targetName="principalName"/>
+                      </list>
+                  </property>
+              </bean>
           </list>
          </property>
        
@@ -138,6 +149,14 @@
         <property name="name" value="proposalDocument.documentNumber" />
         <property name="label" value="Document Number" />
         <property name="shortLabel" value="Doc Number" />
+    </bean>
+
+
+    <bean id="ProposalDevelopmentRoutingState-initiatorPrincipalName" parent="ProposalDevelopmentRoutingState-initiatorPrincipalName-parentBean" />
+    <bean id="ProposalDevelopmentRoutingState-initiatorPrincipalName-parentBean" abstract="true" parent="DocumentSearchCriteria-initiatorPrincipalName">
+        <property name="name" value="initiatorPrincipalName" />
+        <property name="label" value="Proposal Initiator NetID" />
+        <property name="shortLabel" value="Initiator" />
     </bean>
        
     <bean id="ProposalDevelopmentRoutingState-proposalTitle" parent="ProposalDevelopmentRoutingState-proposalTitle-parentBean" />
@@ -192,6 +211,25 @@
         <property name="shortLabel" value="Sponsor Deadline Time" />
         <property name="required" value="false" />
     </bean>
+
+    <bean id="ProposalDevelopmentRoutingState-deadlineDateTime" parent="ProposalDevelopmentRoutingState-deadlineDateTime-parentBean" />
+    <bean id="ProposalDevelopmentRoutingState-deadlineDateTime-parentBean" abstract="true" parent="AttributeReferenceDummy-genericDate">
+        <property name="name" value="sponsorDeadlineDateTime" />
+        <property name="label" value="Sponsor Deadline" />
+        <property name="shortLabel" value="Sponsor Deadline" />
+        <property name="required" value="false" />
+        <property name="formatterClass" value="org.kuali.rice.core.web.format.TimestampAMPMFormatter"/>
+        <property name="summary" value="The Deadline Date of the Proposal" />
+        <property name="description" value="The date in which the proposal is due to the sponsoring agency.  Additional deadlines may be set by the office authorized to submit proposals on behalf of the institution (e.g. sponsored programs, etc.)." />
+    </bean>
+
+    <bean id="ProposalDevelopmentRoutingState-deadlineType" parent="ProposalDevelopmentRoutingState-deadlineType-parentBean" />
+    <bean id="ProposalDevelopmentRoutingState-deadlineType-parentBean" abstract="true" parent="DevelopmentProposal-deadlineType">
+        <property name="name" value="deadlineType" />
+        <property name="label" value="Sponsor Deadline Type" />
+        <property name="shortLabel" value="Sponsor Deadline Type" />
+        <property name="required" value="false" />
+    </bean>
     
     <bean id="ProposalDevelopmentRoutingState-principalInvestigatorName" parent="ProposalDevelopmentRoutingState-principalInvestigatorName-parentBean" />
     <bean id="ProposalDevelopmentRoutingState-principalInvestigatorName-parentBean" abstract="true" parent="DevelopmentProposal-principalInvestigatorName">
@@ -217,6 +255,7 @@
         <property name="description" value="Limit search to specific researcher participating in a proposal as a PI/Co-I" />
         
     </bean>
+
     
     <bean id="ProposalDevelopmentRoutingState-leadUnit.unitNumber" parent="ProposalDevelopmentRoutingState-leadUnit.unitNumber-parentBean" />
     <bean id="ProposalDevelopmentRoutingState-leadUnit.unitNumber-parentBean" abstract="true" parent="AttributeDefinition">
@@ -440,13 +479,14 @@
             	<bean parent="FieldDefinition" p:attributeName="routeStopName" p:defaultValue="OSPOfficeRouting"/>
                 <bean parent="FieldDefinition" p:attributeName="nodeStopLeadUnit.unitNumber" p:forceLookup="true" />
                 <bean parent="FieldDefinition" p:attributeName="routeStopDate"/>
-                <bean parent="FieldDefinition" p:attributeName="developmentProposal.proposalNumber" p:forceLookup="true" />
                 <bean parent="FieldDefinition" p:attributeName="proposalDocument.documentNumber" />
                 <bean parent="FieldDefinition" p:attributeName="proposalTitle"/>
                 <bean parent="FieldDefinition" p:attributeName="sponsor.sponsorCode" p:hidden="true" />
                 <bean parent="FieldDefinition" p:attributeName="sponsor.sponsorName" p:forceLookup="true" />
                 <bean parent="FieldDefinition" p:attributeName="sponsorDeadlineDate"/>
+                <bean parent="FieldDefinition" p:attributeName="deadlineType"/>
                 <bean parent="FieldDefinition" p:attributeName="proposalPersonName"/>
+                <bean parent="FieldDefinition" p:attributeName="initiatorPrincipalName" p:forceLookup="true" />
                 <bean parent="FieldDefinition" p:attributeName="leadUnit.unitNumber" p:forceLookup="true" />
                 <bean parent="FieldDefinition" p:attributeName="leadUnit.parentUnitNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="workflowUnit.unitNumber" p:forceLookup="true" />
@@ -456,19 +496,19 @@
             <list>
                 <bean parent="FieldDefinition" p:attributeName="routeStopDate"/>
 				        <bean parent="FieldDefinition" p:attributeName="routeStopName"/>
-                <bean parent="FieldDefinition" p:attributeName="proposalNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="proposalDocumentNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="proposalTitle"/>
                 <bean parent="FieldDefinition" p:attributeName="sponsorName"/>
-                <bean parent="FieldDefinition" p:attributeName="sponsorDeadlineDate"/>
-                <bean parent="FieldDefinition" p:attributeName="sponsorDeadlineTime"/>
+                <bean parent="FieldDefinition" p:attributeName="sponsorDeadlineDateTime"/>
+                <bean parent="FieldDefinition" p:attributeName="deadlineType"/>
                 <bean parent="FieldDefinition" p:attributeName="principalInvestigatorName"/>
                 <bean parent="FieldDefinition" p:attributeName="leadUnitNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="leadUnitName"/>
-                <bean parent="FieldDefinition" p:attributeName="routeLog"/>
                 <bean parent="FieldDefinition" p:attributeName="finalProposalReceivedTime" />
                 <bean parent="FieldDefinition" p:attributeName="SPSReviewerName"/>
                 <bean parent="FieldDefinition" p:attributeName="ORDExpedited"/>
+                <bean parent="FieldDefinition" p:attributeName="initiatorPrincipalName"/>
+                <bean parent="FieldDefinition" p:attributeName="routeLog"/>
             </list>
         </property>
     </bean>

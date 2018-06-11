@@ -15,11 +15,11 @@
  */
 package edu.arizona.kra.proposaldevelopment;
 
+import org.kuali.rice.krad.util.KRADConstants;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.kuali.rice.krad.util.KRADConstants;
 
 /**
  * PropDev Routing State Dashboard Constants
@@ -35,10 +35,10 @@ public final class PropDevRoutingStateConstants {
     public static final String SPS_REVIEWER_ROLE_NAME = "SPS Proposal Reviewer";
 
     
-    public static final String SQL_LOOKUP =  "select actions.nodeStopDate AS stop_date, rn.NM AS node_name, prop.PROPOSAL_NUMBER AS proposal_number, doc.DOC_HDR_ID AS document_number, prop.TITLE AS proposal_title,"
+    public static final String SQL_LOOKUP =  "select actions.nodeStopDate AS stop_date, rn.NM AS node_name,  prop.PROPOSAL_NUMBER AS proposal_number, prop.DEADLINE_TYPE as deadline_type, doc.DOC_HDR_ID AS document_number, persons.prncpl_nm as document_initiator, prop.TITLE AS proposal_title,"
             +" s.SPONSOR_NAME AS sponsor_name, s.SPONSOR_CODE AS sponsor_code, prop.DEADLINE_DATE AS sponsor_deadline_date, prop.DEADLINE_TIME AS sponsor_deadline_time, pers.FULL_NAME AS principal_investigator, prop.OWNED_BY_UNIT AS lead_unit, "
             +" u.UNIT_NAME AS lead_unit_name, actions.annot AS annotation, CASE WHEN tmp.ord_expedited IS NULL THEN 'N' ELSE tmp.ord_expedited END AS ord_expedited, tmp.full_name as sps_reviewer, tmp.person_id as sps_id, tmp.received_time as final_prop_received"
-            +" FROM krew_doc_hdr_t doc, krew_rte_node_t rn, krew_rte_node_instn_t rni, "
+            +" FROM krew_doc_hdr_t doc, krew_rte_node_t rn, krew_rte_node_instn_t rni,  krim_entity_cache_t persons,"
             + " eps_proposal prop LEFT OUTER JOIN (select COALESCE(ordexp.proposal_number, sps.proposal_number, notes.proposal_number) AS proposal_nbr, ord_expedited, full_name, person_id, received_time FROM"
             + " (SELECT * FROM eps_prop_ord_expedited WHERE eps_prop_ord_expedited.cur_ind=1) ordexp FULL OUTER JOIN (SELECT * FROM eps_prop_sps_reviewer WHERE eps_prop_sps_reviewer.cur_ind=1) sps ON ordexp.proposal_number = sps.proposal_number"
             + " FULL OUTER JOIN (SELECT proposal_number, received_time FROM ( SELECT proposal_number, TO_TIMESTAMP(PROPOSAL_RECEIVED_DATE || ' ' ||PROPOSAL_RECEIVED_TIME, 'DD-MON-YY HH:MI AM') as received_time,"
@@ -60,6 +60,7 @@ public final class PropDevRoutingStateConstants {
             +" AND rni.RTE_NODE_INSTN_ID=actions.actnRteNodeInstanceId AND rn.rte_node_id = rni.RTE_NODE_ID"
             +" AND s.SPONSOR_CODE = prop.SPONSOR_CODE"
             +" AND u.UNIT_NUMBER = prop.OWNED_BY_UNIT"
+            +" AND doc.INITR_PRNCPL_ID = persons.PRNCPL_ID"
             +" AND pers.PROPOSAL_NUMBER = prop.PROPOSAL_NUMBER AND pers.PROP_PERSON_ROLE_ID='PI'";
 
     public static final String ORD_EXPEDITED_QUERY = "select ord_expedited FROM eps_prop_ord_expedited WHERE cur_ind=1 AND proposal_number=?";
@@ -98,11 +99,13 @@ public final class PropDevRoutingStateConstants {
     public static final String COL_ANNOTATION= "annotation";
     public static final String COL_PROPOSAL_NUMBER = "proposal_number";
     public static final String COL_DOCUMENT_NUMBER = "document_number";
+    public static final String COL_DOC_INITIATOR = "document_initiator";
     public static final String COL_PROPOSAL_TITLE = "proposal_title";
     public static final String COL_SPONSOR_NAME = "sponsor_name";
     public static final String COL_SPONSOR_CODE = "sponsor_code";
     public static final String COL_SPONSOR_DEADLINE_DATE = "sponsor_deadline_date";
     public static final String COL_SPONSOR_DEADLINE_TIME = "sponsor_deadline_time";
+    public static final String COL_DEADLINE_TYPE = "deadline_type";
     public static final String COL_PRINCIPAL_INVESTIGATOR = "principal_investigator";
     public static final String COL_LEAD_UNIT = "lead_unit";
     public static final String COL_LEAD_UNIT_NAME = "lead_unit_name";
@@ -126,6 +129,8 @@ public final class PropDevRoutingStateConstants {
     public static final String LEAD_UNIT = "leadUnit.unitNumber";
     public static final String LEAD_COLLEGE = "leadUnit.parentUnitNumber";
     public static final String WORKFLOW_UNIT = "workflowUnit.unitNumber";
+    public static final String DEADLINE_TYPE = "deadlineType";
+    public static final String INITIATOR = "initiatorPrincipalName";
 
     public static final String NODE_NAME_CRITERIA = " AND rn.NM = '";
     public static final String SPONSOR_NAME_CRITERIA = " AND lower(s.SPONSOR_NAME) LIKE '%";
@@ -143,6 +148,8 @@ public final class PropDevRoutingStateConstants {
     public static final String ORDER_CRITERIA = " ORDER BY stop_date";
     public static final String WORKFLOW_UNITS_CRITERIA = " AND prop.owned_by_unit IN (";
     public static final String WORKFLOW_UNITS_CRITERIA_CONT = ") ";
+    public static final String DEADLINE_TYPE_CRITERIA = " AND prop.DEADLINE_TYPE='";
+    public static final String INITIATOR_CRITERIA = " AND persons.prncpl_nm='";
 
     public static final String DATE_QUERY_PREFIX = "to_date('";
     public static final String DATE_FORMAT_STR = "','MM/DD/RRRR')";
@@ -163,6 +170,14 @@ public final class PropDevRoutingStateConstants {
     public static final String NODE_KEY_HIERARCHY = "Hierarchy Request";
     public static final String NODE_KEY_INITIATED = "Initiated";
 
+    public static final String DEADLINE_TYPE_NONE_LABEL = "None";
+    public static final String DEADLINE_TYPE_POSTMARK_LABEL = "Postmark";
+    public static final String DEADLINE_TYPE_RECEIPT_LABEL = "Receipt";
+    public static final String DEADLINE_TYPE_TARGET_LABEL = "Target";
+    public static final String DEADLINE_TYPE_POSTMARK = "P";
+    public static final String DEADLINE_TYPE_RECEIPT = "R";
+    public static final String DEADLINE_TYPE_TARGET = "T";
+
     public static final String YES = "Y";
     public static final String NO = "N";
 
@@ -172,6 +187,7 @@ public final class PropDevRoutingStateConstants {
     
     public static final String PROP_NUMBER = "proposalNumber";
     public static final String CREATED_DATE = "createdDate";
+
     public static final String ACTIVE = "active";
     
     static {
@@ -182,6 +198,8 @@ public final class PropDevRoutingStateConstants {
         aMap.put(DOCUMENT_NUMBER, DOC_NUMBER_CRITERIA);
         aMap.put(SPONSOR_CODE, SPONSOR_CODE_CRITERIA);
         aMap.put(LEAD_UNIT, UNIT_CRITERIA);
+        aMap.put(DEADLINE_TYPE, DEADLINE_TYPE_CRITERIA);
+        aMap.put(INITIATOR, INITIATOR_CRITERIA);
         SEARCH_QUERIES = Collections.unmodifiableMap(aMap);
 
         //this maps the user search criteria that translate to a LIKE % in the main query
