@@ -31,7 +31,7 @@ var replaceWordChars = function(taElement) {
 
 jQuery( document ).ready(function() {
 	// Show loader for hyperlinks.
-	jQuery('a').click(function(e) {
+	jQuery('#lookup-results a').click(function(e) {
 		e.preventDefault();
 		createLoading(true);
 		window.location.href = jQuery(this).attr('href');
