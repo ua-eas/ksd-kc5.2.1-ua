@@ -486,7 +486,7 @@
                 <bean parent="FieldDefinition" p:attributeName="sponsorDeadlineDate"/>
                 <bean parent="FieldDefinition" p:attributeName="deadlineType"/>
                 <bean parent="FieldDefinition" p:attributeName="proposalPersonName"/>
-                <bean parent="FieldDefinition" p:attributeName="initiatorPrincipalName" p:forceLookup="true" />
+                <bean parent="FieldDefinition" p:attributeName="initiatorPrincipalName" p:useShortLabel="true" p:forceLookup="true" />
                 <bean parent="FieldDefinition" p:attributeName="leadUnit.unitNumber" p:forceLookup="true" />
                 <bean parent="FieldDefinition" p:attributeName="leadUnit.parentUnitNumber"/>
                 <bean parent="FieldDefinition" p:attributeName="workflowUnit.unitNumber" p:forceLookup="true" />
@@ -507,7 +507,7 @@
                 <bean parent="FieldDefinition" p:attributeName="finalProposalReceivedTime" />
                 <bean parent="FieldDefinition" p:attributeName="SPSReviewerName"/>
                 <bean parent="FieldDefinition" p:attributeName="ORDExpedited"/>
-                <bean parent="FieldDefinition" p:attributeName="initiatorPrincipalName"/>
+                <bean parent="FieldDefinition" p:attributeName="initiatorPrincipalName" p:useShortLabel="true"/>
                 <bean parent="FieldDefinition" p:attributeName="routeLog"/>
             </list>
         </property>
