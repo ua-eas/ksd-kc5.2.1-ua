@@ -509,8 +509,9 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
 
 
     private static java.sql.Date addTimestampToDate(java.sql.Date date, String time){
-        if ( StringUtils.isEmpty( time ))
-            return date;
+        if ( StringUtils.isEmpty( time )) {
+            time = "5:00 PM";
+        }
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
             Date temp = sdf.parse(time);

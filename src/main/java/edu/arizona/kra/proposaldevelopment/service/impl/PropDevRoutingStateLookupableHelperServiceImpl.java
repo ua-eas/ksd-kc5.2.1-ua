@@ -15,8 +15,10 @@
  */
 package edu.arizona.kra.proposaldevelopment.service.impl;
 
-import java.util.*;
-
+import edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants;
+import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
+import edu.arizona.kra.proposaldevelopment.service.CustomAuthorizationService;
+import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.common.util.StringUtils;
@@ -35,10 +37,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
 
-import edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants;
-import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
-import edu.arizona.kra.proposaldevelopment.service.CustomAuthorizationService;
-import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
+import java.util.*;
 
 
 /**
@@ -55,7 +54,7 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
     private static final String SEARCH_RESULT_PROPERTY_NAME_LEAD_UNIT_NAME = "leadUnitName";
     private static final String SEARCH_RESULT_PROPERTY_NAME_ORD_EXPEDITED = "ORDExpedited";
     private static final String SEARCH_RESULT_PROPERTY_NAME_SPS_REVIEWER = "SPSReviewerName";
-    private static final String SEARCH_RESULT_PROPERTY_NAME_RECEIVED_TIME = "finalProposalReceivedTime";
+    private static final String SEARCH_RESULT_PROPERTY_NAME_INITIATOR = "initiatorPrincipalName";
     
     private static final String PROPDEV_DOCUMENT = "ProposalDevelopmentDocument";
     private static final String PROPDEV_NUMBER = "proposalNumber";
@@ -209,6 +208,9 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
         else if (SEARCH_RESULT_PROPERTY_NAME_ORD_EXPEDITED.equals(propertyName) && canAssignORDExpedited()){
             return generateORDExpeditedUrl(propDevRteState);
         }
+        else if (SEARCH_RESULT_PROPERTY_NAME_INITIATOR.equals(propertyName) ){
+            return generateInitiatorUrl(propDevRteState.getInitiatorPrincipalName());
+        }
         return super.getInquiryUrl(bo, propertyName);
     }
 
@@ -269,6 +271,20 @@ public class PropDevRoutingStateLookupableHelperServiceImpl extends KraLookupabl
         String url = ConfigContext.getCurrentContextConfig().getProperty(Config.KR_URL) +
                 "/inquiry.do?businessObjectClassName=org.kuali.kra.bo.Unit&unitNumber="+leadUnitNumber+"&methodToCall=start";
         link.setHref(url);
+        return link;
+    }
+
+    protected HtmlData.AnchorHtmlData generateInitiatorUrl(String netID) {
+        HtmlData.AnchorHtmlData link = new HtmlData.AnchorHtmlData();
+
+        if(org.apache.commons.lang.StringUtils.isNotBlank(netID)) {
+            link.setTarget("_blank");
+            link.setDisplayText(netID);
+            link.setTitle("Proposal Initiator NetID=" + netID);
+
+            String url = ConfigContext.getCurrentContextConfig().getProperty(Config.KIM_URL) + "/identityManagementPersonInquiry.do?principalName=" + netID;
+            link.setHref(url);
+        }
         return link;
     }
     
