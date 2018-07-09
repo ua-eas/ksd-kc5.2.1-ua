@@ -30,13 +30,7 @@ var replaceWordChars = function(taElement) {
 }
 
 jQuery( document ).ready(function() {
-	// Show loader for hyperlinks.
-	jQuery('#lookup-results a').click(function(e) {
-		e.preventDefault();
-		createLoading(true);
-		window.location.href = jQuery(this).attr('href');
-	});
-
+	
 	/* Show/Hide search criteria on the lookups */
 	jQuery("#lookup-criteria-toggle").click(function(event){
 		
