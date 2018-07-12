@@ -53,8 +53,9 @@ if (top.location != self.location) {
           <a class="portal_link" onclick="document.getElementById('backdoor-form').submit();">
 		    <span class="icon-enter"></span>
 		  </a>
+            <kul:csrf/>
         </html:form>
-      </c:if> 
+      </c:if>
 </div>
 
 </c:if>

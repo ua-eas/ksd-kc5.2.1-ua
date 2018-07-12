@@ -15,7 +15,7 @@
 --%>
 
 <%@ include file="/rice-portal/jsp/sys/riceTldHeader.jsp" %>
-
+<kul:csrf />
 <%-- 
 
 This is where application specific (kra) tag includes would go.

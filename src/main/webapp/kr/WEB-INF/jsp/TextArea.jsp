@@ -157,8 +157,10 @@ if (textAreaFieldLabel == null) {
 	<html:hidden property="formKey" value="${formKey}"/>
 	<html:hidden property="docFormKey" value="${docFormKey}"/>
 	<html:hidden property="refreshCaller" value="TextAreaRefresh"/>
+	<kul:csrf />
 
-    <c:if test="${not empty parameters}">
+
+	<c:if test="${not empty parameters}">
       <c:forEach items="${parameters}" var="mapEntry" >
         <c:if test="${not fn:contains(mapEntry.key,'methodToCall')}">
         <html:hidden property="${mapEntry.key}" value="${mapEntry.value[0]}"/>
