@@ -16,29 +16,25 @@
 package edu.arizona.kra.proposaldevelopment.dao.ojb;
 
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-
-import edu.arizona.kra.util.DBConnection;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.ojb.broker.accesslayer.LookupException;
-import org.kuali.rice.krad.dao.impl.LookupDaoOjb;
-import org.kuali.rice.krad.util.GlobalVariables;
-import org.springframework.transaction.annotation.Transactional;
-
-import static edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants.*;
 import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
 import edu.arizona.kra.proposaldevelopment.bo.SPSReviewer;
 import edu.arizona.kra.proposaldevelopment.dao.PropDevRoutingStateDao;
 import edu.arizona.kra.proposaldevelopment.lookup.PropDevRouteStopValueFinder;
+import edu.arizona.kra.util.DBConnection;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ojb.broker.accesslayer.LookupException;
+import org.kuali.rice.krad.dao.impl.LookupDaoOjb;
+import org.kuali.rice.krad.util.GlobalVariables;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants.*;
 
 
 /**
@@ -48,7 +44,8 @@ import edu.arizona.kra.proposaldevelopment.lookup.PropDevRouteStopValueFinder;
 
 public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRoutingStateDao {
     private static final Logger LOG = LoggerFactory.getLogger(PropDevRoutingStateDaoOjb.class);
-    private static final PropDevRouteStopValueFinder nodeNameFinder = new PropDevRouteStopValueFinder();  
+    private static final PropDevRouteStopValueFinder nodeNameFinder = new PropDevRouteStopValueFinder();
+
 
     @Override
     public List<ProposalDevelopmentRoutingState> getPropDevRoutingState(Map<String, String> searchCriteria) throws SQLException, LookupException {        
@@ -76,12 +73,15 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
                     rtState.setRouteStopDate( rs.getTimestamp(COL_STOP_DATE));
                     rtState.setRouteStopName( getRouteStopLabel(rs.getString(COL_NODE_NAME), annotation));
                     rtState.setProposalNumber( rs.getString(COL_PROPOSAL_NUMBER));
+                    rtState.setDeadlineType( getDeadlineTypeLabel(rs.getString(COL_DEADLINE_TYPE)));
                     rtState.setProposalDocumentNumber( documentNumber );
+                    rtState.setInitiatorPrincipalName( rs.getString(COL_DOC_INITIATOR));
                     rtState.setProposalTitle( rs.getString(COL_PROPOSAL_TITLE));
                     rtState.setSponsorName( rs.getString(COL_SPONSOR_NAME));
                     rtState.setSponsorCode( rs.getString(COL_SPONSOR_CODE));
                     rtState.setSponsorDeadlineDate( rs.getDate(COL_SPONSOR_DEADLINE_DATE));
                     rtState.setSponsorDeadlineTime( rs.getString(COL_SPONSOR_DEADLINE_TIME));
+                    rtState.setSponsorDeadlineDateTime( addTimestampToDate(rtState.getSponsorDeadlineDate(), rtState.getSponsorDeadlineTime()));
                     rtState.setPrincipalInvestigatorName( rs.getString(COL_PRINCIPAL_INVESTIGATOR));
                     rtState.setLeadUnitNumber( rs.getString(COL_LEAD_UNIT));
                     rtState.setLeadUnitName( rs.getString(COL_LEAD_UNIT_NAME));
@@ -152,12 +152,11 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
             query.insert(annotationCriteriaOffset, LEAD_UNIT_ANNOT_CRITERIA+routeUnitNumber+"%'");
         }
 
-
         if ( searchCriteria.containsKey(PROPOSAL_PERSON_NAME) && StringUtils.isNotEmpty(searchCriteria.get(PROPOSAL_PERSON_NAME))){
             String ppName = searchCriteria.get(PROPOSAL_PERSON_NAME).replaceAll("[\"?]", "");
             query.append(PROPOSAL_PERSON_NAME_CRITERIA);
             query.append(StringUtils.lowerCase(ppName.replaceAll("[*]", "%")));
-            query.append("%')"); 
+            query.append("%')");
         } 
 
         if ( searchCriteria.containsKey(LEAD_COLLEGE) && StringUtils.isNotEmpty(searchCriteria.get(LEAD_COLLEGE))){
@@ -247,6 +246,18 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
             }
         }
         return routeStopName;
+    }
+
+    private String getDeadlineTypeLabel(String deadlineType){
+        if (StringUtils.isNotEmpty(deadlineType)){
+            if ( DEADLINE_TYPE_POSTMARK.equalsIgnoreCase(deadlineType) )
+                return  DEADLINE_TYPE_POSTMARK_LABEL;
+            else if (DEADLINE_TYPE_RECEIPT.equalsIgnoreCase(deadlineType))
+                return DEADLINE_TYPE_RECEIPT_LABEL;
+            else if (DEADLINE_TYPE_TARGET.equalsIgnoreCase(deadlineType))
+                return DEADLINE_TYPE_TARGET_LABEL;
+        }
+        return DEADLINE_TYPE_NONE_LABEL;
     }
 
     @Override
@@ -496,5 +507,27 @@ public class PropDevRoutingStateDaoOjb extends LookupDaoOjb implements PropDevRo
         return unitNumbers;
     }
 
+
+    private static java.sql.Date addTimestampToDate(java.sql.Date date, String time){
+        if ( StringUtils.isEmpty( time )) {
+            time = "5:00 PM";
+        }
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+            Date temp = sdf.parse(time);
+
+            Calendar cal = Calendar.getInstance(); // creates calendar
+            cal.setTime(date);
+            cal.add(Calendar.HOUR_OF_DAY, temp.getHours());
+            cal.add(Calendar.MINUTE, temp.getMinutes());
+
+            return new java.sql.Date(cal.getTimeInMillis());
+
+        } catch (Exception e){
+            LOG.info("Exception parsing time: "+time);
+        }
+        return date;
+
+    }
 
 }
