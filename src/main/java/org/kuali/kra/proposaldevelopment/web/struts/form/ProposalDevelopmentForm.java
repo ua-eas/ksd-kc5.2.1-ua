@@ -252,7 +252,7 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
     private boolean canEditSPSRestrictedNotes;
     private SPSRestrictedNote newSPSRestrictedNote;
     private List<SPSRestrictedNote> SPSRestrictedNotes;
-    
+
 
     public ProposalDevelopmentForm() {
         super();
@@ -2176,5 +2176,7 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
     public boolean canEditSPSRestrictedNotes(){
         return canEditSPSRestrictedNotes;      
     }
+
+
 
 }
