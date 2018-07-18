@@ -30,6 +30,18 @@ var replaceWordChars = function(taElement) {
 }
 
 jQuery( document ).ready(function() {
+    // Show loader for hyperlinks that contain displayDocSearchView in the href url. This applies to links for the Document Id in the Document Search and the Actions in the Development Proposal Lookup.
+    jQuery('#lookup-results a[href*="displayDocSearchView"]').click(function(e) {
+
+        var targetValue = jQuery(this).attr('target');
+
+        //We will only create the loading page if the document or action opens in the same window.  This will ignore the links on the Proposal Routing Dashboard because we don't want them to be impacted.
+        if(targetValue != '_blank'){
+            e.preventDefault();
+            createLoading(true);
+            window.location.href = jQuery(this).attr('href');
+        }
+    });
 	
 	/* Show/Hide search criteria on the lookups */
 	jQuery("#lookup-criteria-toggle").click(function(event){
