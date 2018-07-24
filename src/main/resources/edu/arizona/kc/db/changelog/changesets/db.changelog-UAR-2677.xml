@@ -7,13 +7,14 @@
             Adding parameter for CSRF protection
         </comment>
         <sql>
-            INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VAL, PARM_DESC_TXT, PARM_TYP_CD, EVAL_OPRTR_CD, OBJ_ID, VER_NBR) VALUES ('KC', 'KC-GEN', 'All', 'CSRF_PROTECTION_ENABLED', 'Y', 'CSRF protection.', 'CONFG', 'A', sys_guid(), 1);
+            INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VAL, PARM_DESC_TXT, PARM_TYP_CD, EVAL_OPRTR_CD, OBJ_ID, VER_NBR) 
+            VALUES ('KC', 'KC-SYS', 'Config', 'CSRF_PROTECTION_ENABLED', 'Y', 'CSRF protection.', 'CONFG', 'A', sys_guid(), 1);
         </sql>
         <rollback>
             delete from KRCR_PARM_T
                 where APPL_ID= 'KC'
-                and NMSPC_CD = 'KC-GEN'
-                and CMPNT_CD = 'All'
+                and NMSPC_CD = 'KC-SYS'
+                and CMPNT_CD = 'Config'
                 and PARM_NM = 'CSRF_PROTECTION_ENABLED'
                 and VAL = 'Y'
                 and PARM_DESC_TXT = 'CSRF protection.'
