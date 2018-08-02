@@ -1,12 +1,12 @@
 /*
  * Copyright 2005-2014 The Kuali Foundation
- * 
+ *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.opensource.org/licenses/ecl1.php
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,6 +48,7 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.infrastructure.TaskGroupName;
 import org.kuali.kra.institutionalproposal.ProposalStatus;
+import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposalBoLite;
 import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
 import org.kuali.kra.krms.KcKrmsConstants;
@@ -83,7 +84,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * 
+ *
  * This class represents the Award Document Object.
  * AwardDocument has a 1:1 relationship with Award Business Object.
  * We have declared a list of Award BOs in the AwardDocument at the same time to
@@ -95,44 +96,45 @@ import java.util.*;
 @COMPONENT(component=ParameterConstants.DOCUMENT_COMPONENT)
 public class AwardDocument extends BudgetParentDocument<Award> implements  Copyable, SessionDocument, KrmsRulesContext {
     private static final Log LOG = LogFactory.getLog(AwardDocument.class);
-    
+
     public static final String PLACEHOLDER_DOC_DESCRIPTION = "*****PLACEHOLDER*****";
 
     /**
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = 1668673531338660064L;
-    
+
     public static final String DOCUMENT_TYPE_CODE = "AWRD";
     private static final String DEFAULT_TAB = "Versions";
     private static final String ALTERNATE_OPEN_TAB = "Parameters";
-    
+
     private List<Award> awardList;
     private List<BudgetDocumentVersion> actualBudgetDocumentVersions;
     private List<BudgetDocumentVersion> budgetDocumentVersions;
-    
+
     private static final String RETURN_TO_AWARD_ALT_TEXT = "return to award";
     private static final String RETURN_TO_AWARD_METHOD_TO_CALL = "methodToCall.returnToAward";
     private static final String KRA_EXTERNALIZABLE_IMAGES_URI_KEY = "kra.externalizable.images.url";
-    
+
     private static final String HAS_SYNC_SPLITNODE = "hasSync";
     private static final String IS_SYNC_CHILD_SPLITNODE = "isSyncChild";
-    
+
 
     private transient boolean documentSaveAfterVersioning;
     private transient AwardService awardService;
-    
+    private transient BusinessObjectService businessObjectService;
+
     /**
      * Constructs a AwardDocument object
      */
-    public AwardDocument(){        
-        super();        
+    public AwardDocument(){
+        super();
         init();
     }
-    
+
     /**
-     * 
-     * This method is a convenience method for facilitating a 1:1 relationship between AwardDocument 
+     *
+     * This method is a convenience method for facilitating a 1:1 relationship between AwardDocument
      * and Award to the outside world - aka a single Award field associated with AwardDocument
      * @return
      */
@@ -141,15 +143,15 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     }
 
     /**
-     * 
-     * This method is a convenience method for facilitating a 1:1 relationship between AwardDocument 
+     *
+     * This method is a convenience method for facilitating a 1:1 relationship between AwardDocument
      * and Award to the outside world - aka a single Award field associated with AwardDocument
      * @param award
      */
     public void setAward(Award award) {
         awardList.set(0, award);
     }
-   
+
     /**
      *
      * @return
@@ -165,36 +167,36 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     public void setAwardList(List<Award> awardList) {
         this.awardList = awardList;
     }
-    
+
     public String getDocumentTypeCode() {
         return DOCUMENT_TYPE_CODE;
     }
-    
+
     /**
      * @return
      */
     public boolean isDocumentSaveAfterVersioning() {
         return documentSaveAfterVersioning;
     }
-    
+
     /**
      * @param documentSaveAfterVersioning
      */
     public void setDocumentSaveAfterAwardLookupEditOrVersion(boolean documentSaveAfterVersioning) {
         this.documentSaveAfterVersioning = documentSaveAfterVersioning;
     }
-    
+
     /**
-     * 
+     *
      * @see org.kuali.core.bo.PersistableBusinessObjectBase#buildListOfDeletionAwareLists()
      */
     @SuppressWarnings("unchecked")
     @Override
     public List buildListOfDeletionAwareLists() {
         List managedLists = super.buildListOfDeletionAwareLists();
-        
+
         Award award = getAward();
-        
+
         addAwardPersonUnitsCollection(managedLists, award);
         managedLists.add(award.getProjectPersons());
         managedLists.add(award.getAwardUnitContacts());
@@ -210,10 +212,10 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         managedLists.add(award.getAwardApprovedSubawards());
         managedLists.add(award.getAwardCloseoutItems());
         managedLists.add(award.getAwardAttachments());
-        
+
         List<AwardSpecialReviewExemption> specialReviewExemptions = new ArrayList<AwardSpecialReviewExemption>();
         for (AwardSpecialReview specialReview : getAward().getSpecialReviews()) {
-            specialReviewExemptions.addAll(specialReview.getSpecialReviewExemptions());            
+            specialReviewExemptions.addAll(specialReview.getSpecialReviewExemptions());
         }
         managedLists.add(specialReviewExemptions);
         managedLists.add(award.getSpecialReviews());
@@ -225,30 +227,30 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         }
         managedLists.add(recipients);
         managedLists.add(reportTerms);
-        
+
         managedLists.add(award.getFundingProposals());
 
         managedLists.add(awardList);
-        
+
         return managedLists;
     }
-    
+
     /**
      * @see org.kuali.rice.krad.document.DocumentBase#doRouteStatusChange(DocumentRouteStatusChange)
      */
     @Override
     public void doRouteStatusChange(DocumentRouteStatusChange statusChangeEvent) {
         super.doRouteStatusChange(statusChangeEvent);
-        
+
         String newStatus = statusChangeEvent.getNewRouteStatus();
         String oldStatus = statusChangeEvent.getOldRouteStatus();
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(String.format("********************* Status Change: from %s to %s", statusChangeEvent.getOldRouteStatus(), newStatus));
         }
-        
+
         if (KewApiConstants.ROUTE_HEADER_FINAL_CD.equalsIgnoreCase(newStatus) || KewApiConstants.ROUTE_HEADER_PROCESSED_CD.equalsIgnoreCase(newStatus)) {
-       // if (KewApiConstants.ROUTE_HEADER_FINAL_CD.equalsIgnoreCase(newStatus)) {
+            // if (KewApiConstants.ROUTE_HEADER_FINAL_CD.equalsIgnoreCase(newStatus)) {
 
             //getVersionHistoryService().createVersionHistory(getAward(), VersionStatus.ACTIVE, GlobalVariables.getUserSession().getPrincipalName());
             getAwardService().updateAwardSequenceStatus(getAward(), VersionStatus.ACTIVE);
@@ -261,13 +263,13 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
             getAwardService().updateAwardSequenceStatus(getAward(), VersionStatus.CANCELED);
             getVersionHistoryService().updateVersionHistory(getAward(), VersionStatus.CANCELED, GlobalVariables.getUserSession().getPrincipalName());
         }
-        
+
         //reset Award List with updated document - in some scenarios the change in status is not reflected.
         for (Award award : awardList) {
             award.setAwardDocument(this);
         }
     }
-    
+
     public void doRouteLevelChange(DocumentRouteLevelChange levelChangeEvent) {
         if (StringUtils.equalsIgnoreCase(levelChangeEvent.getNewNodeName(), Constants.AWARD_SYNC_VALIDATION_NODE_NAME)
                 && !getAward().getSyncChanges().isEmpty()) {
@@ -277,7 +279,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
             getAwardSyncService().applyAwardSyncChangesToHierarchy(getAward());
         }
     }
-    
+
     /**
      * @see org.kuali.kra.document.ResearchDocumentBase#answerSplitNodeQuestion(String)
      */
@@ -294,14 +296,14 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         //if no super class answers the question.
         return super.answerSplitNodeQuestion(routeNodeName);
     }
-    
+
     protected void init() {
         awardList = new ArrayList<Award>();
         awardList.add(new Award());
         budgetDocumentVersions = new ArrayList<BudgetDocumentVersion>();
         actualBudgetDocumentVersions = new ArrayList<BudgetDocumentVersion>();
     }
-    
+
     @Override
     public void prepareForSave() {
         super.prepareForSave();
@@ -318,9 +320,9 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
             award.getProjectPersons().addAll(aList);
             this.removeKeyPersonRoleForNoneKeyPerson();
         }
-            
+
     }
-    
+
     void removeKeyPersonRoleForNoneKeyPerson() {
         for ( AwardPerson person : this.getAward().getProjectPersons() ) {
             if ( !StringUtils.equalsIgnoreCase(person.getContactRole().getRoleCode(), ContactRole.KEY_PERSON_CODE) &&
@@ -329,14 +331,14 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
             }
         }
     }
-    
+
     @Override
     public void postProcessSave(KualiDocumentEvent event) {
         if (event instanceof SaveDocumentEvent) {
             updateFundedProposals();
         }
     }
-    
+
     private void updateFundedProposals() {
         Set<String> modifiedProposals = new HashSet<String>();
         List<AwardFundingProposal> pendingVersions = new ArrayList<AwardFundingProposal>();
@@ -347,10 +349,24 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
                 pendingVersions.add(afp);
             }
         }
+
         if (modifiedProposals.size() > 0) {
-            getInstitutionalProposalService().fundInstitutionalProposals(modifiedProposals);
-            getAward().refreshReferenceObject("fundingProposals");
+            for(InstitutionalProposal ip: getInstitutionalProposalService().fundInstitutionalProposals(modifiedProposals)){
+                List<AwardFundingProposal> removedFundingProposals = getAward().removeFundingProposals(ip.getProposalNumber());
+                getBusinessObjectService().delete(removedFundingProposals);
+                getAward().add(ip);
+            }
         }
+    }
+
+    public BusinessObjectService getBusinessObjectService() {
+        if (businessObjectService == null) {
+            businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
+        }
+        return businessObjectService;
+    }
+    public void setBusinessObjectService(BusinessObjectService businessObjectService) {
+        this.businessObjectService = businessObjectService;
     }
 
     @SuppressWarnings("unchecked")
@@ -364,19 +380,19 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         managedLists.add(personUnits);
         managedLists.add(personSplits);
     }
-    
+
     /**
      * @return
      */
     protected VersionHistoryService getVersionHistoryService() {
         return KraServiceLocator.getService(VersionHistoryService.class);
     }
-    
+
     protected AwardSyncService getAwardSyncService() {
         return KraServiceLocator.getService(AwardSyncService.class);
     }
 
-     public List getBudgetDocumentVersions() {
+    public List getBudgetDocumentVersions() {
         if (budgetDocumentVersions == null || budgetDocumentVersions.isEmpty()) {
             budgetDocumentVersions = KraServiceLocator.getService(AwardBudgetService.class).getAllBudgetsForAward(this);
         }
@@ -390,13 +406,13 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     @Override
     public void saveBudgetFinalVersionStatus(BudgetDocument budgetDocument) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void processAfterRetrieveForBudget(BudgetDocument budgetDocument) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public String getDocumentKey() {
@@ -427,7 +443,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
                 List<String> roleNames = new ArrayList<String>();
                 return roleNames;
             }
-            
+
             public String getNamespace() {
                 return Constants.MODULE_NAMESPACE_AWARD;
             }
@@ -439,7 +455,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
             public String getDocumentRoleTypeCode() {
                 return RoleConstants.AWARD_ROLE_TYPE;
             }
-            
+
             public void populateAdditionalQualifiedRoleAttributes(Map<String, String> qualifiedRoleAttributes) {
             }
         };
@@ -455,7 +471,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         returnToProposalButton.setExtraButtonProperty(RETURN_TO_AWARD_METHOD_TO_CALL);
         returnToProposalButton.setExtraButtonSource(buildExtraButtonSourceURI("tinybutton-returntoaward.gif"));
         returnToProposalButton.setExtraButtonAltText(RETURN_TO_AWARD_ALT_TEXT);
-        
+
         return returnToProposalButton;
     }
 
@@ -471,7 +487,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     private ConfigurationService lookupKualiConfigurationService() {
         return CoreApiServiceLocator.getKualiConfigurationService();
     }
-    
+
     @Override
     public List<HeaderNavigation> getBudgetHeaderNavigatorList() {
         List<HeaderNavigation> budgetHeaderList= super.getBudgetHeaderNavigatorList();
@@ -481,7 +497,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
                 awardBudgetHeaderList.add(headerNavigation);
             }
         }
-        return awardBudgetHeaderList;   
+        return awardBudgetHeaderList;
     }
 
     @Override
@@ -498,14 +514,14 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     public boolean isComplete() {
         return true;
     }
-    
+
     /**
      * This method specifies if this document may be edited; i.e. it's only initiated or saved
      * @return
      */
     public boolean isEditable() {
         WorkflowDocument workflowDoc = getDocumentHeader().getWorkflowDocument();
-        return workflowDoc.isInitiated() || workflowDoc.isSaved(); 
+        return workflowDoc.isInitiated() || workflowDoc.isSaved();
     }
 
     /**
@@ -515,7 +531,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     public boolean isSaved() {
         return getDocumentHeader().getWorkflowDocument().isSaved();
     }
-    
+
     public String getDocumentBoNumber() {
         return getAward().getAwardNumber();
     }
@@ -534,8 +550,8 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
 
     public String getProposalBudgetFlag() {
         return "false";
-    } 
-    
+    }
+
     public boolean getCanModify() {
         Map<String,String> permissionDetails =new HashMap<String,String>();
         permissionDetails.put("sectionName", "award");
@@ -543,16 +559,16 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         Map<String,String> qualifications =new HashMap<String,String>();
         qualifications.put(KraAuthorizationConstants.QUALIFICATION_UNIT_NUMBER, this.getLeadUnitNumber());
         return getPermissionService().isAuthorized(
-                GlobalVariables.getUserSession().getPrincipalId(), 
-                KraAuthorizationConstants.KC_AWARD_NAMESPACE, 
-                KraAuthorizationConstants.PERMISSION_MODIFY_AWARD, 
+                GlobalVariables.getUserSession().getPrincipalId(),
+                KraAuthorizationConstants.KC_AWARD_NAMESPACE,
+                KraAuthorizationConstants.PERMISSION_MODIFY_AWARD,
                 qualifications);
     }
-    
+
     protected PermissionService getPermissionService() {
         return KraServiceLocator.getService(PermissionService.class);
     }
-    
+
     protected InstitutionalProposalService getInstitutionalProposalService() {
         return KraServiceLocator.getService(InstitutionalProposalService.class);
     }
@@ -565,8 +581,8 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
             for (int i = 0; i < budgetVersionOverviews.size(); i++) {
                 AwardBudgetVersionOverviewExt budgetVersionOverview = (AwardBudgetVersionOverviewExt)budgetVersionOverviews.get(i);
                 if (budgetVersionOverview != null
-                        && (budget.getBudgetVersionNumber() == null || 
-                            (budget.getBudgetVersionNumber() != null && budgetVersionOverview.getBudgetVersionNumber() > budget.getBudgetVersionNumber()))) {
+                        && (budget.getBudgetVersionNumber() == null ||
+                        (budget.getBudgetVersionNumber() != null && budgetVersionOverview.getBudgetVersionNumber() > budget.getBudgetVersionNumber()))) {
                     budget = budgetVersionOverview;
                 }
             }
@@ -579,25 +595,25 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
             return PLACEHOLDER_DOC_DESCRIPTION.equals(getDocumentHeader().getDocumentDescription());
         return false;
     }
-    
+
     /*
      * Find all Institutional Proposals that were marked as Funded by this Award version,
      * and revert them back to Pending.
      */
     private void revertFundedProposals() {
         Set<String> proposalsToUpdate = new HashSet<String>();
-        
+
         for (AwardFundingProposal awardFundingProposal : this.getAward().getFundingProposals()) {
             proposalsToUpdate.add(awardFundingProposal.getProposal().getProposalNumber());
         }
         //remove any funding proposals for this award
-        KraServiceLocator.getService(BusinessObjectService.class).delete(getAward().getFundingProposals());
-        getAward().getFundingProposals().clear();
-        
-        getInstitutionalProposalService().defundInstitutionalProposals(proposalsToUpdate, 
+        getInstitutionalProposalService().defundInstitutionalProposals(proposalsToUpdate,
                 this.getAward().getAwardNumber(), this.getAward().getSequenceNumber());
+
+        getBusinessObjectService().delete(getAward().getFundingProposals());
+        getAward().getFundingProposals().clear();
     }
-    
+
     /*
      * Mark award comments tied to this award as invalid, so they don't show up in History
      */
@@ -607,7 +623,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         }
     }
     /**
-     * This method is to check whether rice async routing is ok now.   
+     * This method is to check whether rice async routing is ok now.
      * Close to hack.  called by holdingpageaction
      * Different document type may have different routing set up, so each document type
      * can implement its own isProcessComplete
@@ -615,13 +631,13 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
      */
     public boolean isProcessComplete() {
         boolean isComplete = false;
-        
+
         if (getDocumentHeader().hasWorkflowDocument()) {
             /**
              * per KRACOEUS-5394 changing from getDocumentHeader().getWorkflowDocument().isFinal().  This way
              * we route back to the award document more appropriately from holding page.
              */
-            if (getDocumentHeader().getWorkflowDocument().isFinal() 
+            if (getDocumentHeader().getWorkflowDocument().isFinal()
                     || getDocumentHeader().getWorkflowDocument().isProcessed()
                     || KraServiceLocator.getService(KraWorkflowService.class).hasPendingApprovalRequests(getDocumentHeader().getWorkflowDocument())) {
                 isComplete = true;
@@ -632,7 +648,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
                 isComplete = true;
             }
         }
-           
+
         return isComplete;
     }
 
@@ -659,12 +675,12 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     public void setAwardService(AwardService awardService) {
         this.awardService = awardService;
     }
-    
+
     public void populateContextQualifiers(Map<String, String> qualifiers) {
         qualifiers.put("namespaceCode", getNamespace());
         qualifiers.put("name", getRuleContextName());
     }
-    
+
     public void addFacts(Facts.Builder factsBuilder) {
         KcKrmsFactBuilderService fbService = KraServiceLocator.getService("awardFactBuilderService");
         fbService.addFacts(factsBuilder, this);
@@ -678,7 +694,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     public void populateAgendaQualifiers(Map<String, String> qualifiers) {
         qualifiers.put(KcKrmsConstants.UNIT_NUMBER, getLeadUnitNumber());
     }
-    
+
     public String buildForwardUrl() {
         ResearchDocumentService researchDocumentService = KraServiceLocator.getService(ResearchDocumentService.class);
         String forward = researchDocumentService.getDocHandlerUrl(getDocumentNumber());
@@ -694,7 +710,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         if (GlobalVariables.getUserSession().isBackdoorInUse()) {
             forward += "&" + KewApiConstants.BACKDOOR_ID_PARAMETER + "=" + GlobalVariables.getUserSession().getPrincipalName();
         }
-        
+
         String returnVal = "<a href=\"" + forward + "\"target=\"_blank\">" + documentNumber + "</a>";
         return returnVal;
     }
