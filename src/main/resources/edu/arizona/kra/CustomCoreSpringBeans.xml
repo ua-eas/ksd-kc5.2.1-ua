@@ -35,6 +35,8 @@
                            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <import resource="classpath:edu/arizona/kra/UA-DataSourceSpringBeans.xml" />
     
     <bean id="coreModuleConfiguration" parent="coreModuleConfiguration-parentBean">
         <property name="packagePrefixes">
