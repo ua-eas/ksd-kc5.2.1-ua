@@ -3,14 +3,28 @@ var ruleReferenced;
     $j(document).ready(function(){
 			
 			// More/Less Information...
-				$j(".Qmoreinfocontrol").parent().next().hide();
+				if($j(".Qmoreinfocontrol").parent().next().attr('name')==='csrfToken'){
+					$j(".Qmoreinfocontrol").parent().next().next().hide();
+				}else{
+					$j(".Qmoreinfocontrol").parent().next().hide();
+				}
+
 				$j(".Qmoreinfocontrol").toggle(
-					function()
-					{
-						$j(this).parent().next().slideDown(400);
+					function() {
+
+						if($j(this).parent().next().attr('name')==='csrfToken'){
+							$j(this).parent().next().next().slideDown(400);
+						}else{
+							$j(this).parent().next().slideDown(400);
+						}
 						$j(this).html("Less Information...");
 					},function(){
-						$j(this).parent().next().slideUp(400);
+
+						if($j(this).parent().next().attr('name')==='csrfToken'){
+							$j(this).parent().next().next().slideUp(400);
+						}else{
+							$j(this).parent().next().slideUp(400);
+						}
 						$j(this).html("More Information...");
 					}
 				);
