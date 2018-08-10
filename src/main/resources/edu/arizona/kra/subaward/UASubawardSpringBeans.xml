@@ -36,28 +36,23 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
+    <import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml" />
 
-    
-    <bean id="coreModuleConfiguration" parent="coreModuleConfiguration-parentBean">
-        <property name="packagePrefixes">
-            <list merge="true">
-                <value>edu.arizona.kra</value>
-            </list>
-        </property>
-        <property name="dataDictionaryPackages">
-            <list merge="true">
-                <value>edu/arizona/kra/datadictionary</value>
-            </list>
-        </property>
-    </bean>
-    
-    <bean class="org.kuali.rice.core.framework.util.spring.NamedOrderedListBean">
-        <property name="name" value="scriptConfigurationFilePaths" />
-        <property name="listItem" value="classpath:org/kuali/kra/dwr-ua.xml" />
+    <bean id="BiGLFeedDao" class="edu.arizona.kra.subaward.batch.dao.ojb.BiGLFeedDaoOjb" depends-on="edu.arizona.biDataSourceOjbConfigurer">
+        <property name="jcdAlias" value="edu.arizona.biDataSource" />
     </bean>
 
-    <bean id="protocolCustomDataService" class="edu.arizona.kra.protocol.ProtocolCustomDataServiceImpl">
-        <property name="businessObjectService" ref="businessObjectService" />
-    </bean> 
-     
+    <bean id="SubawardGLFeedDao" class="edu.arizona.kra.subaward.batch.dao.ojb.SubawardGLFeedDaoOjb" parent="platformAwareDao"/>
+
+
+    <bean id="glDataImportService" class="edu.arizona.kra.subaward.batch.service.impl.GlDataImportServiceImpl">
+        <property name="biGLFeedDao">
+            <ref bean="BiGLFeedDao" />
+        </property>
+        <property name="subawardGLFeedDao">
+            <ref bean="SubawardGLFeedDao" />
+        </property>
+    </bean>
+
+
 </beans>

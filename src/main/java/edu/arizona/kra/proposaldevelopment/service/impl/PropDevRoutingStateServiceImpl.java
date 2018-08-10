@@ -15,11 +15,15 @@
  */
 package edu.arizona.kra.proposaldevelopment.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
+import edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants;
+import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
+import edu.arizona.kra.proposaldevelopment.bo.SPSRestrictedNote;
+import edu.arizona.kra.proposaldevelopment.bo.SPSReviewer;
+import edu.arizona.kra.proposaldevelopment.dao.PropDevRoutingStateDao;
+import edu.arizona.kra.proposaldevelopment.dao.SPSRestrictedNoteDao;
+import edu.arizona.kra.proposaldevelopment.service.CustomAuthorizationService;
+import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
+import edu.arizona.kra.subaward.batch.service.GlDataImportService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,17 +33,13 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.krad.exception.AuthorizationException;
 import org.kuali.rice.krad.service.DocumentHeaderService;
-import org.kuali.rice.krad.service.NoteService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
-import edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants;
-import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
-import edu.arizona.kra.proposaldevelopment.bo.SPSRestrictedNote;
-import edu.arizona.kra.proposaldevelopment.bo.SPSReviewer;
-import edu.arizona.kra.proposaldevelopment.dao.PropDevRoutingStateDao;
-import edu.arizona.kra.proposaldevelopment.dao.SPSRestrictedNoteDao;
-import edu.arizona.kra.proposaldevelopment.service.CustomAuthorizationService;
-import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -67,13 +67,17 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     @Override
     public List<ProposalDevelopmentRoutingState> findPropDevRoutingState(Map<String, String> searchCriteria) {
         LOG.debug("getSearchResults():"+searchCriteria.toString());
+        GlDataImportService glDataImportService = KraServiceLocator.getService("GlDataImportService");
+        Date today = new Date(System.currentTimeMillis());
+        Date threeDaysAgo = new Date(System.currentTimeMillis() - 1000*360*24*3);
+        glDataImportService.importGLData(threeDaysAgo, today);
         List <ProposalDevelopmentRoutingState> results = new ArrayList<ProposalDevelopmentRoutingState>();
-        try {
-            results = propDevRoutingStateDao.getPropDevRoutingState(searchCriteria);
-        } catch (Exception e){
-            LOG.error(e);
-        }
-        LOG.debug("getSearchResults(): size="+results.size());
+//        try {
+//            results = propDevRoutingStateDao.getPropDevRoutingState(searchCriteria);
+//        } catch (Exception e){
+//            LOG.error(e);
+//        }
+//        LOG.debug("getSearchResults(): size="+results.size());
         return results;
     }
 

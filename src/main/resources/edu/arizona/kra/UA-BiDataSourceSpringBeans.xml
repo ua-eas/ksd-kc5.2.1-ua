@@ -91,4 +91,13 @@
 
   <alias name="biDataSource${connection.pool.impl}" alias="biDataSource"/>
 
+  <bean id="edu.arizona.biDataSourceOjbConfigurer" class="org.kuali.rice.core.framework.persistence.ojb.BaseOjbConfigurer">
+    <property name="jcdAliases">
+      <list>
+        <value>edu.arizona.biDataSource</value>
+      </list>
+    </property>
+    <property name="metadataLocation" value="classpath:edu/arizona/kra/subaward/repository-biGlData.xml" />
+  </bean>
+
 </beans>
