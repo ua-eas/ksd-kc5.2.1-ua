@@ -20,9 +20,8 @@ package edu.arizona.kra.sys.batch;
 
 import edu.arizona.kra.sys.batch.bo.Step;
 import edu.arizona.kra.sys.batch.service.SchedulerService;
-
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.krad.bo.TransientBusinessObjectBase;
-
 import org.quartz.JobDetail;
 
 import java.util.Date;
@@ -30,6 +29,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public class BatchJobStatus extends TransientBusinessObjectBase {
 
     private JobDescriptor jobDescriptor;

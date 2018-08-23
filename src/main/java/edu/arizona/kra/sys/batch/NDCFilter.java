@@ -16,11 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.kuali.kfs.sys.context;
+package edu.arizona.kra.sys.batch;
 
 import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
 
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public class NDCFilter extends Filter {
     private String nestedDiagnosticContext;
 
@@ -30,7 +33,7 @@ public class NDCFilter extends Filter {
     }
 
     /**
-     * @see org.apache.log4j.spi.Filter#decide(org.apache.log4j.spi.LoggingEvent)
+     * @see Filter#decide(LoggingEvent)
      */
     @Override
     public int decide(LoggingEvent event) {

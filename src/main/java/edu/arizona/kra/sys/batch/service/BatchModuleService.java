@@ -16,10 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.kuali.kfs.sys.service;
+package edu.arizona.kra.sys.batch.service;
 
 
 /**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ *
  * This class defines methods needed for batch to run successfully when there are dependencies on jobs that are run on external systems.
  * Implementations of this interface are able to keep track of external job status and report it to the scheduler service.
  */
@@ -37,7 +39,7 @@ public interface BatchModuleService {
      * This method returns the status of the given external job.
      *
      * @param jobName a job name, such that calling {@link #isResponsibleForJob(String)} with this job name would return true
-     * @return one of the status code constants defined in {@link org.kuali.kfs.sys.batch.service.SchedulerService}
+     * @return one of the status code constants defined in {@link edu.arizona.kra.sys.batch.service.SchedulerService}
      */
     public String getExternalJobStatus(String jobName);
 

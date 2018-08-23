@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.kuali.kfs.sys.batch;
+package edu.arizona.kra.sys.batch;
 
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.quartz.SimpleTrigger;
@@ -24,6 +24,10 @@ import org.quartz.Trigger;
 
 import java.util.Date;
 
+
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public class SimpleTriggerDescriptor extends TriggerDescriptor {
     private Date startTime;
     private long startDelay;
@@ -39,9 +43,7 @@ public class SimpleTriggerDescriptor extends TriggerDescriptor {
         setDateTimeService(dateTimeService);
     }
 
-    /**
-     * @see org.kuali.kfs.sys.batch.TriggerDescriptor#completeTriggerDescription(org.quartz.Trigger)
-     */
+
     protected void completeTriggerDescription(Trigger trigger) {
         if (startTime == null) {
             startTime = trigger.getStartTime();

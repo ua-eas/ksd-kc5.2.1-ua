@@ -16,27 +16,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.kuali.kfs.sys.service.impl;
+package edu.arizona.kra.sys.batch.service.impl;
 
-import org.kuali.kfs.krad.service.impl.ModuleServiceBase;
-import org.kuali.kfs.sys.batch.service.impl.SchedulerServiceImpl;
-import org.kuali.kfs.sys.service.BatchModuleService;
+
+import org.kuali.rice.krad.service.impl.ModuleServiceBase;
+import edu.arizona.kra.sys.batch.service.BatchModuleService;
 
 /**
- * This class is the KFS implementation of a module service. It also implements the batch related methods
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ * This class is the KC implementation of a module service. It also implements the batch related methods
  */
-public class KfsModuleServiceImpl extends ModuleServiceBase implements BatchModuleService {
+public class KcModuleServiceImpl extends ModuleServiceBase implements BatchModuleService {
 
-    /***
-     * @see org.kuali.kfs.sys.service.BatchModuleService#hasJobStatus(java.lang.String)
-     */
+
     public boolean isExternalJob(String jobName) {
         return false;
     }
 
-    /***
-     * @see org.kuali.kfs.sys.service.BatchModuleService#getJobStatus(java.lang.String)
-     */
+
     public String getExternalJobStatus(String jobName) {
         if (isExternalJob(jobName))
             return SchedulerServiceImpl.SUCCEEDED_JOB_STATUS_CODE;

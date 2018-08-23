@@ -27,20 +27,11 @@ import org.quartz.Scheduler;
 import java.util.Date;
 import java.util.List;
 
+
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public interface SchedulerService {
-    public static final String SCHEDULE_JOB_NAME = "scheduleJob";
-
-    public static final String PENDING_JOB_STATUS_CODE = "Pending";
-    public static final String SCHEDULED_JOB_STATUS_CODE = "Scheduled";
-    public static final String RUNNING_JOB_STATUS_CODE = "Running";
-    public static final String SUCCEEDED_JOB_STATUS_CODE = "Succeeded";
-    public static final String FAILED_JOB_STATUS_CODE = "Failed";
-    public static final String CANCELLED_JOB_STATUS_CODE = "Cancelled";
-
-    public static final String JOB_STATUS_PARAMETER = "status";
-
-    public static final String SCHEDULED_GROUP = "scheduled";
-    public static final String UNSCHEDULED_GROUP = "unscheduled";
 
     public void initialize();
 

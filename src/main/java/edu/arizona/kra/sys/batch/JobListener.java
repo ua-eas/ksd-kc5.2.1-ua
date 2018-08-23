@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 import org.apache.log4j.PatternLayout;
 
-//import org.kuali.kfs.sys.KFSConstants;
 //import org.kuali.kfs.sys.KFSKeyConstants;
 //import org.kuali.kfs.sys.context.NDCFilter;
 
@@ -44,10 +43,15 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Calendar;
 
+
+
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public class JobListener implements org.quartz.JobListener {
     private static final Logger LOG = Logger.getLogger(JobListener.class);
     protected static final String NAME = "jobListener";
-    public static final String REQUESTOR_EMAIL_ADDRESS_KEY = "requestorEmailAdress";
+
     protected SchedulerService schedulerService;
     protected ConfigurationService configurationService;
     protected KcEmailService emailService;
@@ -73,7 +77,7 @@ public class JobListener implements org.quartz.JobListener {
             initializeLogging(jobExecutionContext);
             // We only want to auto-cancel executions if they are part of a master scheduling job
             // Otherwise, this is a standalone job and should fire, regardless of prior status
-            if (jobExecutionContext.getMergedJobDataMap().containsKey(Job.MASTER_JOB_NAME)) {
+            if (jobExecutionContext.getMergedJobDataMap().containsKey(BatchConstants.MASTER_JOB_NAME)) {
                 if (schedulerService.shouldNotRun(jobExecutionContext.getJobDetail())) {
                     ((Job) jobExecutionContext.getJobInstance()).setNotRunnable(true);
                 }
@@ -115,7 +119,7 @@ public class JobListener implements org.quartz.JobListener {
     }
 
     protected String getLogFileName(String nestedDiagnosticContext) {
-        return new StringBuilder(configurationService.getPropertyValueAsString(KFSConstants.REPORTS_DIRECTORY_KEY)).append(File.separator).append(nestedDiagnosticContext.toString()).append(".log").toString();
+        return new StringBuilder(configurationService.getPropertyValueAsString(BatchConstants.REPORTS_DIRECTORY_KEY)).append(File.separator).append(nestedDiagnosticContext.toString()).append(".log").toString();
     }
 
     protected void notify(JobExecutionContext jobExecutionContext, String jobStatus) {
@@ -123,18 +127,19 @@ public class JobListener implements org.quartz.JobListener {
             StringBuilder mailMessageSubject = new StringBuilder(jobExecutionContext.getJobDetail().getGroup()).append(": ").append(jobExecutionContext.getJobDetail().getName());
             MailMessage mailMessage = new MailMessage();
             mailMessage.setFromAddress(emailService.getDefaultFromAddress());
-            if (jobExecutionContext.getMergedJobDataMap().containsKey(REQUESTOR_EMAIL_ADDRESS_KEY) && !StringUtils.isBlank(jobExecutionContext.getMergedJobDataMap().getString(REQUESTOR_EMAIL_ADDRESS_KEY))) {
-                mailMessage.addToAddress(jobExecutionContext.getMergedJobDataMap().getString(REQUESTOR_EMAIL_ADDRESS_KEY));
+            if (jobExecutionContext.getMergedJobDataMap().containsKey(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY) && !StringUtils.isBlank(jobExecutionContext.getMergedJobDataMap().getString(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY))) {
+                mailMessage.addToAddress(jobExecutionContext.getMergedJobDataMap().getString(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY));
             }
             if (SchedulerService.FAILED_JOB_STATUS_CODE.equals(jobStatus) || SchedulerService.CANCELLED_JOB_STATUS_CODE.equals(jobStatus)) {
                 mailMessage.addToAddress(emailService.getDefaultFromAddress());
             }
             mailMessageSubject.append(": ").append(jobStatus);
-            String messageText = MessageFormat.format(configurationService.getPropertyValueAsString(KFSKeyConstants.MESSAGE_BATCH_FILE_LOG_EMAIL_BODY), getLogFileName(NDC.peek()));
+            String messageText = MessageFormat.format(configurationService.getPropertyValueAsString(BatchConstants.MESSAGE_BATCH_FILE_LOG_EMAIL_BODY), getLogFileName(NDC.peek()));
             mailMessage.setMessage(messageText);
             if (mailMessage.getToAddresses().size() > 0) {
                 mailMessage.setSubject(mailMessageSubject.toString());
-                emailService.sendEmail(mailMessage,false);
+                //TODO implement this!!!!! -> diffrent implemtenation in KC
+                //emailService.sendEmail(mailMessage,false);
             }
         } catch (Exception iae) {
             LOG.error("Caught exception while trying to send job completion notification e-mail for " + jobExecutionContext.getJobDetail().getName(), iae);

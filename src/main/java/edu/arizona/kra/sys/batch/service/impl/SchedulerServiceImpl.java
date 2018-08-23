@@ -19,67 +19,34 @@
 package edu.arizona.kra.sys.batch.service.impl;
 
 
-
-import org.apache.commons.lang.StringUtils;
-
-import org.kuali.rice.krad.service.KualiModuleService;
-import org.kuali.rice.coreservice.framework.parameter.ParameterService;
-
-
-
-
-import org.kuali.kfs.sys.KFSConstants;
-
-import edu.arizona.kra.sys.batch.bo.Step;
-import edu.arizona.kra.sys.batch.BatchJobStatus;
+import edu.arizona.kra.sys.batch.*;
 import edu.arizona.kra.sys.batch.Job;
-import edu.arizona.kra.sys.batch.BatchSpringContext;
-import edu.arizona.kra.sys.batch.service.SchedulerService;
-import edu.arizona.kra.sys.batch.JobDescriptor;
 import edu.arizona.kra.sys.batch.JobListener;
-
-//TODO here
-
-import org.kuali.kfs.sys.batch.ScheduleStep;
-import org.kuali.kfs.sys.batch.SimpleTriggerDescriptor;
-
-import org.kuali.kfs.sys.context.SpringContext;
-import org.kuali.kfs.sys.service.BatchModuleService;
-import org.kuali.kfs.sys.service.impl.KfsModuleServiceImpl;
-
-//TODO here
-
+import edu.arizona.kra.sys.batch.bo.Step;
+import edu.arizona.kra.sys.batch.service.BatchModuleService;
+import edu.arizona.kra.sys.batch.service.SchedulerService;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.core.api.datetime.DateTimeService;
-
-import org.quartz.CronExpression;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.ObjectAlreadyExistsException;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.UnableToInterruptJobException;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+import org.kuali.rice.krad.service.KualiModuleService;
+import org.kuali.rice.krad.service.ModuleService;
+import org.quartz.*;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
+import static edu.arizona.kra.sys.batch.BatchConstants.*;
+
+
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 @Transactional
 public class SchedulerServiceImpl implements SchedulerService {
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(SchedulerServiceImpl.class);
-
-    protected static final String SOFT_DEPENDENCY_CODE = "softDependency";
-    protected static final String HARD_DEPENDENCY_CODE = "hardDependency";
 
     private Scheduler scheduler;
     private JobListener jobListener;
@@ -255,7 +222,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             JobDetail jobDetail = getScheduledJobDetail(scheduledJobName);
             if (isPending(jobDetail)) {
                 if (shouldScheduleJob(jobDetail)) {
-                    scheduleJob(SCHEDULED_GROUP, scheduledJobName, 0, 0, new Date(), null, Collections.singletonMap(Job.MASTER_JOB_NAME, SCHEDULE_JOB_NAME));
+                    scheduleJob(SCHEDULED_GROUP, scheduledJobName, 0, 0, new Date(), null, Collections.singletonMap(BatchConstants.MASTER_JOB_NAME, SCHEDULE_JOB_NAME));
                 }
                 if (shouldCancelJob(jobDetail)) {
                     updateStatus(SCHEDULED_GROUP, scheduledJobName, CANCELLED_JOB_STATUS_CODE);
@@ -387,13 +354,13 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     protected void scheduleJob(String groupName, String jobName, int startStep, int endStep, Date startTime, String requestorEmailAddress, Map<String, String> additionalJobData) {
         try {
-            updateStatus(groupName, jobName, SchedulerService.SCHEDULED_JOB_STATUS_CODE);
+            updateStatus(groupName, jobName, BatchConstants.SCHEDULED_JOB_STATUS_CODE);
             SimpleTriggerDescriptor trigger = new SimpleTriggerDescriptor(jobName, groupName, jobName, dateTimeService);
             trigger.setStartTime(startTime);
             Trigger qTrigger = trigger.getTrigger();
-            qTrigger.getJobDataMap().put(JobListener.REQUESTOR_EMAIL_ADDRESS_KEY, requestorEmailAddress);
-            qTrigger.getJobDataMap().put(Job.JOB_RUN_START_STEP, String.valueOf(startStep));
-            qTrigger.getJobDataMap().put(Job.JOB_RUN_END_STEP, String.valueOf(endStep));
+            qTrigger.getJobDataMap().put(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY, requestorEmailAddress);
+            qTrigger.getJobDataMap().put(BatchConstants.JOB_RUN_START_STEP, String.valueOf(startStep));
+            qTrigger.getJobDataMap().put(BatchConstants.JOB_RUN_END_STEP, String.valueOf(endStep));
             if (additionalJobData != null) {
                 qTrigger.getJobDataMap().putAll(additionalJobData);
             }
@@ -459,7 +426,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     protected boolean isSoftDependency(String dependentJobName, String dependencyJobName) {
-        return SOFT_DEPENDENCY_CODE.equals(getJobDependencies(dependentJobName).get(dependencyJobName));
+        return BatchConstants.SOFT_DEPENDENCY_CODE.equals(getJobDependencies(dependentJobName).get(dependencyJobName));
     }
 
     protected Map<String, String> getJobDependencies(String jobName) {
@@ -492,13 +459,13 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (jobDetail == null) {
             return FAILED_JOB_STATUS_CODE;
         }
-        KualiModuleServiceImpl moduleService = (KualiModuleServiceImpl)
-            SpringContext.getBean(KualiModuleService.class).getResponsibleModuleServiceForJob(jobDetail.getName());
+        KcModuleServiceImpl moduleService = (KcModuleServiceImpl)
+                KraServiceLocator.getService(KualiModuleService.class).getResponsibleModuleServiceForJob(jobDetail.getName());
         //If the module service has status information for a job, get the status from it
         //else get status from job detail data map
         return (moduleService != null && moduleService.isExternalJob(jobDetail.getName()))
-            ? moduleService.getExternalJobStatus(jobDetail.getName())
-            : jobDetail.getJobDataMap().getString(SchedulerServiceImpl.JOB_STATUS_PARAMETER);
+                ? moduleService.getExternalJobStatus(jobDetail.getName())
+                : jobDetail.getJobDataMap().getString(BatchConstants.JOB_STATUS_PARAMETER);
     }
 
     protected JobDetail getScheduledJobDetail(String jobName) {
@@ -716,8 +683,8 @@ public class SchedulerServiceImpl implements SchedulerService {
             Date currentDate = dateTimeService.getCurrentDate();
             Date validTimeAfter = cronExpression.getNextValidTimeAfter(dateTimeService.getCurrentDate());
             if (validTimeAfter != null) {
-                String cronDate = dateTimeService.toString(validTimeAfter, KFSConstants.MONTH_DAY_YEAR_DATE_FORMAT);
-                if (cronDate.equals(dateTimeService.toString(currentDate, KFSConstants.MONTH_DAY_YEAR_DATE_FORMAT))) {
+                String cronDate = dateTimeService.toString(validTimeAfter, BatchConstants.MONTH_DAY_YEAR_DATE_FORMAT);
+                if (cronDate.equals(dateTimeService.toString(currentDate, BatchConstants.MONTH_DAY_YEAR_DATE_FORMAT))) {
                     cronConditionMet = true;
                 }
             } else {

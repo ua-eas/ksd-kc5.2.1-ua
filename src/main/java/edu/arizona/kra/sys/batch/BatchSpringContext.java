@@ -22,12 +22,14 @@ import org.apache.log4j.Logger;
 import edu.arizona.kra.sys.batch.bo.Step;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 
-
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public class BatchSpringContext {
     private static final Logger LOG = Logger.getLogger(BatchSpringContext.class);
 
     public static Step getStep(String beanId) {
-        return SpringContext.getBean(Step.class, beanId);
+        return KraServiceLocator.getService(beanId);
     }
 
     public static JobDescriptor getJobDescriptor(String beanId) {
@@ -41,11 +43,5 @@ public class BatchSpringContext {
         return KraServiceLocator.getAppContext().getBeansOfType(TriggerDescriptor.class).get(beanId);
     }
 
-    public static BatchInputFileType getBatchInputFileType(String beanId) {
-        return KraServiceLocator.getAppContext().getBeansOfType(BatchInputFileType.class).get(beanId);
-    }
 
-    public static BatchInputFileSetType getBatchInputFileSetType(String beanId) {
-        return KraServiceLocator.getAppContext().getBeansOfType(BatchInputFileSetType.class).get(beanId);
-    }
 }

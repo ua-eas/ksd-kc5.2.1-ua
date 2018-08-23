@@ -18,18 +18,17 @@
  */
 package edu.arizona.kra.sys.batch;
 
-import org.apache.log4j.Logger;
-
 import edu.arizona.kra.sys.batch.bo.Step;
-
+import org.apache.log4j.Logger;
+import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/*Batch framework Imported from KFS*/
-public abstract class AbstractStep extends InitiateDirectoryBase implements Step, BeanNameAware, InitializingBean, InitiateDirectory {
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
+public abstract class AbstractStep implements Step, BeanNameAware, InitializingBean{
 
     private static final Logger LOG = Logger.getLogger(AbstractStep.class);
 

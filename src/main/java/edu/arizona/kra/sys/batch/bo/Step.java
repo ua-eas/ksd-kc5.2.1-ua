@@ -2,7 +2,9 @@ package edu.arizona.kra.sys.batch.bo;
 
 import java.util.Date;
 
-/*Batch framework Imported from KFS*/
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public interface Step {
     /**
      * Perform this step of a batch job.

@@ -16,38 +16,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.kuali.kfs.sys.batch;
+package edu.arizona.kra.sys.batch;
 
 import org.apache.log4j.Logger;
-import org.kuali.kfs.sys.KFSConstants;
-import org.kuali.kfs.sys.batch.service.SchedulerService;
+import edu.arizona.kra.sys.batch.service.SchedulerService;
 
 import java.util.Date;
 
+
+
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public class ScheduleStep extends AbstractStep {
     private static final Logger LOG = Logger.getLogger(ScheduleStep.class);
     private SchedulerService schedulerService;
 
-    /**
-     * @see org.kuali.kfs.sys.batch.Step#execute(String, Date)
-     */
+    @Override
     public boolean execute(String jobName, Date jobRunDate) {
-        boolean isPastScheduleCutoffTime = false;
+
         schedulerService.reinitializeScheduledJobs();
-        while (schedulerService.hasIncompleteJob() && !isPastScheduleCutoffTime) {
+        while (schedulerService.hasIncompleteJob() ) {
             schedulerService.processWaitingJobs();
-            isPastScheduleCutoffTime = schedulerService.isPastScheduleCutoffTime();
             try {
-                Thread.sleep(Integer.parseInt(getParameterService().getParameterValueAsString(getClass(), KFSConstants.SystemGroupParameterNames.BATCH_SCHEDULE_STATUS_CHECK_INTERVAL)));
+                Thread.sleep(Integer.parseInt(getParameterService().getParameterValueAsString(getClass(), BatchConstants.BATCH_SCHEDULE_STATUS_CHECK_INTERVAL)));
             } catch (InterruptedException e) {
                 throw new RuntimeException("Schedule step encountered interrupt exception while trying to wait for the specified batch schedule status check interval", e);
             }
         }
-        if (isPastScheduleCutoffTime) {
-            LOG.info("Schedule exceeded cutoff time, so it was terminated before completion");
-        }
+
         schedulerService.logScheduleResults();
-        return !isPastScheduleCutoffTime;
+        return true;
     }
 
     /**

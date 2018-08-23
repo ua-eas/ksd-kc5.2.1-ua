@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.kuali.kfs.sys.batch;
+package edu.arizona.kra.sys.batch;
 
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.quartz.CronTrigger;
@@ -24,6 +24,11 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.BeanNameAware;
 
+
+
+/**
+ * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ **/
 public abstract class TriggerDescriptor implements BeanNameAware {
     private String name;
     private String group;
@@ -48,7 +53,7 @@ public abstract class TriggerDescriptor implements BeanNameAware {
     }
 
     /**
-     * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+     * @see BeanNameAware#setBeanName(String)
      */
     public void setBeanName(String name) {
         this.name = name;
