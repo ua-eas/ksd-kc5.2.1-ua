@@ -40,26 +40,28 @@ R
     <import resource="classpath:org/kuali/kra/KC-RiceDataSourceSpringBeans.xml" />
     <import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml" />
     <import resource="classpath:org/kuali/kra/core/CommonSpringBeans.xml" />
-    
+
     <bean id="subAwardModule" class="org.kuali.rice.krad.service.impl.ModuleServiceBase">
         <property name="moduleConfiguration" ref="subAwardModuleConfiguration"/>
         <property name="kualiModuleService" ref="kualiModuleService"/>
     </bean>
   	
     <bean id="subAwardModuleConfiguration" parent="subAwardModuleConfiguration-parentBean" />
-    <bean id="subAwardModuleConfiguration-parentBean" class="org.kuali.rice.krad.bo.ModuleConfiguration" abstract="true">
-    	<property name="namespaceCode" value="KC-AWARD" />
-    	<property name="packagePrefixes">
-            <list>
-                <value>org.kuali.kra.subaward</value>
-            </list>
+    <bean id="subAwardModuleConfiguration-parentBean" class="edu.arizona.kra.subaward.config.UASubAwardModuleConfiguration" abstract="true">
+        <property name="namespaceCode" value="KC-AWARD" />
+        <property name="packagePrefixes">
+          <list>
+            <value>org.kuali.kra.subaward</value>
+          </list>
         </property>
-		<property name="databaseRepositoryFilePaths">
-			<list>
-				<value>org/kuali/kra/subaward/repository-subAward.xml</value>				
-			</list>
-		</property>
-	</bean>
+        <property name="biDataSource" ref="arizona.edu.biNonTransactionalDataSource" />
+        <property name="databaseRepositoryFilePaths">
+			      <list>
+				        <value>org/kuali/kra/subaward/repository-subAward.xml</value>
+                <value>edu/arizona/kra/subaward/repository-invoiceFeed.xml</value>
+			      </list>
+        </property>
+	  </bean>
 	<bean id="dateTimeService" class="org.kuali.rice.core.framework.resourceloader.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="dateTimeService" />
     </bean>

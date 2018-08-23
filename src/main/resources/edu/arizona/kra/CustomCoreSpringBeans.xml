@@ -36,7 +36,7 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-
+    <import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml"/>
     
     <bean id="coreModuleConfiguration" parent="coreModuleConfiguration-parentBean">
         <property name="packagePrefixes">
@@ -58,6 +58,6 @@
 
     <bean id="protocolCustomDataService" class="edu.arizona.kra.protocol.ProtocolCustomDataServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
-    </bean> 
+    </bean>
      
 </beans>

@@ -1,7 +1,7 @@
 package edu.arizona.kra.subaward.batch.bo;
 
+import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
-import org.kuali.rice.krad.bo.TransientBusinessObjectBase;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -11,7 +11,7 @@ import java.sql.Timestamp;
  *
  * Created by nataliac on 8/6/18.
  */
-public class GlEntry extends TransientBusinessObjectBase {
+public class GlEntry extends KraPersistableBusinessObjectBase {
     static final long serialVersionUID = -24983129882357448L;
 
 
@@ -47,6 +47,9 @@ public class GlEntry extends TransientBusinessObjectBase {
 
     private Long entryId; //TODO Is this needed? should correspond to ENTRY_ID but we don't have that column from BI _
     private String gecDocumentNumber; //TODO Is this needed? should correspond to GEC_FDOC_NBR but we don't have that column from BI
+
+    public GlEntry() {
+    }
 
     public Long getEntryId() {
         return entryId;
@@ -280,8 +283,7 @@ public class GlEntry extends TransientBusinessObjectBase {
         this.gecDocumentNumber = gecDocumentNumber;
     }
 
-    public GlEntry() {
-    }
+
 
 
 }

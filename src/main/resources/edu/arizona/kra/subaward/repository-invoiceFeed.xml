@@ -1,6 +1,6 @@
 <!-- Created by Natalia Ibanez 08/01/2018-->
 <descriptor-repository version="1.0">
-  <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UARGlEntry" table="KF_UA_DPT_UAR_GL_ENTRY">
+  <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UAGlEntry" table="SUBAWARD_GL_IMPORT">
     <field-descriptor name="universityFiscalYear" column="UNIV_FISCAL_YR" jdbc-type="INTEGER" primarykey="true" index="true" />
     <field-descriptor name="chartOfAccountsCode" column="FIN_COA_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
     <field-descriptor name="accountNumber" column="ACCOUNT_NBR" jdbc-type="VARCHAR" primarykey="true" index="true" />
@@ -29,5 +29,4 @@
     <field-descriptor name="transactionPostingDate" column="TRN_POST_DT" jdbc-type="DATE" />
     <field-descriptor name="transactionDateTimeStamp" column="TIMESTAMP" jdbc-type="TIMESTAMP" index="true" />
   </class-descriptor>
-
 </descriptor-repository>

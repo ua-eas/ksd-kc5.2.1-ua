@@ -38,21 +38,20 @@
 
     <import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml" />
 
-    <bean id="BiGLFeedDao" class="edu.arizona.kra.subaward.batch.dao.ojb.BiGLFeedDaoOjb" depends-on="edu.arizona.biDataSourceOjbConfigurer">
-        <property name="jcdAlias" value="edu.arizona.biDataSource" />
+    <bean id="BiGlFeedDao" class="edu.arizona.kra.subaward.batch.dao.ojb.BiGlFeedDaoBasicDS">
+        <property name="dataSource" ref="arizona.edu.biNonTransactionalDataSource" />
     </bean>
 
-    <bean id="SubawardGLFeedDao" class="edu.arizona.kra.subaward.batch.dao.ojb.SubawardGLFeedDaoOjb" parent="platformAwareDao"/>
-
+    <bean id="SubawardGlFeedDao" parent="platformAwareDao"  class="edu.arizona.kra.subaward.batch.dao.ojb.SubawardGlFeedDaoOjb"/>
 
     <bean id="glDataImportService" class="edu.arizona.kra.subaward.batch.service.impl.GlDataImportServiceImpl">
+        <property name="businessObjectService" ref="businessObjectService" />
         <property name="biGLFeedDao">
-            <ref bean="BiGLFeedDao" />
+            <ref bean="BiGlFeedDao" />
         </property>
         <property name="subawardGLFeedDao">
-            <ref bean="SubawardGLFeedDao" />
+            <ref bean="SubawardGlFeedDao" />
         </property>
     </bean>
-
 
 </beans>
