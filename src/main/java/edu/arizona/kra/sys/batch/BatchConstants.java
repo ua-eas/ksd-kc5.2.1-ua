@@ -33,6 +33,9 @@ public final class BatchConstants {
 
     public static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy";
 
+    public static final int QUARTZ_SCHEDULER_START_DELAY_SEC = 120;
+    public static final String UAR_SCHEDULER_NAME = "UARScheduler";
+
     //Keys
     public static final String REQUESTOR_EMAIL_ADDRESS_KEY = "requestorEmailAdress";
     public static final String MESSAGE_BATCH_FILE_LOG_EMAIL_BODY = "message.batch.log.email.body";

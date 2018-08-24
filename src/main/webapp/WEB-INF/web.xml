@@ -249,10 +249,14 @@
   <!-- ******************* End Logging Filters ********************* -->
   
   ${monitoring.listener}
-  
-  <listener>
-    <listener-class>org.kuali.kra.infrastructure.KraServiceLocatorListener</listener-class>
-  </listener>
+
+	<listener>
+		<listener-class>org.kuali.kra.infrastructure.KraServiceLocatorListener</listener-class>
+	</listener>
+
+	<listener>
+		<listener-class>edu.arizona.kra.sys.batch.BatchSchedulerStarterListener</listener-class>
+	</listener>
 
   <listener>
     <listener-class>org.kuali.kra.web.listener.SessionLoggingListener</listener-class>
@@ -261,23 +265,23 @@
 <!-- Rice content Start -->
   	<listener>
     	<listener-class>org.kuali.rice.krad.web.listener.NonSerializableSessionListener</listener-class>
- 	</listener>
+ 	  </listener>
    
     <listener>
         <listener-class>org.kuali.rice.core.web.listener.BootstrapListener</listener-class>
     </listener>
 
     <listener>
-	  <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
+	    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	  </listener>
 
-	<listener>
-		<listener-class>org.kuali.rice.krad.web.listener.KualiHttpSessionListener</listener-class>
-	</listener>
+	  <listener>
+		  <listener-class>org.kuali.rice.krad.web.listener.KualiHttpSessionListener</listener-class>
+	  </listener>
     
-	<listener>
+	  <listener>
 	    <listener-class>org.kuali.rice.core.framework.config.module.WebModuleLoaderListener</listener-class>
-	</listener>
+	  </listener>
       
 	<servlet>
 		<servlet-name>action</servlet-name>

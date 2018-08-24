@@ -36,11 +36,14 @@ public class BatchSpringContext {
         if (LOG.isDebugEnabled()) {
             LOG.debug("getJobDescriptor:::::" + beanId);
         }
-        return KraServiceLocator.getAppContext().getBeansOfType(JobDescriptor.class).get(beanId);
+
+        //This does not work: return KraServiceLocator.getAppContext().getBeansOfType(JobDescriptor.class).get(beanId);
+        return KraServiceLocator.getService(beanId);
     }
 
     public static TriggerDescriptor getTriggerDescriptor(String beanId) {
-        return KraServiceLocator.getAppContext().getBeansOfType(TriggerDescriptor.class).get(beanId);
+        //This does not work: return KraServiceLocator.getAppContext().getBeansOfType(TriggerDescriptor.class).get(beanId);
+        return KraServiceLocator.getService(beanId);
     }
 
 

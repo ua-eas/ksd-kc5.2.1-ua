@@ -86,14 +86,14 @@ public class BatchJobStatus extends TransientBusinessObjectBase {
 
     public String getStatus() {
         if (isRunning()) {
-            return SchedulerService.RUNNING_JOB_STATUS_CODE;
+            return BatchConstants.RUNNING_JOB_STATUS_CODE;
         }
         String tempStatus = schedulerService.getStatus(jobDetail);
         if (tempStatus == null) {
             if (getNextRunDate() != null) {
-                return SchedulerService.SCHEDULED_JOB_STATUS_CODE;
-            } else if (getGroup().equals(SchedulerService.SCHEDULED_GROUP)) {
-                return SchedulerService.PENDING_JOB_STATUS_CODE;
+                return BatchConstants.SCHEDULED_JOB_STATUS_CODE;
+            } else if (getGroup().equals(BatchConstants.SCHEDULED_GROUP)) {
+                return BatchConstants.PENDING_JOB_STATUS_CODE;
             }
         }
         return tempStatus;
@@ -135,11 +135,11 @@ public class BatchJobStatus extends TransientBusinessObjectBase {
 
     public boolean isScheduled() {
         // is this instance in the scheuled group?
-        if (getGroup().equals(SchedulerService.SCHEDULED_GROUP)) {
+        if (getGroup().equals(BatchConstants.SCHEDULED_GROUP)) {
             return true;
         }
         // does this job exist in the scheduled group?
-        if (getSchedulerService().getJob(SchedulerService.SCHEDULED_GROUP, getName()) != null) {
+        if (getSchedulerService().getJob(BatchConstants.SCHEDULED_GROUP, getName()) != null) {
             return true;
         }
         return false;
@@ -171,7 +171,7 @@ public class BatchJobStatus extends TransientBusinessObjectBase {
 
     public void unschedule() {
         // if in scheduled group and scheduled group, remove it
-        List<BatchJobStatus> jobs = getSchedulerService().getJobs(SchedulerService.UNSCHEDULED_GROUP);
+        List<BatchJobStatus> jobs = getSchedulerService().getJobs(BatchConstants.UNSCHEDULED_GROUP);
         boolean inUnscheduledGroup = false;
         for (BatchJobStatus detail : jobs) {
             if (detail.getName().equals(getName())) {

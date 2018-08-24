@@ -146,6 +146,9 @@
     <param name="kcQuartzDatabasePrefix">KC_QRTZ_</param>
     <!-- User the kc batch jobs run as -->
     <param name="batchJobUserName">kc</param>
+    <param name="batch.quartz.thread.pool.size">8</param>
+    <param name="batch.quartz.trigger.check.interval">60000</param>
+    <param name="batch.schedule.cron.expression">00 00 23 ? * *</param>
 
     <param name="documentSearch.resultProcessor.class.name">org.kuali.kra.proposaldevelopment.document.search.ProposalDocumentSearchResultProcessor</param>
 

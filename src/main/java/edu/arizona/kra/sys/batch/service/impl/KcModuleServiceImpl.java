@@ -19,6 +19,7 @@
 package edu.arizona.kra.sys.batch.service.impl;
 
 
+import edu.arizona.kra.sys.batch.BatchConstants;
 import org.kuali.rice.krad.service.impl.ModuleServiceBase;
 import edu.arizona.kra.sys.batch.service.BatchModuleService;
 
@@ -36,7 +37,7 @@ public class KcModuleServiceImpl extends ModuleServiceBase implements BatchModul
 
     public String getExternalJobStatus(String jobName) {
         if (isExternalJob(jobName))
-            return SchedulerServiceImpl.SUCCEEDED_JOB_STATUS_CODE;
+            return BatchConstants.SUCCEEDED_JOB_STATUS_CODE;
         return null;
     }
 

@@ -25,6 +25,7 @@ import edu.arizona.kra.sys.batch.JobListener;
 import edu.arizona.kra.sys.batch.bo.Step;
 import edu.arizona.kra.sys.batch.service.BatchModuleService;
 import edu.arizona.kra.sys.batch.service.SchedulerService;
+import org.apache.commons.collections.CollectionUtils;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
@@ -83,11 +84,23 @@ public class SchedulerServiceImpl implements SchedulerService {
             throw new RuntimeException("SchedulerServiceImpl encountered an exception when trying to register the global job listener", e);
         }
         for (ModuleService moduleService : kualiModuleService.getInstalledModuleServices()) {
-            initializeJobsForModule(moduleService);
-            initializeTriggersForModule(moduleService);
+
+            if (CollectionUtils.isNotEmpty(moduleService.getModuleConfiguration().getJobNames())) {
+                initializeJobsForModule(moduleService);
+            }
+            if (CollectionUtils.isNotEmpty(moduleService.getModuleConfiguration().getTriggerNames())){
+                initializeTriggersForModule(moduleService);
+            }
         }
 
         dropDependenciesNotScheduled();
+        try {
+            //start scheduler
+            scheduler.startDelayed(10); //TODO: BatchConstants.QUARTZ_SCHEDULER_START_DELAY_SEC);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+            throw new RuntimeException("SchedulerServiceImpl: Exception when starting the Quartz Scheduler", e);
+        }
     }
 
     /**

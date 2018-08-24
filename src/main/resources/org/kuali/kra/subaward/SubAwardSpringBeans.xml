@@ -48,10 +48,11 @@ R
   	
     <bean id="subAwardModuleConfiguration" parent="subAwardModuleConfiguration-parentBean" />
     <bean id="subAwardModuleConfiguration-parentBean" class="edu.arizona.kra.subaward.config.UASubAwardModuleConfiguration" abstract="true">
-        <property name="namespaceCode" value="KC-AWARD" />
+        <property name="namespaceCode" value="KC-SUBAWARD" />
         <property name="packagePrefixes">
           <list>
             <value>org.kuali.kra.subaward</value>
+            <value>edu.arizona.kra.subaward</value>
           </list>
         </property>
         <property name="biDataSource" ref="arizona.edu.biNonTransactionalDataSource" />
@@ -61,7 +62,19 @@ R
                 <value>edu/arizona/kra/subaward/repository-invoiceFeed.xml</value>
 			      </list>
         </property>
+        <property name="triggerNames">
+          <list>
+            <value>scheduleJobTrigger</value>
+          </list>
+        </property>
+        <property name="jobNames">
+          <list>
+            <value>scheduleJob</value>
+            <value>subawardInvoiceFeedJob</value>
+          </list>
+        </property>
 	  </bean>
+
 	<bean id="dateTimeService" class="org.kuali.rice.core.framework.resourceloader.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="dateTimeService" />
     </bean>

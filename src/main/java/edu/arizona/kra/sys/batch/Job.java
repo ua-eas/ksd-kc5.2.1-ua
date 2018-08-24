@@ -86,7 +86,7 @@ public class Job implements StatefulJob, InterruptableJob {
                 // prevent starting of the next step if the thread has an interrupted status
                 if (workerThread.isInterrupted()) {
                     LOG.warn("Aborting Job execution due to manual interruption");
-                    schedulerService.updateStatus(jobExecutionContext.getJobDetail(), SchedulerService.CANCELLED_JOB_STATUS_CODE);
+                    schedulerService.updateStatus(jobExecutionContext.getJobDetail(), BatchConstants.CANCELLED_JOB_STATUS_CODE);
                     return;
                 }
                 if (startStep > 0 && currentStepNumber < startStep) {
@@ -107,22 +107,22 @@ public class Job implements StatefulJob, InterruptableJob {
                     }
                 } catch (InterruptedException ex) {
                     LOG.warn("Stopping after step interruption");
-                    schedulerService.updateStatus(jobExecutionContext.getJobDetail(), SchedulerService.CANCELLED_JOB_STATUS_CODE);
+                    schedulerService.updateStatus(jobExecutionContext.getJobDetail(), BatchConstants.CANCELLED_JOB_STATUS_CODE);
                     return;
                 }
                 if (step.isInterrupted()) {
                     LOG.warn("attempt to interrupt step failed, step continued to completion");
                     LOG.warn("cancelling remainder of job due to step interruption");
-                    schedulerService.updateStatus(jobExecutionContext.getJobDetail(), SchedulerService.CANCELLED_JOB_STATUS_CODE);
+                    schedulerService.updateStatus(jobExecutionContext.getJobDetail(), BatchConstants.CANCELLED_JOB_STATUS_CODE);
                     return;
                 }
             }
         } catch (Exception e) {
-            schedulerService.updateStatus(jobExecutionContext.getJobDetail(), SchedulerService.FAILED_JOB_STATUS_CODE);
+            schedulerService.updateStatus(jobExecutionContext.getJobDetail(), BatchConstants.FAILED_JOB_STATUS_CODE);
             throw new JobExecutionException("Caught exception in " + jobExecutionContext.getJobDetail().getName(), e, false);
         }
         LOG.info("Finished executing job: " + jobExecutionContext.getJobDetail().getName());
-        schedulerService.updateStatus(jobExecutionContext.getJobDetail(), SchedulerService.SUCCEEDED_JOB_STATUS_CODE);
+        schedulerService.updateStatus(jobExecutionContext.getJobDetail(), BatchConstants.SUCCEEDED_JOB_STATUS_CODE);
     }
 
     public static boolean runStep(ParameterService parameterService, String jobName, int currentStepNumber, Step step, Date jobRunDate) throws InterruptedException, WorkflowException {

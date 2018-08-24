@@ -18,25 +18,20 @@
  */
 package edu.arizona.kra.sys.batch;
 
-import org.apache.log4j.Logger;
 import edu.arizona.kra.sys.batch.service.SchedulerService;
+import org.apache.log4j.Logger;
 
 import java.util.Date;
 
-
-
-/**
- * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
- **/
 public class ScheduleStep extends AbstractStep {
     private static final Logger LOG = Logger.getLogger(ScheduleStep.class);
     private SchedulerService schedulerService;
 
-    @Override
-    public boolean execute(String jobName, Date jobRunDate) {
 
+    public boolean execute(String jobName, Date jobRunDate) {
+        boolean isPastScheduleCutoffTime = false;
         schedulerService.reinitializeScheduledJobs();
-        while (schedulerService.hasIncompleteJob() ) {
+        while (schedulerService.hasIncompleteJob() && !isPastScheduleCutoffTime) {
             schedulerService.processWaitingJobs();
             try {
                 Thread.sleep(Integer.parseInt(getParameterService().getParameterValueAsString(getClass(), BatchConstants.BATCH_SCHEDULE_STATUS_CHECK_INTERVAL)));
@@ -46,7 +41,7 @@ public class ScheduleStep extends AbstractStep {
         }
 
         schedulerService.logScheduleResults();
-        return true;
+        return !isPastScheduleCutoffTime;
     }
 
     /**

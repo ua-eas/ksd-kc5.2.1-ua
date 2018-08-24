@@ -36,10 +36,7 @@ import org.kuali.rice.krad.service.DocumentHeaderService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -67,9 +64,12 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     @Override
     public List<ProposalDevelopmentRoutingState> findPropDevRoutingState(Map<String, String> searchCriteria) {
         LOG.debug("getSearchResults():"+searchCriteria.toString());
-        GlDataImportService glDataImportService = KraServiceLocator.getService("GlDataImportService");
+        GlDataImportService glDataImportService = KraServiceLocator.getService("glDataImportService");
         Date today = new Date(System.currentTimeMillis());
-        Date threeDaysAgo = new Date(System.currentTimeMillis() - 1000*360*24*3);
+        Calendar c = Calendar.getInstance();
+        c.setTime(today);
+        c.add(Calendar.DATE, -3);
+        Date threeDaysAgo = new Date(c.getTimeInMillis());
         glDataImportService.importGLData(threeDaysAgo, today);
         List <ProposalDevelopmentRoutingState> results = new ArrayList<ProposalDevelopmentRoutingState>();
 //        try {

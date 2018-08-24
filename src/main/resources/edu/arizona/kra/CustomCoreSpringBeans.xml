@@ -36,7 +36,7 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml"/>
+    <!--import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml"/-->
     
     <bean id="coreModuleConfiguration" parent="coreModuleConfiguration-parentBean">
         <property name="packagePrefixes">
@@ -58,6 +58,84 @@
 
     <bean id="protocolCustomDataService" class="edu.arizona.kra.protocol.ProtocolCustomDataServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
+    </bean>
+
+    <!-- Batch Framework imported from KFS -->
+    <bean id="step" abstract="true">
+        <property name="parameterService" ref="parameterService"/>
+        <property name="dateTimeService" ref="dateTimeService"/>
+    </bean>
+
+    <bean id="scheduleStep" parent="scheduleStep-parentBean"/>
+    <bean id="scheduleStep-parentBean"  class="edu.arizona.kra.sys.batch.ScheduleStep" abstract="true" parent="step">
+        <property name="schedulerService" ref="schedulerService"/>
+    </bean>
+
+    <bean id="cronTrigger" parent="cronTrigger-parentBean" abstract="true"/>
+    <bean id="cronTrigger-parentBean" abstract="true" class="edu.arizona.kra.sys.batch.CronTriggerDescriptor">
+        <property name="group" value="scheduled"/>
+        <property name="dateTimeService" ref="dateTimeService"/>
+    </bean>
+
+    <bean id="scheduledJobDescriptor" parent="scheduledJobDescriptor-parentBean" abstract="true"/>
+    <bean id="scheduledJobDescriptor-parentBean" abstract="true" class="edu.arizona.kra.sys.batch.JobDescriptor">
+        <property name="group" value="scheduled"/>
+    </bean>
+
+    <bean id="unscheduledJobDescriptor" parent="unscheduledJobDescriptor-parentBean" abstract="true"/>
+    <bean id="unscheduledJobDescriptor-parentBean" abstract="true" class="edu.arizona.kra.sys.batch.JobDescriptor">
+        <property name="group" value="unscheduled"/>
+    </bean>
+
+    <bean id="scheduleJobTrigger" parent="scheduleJobTrigger-parentBean"/>
+    <bean id="scheduleJobTrigger-parentBean" parent="cronTrigger" abstract="true">
+        <property name="jobName" value="scheduleJob"/>
+        <property name="cronExpression" value="${batch.schedule.cron.expression}"/>
+    </bean>
+
+    <bean id="scheduleJob" parent="scheduleJob-parentBean" class="edu.arizona.kra.sys.batch.JobDescriptor"/>
+    <bean id="scheduleJob-parentBean" parent="scheduledJobDescriptor" abstract="true">
+        <property name="steps">
+            <list>
+                <ref bean="scheduleStep"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="jobListener" parent="jobListener-parentBean"/>
+    <bean id="jobListener-parentBean" class="edu.arizona.kra.sys.batch.JobListener" abstract="true">
+        <property name="configurationService" ref="kualiConfigurationService"/>
+        <property name="emailService" ref="kcEmailService"/>
+        <property name="dateTimeService" ref="dateTimeService"/>
+    </bean>
+
+    <bean id="UARScheduler" parent="scheduler-parentBean"/>
+    <bean id="scheduler-parentBean" class="edu.arizona.kra.sys.batch.SchedulerFactoryBean" abstract="true">
+        <property name="autoStartup" value="false"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="overwriteExistingJobs" value="true"/>
+        <property name="quartzPropertiesReference">
+            <props>
+                <prop key="org.quartz.scheduler.instanceId">AUTO</prop>
+                <prop key="org.quartz.scheduler.instanceName">UARScheduler</prop>
+                <prop key="org.quartz.threadPool.threadCount">${batch.quartz.thread.pool.size}</prop>
+                <prop key="org.quartz.scheduler.idleWaitTime">${batch.quartz.trigger.check.interval}</prop>
+                <prop key="org.quartz.jobStore.tablePrefix">${kcQuartzDatabasePrefix}</prop>
+                <prop key="org.quartz.plugin.triggHistory.class">org.quartz.plugins.history.LoggingTriggerHistoryPlugin</prop>
+                <prop key="org.quartz.plugin.triggHistory.triggerFiredMessage">Trigger {1}.{0} fired job {6}.{5} at: {4, date, HH:mm:ss MM/dd/yyyy}</prop>
+                <prop key="org.quartz.plugin.triggHistory.triggerCompleteMessage">Trigger {1}.{0} completed firing job {6}.{5} at {4, date, HH:mm:ss MM/dd/yyyy} with resulting trigger instruction code: {9}</prop>
+                <prop key="org.quartz.scheduler.skipUpdateCheck">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="schedulerService" parent="schedulerService-parentBean"/>
+    <bean id="schedulerService-parentBean" abstract="true" class="edu.arizona.kra.sys.batch.service.impl.SchedulerServiceImpl">
+        <property name="scheduler" ref="UARScheduler"/>
+        <property name="jobListener" ref="jobListener"/>
+        <property name="kualiModuleService" ref="kualiModuleService"/>
+        <property name="parameterService" ref="parameterService"/>
+        <property name="dateTimeService" ref="dateTimeService"/>
     </bean>
      
 </beans>

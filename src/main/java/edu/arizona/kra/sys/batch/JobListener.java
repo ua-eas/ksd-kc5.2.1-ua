@@ -26,9 +26,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 import org.apache.log4j.PatternLayout;
 
-//import org.kuali.kfs.sys.KFSKeyConstants;
-//import org.kuali.kfs.sys.context.NDCFilter;
-
 import edu.arizona.kra.sys.batch.service.SchedulerService;
 
 import org.kuali.rice.core.api.mail.MailMessage;
@@ -130,7 +127,7 @@ public class JobListener implements org.quartz.JobListener {
             if (jobExecutionContext.getMergedJobDataMap().containsKey(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY) && !StringUtils.isBlank(jobExecutionContext.getMergedJobDataMap().getString(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY))) {
                 mailMessage.addToAddress(jobExecutionContext.getMergedJobDataMap().getString(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY));
             }
-            if (SchedulerService.FAILED_JOB_STATUS_CODE.equals(jobStatus) || SchedulerService.CANCELLED_JOB_STATUS_CODE.equals(jobStatus)) {
+            if (BatchConstants.FAILED_JOB_STATUS_CODE.equals(jobStatus) || BatchConstants.CANCELLED_JOB_STATUS_CODE.equals(jobStatus)) {
                 mailMessage.addToAddress(emailService.getDefaultFromAddress());
             }
             mailMessageSubject.append(": ").append(jobStatus);
