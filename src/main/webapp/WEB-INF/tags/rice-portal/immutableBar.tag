@@ -57,6 +57,7 @@
 					<span class="icon-exit"></span>
     				<span class="icon-link-text">logout</span>
 				</a>
+				<kul:csrf/>
 			</html:form>
 		</c:otherwise>
 	</c:choose>
