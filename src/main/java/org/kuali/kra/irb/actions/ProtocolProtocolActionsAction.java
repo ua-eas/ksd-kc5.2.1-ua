@@ -2275,11 +2275,16 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         int actionIndex = getSelectedLine(request);
         int attachmentIndex = getSelectedAttachment(request);
         org.kuali.kra.irb.actions.ProtocolAction protocolAction = (org.kuali.kra.irb.actions.ProtocolAction) protocolForm.getActionHelper().getProtocol().getProtocolActions().get(actionIndex);
-        ProtocolCorrespondence attachment = (ProtocolCorrespondence) protocolAction.getProtocolCorrespondences().get(attachmentIndex);
+        ProtocolCorrespondence attachment = null;
+
+        if (protocolAction.getProtocolCorrespondences().size() > 0) {
+            attachment = (ProtocolCorrespondence) protocolAction.getProtocolCorrespondences().get(attachmentIndex);
+        }
 
         if (attachment == null) {
             LOG.info(NOT_FOUND_SELECTION + "protocolAction: " + actionIndex + ", protocolCorrespondence: " + attachmentIndex);
             // may want to tell the user the selection was invalid.
+            GlobalVariables.getMessageMap().putError("notfoundselection", NOT_FOUND_SELECTION, NOT_FOUND_SELECTION);
             return mapping.findForward(Constants.MAPPING_BASIC);
         }
 
