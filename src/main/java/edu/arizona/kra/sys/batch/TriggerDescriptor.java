@@ -23,32 +23,40 @@ import org.quartz.CronTrigger;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.BeanNameAware;
-
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 
 /**
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ * Represents a Trigger Descriptor that links the trigger to a job with jobname
  **/
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public abstract class TriggerDescriptor implements BeanNameAware {
     private String name;
     private String group;
     private String jobName;
     private DateTimeService dateTimeService;
+    private Trigger trigger;
+
     private boolean testMode = false;
 
     protected abstract void completeTriggerDescription(Trigger trigger);
 
     public Trigger getTrigger() {
-        Trigger trigger = null;
-        if (getClass().equals(SimpleTriggerDescriptor.class)) {
-            trigger = new SimpleTrigger(name, group);
-        } else {
-            trigger = new CronTrigger(name, group);
+        if (trigger == null ) {
+            if (getClass().equals(SimpleTriggerDescriptor.class)) {
+                trigger = new SimpleTrigger(name, group);
+            } else {
+                trigger = new CronTrigger(name, group);
+            }
+            trigger.setJobName(jobName);
+            trigger.setJobGroup(group);
+            trigger.setStartTime(dateTimeService.getCurrentDate());
+            completeTriggerDescription(trigger);
         }
-        trigger.setJobName(jobName);
-        trigger.setJobGroup(group);
-        trigger.setStartTime(dateTimeService.getCurrentDate());
-        completeTriggerDescription(trigger);
         return trigger;
     }
 

@@ -45,19 +45,19 @@ public class GlEntry extends KraPersistableBusinessObjectBase {
 
 
 
-    private Long entryId; //TODO Is this needed? should correspond to ENTRY_ID but we don't have that column from BI _
-    private String gecDocumentNumber; //TODO Is this needed? should correspond to GEC_FDOC_NBR but we don't have that column from BI
+//    private Long entryId; //TODO Is this needed? should correspond to ENTRY_ID but we don't have that column from BI _
+//    private String gecDocumentNumber; //TODO Is this needed? should correspond to GEC_FDOC_NBR but we don't have that column from BI
 
     public GlEntry() {
     }
 
-    public Long getEntryId() {
-        return entryId;
-    }
-
-    public void setEntryId(Long entryId) {
-        this.entryId = entryId;
-    }
+//    public Long getEntryId() {
+//        return entryId;
+//    }
+//
+//    public void setEntryId(Long entryId) {
+//        this.entryId = entryId;
+//    }
 
     public Integer getUniversityFiscalYear() {
         return universityFiscalYear;
@@ -275,13 +275,13 @@ public class GlEntry extends KraPersistableBusinessObjectBase {
         this.transactionDateTimeStamp = transactionDateTimeStamp;
     }
 
-    public String getGecDocumentNumber() {
-        return gecDocumentNumber;
-    }
-
-    public void setGecDocumentNumber(String gecDocumentNumber) {
-        this.gecDocumentNumber = gecDocumentNumber;
-    }
+//    public String getGecDocumentNumber() {
+//        return gecDocumentNumber;
+//    }
+//
+//    public void setGecDocumentNumber(String gecDocumentNumber) {
+//        this.gecDocumentNumber = gecDocumentNumber;
+//    }
 
 
 

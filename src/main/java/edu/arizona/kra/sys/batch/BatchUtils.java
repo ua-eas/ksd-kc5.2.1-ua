@@ -3,6 +3,9 @@ package edu.arizona.kra.sys.batch;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
  **/
@@ -22,5 +25,15 @@ public class BatchUtils {
 
         return object;
     }
+
+    public static String getHostname(){
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
 }

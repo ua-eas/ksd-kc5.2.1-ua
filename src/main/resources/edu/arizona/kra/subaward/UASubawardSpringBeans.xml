@@ -52,11 +52,11 @@
 
 
   <!-- Quartz configuration for SubawardInvoiceFeed batch job-->
-  <!-- Use JobDetail here since the MethodInvokingJobDetailFactoryBean does not support persistent storage-->
-  <!--<bean id="subawardInvoiceFeedBatchJobDetail" class="org.quartz.JobDetail">-->
-    <!--<property name="jobClass" value="edu.arizona.kra.subaward.batch.SubawardInvoiceFeedJob"/>-->
-    <!--<property name="name" value="subawardInvoiceFeedBatchJobDetail"/>-->
-  <!--</bean>-->
+<!--   Use JobDetail here since the MethodInvokingJobDetailFactoryBean does not support persistent storage
+  <bean id="subawardInvoiceFeedBatchJobDetail" class="org.quartz.JobDetail">
+    <property name="jobClass" value="edu.arizona.kra.subaward.batch.SubawardInvoiceFeedJob"/>
+    <property name="name" value="subawardInvoiceFeedBatchJobDetail"/>
+  </bean>-->
 
 
   <!--<bean id="subawardInvoiceFeedTrigger" class="org.kuali.kra.scheduling.quartz.KcCronTriggerBean" parent="cronTrigger">-->
@@ -70,7 +70,15 @@
     <!--<property name="parameterComponent" value="Batch"/>-->
   <!--</bean>-->
 
-  <bean id="subawardInvoiceFeedJob" parent="scheduledJobDescriptor" class="edu.arizona.kra.sys.batch.JobDescriptor">
+  <!--<bean id="subawardInvoiceFeedJobTrigger" parent="subawardInvoiceFeedJobTrigger-parentBean"/>-->
+  <!--<bean id="subawardInvoiceFeedJobTrigger-parentBean" parent="cronTrigger" abstract="true">-->
+    <!--<property name="jobName" value="subawardInvoiceFeedJob"/>-->
+    <!--<property name="cronExpression" value="${batch.schedule.cron.expression}"/>-->
+  <!--</bean>-->
+
+
+
+  <bean id="subawardInvoiceFeedJob" parent="scheduledJobDescriptor" >
     <property name="steps">
       <list>
         <ref bean="importGLDataStep"/>
@@ -101,6 +109,5 @@
       <ref bean="SubawardGlFeedDao"/>
     </property>
   </bean>
-
 
 </beans>

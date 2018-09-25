@@ -22,8 +22,6 @@ public class BatchSchedulerStarterListener implements ServletContextListener {
         try {
             LOG.info("Attempting to initialize the SchedulerService");
             KraServiceLocator.getService(SchedulerService.class).initialize();
-
-            //KraServiceLocator.getService(Scheduler.class).start();
         } catch (NoSuchBeanDefinitionException e) {
             LOG.warn("Not initializing the scheduler because there is no scheduler bean");
         } catch (Exception ex) {

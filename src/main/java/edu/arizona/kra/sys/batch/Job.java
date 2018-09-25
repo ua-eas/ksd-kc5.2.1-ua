@@ -139,9 +139,7 @@ public class Job implements StatefulJob, InterruptableJob {
         GlobalVariables.clear();
 
         String stepUserName = KRADConstants.SYSTEM_USER;
-        if (parameterService.parameterExists(stepClass, BatchConstants.STEP_USER_PARM_NM)) {
-            stepUserName = parameterService.getParameterValueAsString(stepClass, BatchConstants.STEP_USER_PARM_NM);
-        }
+
         if (LOG.isInfoEnabled()) {
             LOG.info(new StringBuffer("Creating user session for step: ").append(step.getName()).append("=").append(stepUserName));
         }

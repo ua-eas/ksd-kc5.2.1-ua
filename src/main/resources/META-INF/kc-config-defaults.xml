@@ -148,7 +148,8 @@
     <param name="batchJobUserName">kc</param>
     <param name="batch.quartz.thread.pool.size">8</param>
     <param name="batch.quartz.trigger.check.interval">60000</param>
-    <param name="batch.schedule.cron.expression">00 00 23 ? * *</param>
+    <param name="batch.schedule.cron.expression">0 */2 * ? * *</param>
+    <param name="reports.directory">${user.home}/kuali/main/dev/</param>
 
     <param name="documentSearch.resultProcessor.class.name">org.kuali.kra.proposaldevelopment.document.search.ProposalDocumentSearchResultProcessor</param>
 

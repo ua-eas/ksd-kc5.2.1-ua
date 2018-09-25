@@ -19,6 +19,11 @@
 package edu.arizona.kra.sys.batch.service;
 
 
+import edu.arizona.kra.sys.batch.TriggerDescriptor;
+import org.quartz.Trigger;
+
+import java.util.List;
+
 /**
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
  *
@@ -42,5 +47,13 @@ public interface BatchModuleService {
      * @return one of the status code constants defined in {@link edu.arizona.kra.sys.batch.service.SchedulerService}
      */
     public String getExternalJobStatus(String jobName);
+
+
+    /**
+     * This method returns dynamically instantiated trigger descriptors for the module
+     *
+     * @return List<TriggerDescriptor>
+     */
+    public List<TriggerDescriptor> getTriggerDescriptors();
 
 }

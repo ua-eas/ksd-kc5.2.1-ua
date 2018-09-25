@@ -10,7 +10,7 @@ public final class InvoiceFeedConstants {
     public static String BI_GL_TABLE_SELECT_QUERY1="select * from KUALI_ADMIN.KF_UA_DPT_UAR_GL_ENTRY " +
             "WHERE ((FIN_OBJECT_CD IN ('3340', '3350')) AND (FIN_BALANCE_TYP_CD = 'AC') "+
             "AND (TRN_POST_DT BETWEEN timestamp '";
-    public static String BI_GL_TABLE_SELECT_QUERY2="' AND timestamp '";
+    public static String BI_GL_TABLE_SELECT_QUERY2="' AND timestamp '";F
     public static String BI_GL_TABLE_SELECT_QUERY3= "') AND (UNIV_FISCAL_PRD_CD NOT IN ('BB', 'AB', 'CB')) AND (UNIV_FISCAL_YR > 2015))";
 
 
@@ -41,6 +41,13 @@ public final class InvoiceFeedConstants {
     public static final String COL_GL_TRN_ENCUM_UPDT_CD = "TRN_ENCUM_UPDT_CD";
     public static final String COL_GL_TRN_POST_DT = "TRN_POST_DT";
     public static final String COL_GL_TIMESTAMP = "TIMESTAMP";
+
+    public static final String INVOICE_FEED_TRIGGER_NAME = "SUBAWARD_INV_FEED_TRIGGER";
+    public static final String INVOICE_FEED_JOB_NAME = "subawardInvoiceFeedJob";
+    public static final String INVOICE_FEED_JOB_GROUP = "scheduled";
+
+    public static final String DAYS_INTERVAL_KEY = "DAYS_INTERVAL";
+    public static final int DEFAULT_DATA_INTERVAL_DAYS = 1;
 
     public static final String TIMESTAMP_ZERO = " 00:00:00";
     public static final String TIMESTAMP_EOD = " 23:59:59";

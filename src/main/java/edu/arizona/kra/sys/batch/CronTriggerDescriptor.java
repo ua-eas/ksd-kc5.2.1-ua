@@ -20,14 +20,22 @@ package edu.arizona.kra.sys.batch;
 
 import org.quartz.CronTrigger;
 import org.quartz.Trigger;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 
 
 /**
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
+ * Represents a Cron Trigger Descriptor - has a cron expresion to be set on the trigger
  **/
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class CronTriggerDescriptor extends TriggerDescriptor {
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(TriggerDescriptor.class);
+
     private String cronExpression;
 
 
@@ -41,7 +49,10 @@ public class CronTriggerDescriptor extends TriggerDescriptor {
                 ((CronTrigger) trigger).setCronExpression("0 59 23 31 12 ? 2099");
             }
         } catch (ParseException e) {
-            throw new RuntimeException("Caught exception while trying to set the cronExpression attribute of a CronTrigger: " + getJobName(), e);
+            LOG.error("Invalid CRON EXPRESSION: "+cronExpression+" while trying to set the cronExpression attribute of a CronTrigger: " + getJobName(), e);
+            try {
+                ((CronTrigger) trigger).setCronExpression("0 59 23 31 12 ? 2099");
+            } catch (ParseException x){}
         }
     }
 

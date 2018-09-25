@@ -20,14 +20,18 @@ package edu.arizona.kra.sys.batch.service.impl;
 
 
 import edu.arizona.kra.sys.batch.BatchConstants;
-import org.kuali.rice.krad.service.impl.ModuleServiceBase;
+import edu.arizona.kra.sys.batch.TriggerDescriptor;
 import edu.arizona.kra.sys.batch.service.BatchModuleService;
+import org.kuali.rice.krad.service.impl.ModuleServiceBase;
+
+import java.util.List;
 
 /**
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
  * This class is the KC implementation of a module service. It also implements the batch related methods
  */
 public class KcModuleServiceImpl extends ModuleServiceBase implements BatchModuleService {
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(KcModuleServiceImpl.class);
 
 
     public boolean isExternalJob(String jobName) {
@@ -38,6 +42,10 @@ public class KcModuleServiceImpl extends ModuleServiceBase implements BatchModul
     public String getExternalJobStatus(String jobName) {
         if (isExternalJob(jobName))
             return BatchConstants.SUCCEEDED_JOB_STATUS_CODE;
+        return null;
+    }
+
+    public List<TriggerDescriptor> getTriggerDescriptors(){
         return null;
     }
 

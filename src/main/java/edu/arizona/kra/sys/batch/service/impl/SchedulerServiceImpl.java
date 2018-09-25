@@ -26,6 +26,7 @@ import edu.arizona.kra.sys.batch.bo.Step;
 import edu.arizona.kra.sys.batch.service.BatchModuleService;
 import edu.arizona.kra.sys.batch.service.SchedulerService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
@@ -74,34 +75,83 @@ public class SchedulerServiceImpl implements SchedulerService {
         externalizedJobDescriptors = new HashMap<>();
     }
 
+
+    public boolean isBatchNode(){
+        LOG.info("isBatchNode: hostname="+BatchUtils.getHostname());
+        //TODO dummy data. Implement this!!!
+        return true;
+    }
+
     @Override
     public void initialize() {
-        LOG.info("Initializing the schedule");
-        jobListener.setSchedulerService(this);
-        try {
-            scheduler.addGlobalJobListener(jobListener);
-        } catch (SchedulerException e) {
-            throw new RuntimeException("SchedulerServiceImpl encountered an exception when trying to register the global job listener", e);
-        }
-        for (ModuleService moduleService : kualiModuleService.getInstalledModuleServices()) {
-
-            if (CollectionUtils.isNotEmpty(moduleService.getModuleConfiguration().getJobNames())) {
-                initializeJobsForModule(moduleService);
+        LOG.info("Initializing the quartz batch scheduler nodeName="+BatchUtils.getHostname()+" isBatchNode="+isBatchNode());
+        //only start scheduler and jobs if hostname is set to be the batch node in the BATCH_HOSTNAME parameter
+        if ( isBatchNode() ) {
+            jobListener.setSchedulerService(this);
+            try {
+                scheduler.addGlobalJobListener(jobListener);
+            } catch (SchedulerException e) {
+                throw new RuntimeException("SchedulerServiceImpl encountered an exception when trying to register the global job listener", e);
             }
-            if (CollectionUtils.isNotEmpty(moduleService.getModuleConfiguration().getTriggerNames())){
-                initializeTriggersForModule(moduleService);
-            }
-        }
+            removeOldJobsAndTriggers();
+            for (ModuleService moduleService : kualiModuleService.getInstalledModuleServices()) {
 
-        dropDependenciesNotScheduled();
-        try {
-            //start scheduler
-            scheduler.startDelayed(10); //TODO: BatchConstants.QUARTZ_SCHEDULER_START_DELAY_SEC);
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-            throw new RuntimeException("SchedulerServiceImpl: Exception when starting the Quartz Scheduler", e);
+                if (CollectionUtils.isNotEmpty(moduleService.getModuleConfiguration().getJobNames())) {
+                    initializeJobsForModule(moduleService);
+                    initializeTriggersForModule(moduleService);
+                }
+            }
+
+            dropDependenciesNotScheduled();
+            try {
+                //start scheduler
+                scheduler.startDelayed(10); //TODO <-- just for testing purposes... have to use this instead-> BatchConstants.QUARTZ_SCHEDULER_START_DELAY_SEC);
+            } catch (SchedulerException e) {
+                e.printStackTrace();
+                throw new RuntimeException("SchedulerServiceImpl: Exception when starting the Quartz Scheduler", e);
+            }
+        } else {
+            LOG.info("Skipping the initialization - "+BatchUtils.getHostname()+" is NOT a batch node !");
         }
     }
+
+    /**
+     * Method that cleans up the scheduled jobs and triggers from the DB when the scheduler starts. THis prevents old stale jobs from existing in the DB.
+     */
+    protected void removeOldJobsAndTriggers(){
+
+        try {
+            removeTriggers(BatchConstants.SCHEDULED_GROUP);
+            removeTriggers(BatchConstants.UNSCHEDULED_GROUP);
+
+            removeJobs(BatchConstants.SCHEDULED_GROUP);
+            removeJobs(BatchConstants.UNSCHEDULED_GROUP);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            LOG.info("Exception at removeOldJobsAndTriggers:",e);
+        }
+    }
+
+    private void removeJobs(String groupName) throws SchedulerException{
+        String[] jobNames = scheduler.getJobNames(groupName);
+        if (ArrayUtils.isNotEmpty(jobNames)){
+            for (String job:jobNames){
+                scheduler.deleteJob(job,groupName);
+            }
+        }
+    }
+
+    private void removeTriggers(String groupName) throws SchedulerException{
+        String[] triggerNames = scheduler.getTriggerNames(groupName);
+        if (ArrayUtils.isNotEmpty(triggerNames)){
+            for (String trigger:triggerNames){
+                scheduler.unscheduleJob(trigger,groupName);
+            }
+        }
+    }
+
+
 
     /**
      * Initializes all of the jobs into Quartz for the given ModuleService
@@ -141,6 +191,19 @@ public class SchedulerServiceImpl implements SchedulerService {
      * @param moduleService the ModuleService instance to initialize triggers for
      */
     protected void initializeTriggersForModule(ModuleService moduleService) {
+        //add dynamically instantiated triggers for module
+        if (moduleService instanceof KcModuleServiceImpl && CollectionUtils.isNotEmpty(((KcModuleServiceImpl)moduleService).getTriggerDescriptors())){
+            for (TriggerDescriptor triggerDesc: ((KcModuleServiceImpl) moduleService).getTriggerDescriptors()){
+                try {
+                    BatchSpringContext.registerTriggerDescriptor(triggerDesc);
+                    addTrigger(triggerDesc.getTrigger());
+                    LOG.info("Test: "+BatchSpringContext.getTriggerDescriptor(triggerDesc.getTrigger().getName()));
+                } catch (Exception ex) {
+                    LOG.error("Unable to install " + triggerDesc.toString() + " trigger into scheduler.", ex);
+                }
+            }
+        }
+        //add regular .xml defined triggers - if any
         if (moduleService.getModuleConfiguration().getTriggerNames() != null) {
             for (String triggerName : moduleService.getModuleConfiguration().getTriggerNames()) {
                 try {
@@ -349,6 +412,11 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
+
+    /**
+     * Adds a new trigger or replaces an existing trigger in the scheduler
+     * @param trigger -> Trigger to be added.
+     */
     protected void addTrigger(Trigger trigger) {
         try {
             if (UNSCHEDULED_GROUP.equals(trigger.getGroup())) {
@@ -356,8 +424,14 @@ public class SchedulerServiceImpl implements SchedulerService {
             } else {
                 LOG.info("Adding trigger: " + trigger.getName());
                 try {
-                    scheduler.scheduleJob(trigger);
+                   Trigger oldTrigger =  scheduler.getTrigger(trigger.getName(), trigger.getGroup());
+                   if ( oldTrigger != null ){
+                       scheduler.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
+                   } else {
+                       scheduler.scheduleJob(trigger);
+                   }
                 } catch (ObjectAlreadyExistsException ex) {
+                    LOG.debug("Caught ex: ", ex);
                 }
             }
         } catch (SchedulerException e) {

@@ -71,12 +71,6 @@
         <property name="schedulerService" ref="schedulerService"/>
     </bean>
 
-    <bean id="cronTrigger" parent="cronTrigger-parentBean" abstract="true"/>
-    <bean id="cronTrigger-parentBean" abstract="true" class="edu.arizona.kra.sys.batch.CronTriggerDescriptor">
-        <property name="group" value="scheduled"/>
-        <property name="dateTimeService" ref="dateTimeService"/>
-    </bean>
-
     <bean id="scheduledJobDescriptor" parent="scheduledJobDescriptor-parentBean" abstract="true"/>
     <bean id="scheduledJobDescriptor-parentBean" abstract="true" class="edu.arizona.kra.sys.batch.JobDescriptor">
         <property name="group" value="scheduled"/>
@@ -87,20 +81,32 @@
         <property name="group" value="unscheduled"/>
     </bean>
 
-    <bean id="scheduleJobTrigger" parent="scheduleJobTrigger-parentBean"/>
-    <bean id="scheduleJobTrigger-parentBean" parent="cronTrigger" abstract="true">
-        <property name="jobName" value="scheduleJob"/>
-        <property name="cronExpression" value="${batch.schedule.cron.expression}"/>
+    <!--<bean id="scheduleJobTrigger" parent="scheduleJobTrigger-parentBean"/>-->
+    <!--<bean id="scheduleJobTrigger-parentBean" parent="cronTrigger" abstract="true">-->
+        <!--<property name="jobName" value="scheduleJob"/>-->
+        <!--<property name="cronExpression" value="${batch.schedule.cron.expression}"/>-->
+    <!--</bean>-->
+
+
+    <bean id="trigger" abstract="true">
+        <property name="group" value="scheduled"/>
+        <property name="dateTimeService" ref="dateTimeService"/>
     </bean>
 
-    <bean id="scheduleJob" parent="scheduleJob-parentBean" class="edu.arizona.kra.sys.batch.JobDescriptor"/>
-    <bean id="scheduleJob-parentBean" parent="scheduledJobDescriptor" abstract="true">
-        <property name="steps">
-            <list>
-                <ref bean="scheduleStep"/>
-            </list>
-        </property>
-    </bean>
+    <bean id="simpleTrigger" parent="simpleTrigger-parentBean" abstract="true"/>
+    <bean id="simpleTrigger-parentBean" abstract="true" parent="trigger" class="edu.arizona.kra.sys.batch.SimpleTriggerDescriptor"/>
+
+    <bean id="cronTrigger" parent="cronTrigger-parentBean" abstract="true"/>
+    <bean id="cronTrigger-parentBean" abstract="true" parent="trigger" class="edu.arizona.kra.sys.batch.CronTriggerDescriptor"/>
+
+    <!--<bean id="scheduleJob" parent="scheduleJob-parentBean" class="edu.arizona.kra.sys.batch.JobDescriptor"/>-->
+    <!--<bean id="scheduleJob-parentBean" parent="scheduledJobDescriptor" abstract="true">-->
+        <!--<property name="steps">-->
+            <!--<list>-->
+                <!--<ref bean="scheduleStep"/>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
 
     <bean id="jobListener" parent="jobListener-parentBean"/>
     <bean id="jobListener-parentBean" class="edu.arizona.kra.sys.batch.JobListener" abstract="true">

@@ -21,6 +21,7 @@ package edu.arizona.kra.sys.batch;
 import org.apache.log4j.Logger;
 import edu.arizona.kra.sys.batch.bo.Step;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.springframework.context.ApplicationContext;
 
 /**
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
@@ -44,6 +45,14 @@ public class BatchSpringContext {
     public static TriggerDescriptor getTriggerDescriptor(String beanId) {
         //This does not work: return KraServiceLocator.getAppContext().getBeansOfType(TriggerDescriptor.class).get(beanId);
         return KraServiceLocator.getService(beanId);
+    }
+
+    public static void registerTriggerDescriptor(TriggerDescriptor triggerDescriptor) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("registerTriggerDescriptor:::::" + triggerDescriptor);
+        }
+        ApplicationContext appContext = KraServiceLocator.getAppContext();
+        appContext.getAutowireCapableBeanFactory().autowireBean(triggerDescriptor);
     }
 
 

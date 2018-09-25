@@ -19,16 +19,22 @@
 package edu.arizona.kra.sys.batch;
 
 import edu.arizona.kra.sys.batch.bo.Step;
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
+import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.COMPONENT;
+import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.NAMESPACE;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
+
+import static org.kuali.rice.coreservice.framework.parameter.ParameterConstants.BATCH_COMPONENT;
 
 /**
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
  **/
-public abstract class AbstractStep implements Step, BeanNameAware, InitializingBean{
+@COMPONENT(component = BATCH_COMPONENT)
+public abstract class AbstractStep implements Step, BeanNameAware, InitializingBean {
 
     private static final Logger LOG = Logger.getLogger(AbstractStep.class);
 
