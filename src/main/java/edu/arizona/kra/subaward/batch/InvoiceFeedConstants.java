@@ -5,12 +5,19 @@ package edu.arizona.kra.subaward.batch;
  */
 public final class InvoiceFeedConstants {
 
+    public static final String PARAM_NAMESPACE_SUBWAWARD="KC-SUBAWARD";
+    public static final String PARAM_COMPONENT_BATCH="Batch";
+
+    public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_ENABLED="subAwardInvoiceFeedJobEnabled";
+    public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_SCHEDULE="subAwardInvoiceFeedJobRunSchedule";
+    public static final String PARAM_NAME_SUBAWARD_INVOICE_DATA_INTERVALS="subAwardInvoiceFeedJobDataIntervalsDays";
+
     public static String CLEAR_GL_IMPORT_TABLE_QUERY="truncate table SUBAWARD_GL_IMPORT";
 
     public static String BI_GL_TABLE_SELECT_QUERY1="select * from KUALI_ADMIN.KF_UA_DPT_UAR_GL_ENTRY " +
             "WHERE ((FIN_OBJECT_CD IN ('3340', '3350')) AND (FIN_BALANCE_TYP_CD = 'AC') "+
             "AND (TRN_POST_DT BETWEEN timestamp '";
-    public static String BI_GL_TABLE_SELECT_QUERY2="' AND timestamp '";F
+    public static String BI_GL_TABLE_SELECT_QUERY2="' AND timestamp '";
     public static String BI_GL_TABLE_SELECT_QUERY3= "') AND (UNIV_FISCAL_PRD_CD NOT IN ('BB', 'AB', 'CB')) AND (UNIV_FISCAL_YR > 2015))";
 
 
@@ -51,5 +58,6 @@ public final class InvoiceFeedConstants {
 
     public static final String TIMESTAMP_ZERO = " 00:00:00";
     public static final String TIMESTAMP_EOD = " 23:59:59";
+
 
 }

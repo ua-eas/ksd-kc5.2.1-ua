@@ -37,17 +37,18 @@ public class GlDataImportServiceImpl implements GlDataImportService {
 
             List<BiGlEntry> biGlEntryList = biGLFeedDao.importGLData(beginDate, endDate);
             if (biGlEntryList.isEmpty() ){
-                //TODO handle this: write notice report!
+                LOG.info("GLDataImportService: importGLData: 0 rows were returned from BI!");
+                //TODO handle this: write notice report! -> entry in error table??
                 return 0;
             }
             List<UAGlEntry> importedGlEntries = InvoiceFeedUtils.translateBiGlEntries(biGlEntryList);
-            getBusinessObjectService().save(importedGlEntries);
+            List<?> result = getBusinessObjectService().save(importedGlEntries);
+            importedLinesCount = result.size();
         } catch (Exception e){
             LOG.error(e);
-            //TODO How to handle the exceptions!???!!! -> create a error for the error reporting step + abort rest of jobs -> in the higher layer
+            throw new RuntimeException(e);
         }
 
-        LOG.info("GlDataImportService: Number of imported lines:"+importedLinesCount);
         return  importedLinesCount;
 
     }

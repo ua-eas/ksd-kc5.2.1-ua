@@ -1,43 +1,17 @@
-/*
- * The Kuali Financial System, a comprehensive financial management system for higher education.
- *
- * Copyright 2005-2017 Kuali, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package edu.arizona.kra.sys.batch;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
-import org.apache.log4j.PatternLayout;
-
 import edu.arizona.kra.sys.batch.service.SchedulerService;
-
-import org.kuali.rice.core.api.mail.MailMessage;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.*;
 import org.kuali.kra.service.KcEmailService;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.core.api.mail.MailMessage;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Calendar;
 
 
@@ -131,13 +105,13 @@ public class JobListener implements org.quartz.JobListener {
                 mailMessage.addToAddress(emailService.getDefaultFromAddress());
             }
             mailMessageSubject.append(": ").append(jobStatus);
-            String messageText = MessageFormat.format(configurationService.getPropertyValueAsString(BatchConstants.MESSAGE_BATCH_FILE_LOG_EMAIL_BODY), getLogFileName(NDC.peek()));
-            mailMessage.setMessage(messageText);
-            if (mailMessage.getToAddresses().size() > 0) {
-                mailMessage.setSubject(mailMessageSubject.toString());
-                //TODO implement this!!!!! -> diffrent implemtenation in KC
-                //emailService.sendEmail(mailMessage,false);
-            }
+//            String messageText = MessageFormat.format(configurationService.getPropertyValueAsString(BatchConstants.MESSAGE_BATCH_FILE_LOG_EMAIL_BODY), getLogFileName(NDC.peek()));
+//            mailMessage.setMessage(messageText);
+//            if (mailMessage.getToAddresses().size() > 0) {
+//                mailMessage.setSubject(mailMessageSubject.toString());
+//                //TODO implement this!!!!! -> diffrent implemtenation in KC
+//                //emailService.sendEmail(mailMessage,false);
+//            }
         } catch (Exception iae) {
             LOG.error("Caught exception while trying to send job completion notification e-mail for " + jobExecutionContext.getJobDetail().getName(), iae);
         }

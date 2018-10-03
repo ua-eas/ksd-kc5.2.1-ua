@@ -27,6 +27,7 @@ import edu.arizona.kra.sys.batch.service.BatchModuleService;
 import edu.arizona.kra.sys.batch.service.SchedulerService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
@@ -75,11 +76,13 @@ public class SchedulerServiceImpl implements SchedulerService {
         externalizedJobDescriptors = new HashMap<>();
     }
 
-
     public boolean isBatchNode(){
         LOG.info("isBatchNode: hostname="+BatchUtils.getHostname());
-        //TODO dummy data. Implement this!!!
-        return true;
+        if ( parameterService.parameterExists(BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME, BatchConstants.BATCH_COMPONENT_CODE, BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME)) {
+            String batchNodename = parameterService.getParameterValueAsString(BatchConstants.NAMESPACE_KC_SYS, BatchConstants.BATCH_COMPONENT_CODE, BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME);
+            return StringUtils.equals( BatchUtils.getHostname(), batchNodename);
+        }
+        return false;
     }
 
     @Override
@@ -195,9 +198,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (moduleService instanceof KcModuleServiceImpl && CollectionUtils.isNotEmpty(((KcModuleServiceImpl)moduleService).getTriggerDescriptors())){
             for (TriggerDescriptor triggerDesc: ((KcModuleServiceImpl) moduleService).getTriggerDescriptors()){
                 try {
-                    BatchSpringContext.registerTriggerDescriptor(triggerDesc);
                     addTrigger(triggerDesc.getTrigger());
-                    LOG.info("Test: "+BatchSpringContext.getTriggerDescriptor(triggerDesc.getTrigger().getName()));
                 } catch (Exception ex) {
                     LOG.error("Unable to install " + triggerDesc.toString() + " trigger into scheduler.", ex);
                 }
@@ -321,15 +322,21 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Override
     public boolean shouldNotRun(JobDetail jobDetail) {
-        if (SCHEDULED_GROUP.equals(jobDetail.getGroup())) {
-            if (isCancelled(jobDetail)) {
-                LOG.info("Telling listener not to run job, because it has been cancelled: " + jobDetail.getName());
-                return true;
-            } else {
-                for (String dependencyJobName : getJobDependencies(jobDetail.getName()).keySet()) {
-                    if (!isDependencySatisfiedPositively(jobDetail, getScheduledJobDetail(dependencyJobName))) {
-                        LOG.info("Telling listener not to run job, because a dependency has not been satisfied positively: " + jobDetail.getName() + " (dependency job = " + dependencyJobName + ")");
-                        return true;
+        if (isBatchNode()) {
+            if (SCHEDULED_GROUP.equals(jobDetail.getGroup())) {
+                if ( isDisabled(jobDetail)) {
+                    return true;
+                }
+
+                if (isCancelled(jobDetail)) {
+                    LOG.info("Telling listener not to run job, because it has been cancelled: " + jobDetail.getName());
+                    return true;
+                } else {
+                    for (String dependencyJobName : getJobDependencies(jobDetail.getName()).keySet()) {
+                        if (!isDependencySatisfiedPositively(jobDetail, getScheduledJobDetail(dependencyJobName))) {
+                            LOG.info("Telling listener not to run job, because a dependency has not been satisfied positively: " + jobDetail.getName() + " (dependency job = " + dependencyJobName + ")");
+                            return true;
+                        }
                     }
                 }
             }
@@ -356,13 +363,12 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Override
     public void runJob(String groupName, String jobName, int startStep, int stopStep, Date jobStartTime, String requestorEmailAddress) {
-        LOG.info("Executing user initiated job: " + groupName + "." + jobName + " (startStep=" + startStep + " / stopStep=" + stopStep + " / startTime=" + jobStartTime + " / requestorEmailAddress=" + requestorEmailAddress + ")");
+        if ( isBatchNode() ) {
+            LOG.info("Executing user initiated job: " + groupName + "." + jobName + " (startStep=" + startStep + " / stopStep=" + stopStep + " / startTime=" + jobStartTime + " / requestorEmailAddress=" + requestorEmailAddress + ")");
 
-        try {
-            JobDetail jobDetail = scheduler.getJobDetail(jobName, groupName);
             scheduleJob(groupName, jobName, startStep, stopStep, jobStartTime, requestorEmailAddress, null);
-        } catch (SchedulerException ex) {
-            throw new RuntimeException("Unable to run a job directly", ex);
+        } else {
+            LOG.info("NOT batch node. Cannot execute user initiated job: " + groupName + "." + jobName);
         }
     }
 
@@ -539,6 +545,17 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     protected boolean isCancelled(JobDetail jobDetail) {
         return CANCELLED_JOB_STATUS_CODE.equals(getStatus(jobDetail));
+    }
+
+    protected boolean isDisabled(JobDetail jobDetail){
+        if ( jobDetail.getJobDataMap().get(BatchConstants.JOB_ENABLED_KEY) != null ){
+            String jobEnabled = jobDetail.getJobDataMap().getString(BatchConstants.JOB_ENABLED_KEY);
+            if (StringUtils.equalsIgnoreCase(Boolean.FALSE.toString(), jobEnabled) || StringUtils.equalsIgnoreCase(BatchConstants.JOB_DISABLED_VALUE, jobEnabled)){
+                LOG.debug("Job "+jobDetail.getFullName()+" is DISABLED!!! jobDataMapValue="+jobEnabled);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

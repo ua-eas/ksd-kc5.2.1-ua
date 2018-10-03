@@ -37,12 +37,12 @@ public class BiDBConnection implements Closeable{
      * @throws LookupException
      */
     public ResultSet executeQuery(String sqlQuery, Object[] queryParams) throws SQLException{
-        LOG.debug("executeQuery={}",sqlQuery);
+        LOG.info("executeQuery={}",sqlQuery);
         conn = dataSource.getConnection();
         ps = conn.prepareStatement(sqlQuery);
         setParams(ps, queryParams);
         rs = ps.executeQuery();
-        LOG.debug("executeQuery successfully ended. Result set fetch size="+rs.getFetchSize());
+        LOG.debug("executeQuery successfully ended.");
         return rs;
     }
 

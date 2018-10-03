@@ -2,6 +2,7 @@ package edu.arizona.kra.subaward.batch;
 
 import edu.arizona.kra.subaward.batch.service.GlDataImportService;
 import edu.arizona.kra.sys.batch.AbstractStep;
+import org.quartz.JobDataMap;
 
 import java.util.Date;
 
@@ -20,18 +21,32 @@ public class ImportGLDataStep extends AbstractStep {
     }
 
     /**
-     * @see edu.arizona.kra.sys.batch.bo.Step#execute(java.lang.String, java.util.Date)
+     * @see edu.arizona.kra.sys.batch.bo.Step#execute(java.lang.String, java.util.Date, JobDataMap jobDataMap)
      */
     @Override
-    public boolean execute(String jobName, Date jobRunDate) throws InterruptedException {
-        LOG.debug("execute() started");
+    public boolean execute(String jobName, Date jobRunDate, JobDataMap jobDataMap) throws InterruptedException {
+        LOG.debug("ImportGLDataStep: execute() started");
         java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
-        java.sql.Date threeDaysAgo = InvoiceFeedUtils.substractDaysFromDate(today, 3);
+        int daysInterval = getDataIntervalInDays(jobDataMap);
+        java.sql.Date startDate = InvoiceFeedUtils.substractDaysFromDate(today, daysInterval);
 
-        //TODO set appropriate dates from Trigger - figure out how to get that info in the step
-        glDataImportService.importGLData(threeDaysAgo, today);
+        glDataImportService.importGLData(startDate, today);
+        LOG.debug("ImportGLDataStep: execute() finished");
 
         return true;
+    }
+
+    protected int getDataIntervalInDays(JobDataMap jobDataMap ){
+        Integer daysInterval = InvoiceFeedConstants.DEFAULT_DATA_INTERVAL_DAYS;
+        if ( jobDataMap != null && jobDataMap.get(InvoiceFeedConstants.DAYS_INTERVAL_KEY) != null ){
+            try{
+                daysInterval = (Integer) jobDataMap.get(InvoiceFeedConstants.DAYS_INTERVAL_KEY);
+            } catch (ClassCastException e){
+                daysInterval = InvoiceFeedConstants.DEFAULT_DATA_INTERVAL_DAYS;
+                LOG.error("ImportGLDataStep: could not parse days interval: "+jobDataMap.getString(InvoiceFeedConstants.DAYS_INTERVAL_KEY)+" using default value:"+daysInterval);
+            }
+        }
+        return daysInterval;
     }
 
 

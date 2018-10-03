@@ -37,7 +37,7 @@ public class SubawardModuleServiceImpl extends KcModuleServiceImpl implements Ba
                     CronTriggerDescriptor triggerDescriptor = buildSubawardInvoiceFeedTriggerDescriptor(INVOICE_FEED_TRIGGER_NAME + "_" + (index + 1), cronExpression);
 
                     //set additional data on the trigger for the data interval to be passed to the job when fired
-                    int dataInterval = DEFAULT_DATA_INTERVAL_DAYS;
+                    Integer dataInterval = DEFAULT_DATA_INTERVAL_DAYS;
                     try {
                         dataInterval = dataIntervals.get(index);
                     } catch (Exception e) {
@@ -50,6 +50,8 @@ public class SubawardModuleServiceImpl extends KcModuleServiceImpl implements Ba
 
                     index++;
                 }
+            } else {
+                LOG.info("Subaward Invoice feed DISABLED. Skipping adding trigers.");
             }
         }
         return triggerDescriptors;

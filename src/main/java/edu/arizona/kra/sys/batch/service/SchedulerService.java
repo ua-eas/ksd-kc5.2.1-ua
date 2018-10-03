@@ -44,6 +44,12 @@ public interface SchedulerService {
      */
     public boolean hasIncompleteJob();
 
+    /**
+     * Checks if the current host name matches the batch host name parameter, otherwise returns false.
+     * @return
+     */
+    public boolean isBatchNode();
+
 
 
     public void processWaitingJobs();

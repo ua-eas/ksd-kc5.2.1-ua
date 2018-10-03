@@ -1,5 +1,7 @@
 package edu.arizona.kra.sys.batch.bo;
 
+import org.quartz.JobDataMap;
+
 import java.util.Date;
 
 /**
@@ -11,10 +13,11 @@ public interface Step {
      *
      * @param jobName    the name of the job running the step
      * @param jobRunDate the time/date the job is executed
+     * @param jobExecutionContext Job execution context that also contains the JobDataMap
      * @return true if successful and continue the job, false if successful and stop the job
      * @throws Throwable if unsuccessful
      */
-    public boolean execute(String jobName, Date jobRunDate) throws InterruptedException;
+    public boolean execute(String jobName, Date jobRunDate, JobDataMap jobDataMap) throws InterruptedException;
 
     /**
      * Return id of this step spring bean.

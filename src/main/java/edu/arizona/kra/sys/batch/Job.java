@@ -1,21 +1,3 @@
-/*
- * The Kuali Financial System, a comprehensive financial management system for higher education.
- *
- * Copyright 2005-2017 Kuali, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package edu.arizona.kra.sys.batch;
 
 import edu.arizona.kra.sys.batch.bo.Step;
@@ -42,8 +24,8 @@ import java.util.List;
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
  **/
 public class Job implements StatefulJob, InterruptableJob {
-
     private static final Logger LOG = Logger.getLogger(Job.class);
+
     private SchedulerService schedulerService;
     private ParameterService parameterService;
     private DateTimeService dateTimeService;
@@ -102,7 +84,7 @@ public class Job implements StatefulJob, InterruptableJob {
                 }
                 step.setInterrupted(false);
                 try {
-                    if (!runStep(parameterService, jobExecutionContext.getJobDetail().getFullName(), currentStepNumber, step, jobRunDate)) {
+                    if (!runStep(jobExecutionContext, jobExecutionContext.getJobDetail().getFullName(), currentStepNumber, step, jobRunDate)) {
                         break;
                     }
                 } catch (InterruptedException ex) {
@@ -125,7 +107,7 @@ public class Job implements StatefulJob, InterruptableJob {
         schedulerService.updateStatus(jobExecutionContext.getJobDetail(), BatchConstants.SUCCEEDED_JOB_STATUS_CODE);
     }
 
-    public static boolean runStep(ParameterService parameterService, String jobName, int currentStepNumber, Step step, Date jobRunDate) throws InterruptedException, WorkflowException {
+    public static boolean runStep(JobExecutionContext jobExContext, String jobName, int currentStepNumber, Step step, Date jobRunDate) throws InterruptedException, WorkflowException {
         boolean continueJob = true;
         if (GlobalVariables.getUserSession() == null) {
             LOG.info(new StringBuffer("Started processing step: ").append(currentStepNumber).append("=").append(step.getName()).append(" for user <unknown>"));
@@ -150,7 +132,7 @@ public class Job implements StatefulJob, InterruptableJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start(jobName);
         try {
-            continueJob = step.execute(jobName, jobRunDate);
+            continueJob = step.execute(jobName, jobRunDate, jobExContext.getMergedJobDataMap());
         } catch (InterruptedException e) {
             LOG.error("Exception occured executing step", e);
             throw e;
@@ -204,7 +186,8 @@ public class Job implements StatefulJob, InterruptableJob {
     }
 
     protected boolean isNotRunnable() {
-        return notRunnable;
+
+        return notRunnable && (!schedulerService.isBatchNode()) ;
     }
 
     public ParameterService getParameterService() {
