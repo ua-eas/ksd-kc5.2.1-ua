@@ -15,12 +15,8 @@
  */
 package edu.arizona.kra.proposaldevelopment.bo;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants;
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
 import org.kuali.kra.common.permissions.Permissionable;
@@ -28,7 +24,15 @@ import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
+import org.kuali.rice.kim.api.identity.Person;
+import org.kuali.rice.kim.api.services.KimApiServiceLocator;
 import org.kuali.rice.krad.bo.TransientBusinessObjectBase;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -47,12 +51,14 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     private String sponsorCode;
     private Date sponsorDeadlineDate;
     private String sponsorDeadlineTime;
+    private Date sponsorDeadlineDateTime;
+    private String deadlineType;
     private String principalInvestigatorName;
     private String proposalPersonName;
     private String leadUnitNumber;
     private String leadUnitName;
     private String leadCollege;
-    private String routeStopName = "SPS Approve";
+    private String routeStopName = PropDevRoutingStateConstants.NODE_NAME_SPS_APPROVE;
     private String routeStopCollege;
     private Timestamp routeStopDate;
     private Boolean finalProposalReceived;
@@ -66,6 +72,8 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     private Unit workflowUnit;
     private Sponsor sponsor;
     private String workflowUnitNumber;
+    private String initiatorPrincipalName;
+    private String initiatorPrincipalId;
 
 
 
@@ -147,6 +155,29 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
 
     public void setProposalPersonName(String proposalPersonName) {
         this.proposalPersonName = proposalPersonName;
+    }
+
+    public String getInitiatorPrincipalId() {
+        return initiatorPrincipalId;
+    }
+
+    public void setInitiatorPrincipalId(String initiatorPrincipalId) {
+        this.initiatorPrincipalId = initiatorPrincipalId;
+    }
+
+    public String getInitiatorPrincipalName() {
+        return initiatorPrincipalName;
+    }
+
+    public void setInitiatorPrincipalName(String name) {
+        this.initiatorPrincipalName = name;
+    }
+
+    public Person getInitiatorPerson() {
+        if (StringUtils.isEmpty(initiatorPrincipalId)) {
+            return null;
+        }
+        return KimApiServiceLocator.getPersonService().getPerson(initiatorPrincipalId);
     }
 
     public String getLeadUnitNumber() {
@@ -304,6 +335,22 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
         this.workflowUnitNumber = workflowUnitNumber;
     }
 
+    public Date getSponsorDeadlineDateTime() {
+        return sponsorDeadlineDateTime;
+    }
+
+    public void setSponsorDeadlineDateTime(Date sponsorDeadlineDateTime) {
+        this.sponsorDeadlineDateTime = sponsorDeadlineDateTime;
+    }
+
+    public String getDeadlineType() {
+        return deadlineType;
+    }
+
+    public void setDeadlineType(String deadlineType) {
+        this.deadlineType = deadlineType;
+    }
+
     @Override
     public String getDocumentKey() {
         return Permissionable.PROPOSAL_KEY;
@@ -337,5 +384,7 @@ public class ProposalDevelopmentRoutingState extends TransientBusinessObjectBase
     @Override
     public void populateAdditionalQualifiedRoleAttributes(Map<String, String> arg0) {
     }
+
+
 
 }
