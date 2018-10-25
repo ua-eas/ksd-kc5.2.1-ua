@@ -27,7 +27,7 @@
       VALUES ('KC-SUBAWARD', 'Batch', 1, 'Batch', 'Y', sys_guid());
 
       INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, OBJ_ID)
-      VALUES ('KC', 'KC-SUBAWARD', 'Batch', 'subAwarInvoiceFeedJobEnabled', 1, 'CONFG', 'N', 'Enables or disables running SubAward Invoice Feed Job from KFS.', 'A', sys_guid());
+      VALUES ('KC', 'KC-SUBAWARD', 'Batch', 'subAwardInvoiceFeedJobEnabled', 1, 'CONFG', 'N', 'Enables or disables running SubAward Invoice Feed Job from KFS.', 'A', sys_guid());
 
       INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, OBJ_ID)
       VALUES ('KC', 'KC-SUBAWARD', 'Batch', 'subAwardInvoiceFeedJobRunSchedule', 1, 'CONFG', '0 0 3 ? * MON *;0 0 3 ? * TUE-FRI *', 'Multiple cron expressions separated by ; defining run times for the SubAward Invoice Feed from KFS Job.  Each expression will define a corresponding Job Trigger.', 'A', sys_guid());
