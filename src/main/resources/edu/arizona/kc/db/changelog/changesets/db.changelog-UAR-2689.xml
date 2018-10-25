@@ -38,7 +38,7 @@
     <rollback>
 
       DELETE FROM KRCR_CMPNT_T WHERE NMSPC_CD='KC-SUBAWARD' and NM='Batch';
-      DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SUBAWARD' and CMPNT_CD='Batch' and PARM_NM='subAwarInvoiceFeedJobEnabled';
+      DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SUBAWARD' and CMPNT_CD='Batch' and PARM_NM='subAwardInvoiceFeedJobEnabled';
       DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SUBAWARD' and CMPNT_CD='Batch' and PARM_NM='subAwardInvoiceFeedJobRunSchedule';
       DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SUBAWARD' and CMPNT_CD='Batch' and PARM_NM='subAwardInvoiceFeedJobDataIntervalsDays';
 
