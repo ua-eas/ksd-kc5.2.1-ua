@@ -6,6 +6,7 @@ import edu.arizona.kra.subaward.batch.bo.UAGlEntry;
 import edu.arizona.kra.subaward.batch.dao.BiGLFeedDao;
 import edu.arizona.kra.subaward.batch.dao.SubawardGlFeedDao;
 import edu.arizona.kra.subaward.batch.service.GlDataImportService;
+import edu.arizona.kra.subaward.batch.service.SubawardInvoiceErrorReportService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.rice.krad.service.BusinessObjectService;
@@ -24,6 +25,7 @@ public class GlDataImportServiceImpl implements GlDataImportService {
     private SubawardGlFeedDao subawardGLFeedDao;
 
     private BusinessObjectService businessObjectService;
+    private SubawardInvoiceErrorReportService subawardInvoiceErrorReportService;
 
 
 
@@ -38,14 +40,16 @@ public class GlDataImportServiceImpl implements GlDataImportService {
             List<BiGlEntry> biGlEntryList = biGLFeedDao.importGLData(beginDate, endDate);
             if (biGlEntryList.isEmpty() ){
                 LOG.info("GLDataImportService: importGLData: 0 rows were returned from BI!");
-                //TODO handle this: write notice report! -> entry in error table??
+                //TODO handle this: write notice report! -> entry in error table??!?
                 return 0;
             }
-            List<UAGlEntry> importedGlEntries = InvoiceFeedUtils.translateBiGlEntries(biGlEntryList);
+            //UAR-2691: forced cast to UAGlEntry list instead of adapter as per Code Review
+            List<UAGlEntry> importedGlEntries =  (List<UAGlEntry>)(List<?>)biGlEntryList;
             List<?> result = getBusinessObjectService().save(importedGlEntries);
             importedLinesCount = result.size();
         } catch (Exception e){
             LOG.error(e);
+            subawardInvoiceErrorReportService.recordError("GlDataImportServiceImpl: Exception at importing GL Entries from BI!", e);
             throw new RuntimeException(e);
         }
 
@@ -68,5 +72,9 @@ public class GlDataImportServiceImpl implements GlDataImportService {
 
     public void setSubawardGLFeedDao(SubawardGlFeedDao subawardGLFeedDao) {
         this.subawardGLFeedDao = subawardGLFeedDao;
+    }
+
+    public void setSubawardInvoiceErrorReportService(SubawardInvoiceErrorReportService subawardInvoiceErrorReportService) {
+        this.subawardInvoiceErrorReportService = subawardInvoiceErrorReportService;
     }
 }
