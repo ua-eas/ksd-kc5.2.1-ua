@@ -1,6 +1,7 @@
 package edu.arizona.kra.subaward.batch;
 
 import edu.arizona.kra.subaward.batch.service.GlDataImportService;
+import edu.arizona.kra.subaward.batch.service.SubawardInvoiceErrorReportService;
 import edu.arizona.kra.sys.batch.AbstractStep;
 import org.quartz.JobDataMap;
 
@@ -15,6 +16,7 @@ public class ImportGLDataStep extends AbstractStep {
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ImportGLDataStep.class);
 
     private GlDataImportService glDataImportService;
+    private SubawardInvoiceErrorReportService subawardInvoiceErrorReportService;
 
     public ImportGLDataStep() {
         super();
@@ -44,6 +46,7 @@ public class ImportGLDataStep extends AbstractStep {
             } catch (ClassCastException e){
                 daysInterval = InvoiceFeedConstants.DEFAULT_DATA_INTERVAL_DAYS;
                 LOG.error("ImportGLDataStep: could not parse days interval: "+jobDataMap.getString(InvoiceFeedConstants.DAYS_INTERVAL_KEY)+" using default value:"+daysInterval);
+                subawardInvoiceErrorReportService.recordError("ImportGLDataStep: could not parse days interval: "+jobDataMap.getString(InvoiceFeedConstants.DAYS_INTERVAL_KEY)+" using default value:"+daysInterval, e);
             }
         }
         return daysInterval;
@@ -53,4 +56,9 @@ public class ImportGLDataStep extends AbstractStep {
     public void setGlDataImportService(GlDataImportService glDataImportService) {
         this.glDataImportService = glDataImportService;
     }
+
+    public void setSubawardInvoiceErrorReportService(SubawardInvoiceErrorReportService subawardInvoiceErrorReportService) {
+        this.subawardInvoiceErrorReportService = subawardInvoiceErrorReportService;
+    }
+
 }
