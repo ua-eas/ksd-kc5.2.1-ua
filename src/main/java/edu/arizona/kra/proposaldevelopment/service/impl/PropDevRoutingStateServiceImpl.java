@@ -15,15 +15,11 @@
  */
 package edu.arizona.kra.proposaldevelopment.service.impl;
 
-import edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants;
-import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
-import edu.arizona.kra.proposaldevelopment.bo.SPSRestrictedNote;
-import edu.arizona.kra.proposaldevelopment.bo.SPSReviewer;
-import edu.arizona.kra.proposaldevelopment.dao.PropDevRoutingStateDao;
-import edu.arizona.kra.proposaldevelopment.dao.SPSRestrictedNoteDao;
-import edu.arizona.kra.proposaldevelopment.service.CustomAuthorizationService;
-import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
-import edu.arizona.kra.subaward.batch.service.GlDataImportService;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,10 +29,17 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.krad.exception.AuthorizationException;
 import org.kuali.rice.krad.service.DocumentHeaderService;
+import org.kuali.rice.krad.service.NoteService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
-import java.sql.Date;
-import java.util.*;
+import edu.arizona.kra.proposaldevelopment.PropDevRoutingStateConstants;
+import edu.arizona.kra.proposaldevelopment.bo.ProposalDevelopmentRoutingState;
+import edu.arizona.kra.proposaldevelopment.bo.SPSRestrictedNote;
+import edu.arizona.kra.proposaldevelopment.bo.SPSReviewer;
+import edu.arizona.kra.proposaldevelopment.dao.PropDevRoutingStateDao;
+import edu.arizona.kra.proposaldevelopment.dao.SPSRestrictedNoteDao;
+import edu.arizona.kra.proposaldevelopment.service.CustomAuthorizationService;
+import edu.arizona.kra.proposaldevelopment.service.PropDevRoutingStateService;
 
 
 /**
@@ -58,26 +61,19 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     /**
      * Method that generates the search results for the lookup framework.
      * Called by performLookup()
-     * 
+     *
      * @see org.kuali.rice.kns.lookup.KualiLookupableHelperServiceImpl#getSearchResults(java.util.Map)
      */
     @Override
     public List<ProposalDevelopmentRoutingState> findPropDevRoutingState(Map<String, String> searchCriteria) {
         LOG.debug("getSearchResults():"+searchCriteria.toString());
-        GlDataImportService glDataImportService = KraServiceLocator.getService("glDataImportService");
-        Date today = new Date(System.currentTimeMillis());
-        Calendar c = Calendar.getInstance();
-        c.setTime(today);
-        c.add(Calendar.DATE, -3);
-        Date threeDaysAgo = new Date(c.getTimeInMillis());
-        glDataImportService.importGLData(threeDaysAgo, today);
         List <ProposalDevelopmentRoutingState> results = new ArrayList<ProposalDevelopmentRoutingState>();
-//        try {
-//            results = propDevRoutingStateDao.getPropDevRoutingState(searchCriteria);
-//        } catch (Exception e){
-//            LOG.error(e);
-//        }
-//        LOG.debug("getSearchResults(): size="+results.size());
+        try {
+            results = propDevRoutingStateDao.getPropDevRoutingState(searchCriteria);
+        } catch (Exception e){
+            LOG.error(e);
+        }
+        LOG.debug("getSearchResults(): size="+results.size());
         return results;
     }
 
@@ -85,11 +81,11 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     @Override
     public List<SPSRestrictedNote> getSPSRestrictedNotes(String proposalNumber) throws  AuthorizationException {
         LOG.debug("getSPSRestrictedNotes(): prop="+proposalNumber+" currentUser:"+GlobalVariables.getUserSession().getPrincipalName());
-        
+
         if ( StringUtils.isEmpty(proposalNumber) ){
             throw new IllegalArgumentException("Null/empty proposalNumber !");
         }
-        
+
         List<SPSRestrictedNote> restrictedNotes = new ArrayList<SPSRestrictedNote>();
         try {
             restrictedNotes = SPSRestrictedNoteDao.getSPSRestrictedNotes(proposalNumber);
@@ -107,7 +103,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
                     }
                 }
             }
-            
+
         } catch (Exception e){
             LOG.error(e);
             throw new RuntimeException(e);
@@ -115,7 +111,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
         LOG.debug("getSPSRestrictedNotes(): Finished.");
         return restrictedNotes;
     }
-    
+
     @Override
     public boolean canEditSPSRestrictedNotes(){
         LOG.debug("canEditSPSRestrictedNotes()");
@@ -125,8 +121,8 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
         }
         return false;
     }
-    
-    
+
+
     @Override
     public SPSRestrictedNote addSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException{
         LOG.debug("addSPSRestrictedNote(): "+spsRestrictedNote);
@@ -138,7 +134,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
             throw new RuntimeException(e);
         }
     }
-    
+
 
     @Override
     public boolean deleteSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException {
@@ -156,7 +152,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     public void setPropDevRoutingStateDao(PropDevRoutingStateDao propDevRoutingStateDao) {
         this.propDevRoutingStateDao = propDevRoutingStateDao;
     }
-    
+
     public void setSPSRestrictedNoteDao(SPSRestrictedNoteDao SPSRestrictedNoteDao) {
         this.SPSRestrictedNoteDao = SPSRestrictedNoteDao;
     }
@@ -177,7 +173,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     public void setKcPersonService(KcPersonService kcPersonService) {
         this.kcPersonService = kcPersonService;
     }
-    
+
     protected DocumentHeaderService getDocumentHeaderService() {
         if (documentHeaderService == null ){
             documentHeaderService = KraServiceLocator.getService(DocumentHeaderService.class);
@@ -199,7 +195,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
 
 
     @Override
-    public void setORDExpedited(String proposalNumber, Boolean ordExp) throws AuthorizationException, IllegalArgumentException {    
+    public void setORDExpedited(String proposalNumber, Boolean ordExp) throws AuthorizationException, IllegalArgumentException {
         LOG.debug("setORDExpedited() propNumber:"+proposalNumber+ " ordExp="+ordExp+" currentUser:"+GlobalVariables.getUserSession().getPrincipalName() );
         checkUserAuthorization( PropDevRoutingStateConstants.EDIT_ORD_EXPEDITED_PERMISSION);
 
@@ -233,7 +229,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     @Override
     public void setSPSReviewer(String proposalNumber, String kcPersonId) throws AuthorizationException, IllegalArgumentException {
         LOG.debug("setSPSReviewer() propNumber:"+proposalNumber+ " kcPersonId="+kcPersonId +" crtUser="+GlobalVariables.getUserSession().getPrincipalName());
-        checkUserAuthorization( PropDevRoutingStateConstants.EDIT_SPS_REVIEWER_PERMISSION); 
+        checkUserAuthorization( PropDevRoutingStateConstants.EDIT_SPS_REVIEWER_PERMISSION);
         KcPerson kcPerson = null;
         try {
             kcPerson = getKcPersonService().getKcPersonByPersonId(kcPersonId);
