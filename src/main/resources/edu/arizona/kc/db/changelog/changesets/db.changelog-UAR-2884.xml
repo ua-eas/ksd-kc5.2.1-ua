@@ -4,21 +4,24 @@
 
   <changeSet id="UAR-2884" author="Natalia Ibanez">
     <comment>
-      UAR-2884: Adding the corresponding permission template in KC-SYS and coresponding Modify Batch Job Permission.
+      UAR-2884:  Create UA Batch Adminstrators Role and add coresponding Modify Batch Job Permission to it.
     </comment>
     <sql>
       --create UA Batch Adminstrators Role
       insert into KRIM_ROLE_T (ROLE_ID,OBJ_ID,VER_NBR,ROLE_NM,NMSPC_CD,DESC_TXT,KIM_TYP_ID,ACTV_IND,LAST_UPDT_DT)
       values (KRIM_ROLE_ID_S.NEXTVAL, SYS_GUID(), 1, 'UA Batch Admin', 'KC-ADM', 'UA Batch Adminstrators', '1', 'Y', CURRENT_TIMESTAMP);
-
+    </sql>
+    <rollback>
+      delete from krim_role_t where ROLE_NM='UA Batch Admin';
+    </rollback>
+  </changeSet>
+  <changeSet>
+    <sql>
       -- Assign Modify Batch Permission to  UA Batch Adminstrators role
       insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
       values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y', (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Batch Admin'), 164);
     </sql>
-
     <rollback>
-      delete from krim_role_t where ROLE_NM='UA Batch Admin';
-
       delete from KRIM_ROLE_PERM_T WHERE role_id IN (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Batch Admin');
     </rollback>
   </changeSet>
