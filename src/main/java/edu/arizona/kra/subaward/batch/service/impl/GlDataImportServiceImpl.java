@@ -43,7 +43,8 @@ public class GlDataImportServiceImpl implements GlDataImportService {
                 //TODO handle this: write notice report! -> entry in error table??!?
                 return 0;
             }
-            List<UAGlEntry> importedGlEntries = InvoiceFeedUtils.translateBiGlEntries(biGlEntryList);
+            //UAR-2691: forced cast to UAGlEntry list instead of adapter as per Code Review
+            List<UAGlEntry> importedGlEntries =  (List<UAGlEntry>)(List<?>)biGlEntryList;
             List<?> result = getBusinessObjectService().save(importedGlEntries);
             importedLinesCount = result.size();
         } catch (Exception e){
