@@ -76,9 +76,9 @@ public class SubawardInvoiceFeedServiceImpl implements SubawardInvoiceFeedServic
 
     public SubawardInvoiceErrorReportService getSubawardInvoiceErrorReportService() {
         if ( subawardInvoiceErrorReportService ==null ) {
-            subawardInvoiceErrorReportService =   KraServiceLocator.getService(SubawardInvoiceErrorReportService.class)
+            subawardInvoiceErrorReportService =   KraServiceLocator.getService(SubawardInvoiceErrorReportService.class);
         }
-        return subawardInvoiceErrorReportService
+        return subawardInvoiceErrorReportService;
     }
 
 
