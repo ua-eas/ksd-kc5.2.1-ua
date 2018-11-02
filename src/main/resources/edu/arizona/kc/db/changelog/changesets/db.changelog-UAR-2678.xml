@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="UAR-2678_1" author="Natalia Ibanez">
+        <comment>
+            Creating SUBAWARD_GL_IMPORT for Subwaward Invoice that will contain RAW GL data from BI
+        </comment>
+        <sql>
+            CREATE TABLE KRAOWNER.SUBAWARD_GL_IMPORT(
+                UNIV_FISCAL_YR NUMBER(4,0),
+                FIN_COA_CD VARCHAR2(2),
+                ACCOUNT_NBR VARCHAR2(7),
+                SUB_ACCT_NBR VARCHAR2(5),
+                FIN_OBJECT_CD VARCHAR2(4),
+                FIN_SUB_OBJ_CD VARCHAR2(3),
+                FIN_BALANCE_TYP_CD VARCHAR2(2),
+                FIN_OBJ_TYP_CD VARCHAR2(2),
+                UNIV_FISCAL_PRD_CD VARCHAR2(2),
+                FDOC_TYP_CD VARCHAR2(4),
+                FS_ORIGIN_CD VARCHAR2(2),
+                FDOC_NBR VARCHAR2(14),
+                TRN_ENTR_SEQ_NBR NUMBER(5,0),
+                TRN_LDGR_ENTR_DESC VARCHAR2(40),
+                TRN_LDGR_ENTR_AMT NUMBER(19,2),
+                TRN_DEBIT_CRDT_CD VARCHAR2(1),
+                TRANSACTION_DT DATE,
+                ORG_DOC_NBR VARCHAR2(10),
+                PROJECT_CD VARCHAR2(10),
+                ORG_REFERENCE_ID VARCHAR2(8),
+                FDOC_REF_TYP_CD VARCHAR2(4),
+                FS_REF_ORIGIN_CD VARCHAR2(2),
+                FDOC_REF_NBR VARCHAR2(14),
+                FDOC_REVERSAL_DT DATE,
+                TRN_ENCUM_UPDT_CD VARCHAR2(1),
+                TRN_POST_DT DATE,
+                TIMESTAMP DATE
+            );
+        </sql>
+        <rollback>
+            DROP table KRAOWNER.SUBAWARD_GL_IMPORT CASCADE CONSTRAINTS;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="UAR-2678_2" author="Natalia Ibanez">
+        <comment>
+            Creating SUBAWARD_PRE_INVOICE table that will hold UAR parsed data from the SUBAWARD_GL_IMPORT before creating the actual subaward invoices
+        </comment>
+        <sql>
+            CREATE TABLE KRAOWNER.SUBAWARD_PRE_INVOICE(
+                ID NUMBER(22,0) NOT NULL,
+                FDOC_NBR VARCHAR2(14),
+                PURCHASE_ORD_NBR VARCHAR2(14),
+                AMT_RELEASED NUMBER(19,2),
+                COMMENTS VARCHAR2(40),
+                EFFECTIVE_DATE DATE,
+                FIN_OBJECT_CD VARCHAR2(4),
+                IMPORTED_DT DATE,
+                SUBAWARD_ID NUMBER(12,0),
+                SUBAWARD_AMT_REL_ID NUMBER(12,0),
+                INVOICE_DOCUMENT_NBR VARCHAR2(40)
+            );
+            ALTER TABLE SUBAWARD_PRE_INVOICE ADD CONSTRAINT subaward_pre_invoice_PK PRIMARY KEY(ID);
+
+            --create Sequence for subaward_pre_invoice id
+            CREATE SEQUENCE KRAOWNER.subaward_pre_invoice_seq
+                MINVALUE 1
+                START WITH 1
+                INCREMENT BY 1
+                NOCACHE;
+        </sql>
+        <rollback>
+            DROP table KRAOWNER.SUBAWARD_PRE_INVOICE CASCADE CONSTRAINTS;
+            DROP sequence KRAOWNER.subaward_pre_invoice_seq;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="UAR-2678_3" author="Natalia Ibanez">
+        <comment>
+            Creating SUBAWARD_INVOICE_IMPORT_ERRORS table that will hold all errors related to the subaward invoice import
+        </comment>
+        <sql>
+            CREATE TABLE KRAOWNER.SUBAWARD_INVOICE_IMPORT_ERRORS(
+                ID NUMBER(12,0) NOT NULL,
+                ERROR_MSG VARCHAR2(100),
+                ERROR_DT DATE,
+                GL_ENTRY_ID NUMBER(19,0),
+                SUBAWARD_ID NUMBER(12,0),
+                SUBAWARD_AMT_REL_ID NUMBER(12,0),
+                INVOICE_DOCUMENT_NBR VARCHAR2(40),
+                NOTICE_SENT_DT DATE
+            );
+            ALTER TABLE SUBAWARD_INVOICE_IMPORT_ERRORS ADD CONSTRAINT subaward_inv_import_err_PK PRIMARY KEY(ID);
+
+            --create Sequence for subaward_invoice_import_errors id
+            CREATE SEQUENCE KRAOWNER.subaward_inv_import_err_seq
+                MINVALUE 1
+                START WITH 1
+                INCREMENT BY 1
+                NOCACHE;
+        </sql>
+        <rollback>
+            DROP table KRAOWNER.SUBAWARD_INVOICE_IMPORT_ERRORS CASCADE CONSTRAINTS;
+            DROP sequence KRAOWNER.subaward_inv_import_err_seq;
+        </rollback>
+    </changeSet>
+    <changeSet id="UAR-2678_4" author="Natalia Ibanez">
+        <comment>
+            Creating SUBAWARD_INVOICE_IMPORT_ERRORS table that will hold all errors related to the subaward invoice import
+        </comment>
+        <sql>
+            CREATE TABLE KRAOWNER.SUBAWARD_INV_IMPORT_SUMMARY(
+                ID NUMBER(12,0) NOT NULL,
+                RUN_DT DATE,
+                IMPORT_DT DATE,
+                IMPORT_INTERVAL VARCHAR2(40),
+                GL_ENTRIES_IMPORT_CT NUMBER(8,0),
+                SUBAWARD_PRE_INVOICE_CT NUMBER(8,0),
+                SUBAWARD_INVOICE_CT NUMBER(8,0),
+                ERRORS_CT NUMBER(8,0)
+            );
+
+            ALTER TABLE SUBAWARD_INV_IMPORT_SUMMARY ADD CONSTRAINT subaward_inv_import_sum_PK PRIMARY KEY(ID);
+
+            --create Sequence for subaward_inv_import_summary id
+            CREATE SEQUENCE KRAOWNER.subaward_inv_import_sum_seq
+                MINVALUE 1
+                START WITH 1
+                INCREMENT BY 1
+                NOCACHE;
+        </sql>
+        <rollback>
+            DROP table KRAOWNER.SUBAWARD_INV_IMPORT_SUMMARY CASCADE CONSTRAINTS;
+            DROP sequence KRAOWNER.subaward_inv_import_sum_seq;
+        </rollback>
+    </changeSet>
+</databaseChangeLog> 
