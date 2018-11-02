@@ -63,6 +63,7 @@
 		<form-bean name="IacucResearchAreasForm" type="org.kuali.kra.iacuc.IacucResearchAreasForm" />
 		<form-bean name="IsrSsrReportGenerationForm" type="org.kuali.kra.subawardReporting.web.struts.form.IsrSsrReportGenerationForm" />
 		<form-bean name="AssociateWorkflowForm" type="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowForm"/>
+      <form-bean name="KualiBatchJobModifyForm" type="edu.arizona.kra.web.struts.form.KualiBatchJobModifyForm"/>
     </form-beans>
 
 <!-- Rice content Start -->
@@ -716,7 +717,11 @@
             <forward name="home" path="/WEB-INF/jsp/personmasschange/PersonMassChangeHome.jsp" />
             <forward name="view" path="/WEB-INF/jsp/personmasschange/PersonMassChangeView.jsp" />
         </action>
-     
+
+        <action path="/batchModify" name="KualiBatchJobModifyForm" scope="request" attribute="KualiForm" parameter="methodToCall" type="edu.arizona.kra.web.struts.action.KualiBatchJobModifyAction">
+          <set-property property="cancellable" value="true"/>
+          <forward name="basic" path="/WEB-INF/jsp/sys/KualiBatchJobModify.jsp"/>
+        </action>
     </action-mappings>
 
 
