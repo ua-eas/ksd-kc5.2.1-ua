@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <import resource="classpath:edu/arizona/kra/CustomCoreSpringBeans.xml"/>
+  <import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml"/>
+
+  <bean id="subawardInvoiceErrorReportService" class="edu.arizona.kra.subaward.batch.service.impl.SubawardInvoiceErrorReportServiceImpl"/>
+
+  <bean id="subawardInvoiceFeedJob" parent="scheduledJobDescriptor" >
+    <property name="steps">
+      <list>
+        <ref bean="importGLDataStep"/>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="importGLDataStep" class="edu.arizona.kra.subaward.batch.ImportGLDataStep" parent="step">
+    <property name="glDataImportService" ref="glDataImportService"/>
+    <property name="subawardInvoiceErrorReportService" ref="subawardInvoiceErrorReportService"/>
+  </bean>
+
+
+  <bean id="BiGlFeedDao" class="edu.arizona.kra.subaward.batch.dao.ojb.BiGlFeedDaoBasicDS">
+    <property name="dataSource" ref="arizona.edu.biNonTransactionalDataSource"/>
+  </bean>
+
+  <bean id="SubawardGlFeedDao" parent="platformAwareDao" class="edu.arizona.kra.subaward.batch.dao.ojb.SubawardGlFeedDaoOjb"/>
+
+  <bean id="glDataImportService" class="edu.arizona.kra.subaward.batch.service.impl.GlDataImportServiceImpl">
+    <property name="businessObjectService" ref="businessObjectService"/>
+    <property name="biGLFeedDao" ref="BiGlFeedDao"/>
+    <property name="subawardGLFeedDao" ref="SubawardGlFeedDao"/>
+    <property name="subawardInvoiceErrorReportService" ref="subawardInvoiceErrorReportService"/>
+  </bean>
+
+</beans>

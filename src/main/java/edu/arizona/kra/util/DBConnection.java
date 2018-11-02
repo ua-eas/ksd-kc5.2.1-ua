@@ -1,17 +1,16 @@
 package edu.arizona.kra.util;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.io.Closeable;
-
-
 import org.apache.ojb.broker.PersistenceBroker;
 import org.apache.ojb.broker.accesslayer.LookupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springmodules.orm.ojb.OjbFactoryUtils;
+
+import java.io.Closeable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Class for properly obtaining/releasing connections from the PersistenceBroker
@@ -101,18 +100,20 @@ public class DBConnection implements Closeable{
                 LOG.warn("Failed to close PreparedStatement.", ex);
             }
         }
-        if ( conn != null ){
-            try {
-                broker.serviceConnectionManager().releaseConnection();
-            } catch (Exception ex) {
-                LOG.warn("Failed to release Connection.", ex);
+        if ( !broker.isInTransaction()) {
+            if (conn != null && broker.serviceConnectionManager().isInLocalTransaction()) {
+                try {
+                    broker.serviceConnectionManager().releaseConnection();
+                } catch (Exception ex) {
+                    LOG.warn("Failed to release Connection.", ex);
+                }
             }
-        }
-        if (broker != null) {
-            try {
-                OjbFactoryUtils.releasePersistenceBroker(broker, broker.getPBKey());
-            } catch (Exception e) {
-                LOG.error("Failed releasing PersistenceBroker: " + e.getMessage(), e);
+            if (broker != null) {
+                try {
+                    OjbFactoryUtils.releasePersistenceBroker(broker, broker.getPBKey());
+                } catch (Exception e) {
+                    LOG.error("Failed releasing PersistenceBroker: " + e.getMessage(), e);
+                }
             }
         }
     }

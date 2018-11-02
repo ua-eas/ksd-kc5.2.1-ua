@@ -117,6 +117,11 @@
     <param name="server.datasource.pool.size">${datasource.pool.size}</param>
     <param name="server.datasource.connectionTimeout">${datasource.connectionTimeout}</param>
 
+    <param name="bi.datasource.url">${bi.datasource.url}</param>
+    <param name="bi.datasource.username">${bi.datasource.username}</param>
+    <param name="bi.datasource.password">${bi.datasource.password}</param>
+    <param name="bi.datasource.ojb.platform">${bi.datasource.platform}</param>
+
     <param name="keystore.alias">onestartsharedservices-devandtst</param>
     <param name="keystore.file">kul</param>
     <param name="keystore.password">kulpass</param>
@@ -146,7 +151,11 @@
     <param name="kcQuartzDatabasePrefix">KC_QRTZ_</param>
     <!-- User the kc batch jobs run as -->
     <param name="batchJobUserName">kc</param>
-    <param name="org.quartz.scheduler.skipUpdateCheck">true</param>
+
+    <param name="batch.quartz.thread.pool.size">8</param>
+    <param name="batch.quartz.trigger.check.interval">60000</param>
+    <param name="batch.schedule.cron.expression">0 */2 * ? * *</param>
+    <param name="reports.directory">${user.home}/kuali/main/dev/</param>
 
     <param name="documentSearch.resultProcessor.class.name">org.kuali.kra.proposaldevelopment.document.search.ProposalDocumentSearchResultProcessor</param>
 
@@ -217,7 +226,7 @@
 
     <param name="rice.kc.ip.additionalSpringFiles">classpath:edu/arizona/kra/institutionalproposal/CustomInstitutionalProposalSpringBeans.xml</param>
 
-    <param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/CustomCoreSpringBeans.xml,classpath:edu/arizona/kra/budget/CustomBudgetSpringBeans.xml,classpath:edu/arizona/kra/irb/CustomIrbSpringBeans.xml,classpath:edu/arizona/kra/committee/CustomCommitteeSpringBeans.xml,classpath:edu/arizona/kra/proposaldevelopment/CustomPropDevSpringBeans.xml</param>
+    <param name="rice.kc.core.additionalSpringFiles">classpath:edu/arizona/kra/CustomCoreSpringBeans.xml,classpath:edu/arizona/kra/budget/CustomBudgetSpringBeans.xml,classpath:edu/arizona/kra/irb/CustomIrbSpringBeans.xml,classpath:edu/arizona/kra/committee/CustomCommitteeSpringBeans.xml,classpath:edu/arizona/kra/proposaldevelopment/CustomPropDevSpringBeans.xml,classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml,classpath:edu/arizona/kra/subaward/UASubawardSpringBeans.xml</param>
 
     <!-- Enable daily/weekly email scheduling -->
     <param name="email.reminder.lifecycle.enabled">true</param>

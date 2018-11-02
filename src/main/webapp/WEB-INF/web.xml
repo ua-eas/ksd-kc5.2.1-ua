@@ -2,7 +2,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     version="2.5"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee   http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-	<display-name>KCRA Application</display-name>
+	<display-name>UAR Application</display-name>
 
 <!-- Rice content Start -->
     <context-param>
@@ -249,10 +249,14 @@
   <!-- ******************* End Logging Filters ********************* -->
   
   ${monitoring.listener}
-  
-  <listener>
-    <listener-class>org.kuali.kra.infrastructure.KraServiceLocatorListener</listener-class>
-  </listener>
+
+	<listener>
+		<listener-class>org.kuali.kra.infrastructure.KraServiceLocatorListener</listener-class>
+	</listener>
+
+	<listener>
+		<listener-class>edu.arizona.kra.sys.batch.BatchSchedulerStarterListener</listener-class>
+	</listener>
 
   <listener>
     <listener-class>org.kuali.kra.web.listener.SessionLoggingListener</listener-class>
@@ -261,23 +265,23 @@
 <!-- Rice content Start -->
   	<listener>
     	<listener-class>org.kuali.rice.krad.web.listener.NonSerializableSessionListener</listener-class>
- 	</listener>
+ 	  </listener>
    
     <listener>
         <listener-class>org.kuali.rice.core.web.listener.BootstrapListener</listener-class>
     </listener>
 
     <listener>
-	  <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
+	    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	  </listener>
 
-	<listener>
-		<listener-class>org.kuali.rice.krad.web.listener.KualiHttpSessionListener</listener-class>
-	</listener>
+	  <listener>
+		  <listener-class>org.kuali.rice.krad.web.listener.KualiHttpSessionListener</listener-class>
+	  </listener>
     
-	<listener>
+	  <listener>
 	    <listener-class>org.kuali.rice.core.framework.config.module.WebModuleLoaderListener</listener-class>
-	</listener>
+	  </listener>
       
 	<servlet>
 		<servlet-name>action</servlet-name>
