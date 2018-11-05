@@ -78,7 +78,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     public boolean isBatchNode(){
         LOG.info("isBatchNode: hostname="+BatchUtils.getHostname());
-        if ( parameterService.parameterExists(BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME, BatchConstants.BATCH_COMPONENT_CODE, BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME)) {
+        if ( parameterService.parameterExists(BatchConstants.NAMESPACE_KC_SYS, BatchConstants.BATCH_COMPONENT_CODE, BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME)) {
             String batchNodename = parameterService.getParameterValueAsString(BatchConstants.NAMESPACE_KC_SYS, BatchConstants.BATCH_COMPONENT_CODE, BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME);
             return StringUtils.equals( BatchUtils.getHostname(), batchNodename);
         }
