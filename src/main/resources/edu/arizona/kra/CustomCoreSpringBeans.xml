@@ -60,7 +60,6 @@
         <property name="businessObjectService" ref="businessObjectService" />
     </bean>
 
-<<<<<<< HEAD
     <!-- Batch Framework imported from KFS -->
     <bean id="step" abstract="true">
         <property name="parameterService" ref="parameterService"/>
