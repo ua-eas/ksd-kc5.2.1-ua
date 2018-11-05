@@ -1,9 +1,13 @@
 package edu.arizona.kra.subaward.batch.service.impl;
 
+
+import edu.arizona.kra.subaward.batch.service.SubawardInvoiceErrorReportService;
+
 /**
+ * Error reporting Service Implementation that will write the errors to the error table
  * Created by nataliac on 10/31/18.
  */
-public class SubawardInvoiceErrorReportServiceImpl {
+public class SubawardInvoiceErrorReportServiceImpl implements SubawardInvoiceErrorReportService {
 
     /**
      * Method that saves the occured exception with the given message
