@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="UAR-2689_1" author="Natalia Ibanez">
+        <comment>
+            Adding Batch Component for KC-SYS and Batch Hostname parameter to enable only one batch node in PRD.
+        </comment>
+        <sql>
+            INSERT INTO KRCR_CMPNT_T(NMSPC_CD, CMPNT_CD, VER_NBR, NM, ACTV_IND, OBJ_ID)
+            VALUES ('KC-SYS', 'Batch', 1, 'Batch', 'Y', sys_guid());
+
+            INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, OBJ_ID)
+            VALUES ('KC', 'KC-SYS', 'Batch', 'batchNodeHostname', 1, 'CONFG', 'cougar', 'Enables only ONE node with the specified hostname to run batch jobs - like Subaward invoice feed.', 'A', sys_guid());
+        </sql>
+        <rollback>
+            DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SYS' and CMPNT_CD='Batch' and PARM_NM='batchNodeHostname';
+            DELETE FROM KRCR_CMPNT_T WHERE NMSPC_CD='KC-SYS' and NM='Batch';
+        </rollback>
+    </changeSet>
+    <changeSet id="UAR-2689_2" author="Natalia C. Ibanez">
+        <comment>
+            Adding Subaward Invoice Feed Job Parameters.
+        </comment>
+        <sql>
+            INSERT INTO KRCR_CMPNT_T(NMSPC_CD, CMPNT_CD, VER_NBR, NM, ACTV_IND, OBJ_ID)
+            VALUES ('KC-SUBAWARD', 'Batch', 1, 'Batch', 'Y', sys_guid());
+
+            INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, OBJ_ID)
+            VALUES ('KC', 'KC-SUBAWARD', 'Batch', 'subAwardInvoiceFeedJobEnabled', 1, 'CONFG', 'N', 'Enables or disables running SubAward Invoice Feed Job from KFS.', 'A', sys_guid());
+
+            INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, OBJ_ID)
+            VALUES ('KC', 'KC-SUBAWARD', 'Batch', 'subAwardInvoiceFeedJobRunSchedule', 1, 'CONFG', '0 0 3 ? * MON *;0 0 3 ? * TUE-FRI *', 'Multiple cron expressions separated by ; defining run times for the SubAward Invoice Feed from KFS Job.  Each expression will define a corresponding Job Trigger.', 'A', sys_guid());
+
+            INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, OBJ_ID)
+            VALUES ('KC', 'KC-SUBAWARD', 'Batch', 'subAwardInvoiceFeedJobDataIntervalsDays', 1, 'CONFG', '3;1', 'One or more Intervals specified in days and separated by ";" corresponding to the run times of the SubAward Invoice Feed Job Schedule times. Determines how many days back of data will the job bring back from KFS counting at runtime date.', 'A', sys_guid());
+        </sql>
+        <rollback>
+            DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SUBAWARD' and CMPNT_CD='Batch' and PARM_NM='subAwardInvoiceFeedJobEnabled';
+            DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SUBAWARD' and CMPNT_CD='Batch' and PARM_NM='subAwardInvoiceFeedJobRunSchedule';
+            DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SUBAWARD' and CMPNT_CD='Batch' and PARM_NM='subAwardInvoiceFeedJobDataIntervalsDays';
+            DELETE FROM KRCR_CMPNT_T WHERE NMSPC_CD='KC-SUBAWARD' and NM='Batch';
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
