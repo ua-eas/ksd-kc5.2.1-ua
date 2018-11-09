@@ -21,6 +21,7 @@ public final class InvoiceFeedConstants {
     public static String BI_GL_TABLE_SELECT_QUERY3= "') AND (UNIV_FISCAL_PRD_CD NOT IN ('BB', 'AB', 'CB')) AND (UNIV_FISCAL_YR > 2015))";
 
 
+    public static final String COL_GL_ENTRY_ID  = "ENTRY_ID";
     public static final String COL_GL_UNIV_FISCAL_YR  = "UNIV_FISCAL_YR";
     public static final String COL_GL_FIN_COA_CD = "FIN_COA_CD";
     public static final String COL_GL_ACCOUNT_NBR = "ACCOUNT_NBR";

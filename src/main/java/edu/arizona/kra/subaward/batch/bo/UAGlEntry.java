@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class UAGlEntry extends KraPersistableBusinessObjectBase {
     static final long serialVersionUID = -24983129882357448L;
 
-
+    private Long entryId;
     private Integer universityFiscalYear;
     private String chartOfAccountsCode;
     private String accountNumber;
@@ -44,20 +44,18 @@ public class UAGlEntry extends KraPersistableBusinessObjectBase {
     private Timestamp transactionDateTimeStamp;
 
 
-
-//    private Long entryId; //TODO Is this needed? should correspond to ENTRY_ID but we don't have that column from BI _
 //    private String gecDocumentNumber; //TODO Is this needed? should correspond to GEC_FDOC_NBR but we don't have that column from BI
 
     public UAGlEntry() {
     }
 
-//    public Long getEntryId() {
-//        return entryId;
-//    }
-//
-//    public void setEntryId(Long entryId) {
-//        this.entryId = entryId;
-//    }
+    public Long getEntryId() {
+        return entryId;
+    }
+
+    public void setEntryId(Long entryId) {
+        this.entryId = entryId;
+    }
 
     public Integer getUniversityFiscalYear() {
         return universityFiscalYear;
