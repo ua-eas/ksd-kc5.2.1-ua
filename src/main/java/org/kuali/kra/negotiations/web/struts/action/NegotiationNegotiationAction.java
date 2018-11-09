@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.negotiations.web.struts.action;
 
+import edu.arizona.kra.negotiations.NegotiationConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -65,9 +66,6 @@ public class NegotiationNegotiationAction extends NegotiationAction {
         NegotiationForm negotiationForm = (NegotiationForm) form;
         ActionForward actionForward = super.execute(mapping, form, request, response);
         loadCodeObjects(negotiationForm.getNegotiationDocument().getNegotiation());
-        negotiationForm.getMedusaBean().setModuleName("neg");
-        negotiationForm.getMedusaBean().setModuleIdentifier(negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationId());
-        negotiationForm.getMedusaBean().generateParentNodes();
         negotiationForm.getNegotiationActivityHelper().sortActivities();
         negotiationForm.getNegotiationActivityHelper().generateAllAttachments();
         return actionForward;
@@ -111,9 +109,15 @@ public class NegotiationNegotiationAction extends NegotiationAction {
             // filtered with permissions. If that filter is removed, it will become an issue.
             super.loadDocument(negotiationForm);
         }
+
+        negotiationForm.getMedusaBean().setModuleName("neg");
+        negotiationForm.getMedusaBean().setMedusaViewRadio("0");
+        negotiationForm.getMedusaBean().setModuleIdentifier(negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationId());
+        negotiationForm.getMedusaBean().generateParentNodes();
+
         //close the document overview as it can't be default closed via jsp.
-        negotiationForm.getTabStates().put("DocumentOverview", "false");
-        return mapping.findForward(Constants.MAPPING_BASIC);
+        //negotiationForm.getTabStates().put("DocumentOverview", "false");
+        return mapping.findForward(NegotiationConstants.MAPPING_NEGOTIATION_MEDUSA_PAGE);
     }
     
     /**
