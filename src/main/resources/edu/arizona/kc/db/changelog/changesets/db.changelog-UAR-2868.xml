@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="UAR-2868" author="Natalia C. Ibanez">
+        <comment>
+            Removing old KC jobs and triggers lingering in the DB from OTB foundation
+        </comment>
+        <sql>
+            DELETE FROM KC_QRTZ_CRON_TRIGGERS;
+            DELETE FROM KC_QRTZ_TRIGGERS;
+            DELETE FROM KC_QRTZ_JOB_DETAILS;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
