@@ -45,6 +45,7 @@ public class BiGlFeedDaoBasicDS implements BiGLFeedDao {
            while (rs.next()) {
                BiGlEntry glEntry = new BiGlEntry();
 
+               glEntry.setEntryId(rs.getLong(COL_GL_ENTRY_ID));
                glEntry.setAccountNumber(rs.getString(COL_GL_ACCOUNT_NBR));
                glEntry.setUniversityFiscalYear(rs.getInt(COL_GL_UNIV_FISCAL_YR));
                glEntry.setChartOfAccountsCode(rs.getString(COL_GL_FIN_COA_CD));
