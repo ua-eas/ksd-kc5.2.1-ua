@@ -1,0 +1,43 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+                           http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+  <bean id="arizona.edu.biNonTransactionalDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="${datasource.driver.name}"/>
+    <property name="url" value="${bi.datasource.url}" />
+    <property name="maxActive" value="${datasource.pool.maxActive}"/>
+    <property name="minIdle" value="${datasource.minIdle}" />
+    <property name="initialSize" value="${datasource.initialSize}"/>
+    <property name="validationQuery" value="${datasource.pool.validationQuery}"/>
+    <property name="username" value="${bi.datasource.username}" />
+    <property name="password" value="${bi.datasource.password}" />
+    <property name="accessToUnderlyingConnectionAllowed" value="${datasource.accessToUnderlyingConnectionAllowed}"/>
+  </bean>
+
+  <bean id="glImportServiceDataSource" class="org.kuali.rice.core.framework.persistence.jdbc.datasource.PrimaryDataSourceFactoryBean" scope="singleton">
+    <property name="nonTransactionalDataSource" value="true"/>
+    <property name="preferredDataSourceParams">
+      <list>
+        <value>arizona.edu.biNonTransactionalDataSource</value>
+      </list>
+    </property>
+    <property name="serverDataSource" value="false"/>
+  </bean>
+
+
+</beans>

@@ -61,7 +61,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     /**
      * Method that generates the search results for the lookup framework.
      * Called by performLookup()
-     * 
+     *
      * @see org.kuali.rice.kns.lookup.KualiLookupableHelperServiceImpl#getSearchResults(java.util.Map)
      */
     @Override
@@ -81,11 +81,11 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     @Override
     public List<SPSRestrictedNote> getSPSRestrictedNotes(String proposalNumber) throws  AuthorizationException {
         LOG.debug("getSPSRestrictedNotes(): prop="+proposalNumber+" currentUser:"+GlobalVariables.getUserSession().getPrincipalName());
-        
+
         if ( StringUtils.isEmpty(proposalNumber) ){
             throw new IllegalArgumentException("Null/empty proposalNumber !");
         }
-        
+
         List<SPSRestrictedNote> restrictedNotes = new ArrayList<SPSRestrictedNote>();
         try {
             restrictedNotes = SPSRestrictedNoteDao.getSPSRestrictedNotes(proposalNumber);
@@ -103,7 +103,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
                     }
                 }
             }
-            
+
         } catch (Exception e){
             LOG.error(e);
             throw new RuntimeException(e);
@@ -111,7 +111,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
         LOG.debug("getSPSRestrictedNotes(): Finished.");
         return restrictedNotes;
     }
-    
+
     @Override
     public boolean canEditSPSRestrictedNotes(){
         LOG.debug("canEditSPSRestrictedNotes()");
@@ -121,8 +121,8 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
         }
         return false;
     }
-    
-    
+
+
     @Override
     public SPSRestrictedNote addSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException{
         LOG.debug("addSPSRestrictedNote(): "+spsRestrictedNote);
@@ -134,7 +134,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
             throw new RuntimeException(e);
         }
     }
-    
+
 
     @Override
     public boolean deleteSPSRestrictedNote(SPSRestrictedNote spsRestrictedNote) throws AuthorizationException, IllegalArgumentException {
@@ -152,7 +152,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     public void setPropDevRoutingStateDao(PropDevRoutingStateDao propDevRoutingStateDao) {
         this.propDevRoutingStateDao = propDevRoutingStateDao;
     }
-    
+
     public void setSPSRestrictedNoteDao(SPSRestrictedNoteDao SPSRestrictedNoteDao) {
         this.SPSRestrictedNoteDao = SPSRestrictedNoteDao;
     }
@@ -173,7 +173,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     public void setKcPersonService(KcPersonService kcPersonService) {
         this.kcPersonService = kcPersonService;
     }
-    
+
     protected DocumentHeaderService getDocumentHeaderService() {
         if (documentHeaderService == null ){
             documentHeaderService = KraServiceLocator.getService(DocumentHeaderService.class);
@@ -195,7 +195,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
 
 
     @Override
-    public void setORDExpedited(String proposalNumber, Boolean ordExp) throws AuthorizationException, IllegalArgumentException {    
+    public void setORDExpedited(String proposalNumber, Boolean ordExp) throws AuthorizationException, IllegalArgumentException {
         LOG.debug("setORDExpedited() propNumber:"+proposalNumber+ " ordExp="+ordExp+" currentUser:"+GlobalVariables.getUserSession().getPrincipalName() );
         checkUserAuthorization( PropDevRoutingStateConstants.EDIT_ORD_EXPEDITED_PERMISSION);
 
@@ -229,7 +229,7 @@ public class PropDevRoutingStateServiceImpl implements PropDevRoutingStateServic
     @Override
     public void setSPSReviewer(String proposalNumber, String kcPersonId) throws AuthorizationException, IllegalArgumentException {
         LOG.debug("setSPSReviewer() propNumber:"+proposalNumber+ " kcPersonId="+kcPersonId +" crtUser="+GlobalVariables.getUserSession().getPrincipalName());
-        checkUserAuthorization( PropDevRoutingStateConstants.EDIT_SPS_REVIEWER_PERMISSION); 
+        checkUserAuthorization( PropDevRoutingStateConstants.EDIT_SPS_REVIEWER_PERMISSION);
         KcPerson kcPerson = null;
         try {
             kcPerson = getKcPersonService().getKcPersonByPersonId(kcPersonId);
