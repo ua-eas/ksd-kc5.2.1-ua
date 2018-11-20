@@ -143,5 +143,18 @@
         <property name="parameterService" ref="parameterService"/>
         <property name="dateTimeService" ref="dateTimeService"/>
     </bean>
+
+    <bean id="batchJobStatusLookupable" parent="batchJobStatusLookupable-parentBean" scope="prototype"/>
+    <bean id="batchJobStatusLookupable-parentBean" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype" abstract="true">
+        <property name="lookupableHelperService">
+            <ref bean="batchJobStatusLookupableHelperService"/>
+        </property>
+    </bean>
+    <bean id="batchJobStatusLookupableHelperService" parent="batchJobStatusLookupableHelperService-parentBean" scope="prototype"/>
+    <bean id="batchJobStatusLookupableHelperService-parentBean" class="edu.arizona.kra.sys.batch.lookup.BatchJobStatusLookupableHelperServiceImpl" scope="prototype" parent="parentLookupableHelperService" abstract="true">
+        <property name="schedulerService" ref="schedulerService"/>
+        <property name="parameterService" ref="parameterService"/>
+
+    </bean>
      
 </beans>
