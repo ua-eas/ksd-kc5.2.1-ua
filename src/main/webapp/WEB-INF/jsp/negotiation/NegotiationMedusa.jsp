@@ -26,7 +26,7 @@
 	auditCount="0"
   	headerDispatch="${KualiForm.headerDispatch}"
   	headerTabActive="medusa"
->
+	extraTopButtons="${KualiForm.extraButtons}" >
 
 
 

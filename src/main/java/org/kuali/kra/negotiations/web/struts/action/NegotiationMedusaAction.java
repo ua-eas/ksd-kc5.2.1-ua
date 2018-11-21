@@ -52,8 +52,11 @@ public class NegotiationMedusaAction extends NegotiationAction {
     }
 
     public ActionForward refreshView(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
-        return mapping.findForward(Constants.MAPPING_AWARD_BASIC);
+        return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+
+    public ActionForward negotiation(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        return mapping.findForward(Constants.NEGOTIATION_HOME_PAGE);
     }
 
 
