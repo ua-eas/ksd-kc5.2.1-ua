@@ -1,5 +1,7 @@
 package edu.arizona.kra.subaward.batch.service;
 
+import edu.arizona.kra.subaward.batch.bo.UAGlEntry;
+
 /**
  * Created by nataliac on 10/31/18.
  */
@@ -12,9 +14,9 @@ public interface SubawardInvoiceErrorReportService {
 
 
     /**
-     * Method that saves the occured exception with the given message
+     * Method that reports a duplicate row problem and the associated glEntry data
      */
-    public void recordError(String message, Exception e, String glEntryID);
+    public void recordDuplicateRowError(UAGlEntry glEntry);
 
 
     /**

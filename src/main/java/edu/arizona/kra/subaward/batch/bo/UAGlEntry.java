@@ -1,6 +1,7 @@
 package edu.arizona.kra.subaward.batch.bo;
 
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.util.DateUtils;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
 
 import java.sql.Date;
@@ -42,6 +43,7 @@ public class UAGlEntry extends KraPersistableBusinessObjectBase {
     private String transactionEncumbranceUpdateCode;
     private Date transactionPostingDate;
     private Timestamp transactionDateTimeStamp;
+    private Date importedDate;
 
 
 //    private String gecDocumentNumber; //TODO Is this needed? should correspond to GEC_FDOC_NBR but we don't have that column from BI
@@ -273,13 +275,50 @@ public class UAGlEntry extends KraPersistableBusinessObjectBase {
         this.transactionDateTimeStamp = transactionDateTimeStamp;
     }
 
-//    public String getGecDocumentNumber() {
-//        return gecDocumentNumber;
-//    }
-//
-//    public void setGecDocumentNumber(String gecDocumentNumber) {
-//        this.gecDocumentNumber = gecDocumentNumber;
-//    }
+    public Date getImportedDate() {
+        return importedDate;
+    }
+
+    public UAGlEntry setImportedDate(Date importedDate) {
+        this.importedDate = importedDate;
+        return this;
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+
+        sb.append("EntryId: "); sb.append(entryId);
+        sb.append(" UniversityFiscalYear: "); sb.append(universityFiscalYear);
+        sb.append(" ChartOfAccountsCode: "); sb.append(chartOfAccountsCode);
+        sb.append(" AccountNumber: "); sb.append(chartOfAccountsCode);
+        sb.append(" SubAccountNumber: "); sb.append(subAccountNumber);
+        sb.append(" FinancialObjectCode: "); sb.append(financialObjectCode);
+        sb.append(" FinancialSubObjectCode: "); sb.append(financialSubObjectCode);
+        sb.append(" FinancialBalanceTypeCode: "); sb.append(financialBalanceTypeCode);
+        sb.append(" FinancialObjectTypeCode: "); sb.append(financialObjectTypeCode);
+        sb.append(" UniversityFiscalPeriodCode: "); sb.append(universityFiscalPeriodCode);
+        sb.append(" FinancialDocumentTypeCode: "); sb.append(financialDocumentTypeCode);
+        sb.append(" FinancialSystemOriginationCode: "); sb.append(financialSystemOriginationCode);
+        sb.append(" DocumentNumber: "); sb.append(documentNumber);
+        sb.append(" TransactionLedgerEntrySequenceNumber: "); sb.append(transactionLedgerEntrySequenceNumber);
+        sb.append(" TransactionLedgerEntryDescription: "); sb.append(transactionLedgerEntryDescription);
+        sb.append(" TransactionLedgerEntryAmount: "); sb.append(transactionLedgerEntryAmount.bigDecimalValue().toPlainString());
+        sb.append(" TransactionDebitCreditCode: "); sb.append(transactionDebitCreditCode);
+        sb.append(" TransactionDate: "); sb.append(transactionDate);
+        sb.append(" OrganizationDocumentNumber: "); sb.append(organizationDocumentNumber);
+        sb.append(" ProjectCode: "); sb.append(projectCode);
+        sb.append(" OrganizationReferenceId: "); sb.append(organizationReferenceId);
+        sb.append(" ReferenceFinancialDocumentTypeCode: "); sb.append(referenceFinancialDocumentTypeCode);
+        sb.append(" ReferenceFinancialSystemOriginationCode: "); sb.append(referenceFinancialSystemOriginationCode);
+        sb.append(" ReferenceFinancialDocumentNumber: "); sb.append(referenceFinancialDocumentNumber);
+        sb.append(" FinancialDocumentReversalDate: "); sb.append(financialDocumentReversalDate);
+        sb.append(" TransactionEncumbranceUpdateCode: "); sb.append(transactionEncumbranceUpdateCode);
+        sb.append(" TransactionPostingDate: "); sb.append(transactionPostingDate);
+        sb.append(" TransactionDateTimeStamp: "); sb.append(transactionDateTimeStamp);
+        sb.append(" ImportedDate: "); sb.append(importedDate);
+
+        return sb.toString();
+    }
 
 
 

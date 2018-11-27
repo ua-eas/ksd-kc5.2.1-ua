@@ -1,5 +1,7 @@
 package edu.arizona.kra.subaward.batch;
 
+import org.quartz.JobDataMap;
+
 import java.sql.Date;
 import java.util.Calendar;
 
@@ -17,5 +19,6 @@ public final class InvoiceFeedUtils {
         Date result = new Date(c.getTimeInMillis());
         return result;
     }
+
 
 }

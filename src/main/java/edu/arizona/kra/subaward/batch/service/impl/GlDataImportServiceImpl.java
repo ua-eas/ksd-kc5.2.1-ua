@@ -1,25 +1,30 @@
 package edu.arizona.kra.subaward.batch.service.impl;
 
-import edu.arizona.kra.subaward.batch.InvoiceFeedUtils;
+
 import edu.arizona.kra.subaward.batch.bo.BiGlEntry;
 import edu.arizona.kra.subaward.batch.bo.UAGlEntry;
+import edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceData;
 import edu.arizona.kra.subaward.batch.dao.BiGLFeedDao;
 import edu.arizona.kra.subaward.batch.dao.SubawardGlFeedDao;
 import edu.arizona.kra.subaward.batch.service.GlDataImportService;
 import edu.arizona.kra.subaward.batch.service.SubawardInvoiceErrorReportService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 /**
  * Created by nataliac on 8/8/18.
  */
 public class GlDataImportServiceImpl implements GlDataImportService {
-    private static final Log LOG = LogFactory.getLog(GlDataImportServiceImpl.class);
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(GlDataImportServiceImpl.class);
 
     private BiGLFeedDao biGLFeedDao;
     private SubawardGlFeedDao subawardGLFeedDao;
@@ -48,13 +53,47 @@ public class GlDataImportServiceImpl implements GlDataImportService {
             List<?> result = getBusinessObjectService().save(importedGlEntries);
             importedLinesCount = result.size();
         } catch (Exception e){
-            LOG.error(e);
+            LOG.error("Exception", e);
             subawardInvoiceErrorReportService.recordError("GlDataImportServiceImpl: Exception at importing GL Entries from BI!", e);
             throw new RuntimeException(e);
         }
 
-        return  importedLinesCount;
+        return importedLinesCount;
 
+    }
+
+    @Transactional
+    public UASubawardInvoiceData createInvoiceData(UAGlEntry uaGlEntry){
+        UASubawardInvoiceData subawardInvoiceData = new UASubawardInvoiceData();
+
+        subawardInvoiceData.setEntryId( uaGlEntry.getEntryId());
+        subawardInvoiceData.setFinancialDocNumber( uaGlEntry.getDocumentNumber() );
+        subawardInvoiceData.setPurchaseOrderNumber( uaGlEntry.getReferenceFinancialDocumentNumber());
+        subawardInvoiceData.setAmountReleased( uaGlEntry.getTransactionLedgerEntryAmount());
+        subawardInvoiceData.setFinancialDocumentReversalDate( uaGlEntry.getFinancialDocumentReversalDate());
+        subawardInvoiceData.setEffectiveDate( uaGlEntry.getTransactionPostingDate());
+        subawardInvoiceData.setComments( uaGlEntry.getTransactionLedgerEntryDescription());
+        subawardInvoiceData.setFinancialObjectCode( uaGlEntry.getFinancialObjectCode());
+
+        LOG.debug("GlDataImportService: createInvoiceData for GL Entry ID="+uaGlEntry.getEntryId());
+        return subawardInvoiceData;
+
+    }
+
+
+    public Collection<UAGlEntry> allImportedGLEntries(){
+        return getBusinessObjectService().findAll(UAGlEntry.class);
+    }
+
+
+    public boolean isDuplicateRow(UAGlEntry uaGlEntry){
+        //returns true if there is at least one UASubaward Invoice Data with the same entry ID
+        Map<String, Object> keyMap = new HashMap<String, Object>();
+        keyMap.put("entryId", uaGlEntry.getEntryId());
+        if ( getBusinessObjectService().countMatching(UASubawardInvoiceData.class, keyMap) > 0 ){
+            return true;
+        }
+        return false;
     }
 
 

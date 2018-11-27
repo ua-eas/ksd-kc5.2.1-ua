@@ -1,20 +1,20 @@
 <!-- Created by Natalia Ibanez 08/01/2018-->
 <descriptor-repository version="1.0">
   <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UAGlEntry" table="SUBAWARD_GL_IMPORT">
-    <field-descriptor name="entryId" column="ENTRY_ID" jdbc-type="BIGINT" index="true" />
-    <field-descriptor name="universityFiscalYear" column="UNIV_FISCAL_YR" jdbc-type="INTEGER" primarykey="true" index="true" />
-    <field-descriptor name="chartOfAccountsCode" column="FIN_COA_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="accountNumber" column="ACCOUNT_NBR" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="subAccountNumber" column="SUB_ACCT_NBR" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="financialObjectCode" column="FIN_OBJECT_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="financialSubObjectCode" column="FIN_SUB_OBJ_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="financialBalanceTypeCode" column="FIN_BALANCE_TYP_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="financialObjectTypeCode" column="FIN_OBJ_TYP_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="universityFiscalPeriodCode" column="UNIV_FISCAL_PRD_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="financialDocumentTypeCode" column="FDOC_TYP_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="financialSystemOriginationCode" column="FS_ORIGIN_CD" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="documentNumber" column="FDOC_NBR" jdbc-type="VARCHAR" primarykey="true" index="true" />
-    <field-descriptor name="transactionLedgerEntrySequenceNumber" column="TRN_ENTR_SEQ_NBR" jdbc-type="INTEGER" primarykey="true" index="true" />
+    <field-descriptor name="entryId" column="ENTRY_ID" jdbc-type="BIGINT" primarykey="true" index="true" />
+    <field-descriptor name="universityFiscalYear" column="UNIV_FISCAL_YR" jdbc-type="INTEGER"  index="true" />
+    <field-descriptor name="chartOfAccountsCode" column="FIN_COA_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="accountNumber" column="ACCOUNT_NBR" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="subAccountNumber" column="SUB_ACCT_NBR" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="financialObjectCode" column="FIN_OBJECT_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="financialSubObjectCode" column="FIN_SUB_OBJ_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="financialBalanceTypeCode" column="FIN_BALANCE_TYP_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="financialObjectTypeCode" column="FIN_OBJ_TYP_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="universityFiscalPeriodCode" column="UNIV_FISCAL_PRD_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="financialDocumentTypeCode" column="FDOC_TYP_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="financialSystemOriginationCode" column="FS_ORIGIN_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="documentNumber" column="FDOC_NBR" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="transactionLedgerEntrySequenceNumber" column="TRN_ENTR_SEQ_NBR" jdbc-type="INTEGER" index="true" />
     <field-descriptor name="transactionLedgerEntryDescription" column="TRN_LDGR_ENTR_DESC" jdbc-type="VARCHAR" />
     <field-descriptor name="transactionLedgerEntryAmount" column="TRN_LDGR_ENTR_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
     <field-descriptor name="transactionDebitCreditCode" column="TRN_DEBIT_CRDT_CD" jdbc-type="VARCHAR" />
@@ -30,4 +30,35 @@
     <field-descriptor name="transactionPostingDate" column="TRN_POST_DT" jdbc-type="DATE" />
     <field-descriptor name="transactionDateTimeStamp" column="TIMESTAMP" jdbc-type="TIMESTAMP" index="true" />
   </class-descriptor>
+
+  <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceData" table="SUBAWARD_INV_FEED_DATA">
+    <field-descriptor name="entryId" column="ENTRY_ID" jdbc-type="BIGINT" index="true" primarykey="true" />
+    <field-descriptor name="purchaseOrderNumber" column="FDOC_NBR" jdbc-type="VARCHAR" />
+    <field-descriptor name="purchaseOrderNumber" column="PURCHASE_ORD_NBR" jdbc-type="VARCHAR" />
+    <field-descriptor name="amountReleased" column="AMT_RELEASED" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
+    <field-descriptor name="comments" column="COMMENTS" jdbc-type="VARCHAR" />
+    <field-descriptor name="effectiveDate" column="EFFECTIVE_DATE" jdbc-type="DATE" />
+    <field-descriptor name="financialDocumentReversalDate" column="FDOC_REVERSAL_DT" jdbc-type="DATE" />
+    <field-descriptor name="financialObjectCode" column="FIN_OBJECT_CD" jdbc-type="VARCHAR" index="true" />
+    <field-descriptor name="subAwardId" column="SUBAWARD_ID" jdbc-type="BIGINT" />
+    <field-descriptor name="subAwardAmtReleasedId" column="SUBAWARD_AMT_RELEASED_ID" jdbc-type="INTEGER"/>
+    <field-descriptor name="invoiceDocumentNumber" column="INVOICE_DOCUMENT_NBR" jdbc-type="VARCHAR" />
+    <field-descriptor name="importedDate" column="IMPORTED_DT" jdbc-type="TIMESTAMP" />
+  </class-descriptor>
+
+
+  <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceError" table="SUBAWARD_INV_FEED_ERRORS">
+    <field-descriptor name="id" column="ID" jdbc-type="BIGINT" index="true" primarykey="true" sequence-name="subaward_inv_feed_err_seq" autoincrement="true"/>
+    <field-descriptor name="errorMessage" column="ERROR_MSG" jdbc-type="VARCHAR" />
+    <field-descriptor name="errorDate" column="ERROR_DT" jdbc-type="DATE" />
+    <field-descriptor name="glEntryId" column="GL_ENTRY_ID" jdbc-type="BIGINT" index="true"  />
+    <field-descriptor name="glEntryData" column="GL_ENTRY_DATA" jdbc-type="VARCHAR" />
+    <field-descriptor name="invoiceId" column="INVOICE_ID" jdbc-type="VARCHAR" />
+    <field-descriptor name="subawardId" column="SUBAWARD_ID" jdbc-type="BIGINT" />
+    <field-descriptor name="subAwardAmtReleasedId" column="SUBAWARD_AMT_RELEASED_ID" jdbc-type="INTEGER"/>
+    <field-descriptor name="invoiceDocumentNumber" column="INVOICE_DOCUMENT_NBR" jdbc-type="VARCHAR" />
+    <field-descriptor name="noticeSentDate" column="NOTICE_SENT_DT" jdbc-type="TIMESTAMP" />
+  </class-descriptor>
+
+
 </descriptor-repository>

@@ -60,5 +60,7 @@ public final class InvoiceFeedConstants {
     public static final String TIMESTAMP_ZERO = " 00:00:00";
     public static final String TIMESTAMP_EOD = " 23:59:59";
 
+    public static final String DUPLICATE_GLENTRY_ERROR_MSG = "ERROR: Trying to import a duplicate GL Entry! Skipping row... ";
+
 
 }

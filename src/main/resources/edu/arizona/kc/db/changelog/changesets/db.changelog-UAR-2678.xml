@@ -43,74 +43,70 @@
     </rollback>
   </changeSet>
 
+
   <changeSet id="UAR-2678_2" author="Natalia Ibanez">
     <comment>
-      Creating SUBAWARD_PRE_INVOICE table that will hold UAR parsed data from the SUBAWARD_GL_IMPORT before creating the actual subaward invoices
+      Creating SUBAWARD_INV_FEED_DATA table that will hold UAR parsed data from the SUBAWARD_GL_IMPORT before creating the actual Subaward Invoices
     </comment>
     <sql>
-      CREATE TABLE KRAOWNER.SUBAWARD_PRE_INVOICE(
-        ID NUMBER(22,0) NOT NULL,
+      CREATE TABLE KRAOWNER.SUBAWARD_INV_FEED_DATA(
+        ENTRY_ID NUMBER(19,0) UNIQUE NOT NULL,
         FDOC_NBR VARCHAR2(14),
         PURCHASE_ORD_NBR VARCHAR2(14),
         AMT_RELEASED NUMBER(19,2),
         COMMENTS VARCHAR2(40),
         EFFECTIVE_DATE DATE,
+        FDOC_REVERSAL_DT DATE,
         FIN_OBJECT_CD VARCHAR2(4),
-        IMPORTED_DT DATE,
         SUBAWARD_ID NUMBER(12,0),
-        SUBAWARD_AMT_REL_ID NUMBER(12,0),
-        INVOICE_DOCUMENT_NBR VARCHAR2(40)
+        SUBAWARD_AMT_RELEASED_ID NUMBER(12,0),
+        INVOICE_DOCUMENT_NBR VARCHAR2(40),
+        IMPORTED_DT DATE
       );
-      ALTER TABLE SUBAWARD_PRE_INVOICE ADD CONSTRAINT subaward_pre_invoice_PK PRIMARY KEY(ID);
 
-      --create Sequence for subaward_pre_invoice id
-      CREATE SEQUENCE KRAOWNER.subaward_pre_invoice_seq
-      MINVALUE 1
-      START WITH 1
-      INCREMENT BY 1
-      NOCACHE;
     </sql>
     <rollback>
-      DROP sequence KRAOWNER.subaward_pre_invoice_seq;
-      DROP table KRAOWNER.SUBAWARD_PRE_INVOICE CASCADE CONSTRAINTS;
+      DROP table KRAOWNER.SUBAWARD_INV_FEED_DATA CASCADE CONSTRAINTS;
     </rollback>
   </changeSet>
 
   <changeSet id="UAR-2678_3" author="Natalia Ibanez">
     <comment>
-      Creating SUBAWARD_INVOICE_IMPORT_ERRORS table that will hold all errors related to the subaward invoice import
+      Creating SUBAWARD_INV_FEED_ERRORS table that will hold all errors related to the subaward invoice import process
     </comment>
     <sql>
-      CREATE TABLE KRAOWNER.SUBAWARD_INVOICE_IMPORT_ERRORS(
+      CREATE TABLE KRAOWNER.SUBAWARD_INV_FEED_ERRORS(
         ID NUMBER(12,0) NOT NULL,
         ERROR_MSG VARCHAR2(100),
         ERROR_DT DATE,
         GL_ENTRY_ID NUMBER(19,0),
+        GL_ENTRY_DATA VARCHAR2(1500),
+        INVOICE_ID VARCHAR2(40),
         SUBAWARD_ID NUMBER(12,0),
-        SUBAWARD_AMT_REL_ID NUMBER(12,0),
+        SUBAWARD_AMT_RELEASED_ID NUMBER(12,0),
         INVOICE_DOCUMENT_NBR VARCHAR2(40),
         NOTICE_SENT_DT DATE
       );
-      ALTER TABLE SUBAWARD_INVOICE_IMPORT_ERRORS ADD CONSTRAINT subaward_inv_import_err_PK PRIMARY KEY(ID);
+      ALTER TABLE SUBAWARD_INV_FEED_ERRORS ADD CONSTRAINT subaward_inv_feed_err_PK PRIMARY KEY(ID);
 
-      --create Sequence for subaward_invoice_import_errors id
-      CREATE SEQUENCE KRAOWNER.subaward_inv_import_err_seq
+      --create Sequence for subaward_inv_feed_errors id
+      CREATE SEQUENCE KRAOWNER.subaward_inv_feed_err_seq
       MINVALUE 1
       START WITH 1
       INCREMENT BY 1
       NOCACHE;
     </sql>
     <rollback>
-      DROP sequence KRAOWNER.subaward_inv_import_err_seq;
-      DROP table KRAOWNER.SUBAWARD_INVOICE_IMPORT_ERRORS CASCADE CONSTRAINTS;
+      DROP sequence KRAOWNER.subaward_inv_feed_err_seq;
+      DROP table KRAOWNER.SUBAWARD_INV_FEED_ERRORS CASCADE CONSTRAINTS;
     </rollback>
   </changeSet>
   <changeSet id="UAR-2678_4" author="Natalia Ibanez">
     <comment>
-      Creating SUBAWARD_INVOICE_IMPORT_ERRORS table that will hold all errors related to the subaward invoice import
+      Creating SUBAWARD_INV_FEED_SUMMARY table to hold info about when the job runs and results.
     </comment>
     <sql>
-      CREATE TABLE KRAOWNER.SUBAWARD_INV_IMPORT_SUMMARY(
+      CREATE TABLE KRAOWNER.SUBAWARD_INV_FEED_SUMMARY(
         ID NUMBER(12,0) NOT NULL,
         RUN_DT DATE,
         IMPORT_DT DATE,
@@ -121,18 +117,18 @@
         ERRORS_CT NUMBER(8,0)
       );
 
-      ALTER TABLE SUBAWARD_INV_IMPORT_SUMMARY ADD CONSTRAINT subaward_inv_import_sum_PK PRIMARY KEY(ID);
+      ALTER TABLE SUBAWARD_INV_FEED_SUMMARY ADD CONSTRAINT subaward_inv_feed_sum_PK PRIMARY KEY(ID);
 
-      --create Sequence for subaward_inv_import_summary id
-      CREATE SEQUENCE KRAOWNER.subaward_inv_import_sum_seq
+      --create Sequence for subaward_inv_feed_summary id
+      CREATE SEQUENCE KRAOWNER.subaward_inv_feed_sum_seq
       MINVALUE 1
       START WITH 1
       INCREMENT BY 1
       NOCACHE;
     </sql>
     <rollback>
-      DROP sequence KRAOWNER.subaward_inv_import_sum_seq;
-      DROP table KRAOWNER.SUBAWARD_INV_IMPORT_SUMMARY CASCADE CONSTRAINTS;
+      DROP sequence KRAOWNER.subaward_inv_feed_sum_seq;
+      DROP table KRAOWNER.SUBAWARD_INV_FEED_SUMMARY CASCADE CONSTRAINTS;
     </rollback>
   </changeSet>
 </databaseChangeLog>

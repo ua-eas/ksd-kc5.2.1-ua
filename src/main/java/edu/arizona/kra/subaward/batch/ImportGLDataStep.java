@@ -32,11 +32,20 @@ public class ImportGLDataStep extends AbstractStep {
         int daysInterval = getDataIntervalInDays(jobDataMap);
         java.sql.Date startDate = InvoiceFeedUtils.substractDaysFromDate(today, daysInterval);
 
-        glDataImportService.importGLData(startDate, today);
-        LOG.debug("ImportGLDataStep: execute() finished");
+        int importedLinesCount = glDataImportService.importGLData(startDate, today);
+        if (importedLinesCount > 0)
+            LOG.info("ImportGLDataStep: execute() finished. Imported number of GL Entries : "+importedLinesCount);
+        else
+            LOG.info("ImportGLDataStep: execute() finished. ZERO GL Entries imported!");
 
         return true;
     }
+
+    /**
+     * Method that extracts the number of days for this run from the JobDataMap stored in the trigger - since each run of the job can bring back a different number of days worth of data.
+     * @param jobDataMap
+     * @return
+     */
 
     protected int getDataIntervalInDays(JobDataMap jobDataMap ){
         Integer daysInterval = InvoiceFeedConstants.DEFAULT_DATA_INTERVAL_DAYS;
