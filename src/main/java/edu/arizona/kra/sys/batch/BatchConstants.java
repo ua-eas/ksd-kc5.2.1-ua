@@ -2,17 +2,24 @@ package edu.arizona.kra.sys.batch;
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> UAR-2692
  * Created by nataliac on 8/22/18.
  */
 public final class BatchConstants {
 
     public static final String PARAM_NAME_BATCH_NODE_HOSTNAME="batchNodeHostname";
+
     public static final String NAMESPACE_KC_SYS="KC-SYS";
     public static final String BATCH_COMPONENT_CODE="Batch";
 
     public static final String PERMISSION_TEMPLATE_MODIFY_BATCH_JOB_NAMESPACE="KR-NS";
     public static final String PERMISSION_MODIFY_BATCH_JOB_NAMESPACE="KR-SYS";
     public static final String PERMISSION_NAME_MODIFY_BATCH_JOB="Modify Batch Job";
+
+    public static final String PARAM_NAMESPACE_BATCH="KC-SYS";
+    public static final String PARAM_BATCH_COMPNENT_CODE="Batch";
 
 
 
@@ -52,7 +59,6 @@ public final class BatchConstants {
 
     public static final String SCHEDULED_GROUP = "scheduled";
     public static final String UNSCHEDULED_GROUP = "unscheduled";
-
 
     public static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy";
 

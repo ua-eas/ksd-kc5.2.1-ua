@@ -1,6 +1,11 @@
 package edu.arizona.kra.subaward.batch.service;
 
+import edu.arizona.kra.subaward.batch.bo.UAGlEntry;
+import edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceData;
+
 import java.sql.Date;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by nataliac on 8/8/18.
@@ -17,5 +22,32 @@ public interface GlDataImportService {
      * @return int - the number of rows imported.
      */
     int importGLData(Date beginDate, Date endDate);
+
+
+    /**
+     * Returns all imported  UAGlEntry in the last run of the job
+     *
+     * @return  List<UAGlEntry>
+     */
+    Collection<UAGlEntry> allImportedGLEntries();
+
+    /**
+     * Checks if an imported  GL Entry row has been already imported
+     *
+     * @param uaGlEntry -> GL Entry row to validate against the already imported rows
+     *
+     * @return boolean - true if the UAGlEntry has already been imported successfully previously
+     */
+    boolean isDuplicateRow(UAGlEntry uaGlEntry);
+
+
+    /**
+     * Generates the Subaward Invoice Data from a UAGlEntry
+     *
+     * @param uaGlEntry -> GL Entry row to extract Subaward Invoice data from
+     *
+     * @return UASubawardInvoiceData - created invoice data.
+     */
+    UASubawardInvoiceData createInvoiceData(UAGlEntry uaGlEntry);
 
 }

@@ -77,14 +77,14 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     public boolean isBatchNode(){
-        //TODO: disable this for ease of testing on lower enironments
-        return true;
-//        LOG.info("isBatchNode: hostname="+BatchUtils.getHostname());
+        LOG.info("isBatchNode: hostname="+BatchUtils.getHostname());
 //        if ( parameterService.parameterExists(BatchConstants.NAMESPACE_KC_SYS, BatchConstants.BATCH_COMPONENT_CODE, BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME)) {
 //            String batchNodename = parameterService.getParameterValueAsString(BatchConstants.NAMESPACE_KC_SYS, BatchConstants.BATCH_COMPONENT_CODE, BatchConstants.PARAM_NAME_BATCH_NODE_HOSTNAME);
 //            return StringUtils.equals( BatchUtils.getHostname(), batchNodename);
 //        }
 //        return false;
+        //TODO: Temporarily disabling the node checking for ease of testing on lower environments
+        return true;
     }
 
     @Override

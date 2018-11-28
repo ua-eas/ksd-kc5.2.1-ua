@@ -18,12 +18,13 @@ import java.util.List;
 public class SubawardInvoiceFeedServiceImpl implements SubawardInvoiceFeedService {
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(SubawardInvoiceFeedServiceImpl.class);
 
-    ParameterService parameterService;
+
 
     List <String> runSchedule;
     List <Integer> dataIntervals;
 
-    private SubawardInvoiceErrorReportService subawardInvoiceErrorReportService;
+    ParameterService parameterService;
+    SubawardInvoiceErrorReportService subawardInvoiceErrorReportService;
 
     public boolean isSubawardInvoiceFeedEnabled(){
         if (parameterService.parameterExists(InvoiceFeedConstants.PARAM_NAMESPACE_SUBWAWARD, InvoiceFeedConstants.PARAM_COMPONENT_BATCH, InvoiceFeedConstants.PARAM_NAME_SUBAWARD_INVOICE_FEED_ENABLED )) {
