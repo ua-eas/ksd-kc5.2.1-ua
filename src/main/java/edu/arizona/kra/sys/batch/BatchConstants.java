@@ -66,9 +66,11 @@ public final class BatchConstants {
     public static final String UAR_SCHEDULER_NAME = "UARScheduler";
 
     //Keys
+    public static final String CONFIGURATION_ENVIRONMENT_KEY = "environment";
     public static final String REQUESTOR_EMAIL_ADDRESS_KEY = "requestorEmailAdress";
-    public static final String MESSAGE_BATCH_FILE_LOG_EMAIL_BODY = "message.batch.log.email.body";
     public static final String REPORTS_DIRECTORY_KEY= "reports.directory";
+    public static final String MESSAGE_BATCH_EMAIL_SUBJECT_KEY = "message.batch.email.subject";
+    public static final String MESSAGE_BATCH_EMAIL_BODY_KEY = "message.batch.email.body";
 
     //Parameters
 

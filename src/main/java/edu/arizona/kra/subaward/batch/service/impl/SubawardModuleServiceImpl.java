@@ -1,6 +1,7 @@
 package edu.arizona.kra.subaward.batch.service.impl;
 
 import edu.arizona.kra.subaward.batch.service.SubawardInvoiceFeedService;
+import edu.arizona.kra.sys.batch.BatchConstants;
 import edu.arizona.kra.sys.batch.CronTriggerDescriptor;
 import edu.arizona.kra.sys.batch.TriggerDescriptor;
 import edu.arizona.kra.sys.batch.service.BatchModuleService;
@@ -45,6 +46,7 @@ public class SubawardModuleServiceImpl extends KcModuleServiceImpl implements Ba
                         dataInterval = DEFAULT_DATA_INTERVAL_DAYS;
                     }
                     triggerDescriptor.getTrigger().getJobDataMap().put(DAYS_INTERVAL_KEY, dataInterval);
+                    triggerDescriptor.getTrigger().getJobDataMap().put(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY, subawardInvoiceFeedService.getSubwawardInvoiceFeedDestinationEmail());
 
                     triggerDescriptors.add(triggerDescriptor);
 
@@ -52,7 +54,7 @@ public class SubawardModuleServiceImpl extends KcModuleServiceImpl implements Ba
                 }
             } else {
                 LOG.info("Subaward Invoice feed DISABLED. Skipping adding trigers.");
-            }
+             }
         }
         return triggerDescriptors;
     }

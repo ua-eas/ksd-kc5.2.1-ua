@@ -24,7 +24,7 @@
   <bean id="subawardInvoiceFeedJob" parent="scheduledJobDescriptor" >
     <property name="steps">
       <list>
-        <ref bean="importGLDataStep"/>
+        <!--ref bean="importGLDataStep"/-->
         <ref bean="validateGLDataStep"/>
       </list>
     </property>

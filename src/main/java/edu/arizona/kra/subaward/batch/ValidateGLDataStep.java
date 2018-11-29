@@ -45,6 +45,7 @@ public class ValidateGLDataStep extends AbstractStep {
                 //found a duplicate, report error and skip...
                 subawardInvoiceErrorReportService.recordDuplicateRowError(glEntry);
                 LOG.debug("ValidateGLDataStep: execute() Found duplicate Gl Entry:  "+glEntry.toString()+" Skipping!");
+                break;
             } else {
                 invoiceDataList.add(glDataImportService.createInvoiceData(glEntry));
                 importedEntriesCount++;

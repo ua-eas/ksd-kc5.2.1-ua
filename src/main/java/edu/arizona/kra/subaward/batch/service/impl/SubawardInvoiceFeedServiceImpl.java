@@ -22,6 +22,7 @@ public class SubawardInvoiceFeedServiceImpl implements SubawardInvoiceFeedServic
 
     List <String> runSchedule;
     List <Integer> dataIntervals;
+    String jobNotificationEmail;
 
     ParameterService parameterService;
     SubawardInvoiceErrorReportService subawardInvoiceErrorReportService;
@@ -69,6 +70,17 @@ public class SubawardInvoiceFeedServiceImpl implements SubawardInvoiceFeedServic
         }
         return dataIntervals;
     }
+
+    public String getSubwawardInvoiceFeedDestinationEmail(){
+        if ( StringUtils.isEmpty(jobNotificationEmail) ) {
+            jobNotificationEmail = parameterService.getParameterValueAsString(InvoiceFeedConstants.PARAM_NAMESPACE_SUBWAWARD, InvoiceFeedConstants.PARAM_COMPONENT_BATCH, InvoiceFeedConstants.PARAM_NAME_SUBAWARD_INVOICE_FEED_EMAIL );
+            if (StringUtils.isEmpty(jobNotificationEmail)){
+                LOG.error("getSubwawardInvoiceFeedDestinationEmail: Could not determine DESTINATION EMAIL ADDRESS integer from parameter: "+InvoiceFeedConstants.PARAM_NAME_SUBAWARD_INVOICE_FEED_EMAIL);
+            }
+        }
+        return jobNotificationEmail;
+    }
+
 
     public void setParameterService(ParameterService parameterService) {
         this.parameterService = parameterService;

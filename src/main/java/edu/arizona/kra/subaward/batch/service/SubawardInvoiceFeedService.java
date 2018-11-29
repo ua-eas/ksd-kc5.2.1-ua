@@ -26,4 +26,12 @@ public interface SubawardInvoiceFeedService {
      */
     public List<Integer> getSubwawardInvoiceFeedDataIntervalsDays();
 
+
+    /**
+     * Method that returns a list of data interval in dqys for the job to bring back at each run from the current day. These values should be set in subAwardInvoiceFeedJobDataIntervalsDays parameter
+     * Ex: 2 means it will return data from 2 days before till current date.
+     * @return List<Integer> with number of days
+     */
+    public String getSubwawardInvoiceFeedDestinationEmail();
+
 }

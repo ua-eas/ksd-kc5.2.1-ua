@@ -1,10 +1,12 @@
 package edu.arizona.kra.sys.batch;
 
+import org.apache.log4j.NDC;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.MessageFormat;
 
 /**
  * nataliac on 8/22/18: Batch framework Imported and adapted from KFS
@@ -34,6 +36,7 @@ public class BatchUtils {
         }
         return null;
     }
+
 
 
 }

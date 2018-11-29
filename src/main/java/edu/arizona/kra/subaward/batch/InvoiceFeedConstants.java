@@ -11,6 +11,7 @@ public final class InvoiceFeedConstants {
     public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_ENABLED="subAwardInvoiceFeedJobEnabled";
     public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_SCHEDULE="subAwardInvoiceFeedJobRunSchedule";
     public static final String PARAM_NAME_SUBAWARD_INVOICE_DATA_INTERVALS="subAwardInvoiceFeedJobDataIntervalsDays";
+    public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_EMAIL="subAwardInvoiceFeedNotificationEmail";
 
     public static String CLEAR_GL_IMPORT_TABLE_QUERY="truncate table SUBAWARD_GL_IMPORT";
 
