@@ -42,4 +42,22 @@
             DELETE FROM KRCR_CMPNT_T WHERE NMSPC_CD='KC-SUBAWARD' and NM='Batch';
         </rollback>
     </changeSet>
+
+  <changeSet id="UAR-2689_3" author="Natalia Ibanez">
+    <comment>
+      Adding Subaward Invoice Feed Email Notification Parameters.
+    </comment>
+    <sql>
+      INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, OBJ_ID)
+      VALUES ('KC', 'KC-SUBAWARD', 'Batch', 'subAwardInvoiceFeedNotificationEmail', 1, 'CONFG', 'uar-subaward-notices@list.arizona.edu', 'Sets the destination email for receiving notifications from SubAward Invoice Feed Job.', 'A', sys_guid());
+
+      UPDATE KRCR_PARM_T SET VAL = 'katt-automation@list.arizona.edu' WHERE PARM_NM='EMAIL_NOTIFICATION_FROM_ADDRESS' AND NMSPC_CD = 'KC-GEN' AND APPL_ID='KC' AND CMPNT_CD='All';
+
+      UPDATE KRCR_PARM_T SET PARM_NM = 'EMAIL_NOTIFICATIONS_TEST_ENABLED' WHERE PARM_NM='EMAIL_NOTIFICATION_TEST_ENABLED' AND NMSPC_CD = 'KC-GEN' AND APPL_ID='KC' AND CMPNT_CD='All';
+    </sql>
+    <rollback>
+      DELETE FROM KRCR_PARM_T WHERE NMSPC_CD='KC-SUBAWARD' and CMPNT_CD='Batch' and PARM_NM='subAwardInvoiceFeedNotificationEmail';
+      UPDATE KRCR_PARM_T SET VAL = 'from.address@kuali.org' WHERE PARM_NM='EMAIL_NOTIFICATION_FROM_ADDRESS' AND NMSPC_CD = 'KC-GEN' AND APPL_ID='KC' AND CMPNT_CD='All';
+    </rollback>
+  </changeSet>
 </databaseChangeLog>
