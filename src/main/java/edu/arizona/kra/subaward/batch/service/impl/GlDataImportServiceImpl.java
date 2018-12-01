@@ -35,7 +35,7 @@ public class GlDataImportServiceImpl implements GlDataImportService {
 
 
     @Transactional
-    public int importGLData(Date beginDate, Date endDate) {
+    public int importGLData(Long executionId, Date beginDate, Date endDate) {
         LOG.info("GlDataImportService: Import GL data from: "+beginDate.toString()+ " to: "+endDate.toString());
         int importedLinesCount = 0;
         // cleanup GL temporary table in UAR first
@@ -45,7 +45,6 @@ public class GlDataImportServiceImpl implements GlDataImportService {
             List<BiGlEntry> biGlEntryList = biGLFeedDao.importGLData(beginDate, endDate);
             if (biGlEntryList.isEmpty() ){
                 LOG.info("GLDataImportService: importGLData: 0 rows were returned from BI!");
-                //TODO handle this: write notice report! -> entry in error table??!?
                 return 0;
             }
             //UAR-2691: forced cast to UAGlEntry list instead of adapter as per Code Review
@@ -54,7 +53,7 @@ public class GlDataImportServiceImpl implements GlDataImportService {
             importedLinesCount = result.size();
         } catch (Exception e){
             LOG.error("Exception", e);
-            subawardInvoiceErrorReportService.recordError("GlDataImportServiceImpl: Exception at importing GL Entries from BI!", e);
+            subawardInvoiceErrorReportService.recordError(executionId, "GlDataImportServiceImpl: Exception at importing GL Entries from BI!", e);
             throw new RuntimeException(e);
         }
 

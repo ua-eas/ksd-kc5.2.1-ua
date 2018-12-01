@@ -8,6 +8,11 @@ public final class InvoiceFeedConstants {
     public static final String PARAM_NAMESPACE_SUBWAWARD="KC-SUBAWARD";
     public static final String PARAM_COMPONENT_BATCH="Batch";
 
+    public static final String SIF_JOB_LISTENER_NAME="SubawardInvoiceFeedJobListener";
+    public static final String SIF_JOB_NAME="subawardInvoiceFeedJob";
+    public static final String SIF_JOB_EXECUTION_SUMMARY_KEY="subawardInvoiceFeedJobSummary";
+    public static final String SIF_JOB_EXECUTION_ID_KEY="executionId";
+
     public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_ENABLED="subAwardInvoiceFeedJobEnabled";
     public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_SCHEDULE="subAwardInvoiceFeedJobRunSchedule";
     public static final String PARAM_NAME_SUBAWARD_INVOICE_DATA_INTERVALS="subAwardInvoiceFeedJobDataIntervalsDays";
@@ -62,6 +67,9 @@ public final class InvoiceFeedConstants {
     public static final String TIMESTAMP_EOD = " 23:59:59";
 
     public static final String DUPLICATE_GLENTRY_ERROR_MSG = "ERROR: Trying to import a duplicate GL Entry! Skipping row... ";
+    public static final String EMAIL_SUBJECT_KEY = "subaward.invoice.feed.message.batch.email.subject";
+    public static final String EMAIL_BODY_KEY = "subaward.invoice.feed.message.batch.email.body";
+
 
 
 }

@@ -97,18 +97,17 @@ public class JobListener implements org.quartz.JobListener {
 
     protected void notify(JobExecutionContext jobExecutionContext, String jobStatus) {
         try {
+
+            //TODO: check on DataMap if we need to send LOG notification or NOT - default not.
             String envName = configurationService.getPropertyValueAsString(BatchConstants.CONFIGURATION_ENVIRONMENT_KEY);
             String jobName = jobExecutionContext.getJobDetail().getName();
             String fromAddress =  emailService.getDefaultFromAddress();
             String toAddress =  jobExecutionContext.getMergedJobDataMap().containsKey(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY)?jobExecutionContext.getMergedJobDataMap().getString(BatchConstants.REQUESTOR_EMAIL_ADDRESS_KEY):null;
 
-            //TODO just for TESTING PURPOSES
-            String testAddress = "nataliac@email.arizona.edu";
 
             Set<String> toAddresses =  new HashSet<>(1);
             if ( StringUtils.isNotEmpty(toAddress)){
-                //TODO just for TESTING PURPOSES
-                toAddresses.add(testAddress);
+                toAddresses.add(toAddress);
             }
 
             String subject = createEmailSubjectForJob(envName, jobName, jobStatus);
@@ -137,8 +136,6 @@ public class JobListener implements org.quartz.JobListener {
         EmailAttachment logAttachment = new EmailAttachment();
         logAttachment.setFileName(jobName+".log");
         logAttachment.setMimeType("text/plain");
-
-        //TODO byte[] array = Files.readAllBytes(new File("/path/to/file").toPath());
         logAttachment.setContents( Files.readAllBytes(new File(jobLogFilePath).toPath()));
         return logAttachment;
     }

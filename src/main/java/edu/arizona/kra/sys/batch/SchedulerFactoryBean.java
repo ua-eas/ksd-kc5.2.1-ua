@@ -37,7 +37,6 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
     public void afterPropertiesSet() throws Exception {
         quartzPropertiesReference.put("org.quartz.jobStore.useProperties", "false");
         quartzPropertiesReference.put("org.quartz.jobStore.isClustered", "true");
-        //setDataSource((DataSource) ConfigContext.getCurrentContextConfig().getObject(RiceConstants.DATASOURCE_OBJ));
 
         setQuartzProperties(quartzPropertiesReference);
         super.afterPropertiesSet();
@@ -51,8 +50,6 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
     @Override
     protected Scheduler createScheduler(SchedulerFactory schedulerFactory, String schedulerName) throws SchedulerException {
         Scheduler scheduler = super.createScheduler(schedulerFactory, schedulerName);
-        //TODO is this necessary:
-        // scheduler.addJobListener(new MessageServiceExecutorJobListener());
         return scheduler;
     }
 

@@ -1,12 +1,17 @@
 package edu.arizona.kra.subaward.batch.service.impl;
 
 import edu.arizona.kra.subaward.batch.InvoiceFeedConstants;
+import edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceFeedSummary;
 import edu.arizona.kra.subaward.batch.service.SubawardInvoiceErrorReportService;
 import edu.arizona.kra.subaward.batch.service.SubawardInvoiceFeedService;
+import edu.arizona.kra.sys.batch.BatchConstants;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.directwebremoting.dwrp.Batch;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+import org.kuali.rice.krad.service.BusinessObjectService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +30,8 @@ public class SubawardInvoiceFeedServiceImpl implements SubawardInvoiceFeedServic
     String jobNotificationEmail;
 
     ParameterService parameterService;
-    SubawardInvoiceErrorReportService subawardInvoiceErrorReportService;
+    BusinessObjectService businessObjectService;
+    DateTimeService dateTimeService;
 
     public boolean isSubawardInvoiceFeedEnabled(){
         if (parameterService.parameterExists(InvoiceFeedConstants.PARAM_NAMESPACE_SUBWAWARD, InvoiceFeedConstants.PARAM_COMPONENT_BATCH, InvoiceFeedConstants.PARAM_NAME_SUBAWARD_INVOICE_FEED_ENABLED )) {
@@ -62,7 +68,6 @@ public class SubawardInvoiceFeedServiceImpl implements SubawardInvoiceFeedServic
                             dataIntervals.add(Integer.parseInt(interval));
                         } catch (NumberFormatException e){
                             LOG.error("getSubwawardInvoiceFeedDataIntervalsDays: Could not parse integer from SUBAWARD_INVOICE_DATA_INTERVALS:"+paramValue+" SKIPPING...");
-                            subawardInvoiceErrorReportService.recordError("getSubwawardInvoiceFeedDataIntervalsDays: Could not parse integer from SUBAWARD_INVOICE_DATA_INTERVALS:"+paramValue+" SKIPPING...", e);
                         }
                     }
                 }
@@ -82,17 +87,39 @@ public class SubawardInvoiceFeedServiceImpl implements SubawardInvoiceFeedServic
     }
 
 
+
+
+
+    public UASubawardInvoiceFeedSummary createSubawardInvoiceFeedSummary(){
+        UASubawardInvoiceFeedSummary sifExecutionJobSummary = new UASubawardInvoiceFeedSummary();
+        sifExecutionJobSummary.setJobStartTime(dateTimeService.getCurrentSqlDate());
+        //hack to avoid NULL from UserSession... TODO should we start a user session??! ->execute as BATCH USER??? in Scheduler or job??
+        sifExecutionJobSummary.setUpdateUser(BatchConstants.BATCH_USER);
+        sifExecutionJobSummary.setUpdateUserSet(true);
+        return businessObjectService.save(sifExecutionJobSummary);
+    }
+
+    public UASubawardInvoiceFeedSummary updateSubawardInvoiceFeedSummary(UASubawardInvoiceFeedSummary sifExecutionJobSummary){
+        return businessObjectService.save(sifExecutionJobSummary);
+    }
+
+    public void setDateTimeService(DateTimeService dateTimeService) {
+        this.dateTimeService = dateTimeService;
+    }
+
     public void setParameterService(ParameterService parameterService) {
         this.parameterService = parameterService;
     }
 
-
-    public SubawardInvoiceErrorReportService getSubawardInvoiceErrorReportService() {
-        if ( subawardInvoiceErrorReportService ==null ) {
-            subawardInvoiceErrorReportService =   KraServiceLocator.getService(SubawardInvoiceErrorReportService.class);
-        }
-        return subawardInvoiceErrorReportService;
+    public void setBusinessObjectService(BusinessObjectService businessObjectService) {
+        this.businessObjectService = businessObjectService;
     }
+
+
+
+
+
+
 
 
 }

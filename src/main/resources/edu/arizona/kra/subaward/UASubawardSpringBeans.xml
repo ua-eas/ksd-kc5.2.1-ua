@@ -8,6 +8,7 @@
   <import resource="classpath:edu/arizona/kra/CustomCoreSpringBeans.xml"/>
   <import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml"/>
 
+
   <bean id="subawardInvoiceErrorReportService" class="edu.arizona.kra.subaward.batch.service.impl.SubawardInvoiceErrorReportServiceImpl">
     <property name="businessObjectService" ref="businessObjectService"/>
     <property name="dateTimeService" ref="dateTimeService" />
@@ -20,14 +21,23 @@
     <property name="subawardInvoiceErrorReportService" ref="subawardInvoiceErrorReportService"/>
   </bean>
 
+  <bean id="subawardInvFeedJobListener" parent="subawardJobListener-parentBean"/>
+  <bean id="subawardJobListener-parentBean" class="edu.arizona.kra.subaward.batch.SubawardInvFeedJobListener" abstract="true">
+    <property name="configurationService" ref="kualiConfigurationService"/>
+    <property name="emailService" ref="kcEmailService"/>
+    <property name="dateTimeService" ref="dateTimeService"/>
+    <property name="subawardInvoiceErrorService" ref="subawardInvoiceErrorReportService"/>
+  </bean>
+
 
   <bean id="subawardInvoiceFeedJob" parent="scheduledJobDescriptor" >
     <property name="steps">
       <list>
-        <!--ref bean="importGLDataStep"/-->
+        <ref bean="importGLDataStep"/>
         <ref bean="validateGLDataStep"/>
       </list>
     </property>
+    <property name="jobListener" ref="subawardInvFeedJobListener"/>
   </bean>
 
   <bean id="importGLDataStep" class="edu.arizona.kra.subaward.batch.ImportGLDataStep" parent="step">

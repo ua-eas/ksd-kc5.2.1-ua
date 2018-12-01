@@ -33,6 +33,7 @@
 
   <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceData" table="SUBAWARD_INV_FEED_DATA">
     <field-descriptor name="entryId" column="ENTRY_ID" jdbc-type="BIGINT" index="true" primarykey="true" />
+    <field-descriptor name="executionId" column="EXECUTION_ID" jdbc-type="BIGINT" index="true"/>
     <field-descriptor name="purchaseOrderNumber" column="FDOC_NBR" jdbc-type="VARCHAR" />
     <field-descriptor name="purchaseOrderNumber" column="PURCHASE_ORD_NBR" jdbc-type="VARCHAR" />
     <field-descriptor name="amountReleased" column="AMT_RELEASED" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
@@ -49,6 +50,7 @@
 
   <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceError" table="SUBAWARD_INV_FEED_ERRORS">
     <field-descriptor name="id" column="ID" jdbc-type="BIGINT" index="true" primarykey="true" sequence-name="subaward_inv_feed_err_seq" autoincrement="true"/>
+    <field-descriptor name="executionId" column="EXECUTION_ID" jdbc-type="BIGINT" index="true"/>
     <field-descriptor name="errorMessage" column="ERROR_MSG" jdbc-type="VARCHAR" />
     <field-descriptor name="errorDate" column="ERROR_DT" jdbc-type="DATE" />
     <field-descriptor name="glEntryId" column="GL_ENTRY_ID" jdbc-type="BIGINT" index="true"  />
@@ -58,6 +60,22 @@
     <field-descriptor name="subAwardAmtReleasedId" column="SUBAWARD_AMT_RELEASED_ID" jdbc-type="INTEGER"/>
     <field-descriptor name="invoiceDocumentNumber" column="INVOICE_DOCUMENT_NBR" jdbc-type="VARCHAR" />
     <field-descriptor name="noticeSentDate" column="NOTICE_SENT_DT" jdbc-type="TIMESTAMP" />
+  </class-descriptor>
+
+
+  <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceFeedSummary" table="SUBAWARD_INV_FEED_SUMMARY">
+    <field-descriptor name="executionId" column="EXECUTION_ID" jdbc-type="BIGINT" index="true" primarykey="true" sequence-name="subaward_inv_feed_summary_seq" autoincrement="true"/>
+    <field-descriptor name="jobStartTime" column="RUN_DT" jdbc-type="DATE" />
+    <field-descriptor name="jobEndTime" column="END_DT" jdbc-type="DATE" />
+    <field-descriptor name="jobExecutionTime" column="RUN_TIME" jdbc-type="BIGINT" />
+    <field-descriptor name="jobStatus" column="JOB_STATUS" jdbc-type="VARCHAR" />
+    <field-descriptor name="importIntervalStartDate" column="IMPORT_START_DT" jdbc-type="DATE" />
+    <field-descriptor name="importIntervalEndDate" column="IMPORT_END_DT" jdbc-type="DATE" />
+    <field-descriptor name="importIntervalNbrOfDays" column="IMPORT_INTERVAL" jdbc-type="INTEGER" />
+    <field-descriptor name="glEntriesImportCount" column="GL_ENTRIES_IMPORT_CT" jdbc-type="INTEGER" />
+    <field-descriptor name="invoiceDataCount" column="INVOICE_DATA_CT" jdbc-type="INTEGER" />
+    <field-descriptor name="subawardInvoicesCount" column="SUBAWARD_INVOICE_CT" jdbc-type="INTEGER" />
+    <field-descriptor name="errorCount" column="ERRORS_CT" jdbc-type="INTEGER" />
   </class-descriptor>
 
 

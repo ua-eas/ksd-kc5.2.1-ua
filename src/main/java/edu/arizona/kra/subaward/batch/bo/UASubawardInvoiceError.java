@@ -1,5 +1,6 @@
 package edu.arizona.kra.subaward.batch.bo;
 
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 
 import java.sql.Date;
@@ -11,6 +12,7 @@ public class UASubawardInvoiceError extends KraPersistableBusinessObjectBase {
     static final long serialVersionUID = -24983129882357439L;
 
     private Long id;
+    private Long executionId;
     private String errorMessage;
 
     private Long glEntryId;
@@ -30,6 +32,15 @@ public class UASubawardInvoiceError extends KraPersistableBusinessObjectBase {
 
     public UASubawardInvoiceError setId(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public Long getExecutionId() {
+        return executionId;
+    }
+
+    public UASubawardInvoiceError setExecutionId(Long executionId) {
+        this.executionId = executionId;
         return this;
     }
 
@@ -112,5 +123,30 @@ public class UASubawardInvoiceError extends KraPersistableBusinessObjectBase {
     public UASubawardInvoiceError setNoticeSentDate(Date noticeSentDate) {
         this.noticeSentDate = noticeSentDate;
         return this;
+    }
+
+    public String getEmailStringErrorDesc(){
+        StringBuffer sb = new StringBuffer();
+        sb.append("Error: "); sb.append(errorMessage);
+        if (glEntryId!=null){
+            sb.append(" GL Entry Id: "); sb.append(glEntryId);
+        }
+        if (StringUtils.isNotEmpty(glEntryData)){
+            sb.append(" GL Entry : "); sb.append(glEntryData);
+        }
+        if (StringUtils.isNotEmpty(invoiceId)){
+            sb.append(" Invoice Id: "); sb.append(invoiceId);
+        }
+        if (subawardId != null){
+            sb.append(" Subaward Id: "); sb.append(subawardId);
+        }
+        if (subAwardAmtReleasedId != null){
+            sb.append(" Subaward Amount Released Id: "); sb.append(subAwardAmtReleasedId);
+        }
+        if (StringUtils.isNotEmpty(invoiceDocumentNumber)){
+            sb.append(" Invoice Document Number: "); sb.append(invoiceDocumentNumber);
+        }
+        sb.append("\n");
+        return sb.toString();
     }
 }

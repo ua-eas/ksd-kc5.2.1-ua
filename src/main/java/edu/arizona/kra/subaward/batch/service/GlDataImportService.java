@@ -21,7 +21,7 @@ public interface GlDataImportService {
      * @param endDate ->  ending of the transaction posting date for GL Entries that will be imported into Subaward
      * @return int - the number of rows imported.
      */
-    int importGLData(Date beginDate, Date endDate);
+    int importGLData(Long executionId, Date beginDate, Date endDate);
 
 
     /**

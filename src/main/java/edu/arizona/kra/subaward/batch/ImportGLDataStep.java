@@ -1,11 +1,17 @@
 package edu.arizona.kra.subaward.batch;
 
+import edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceFeedSummary;
 import edu.arizona.kra.subaward.batch.service.GlDataImportService;
 import edu.arizona.kra.subaward.batch.service.SubawardInvoiceErrorReportService;
+import edu.arizona.kra.subaward.batch.service.SubawardInvoiceFeedService;
 import edu.arizona.kra.sys.batch.AbstractStep;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.quartz.JobDataMap;
 
 import java.util.Date;
+
+import static edu.arizona.kra.subaward.batch.InvoiceFeedConstants.SIF_JOB_EXECUTION_ID_KEY;
+import static edu.arizona.kra.subaward.batch.InvoiceFeedConstants.SIF_JOB_EXECUTION_SUMMARY_KEY;
 
 /**
  * First step in SubawardInvoiceFeedJob - Step that imports GL Data of interest for Subaward Invoice Feed from KFS into KC -
@@ -17,6 +23,7 @@ public class ImportGLDataStep extends AbstractStep {
 
     private GlDataImportService glDataImportService;
     private SubawardInvoiceErrorReportService subawardInvoiceErrorReportService;
+    private SubawardInvoiceFeedService subawardInvoiceFeedService;
 
     public ImportGLDataStep() {
         super();
@@ -28,15 +35,25 @@ public class ImportGLDataStep extends AbstractStep {
     @Override
     public boolean execute(String jobName, Date jobRunDate, JobDataMap jobDataMap) throws InterruptedException {
         LOG.debug("ImportGLDataStep: execute() started");
+        UASubawardInvoiceFeedSummary jobSummary = (UASubawardInvoiceFeedSummary)jobDataMap.get(SIF_JOB_EXECUTION_SUMMARY_KEY);
+
         java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
         int daysInterval = getDataIntervalInDays(jobDataMap);
         java.sql.Date startDate = InvoiceFeedUtils.substractDaysFromDate(today, daysInterval);
 
-        int importedLinesCount = glDataImportService.importGLData(startDate, today);
+        jobSummary.setImportIntervalStartDate(startDate);
+        jobSummary.setImportIntervalEndDate(today);
+        jobSummary.setImportIntervalNbrOfDays(daysInterval);
+        getSubawardInvoiceFeedService().updateSubawardInvoiceFeedSummary(jobSummary);
+
+        int importedLinesCount = glDataImportService.importGLData(jobSummary.getExecutionId(), startDate, today);
         if (importedLinesCount > 0)
             LOG.info("ImportGLDataStep: execute() finished. Imported number of GL Entries : "+importedLinesCount);
         else
             LOG.info("ImportGLDataStep: execute() finished. ZERO GL Entries imported!");
+
+        jobSummary.setGlEntriesImportCount(importedLinesCount);
+        getSubawardInvoiceFeedService().updateSubawardInvoiceFeedSummary(jobSummary);
 
         return true;
     }
@@ -55,7 +72,7 @@ public class ImportGLDataStep extends AbstractStep {
             } catch (ClassCastException e){
                 daysInterval = InvoiceFeedConstants.DEFAULT_DATA_INTERVAL_DAYS;
                 LOG.error("ImportGLDataStep: could not parse days interval: "+jobDataMap.getString(InvoiceFeedConstants.DAYS_INTERVAL_KEY)+" using default value:"+daysInterval);
-                subawardInvoiceErrorReportService.recordError("ImportGLDataStep: could not parse days interval: "+jobDataMap.getString(InvoiceFeedConstants.DAYS_INTERVAL_KEY)+" using default value:"+daysInterval, e);
+                subawardInvoiceErrorReportService.recordError(jobDataMap.getLongValue(SIF_JOB_EXECUTION_ID_KEY),"ImportGLDataStep: could not parse days interval: "+jobDataMap.getString(InvoiceFeedConstants.DAYS_INTERVAL_KEY)+" using default value:"+daysInterval, e);
             }
         }
         return daysInterval;
@@ -64,6 +81,13 @@ public class ImportGLDataStep extends AbstractStep {
 
     public void setGlDataImportService(GlDataImportService glDataImportService) {
         this.glDataImportService = glDataImportService;
+    }
+
+    public SubawardInvoiceFeedService getSubawardInvoiceFeedService() {
+        if (subawardInvoiceFeedService == null){
+            subawardInvoiceFeedService = KraServiceLocator.getService(SubawardInvoiceFeedService.class);
+        }
+        return subawardInvoiceFeedService;
     }
 
     public void setSubawardInvoiceErrorReportService(SubawardInvoiceErrorReportService subawardInvoiceErrorReportService) {

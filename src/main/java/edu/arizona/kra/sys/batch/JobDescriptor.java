@@ -21,7 +21,7 @@ package edu.arizona.kra.sys.batch;
 import edu.arizona.kra.sys.batch.bo.Step;
 import edu.arizona.kra.sys.batch.service.SchedulerService;
 
-import org.quartz.JobDetail;
+import org.quartz.*;
 import org.springframework.beans.factory.BeanNameAware;
 
 import java.util.ArrayList;
@@ -41,6 +41,7 @@ public class JobDescriptor implements BeanNameAware {
     private Map<String, String> dependencies;
     private List<Step> steps;
     private SchedulerService schedulerService;
+    private JobListener jobListener;
     private boolean durable = true;
 
     public JobDescriptor() {
@@ -165,4 +166,11 @@ public class JobDescriptor implements BeanNameAware {
         this.namespaceCode = namespaceCode;
     }
 
+    public JobListener getJobListener() {
+        return jobListener;
+    }
+
+    public void setJobListener(JobListener jobListener) {
+        this.jobListener = jobListener;
+    }
 }

@@ -13,6 +13,7 @@ public final class BatchConstants {
 
     public static final String NAMESPACE_KC_SYS="KC-SYS";
     public static final String BATCH_COMPONENT_CODE="Batch";
+    public static final String BATCH_USER="kc";
 
     public static final String PERMISSION_TEMPLATE_MODIFY_BATCH_JOB_NAMESPACE="KR-NS";
     public static final String PERMISSION_MODIFY_BATCH_JOB_NAMESPACE="KR-SYS";

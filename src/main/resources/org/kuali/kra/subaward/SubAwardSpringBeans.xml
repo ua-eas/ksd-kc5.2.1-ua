@@ -41,8 +41,13 @@ R
     <import resource="classpath:edu/arizona/kra/UA-BiDataSourceSpringBeans.xml" />
     <import resource="classpath:org/kuali/kra/core/CommonSpringBeans.xml" />
 
+
+
+
     <bean id="subawardInvoiceFeedService" class="edu.arizona.kra.subaward.batch.service.impl.SubawardInvoiceFeedServiceImpl">
-        <property name="parameterService" ref="parameterService" />
+        <property name="parameterService" ref="parameterService"/>
+        <property name="dateTimeService" ref="dateTimeService"/>
+        <property name="businessObjectService" ref="businessObjectService"/>
     </bean>
 
     <bean id="subAwardModule" class="edu.arizona.kra.subaward.batch.service.impl.SubawardModuleServiceImpl">
@@ -69,13 +74,10 @@ R
 			      </list>
         </property>
         <property name="triggerNames">
-          <list>
-            <!--<value>scheduleJobTrigger</value>-->
-          </list>
+          <list/>
         </property>
         <property name="jobNames">
           <list>
-            <!--<value>scheduleJob</value>-->
             <value>subawardInvoiceFeedJob</value>
           </list>
         </property>

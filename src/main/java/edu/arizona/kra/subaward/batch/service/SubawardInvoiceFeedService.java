@@ -1,5 +1,7 @@
 package edu.arizona.kra.subaward.batch.service;
 
+import edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceFeedSummary;
+
 import java.util.List;
 
 /**
@@ -34,4 +36,14 @@ public interface SubawardInvoiceFeedService {
      */
     public String getSubwawardInvoiceFeedDestinationEmail();
 
+
+    /**
+     * TODO explain
+     */
+    public UASubawardInvoiceFeedSummary createSubawardInvoiceFeedSummary();
+
+    /**
+     * TODO explain
+     */
+    public UASubawardInvoiceFeedSummary updateSubawardInvoiceFeedSummary(UASubawardInvoiceFeedSummary subawardInvoiceFeedSummary);
 }

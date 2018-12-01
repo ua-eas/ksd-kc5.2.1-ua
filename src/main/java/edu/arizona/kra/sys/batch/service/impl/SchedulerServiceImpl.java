@@ -222,6 +222,14 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     protected void loadJob(JobDescriptor jobDescriptor) {
         JobDetail jobDetail = jobDescriptor.getJobDetail();
+
+        if ( jobDescriptor.getJobListener() != null){
+            JobListener jobListener = jobDescriptor.getJobListener();
+            jobListener.setSchedulerService(this);
+            jobDetail.addJobListener( jobDescriptor.getJobListener().getName() );
+            addJobListener(jobListener);
+        }
+
         addJob(jobDetail);
         if (SCHEDULED_GROUP.equals(jobDetail.getGroup())) {
             jobDetail.setGroup(UNSCHEDULED_GROUP);
@@ -417,6 +425,16 @@ public class SchedulerServiceImpl implements SchedulerService {
             scheduler.addJob(jobDetail, true);
         } catch (SchedulerException e) {
             throw new RuntimeException("Caught exception while adding job: " + jobDetail.getFullName(), e);
+        }
+    }
+
+    protected void addJobListener(org.quartz.JobListener jobListener) {
+        try {
+            LOG.info("Adding jobListener: " + jobListener.getName());
+
+            scheduler.addJobListener(jobListener);
+        } catch (SchedulerException e) {
+            throw new RuntimeException("Caught exception while adding jobListener: " + jobListener.getName(), e);
         }
     }
 

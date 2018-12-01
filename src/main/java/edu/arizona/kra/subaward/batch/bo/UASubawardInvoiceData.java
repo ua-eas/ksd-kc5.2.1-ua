@@ -12,6 +12,7 @@ public class UASubawardInvoiceData extends KraPersistableBusinessObjectBase {
     static final long serialVersionUID = -24983129882357449L;
 
     private Long entryId;
+    private Long executionId;
     private String financialDocNumber;
     private String purchaseOrderNumber;
     private KualiDecimal amountReleased;
@@ -34,6 +35,15 @@ public class UASubawardInvoiceData extends KraPersistableBusinessObjectBase {
 
     public UASubawardInvoiceData setEntryId(Long entryId) {
         this.entryId = entryId;
+        return this;
+    }
+
+    public Long getExecutionId() {
+        return executionId;
+    }
+
+    public UASubawardInvoiceData setExecutionId(Long executionId) {
+        this.executionId = executionId;
         return this;
     }
 

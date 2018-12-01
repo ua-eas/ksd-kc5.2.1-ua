@@ -51,6 +51,7 @@
     <sql>
       CREATE TABLE KRAOWNER.SUBAWARD_INV_FEED_DATA(
         ENTRY_ID NUMBER(19,0) UNIQUE NOT NULL,
+        EXECUTION_ID NUMBER(12,0) NOT NULL,
         FDOC_NBR VARCHAR2(14),
         PURCHASE_ORD_NBR VARCHAR2(14),
         AMT_RELEASED NUMBER(19,2),
@@ -77,6 +78,7 @@
     <sql>
       CREATE TABLE KRAOWNER.SUBAWARD_INV_FEED_ERRORS(
         ID NUMBER(12,0) NOT NULL,
+        EXECUTION_ID NUMBER(12,0) NOT NULL,
         ERROR_MSG VARCHAR2(100),
         ERROR_DT DATE,
         GL_ENTRY_ID NUMBER(19,0),
@@ -107,27 +109,31 @@
     </comment>
     <sql>
       CREATE TABLE KRAOWNER.SUBAWARD_INV_FEED_SUMMARY(
-        ID NUMBER(12,0) NOT NULL,
+        EXECUTION_ID NUMBER(12,0) NOT NULL,
         RUN_DT DATE,
-        IMPORT_DT DATE,
-        IMPORT_INTERVAL VARCHAR2(40),
+        END_DT DATE,
+        RUN_TIME NUMBER(12,0),
+        JOB_STATUS VARCHAR2(40),
+        IMPORT_START_DT DATE,
+        IMPORT_END_DT DATE,
+        IMPORT_INTERVAL NUMBER(8,0),
         GL_ENTRIES_IMPORT_CT NUMBER(8,0),
-        SUBAWARD_PRE_INVOICE_CT NUMBER(8,0),
+        INVOICE_DATA_CT NUMBER(8,0),
         SUBAWARD_INVOICE_CT NUMBER(8,0),
         ERRORS_CT NUMBER(8,0)
       );
 
-      ALTER TABLE SUBAWARD_INV_FEED_SUMMARY ADD CONSTRAINT subaward_inv_feed_sum_PK PRIMARY KEY(ID);
+      ALTER TABLE SUBAWARD_INV_FEED_SUMMARY ADD CONSTRAINT subaward_inv_feed_summary_PK PRIMARY KEY(EXECUTION_ID);
 
-      --create Sequence for subaward_inv_feed_summary id
-      CREATE SEQUENCE KRAOWNER.subaward_inv_feed_sum_seq
+      --create Sequence for subaward_inv_feed_summary execution id
+      CREATE SEQUENCE KRAOWNER.subaward_inv_feed_summary_seq
       MINVALUE 1
       START WITH 1
       INCREMENT BY 1
       NOCACHE;
     </sql>
     <rollback>
-      DROP sequence KRAOWNER.subaward_inv_feed_sum_seq;
+      DROP sequence KRAOWNER.subaward_inv_feed_summary_seq;
       DROP table KRAOWNER.SUBAWARD_INV_FEED_SUMMARY CASCADE CONSTRAINTS;
     </rollback>
   </changeSet>

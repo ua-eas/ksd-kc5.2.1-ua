@@ -185,7 +185,7 @@ public class Job implements StatefulJob, InterruptableJob {
         this.notRunnable = notRunnable;
     }
 
-    protected boolean isNotRunnable() {
+    public boolean isNotRunnable() {
 
         return notRunnable && (!schedulerService.isBatchNode()) ;
     }
