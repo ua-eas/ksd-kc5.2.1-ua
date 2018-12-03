@@ -94,7 +94,7 @@ public class SubawardInvFeedJobListener extends JobListener {
             String body = createEmailBodyForJob(jobName, invoiceFeedSummary, subawardInvoiceErrorService.findJobRunErrors(invoiceFeedSummary.getExecutionId()));
 
 
-            emailService.sendEmailWithAttachments(fromAddress, toAddresses, subject, null, null, body, false,  null);
+            emailService.sendEmail(fromAddress, toAddresses, subject, null, null, body, true);
 
 
         } catch (Exception iae) {
@@ -126,11 +126,12 @@ public class SubawardInvFeedJobListener extends JobListener {
 
         StringBuffer sb = new StringBuffer( MessageFormat.format(configurationService.getPropertyValueAsString(InvoiceFeedConstants.EMAIL_BODY_KEY),  args) );
         if ( !errors.isEmpty()) {
-            sb.append("Errors: \n");
+            sb.append("<br> Errors: <br>");
             for(UASubawardInvoiceError error:errors){
                 sb.append(error.getEmailStringErrorDesc());
+                sb.append("<br>");
             }
-            sb.append("\n");
+            sb.append("<br>");
         } else {
             sb.append("Job execution completed without any errors. \n");
         }

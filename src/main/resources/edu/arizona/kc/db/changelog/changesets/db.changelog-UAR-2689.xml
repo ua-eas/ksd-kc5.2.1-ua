@@ -52,7 +52,7 @@
       VALUES ('KC', 'KC-SUBAWARD', 'Batch', 'subAwardInvoiceFeedNotificationEmail', 1, 'CONFG', 'uar-subaward-notices@list.arizona.edu', 'Sets the destination email for receiving notifications from SubAward Invoice Feed Job.', 'A', sys_guid());
 
       UPDATE KRCR_PARM_T SET VAL = 'katt-automation@list.arizona.edu' WHERE PARM_NM='EMAIL_NOTIFICATION_FROM_ADDRESS' AND NMSPC_CD = 'KC-GEN' AND APPL_ID='KC' AND CMPNT_CD='All';
-
+      UPDATE KRCR_PARM_T SET VAL = 'uar-bas@list.arizona.edu' WHERE PARM_NM='EMAIL_NOTIFICATION_TEST_ADDRESS' AND NMSPC_CD = 'KC-GEN' AND APPL_ID='KC' AND CMPNT_CD='All';
       UPDATE KRCR_PARM_T SET PARM_NM = 'EMAIL_NOTIFICATIONS_TEST_ENABLED' WHERE PARM_NM='EMAIL_NOTIFICATION_TEST_ENABLED' AND NMSPC_CD = 'KC-GEN' AND APPL_ID='KC' AND CMPNT_CD='All';
     </sql>
     <rollback>
