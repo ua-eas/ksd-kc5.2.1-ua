@@ -7,6 +7,7 @@
             Removing old KC jobs and triggers lingering in the DB from OTB foundation
         </comment>
         <sql>
+            DELETE FROM KC_QRTZ_JOB_LISTENERS;
             DELETE FROM KC_QRTZ_CRON_TRIGGERS;
             DELETE FROM KC_QRTZ_TRIGGERS;
             DELETE FROM KC_QRTZ_JOB_DETAILS;
