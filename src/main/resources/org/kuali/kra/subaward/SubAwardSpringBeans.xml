@@ -48,6 +48,7 @@ R
         <property name="parameterService" ref="parameterService"/>
         <property name="dateTimeService" ref="dateTimeService"/>
         <property name="businessObjectService" ref="businessObjectService"/>
+        <property name="documentService" ref="documentService"/>
     </bean>
 
     <bean id="subAwardModule" class="edu.arizona.kra.subaward.batch.service.impl.SubawardModuleServiceImpl">

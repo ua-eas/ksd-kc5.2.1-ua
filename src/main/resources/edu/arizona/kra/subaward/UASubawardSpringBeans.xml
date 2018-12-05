@@ -35,6 +35,7 @@
       <list>
         <ref bean="importGLDataStep"/>
         <ref bean="validateGLDataStep"/>
+        <ref bean="createInvoicesStep"/>
       </list>
     </property>
     <property name="jobListener" ref="subawardInvFeedJobListener"/>
@@ -46,6 +47,12 @@
   </bean>
 
   <bean id="validateGLDataStep" class="edu.arizona.kra.subaward.batch.ValidateGLDataStep" parent="step">
+    <property name="glDataImportService" ref="glDataImportService"/>
+    <property name="subawardInvoiceErrorReportService" ref="subawardInvoiceErrorReportService"/>
+    <property name="businessObjectService" ref="businessObjectService"/>
+  </bean>
+
+  <bean id="createInvoicesStep" class="edu.arizona.kra.subaward.batch.CreateInvoicesStep" parent="step">
     <property name="glDataImportService" ref="glDataImportService"/>
     <property name="subawardInvoiceErrorReportService" ref="subawardInvoiceErrorReportService"/>
     <property name="businessObjectService" ref="businessObjectService"/>

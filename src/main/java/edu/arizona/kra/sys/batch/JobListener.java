@@ -98,7 +98,7 @@ public class JobListener implements org.quartz.JobListener {
     protected void notify(JobExecutionContext jobExecutionContext, String jobStatus) {
         try {
 
-            //TODO: check on DataMap if we need to send LOG notification or NOT - default not.
+            //TODO: check on DataMap if we need to send LOG notification or NOT - default YES.
             String envName = configurationService.getPropertyValueAsString(BatchConstants.CONFIGURATION_ENVIRONMENT_KEY);
             String jobName = jobExecutionContext.getJobDetail().getName();
             String fromAddress =  emailService.getDefaultFromAddress();
@@ -119,14 +119,6 @@ public class JobListener implements org.quartz.JobListener {
 
             emailService.sendEmailWithAttachments(fromAddress, toAddresses, subject, null, null, body, false,  attachments);
 
-
-//            String messageText = MessageFormat.format(configurationService.getPropertyValueAsString(BatchConstants.MESSAGE_BATCH_EMAIL_BODY_KEY), getLogFileName(NDC.peek()));
-//            emailMessage.setMessage(messageText);
-//            if (emailMessage.getToAddresses().size() > 0) {
-//                emailMessage.setSubject(mailMessageSubject.toString());
-//
-//                //emailService.sendEmail(emailMessage,false);
-//            }
         } catch (Exception iae) {
             LOG.error("Caught exception while trying to send job completion notification e-mail for " + jobExecutionContext.getJobDetail().getName(), iae);
         }

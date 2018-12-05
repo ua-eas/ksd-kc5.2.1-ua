@@ -9,15 +9,15 @@ import edu.arizona.kra.subaward.batch.dao.SubawardGlFeedDao;
 import edu.arizona.kra.subaward.batch.service.GlDataImportService;
 import edu.arizona.kra.subaward.batch.service.SubawardInvoiceErrorReportService;
 
+import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static edu.arizona.kra.subaward.batch.InvoiceFeedConstants.*;
 
 
 /**
@@ -85,11 +85,51 @@ public class GlDataImportServiceImpl implements GlDataImportService {
     }
 
 
+    public Collection<UASubawardInvoiceData> findNewInvoiceDataEntries(Long executionId){
+        LOG.debug("GlDataImportService: findNewInvoiceDataEntries for executionId="+executionId);
+        Map<String, Object> keyMap = new HashMap<String, Object>();
+        keyMap.put(SIF_JOB_EXECUTION_ID_KEY, executionId);
+
+        return  getBusinessObjectService().findMatching(UASubawardInvoiceData.class, keyMap);
+    }
+
+    public SubAward findMatchingActiveSubaward(UASubawardInvoiceData invoiceData){
+        LOG.debug("GlDataImportService: findMatchingActiveSubaward for invoiceData GL Entry ID="+invoiceData.getEntryId());
+
+        List<Long> subawardIds = subawardGLFeedDao.findActiveSubawardIdforPO(invoiceData.getPurchaseOrderNumber());
+        if ( !subawardIds.isEmpty() ) {
+            if (subawardIds.size() > 1) {
+                StringBuffer sb = new StringBuffer();
+                for (Long subawardId : subawardIds) {
+                    sb.append(subawardId);
+                    sb.append(", ");
+                }
+                LOG.error("AMBIGUOUS SUBAWARD for PO Number=" + invoiceData.getPurchaseOrderNumber() + " There are multiple ACTIVE Subawards corresponding to this PO SubawardIds=" + sb.toString());
+                throw new RuntimeException("AMBIGUOUS SUBAWARD for PO Number=" + invoiceData.getPurchaseOrderNumber() + " There are multiple ACTIVE Subawards corresponding to this PO SubawardIds=" + sb.toString());
+
+            }
+
+            Map<String, Object> keyMap = new HashMap<String, Object>();
+            keyMap.put(SUBAWARD_ID_KEY, subawardIds.get(0));
+
+            Collection<SubAward> subAwards = getBusinessObjectService().findMatching(SubAward.class, keyMap);
+            if (!subAwards.isEmpty()) {
+                return (SubAward) subAwards.toArray()[0];
+            }
+        }
+        LOG.error("GlDataImportService: Could not findMatchingActiveSubaward for invoiceData GL Entry ID="+invoiceData.getEntryId()+" PurchaseOrderNumber="+invoiceData.getPurchaseOrderNumber());
+        return null;
+
+    }
+
+
     public boolean isDuplicateRow(UAGlEntry uaGlEntry){
         //returns true if there is at least one UASubaward Invoice Data with the same entry ID
-        Map<String, Object> keyMap = new HashMap<String, Object>();
-        keyMap.put("entryId", uaGlEntry.getEntryId());
-        if ( getBusinessObjectService().countMatching(UASubawardInvoiceData.class, keyMap) > 0 ){
+        Map<String, Object> positiveCriteria = new HashMap<String, Object>();
+        positiveCriteria.put(GL_ENTRY_ID_KEY, uaGlEntry.getEntryId());
+        Map<String, Object> negativeCriteria = new HashMap<String, Object>();
+        negativeCriteria.put(IMPORTED_DATE_KEY, null);
+        if ( getBusinessObjectService().countMatching(UASubawardInvoiceData.class, positiveCriteria, negativeCriteria) > 0 ){
             return true;
         }
         return false;

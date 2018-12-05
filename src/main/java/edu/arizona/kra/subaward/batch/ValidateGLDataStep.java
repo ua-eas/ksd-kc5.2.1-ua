@@ -21,8 +21,8 @@ import static edu.arizona.kra.subaward.batch.InvoiceFeedConstants.SIF_JOB_EXECUT
 
 
 /**
- * First step in SubawardInvoiceFeedJob - Step that imports GL Data of interest for Subaward Invoice Feed from KFS into KC -
- *
+ * Second step in SubawardInvoiceFeedJob - Step checks imported GL Data for duplicates and transforms the data into KC friendly format of Invoice DATA
+ * *
  * Created by nataliac on 8/23/18.
  */
 public class ValidateGLDataStep extends AbstractStep {
@@ -52,6 +52,7 @@ public class ValidateGLDataStep extends AbstractStep {
                 //found a duplicate, report error and skip...
                 subawardInvoiceErrorReportService.recordDuplicateRowError(executionId, glEntry);
                 LOG.debug("ValidateGLDataStep: execute() Found duplicate Gl Entry:  "+glEntry.toString()+" Skipping!");
+
             } else {
                 UASubawardInvoiceData invoiceData = glDataImportService.createInvoiceData(glEntry);
                 invoiceData.setExecutionId( executionId );

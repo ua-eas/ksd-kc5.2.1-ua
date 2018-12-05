@@ -1,10 +1,6 @@
 package edu.arizona.kra.sys.batch;
 
 /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> UAR-2692
  * Created by nataliac on 8/22/18.
  */
 public final class BatchConstants {
@@ -13,7 +9,8 @@ public final class BatchConstants {
 
     public static final String NAMESPACE_KC_SYS="KC-SYS";
     public static final String BATCH_COMPONENT_CODE="Batch";
-    public static final String BATCH_USER="kc";
+    //TODO temporary fix??? to avoid to deal with roles and authorizations for an automated user for now
+    public static final String BATCH_USER="brandig";
 
     public static final String PERMISSION_TEMPLATE_MODIFY_BATCH_JOB_NAMESPACE="KR-NS";
     public static final String PERMISSION_MODIFY_BATCH_JOB_NAMESPACE="KR-SYS";

@@ -115,7 +115,7 @@ public class SubawardInvFeedJobListener extends JobListener {
                 jobSummary.getJobStatus().toUpperCase(),
                 jobSummary.getJobStartTime()!=null?dateTimeService.toDateTimeString(jobSummary.getJobStartTime()):"",
                 jobSummary.getJobEndTime()!=null?dateTimeService.toDateTimeString(jobSummary.getJobEndTime()):"",
-                Long.toString(jobSummary.getJobExecutionTime()/60000),
+                jobSummary.getJobEndTime()!=null?Long.toString(jobSummary.getJobExecutionTime()/60000):"",
                 jobSummary.getImportIntervalStartDate()!=null?dateTimeService.toDateTimeString(jobSummary.getImportIntervalStartDate()):"",
                 jobSummary.getImportIntervalEndDate()!=null?dateTimeService.toDateTimeString(jobSummary.getImportIntervalEndDate()):"",
                 Integer.toString(jobSummary.getImportIntervalNbrOfDays()),
@@ -133,7 +133,7 @@ public class SubawardInvFeedJobListener extends JobListener {
             }
             sb.append("<br>");
         } else {
-            sb.append("Job execution completed without any errors. \n");
+            sb.append("Job execution completed without any errors. <br>");
         }
         return sb.toString();
     }

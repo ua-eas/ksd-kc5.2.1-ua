@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+  <changeSet id="UAR-2694-1" author="Natalia C Ibanez">
+    <comment>
+      UAR-2694: Create automated batch user kc-batch
+    </comment>
+    <sql>
+      INSERT INTO KRIM_ENTITY_T (ENTITY_ID, OBJ_ID, VER_NBR, ACTV_IND, LAST_UPDT_DT)
+      VALUES ('1111', SYS_GUID(), '1', 'Y', CURRENT_TIMESTAMP);
+
+      INSERT INTO KRIM_ENTITY_NM_T (ENTITY_NM_ID, OBJ_ID, VER_NBR, ENTITY_ID, NM_TYP_CD, FIRST_NM, DFLT_IND, ACTV_IND, LAST_UPDT_DT)
+      VALUES ('1303', SYS_GUID(), '1', '1111', 'PRFR', 'kc-batch', 'Y', 'Y', CURRENT_TIMESTAMP);
+
+      INSERT INTO "KRAOWNER"."KRIM_PRNCPL_T" (OBJ_ID, VER_NBR, PRNCPL_NM, ENTITY_ID, ACTV_IND, PRNCPL_ID, LAST_UPDT_DT)
+      VALUES (SYS_GUID(), '1', 'kc-batch', '1111', 'Y', '3', CURRENT_TIMESTAMP));
+
+      INSERT INTO KRIM_ENTITY_CACHE_T (ENTITY_ID, PRNCPL_ID, PRNCPL_NM, ENTITY_TYP_CD, LAST_UPDT_TS, OBJ_ID)
+      VALUES ('1111', '3', 'kc-batch', 'SYSTEM', CURRENT_TIMESTAMP, SYS_GUID());
+    </sql>
+  </changeSet>
+
+  <changeSet id="UAR-2694-2" author="Natalia C Ibanez">
+    <comment>
+      UAR-2694: Create Subaward Batch Admin role for the automated user and add appropriate permissions to role
+    </comment>
+    <sql>
+      insert into KRIM_ROLE_T (ROLE_ID,OBJ_ID,VER_NBR,ROLE_NM,NMSPC_CD,DESC_TXT,KIM_TYP_ID,ACTV_IND,LAST_UPDT_DT)
+      values (KRIM_ROLE_ID_S.NEXTVAL, SYS_GUID(), 1, 'UA Subaward Batch Admin', 'KC-ADM', 'UA Subaward Batch Administrators', '1', 'Y', CURRENT_TIMESTAMP);
+
+
+      insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+      values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y', (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Subaward Batch Admin'), 1275);
+
+      insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+      values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y', (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Subaward Batch Admin'), 1276);
+
+      insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+      values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y', (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Subaward Batch Admin'), 1275);
+
+      insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+      values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y', (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Subaward Batch Admin'), 1421);
+
+      insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+      values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y', (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Subaward Batch Admin'), 1349);
+
+      insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+      values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y', (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Subaward Batch Admin'), 1350);
+
+      insert into KRIM_ROLE_PERM_T (ROLE_PERM_ID,OBJ_ID,VER_NBR,ACTV_IND,ROLE_ID,PERM_ID)
+      values (KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1, 'Y', (select ROLE_ID from KRIM_ROLE_T where ROLE_NM='UA Subaward Batch Admin'), 1351);
+    </sql>
+
+  </changeSet>
+  <changeSet id="UAR-2694-3" author="Natalia C Ibanez">
+    <comment>
+      UAR-2694: Assign automated batch user kc-batch to  UA Subaward Batch Admin role
+    </comment>
+    <sql>
+      INSERT INTO KRIM_ROLE_MBR_T (ROLE_MBR_ID, VER_NBR, OBJ_ID, ROLE_ID, MBR_ID, MBR_TYP_CD, LAST_UPDT_DT)
+      VALUES (KRIM_ROLE_MBR_ID_S, '1', SYS_GUID(), (select ROLE_ID from KRIM_ROLE_T where role_nm='UA Subaward Batch Admin'), '3', 'P', CURRENT_TIMESTAMP);
+    </sql>
+
+  </changeSet>
+</databaseChangeLog>

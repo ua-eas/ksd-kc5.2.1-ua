@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static edu.arizona.kra.subaward.batch.InvoiceFeedConstants.GL_ENTRY_ID_KEY;
 import static edu.arizona.kra.subaward.batch.InvoiceFeedConstants.SIF_JOB_EXECUTION_ID_KEY;
 
 
@@ -81,6 +82,15 @@ public class SubawardInvoiceErrorReportServiceImpl implements SubawardInvoiceErr
         error.setExecutionId(executionId);
         error.setErrorMessage(message);
         error.setGlEntryId(glEntryId);
+        if ( glEntryId!=null ){
+            Map<String, Object> primaryKeys = new HashMap<String, Object>();
+            primaryKeys.put( GL_ENTRY_ID_KEY, glEntryId );
+
+            UAGlEntry glEntry =  (UAGlEntry) businessObjectService.findByPrimaryKey( UAGlEntry.class, primaryKeys );
+            if ( glEntry !=null ){
+                error.setGlEntryData( glEntry.toString());
+            }
+        }
         error.setSubawardId(subawardId);
         error.setSubAwardAmtReleasedId(subawardAmtRelId);
         error.setInvoiceDocumentNumber(invoiceDocNumber);

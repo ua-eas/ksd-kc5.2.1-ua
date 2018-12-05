@@ -34,7 +34,7 @@
   <class-descriptor class="edu.arizona.kra.subaward.batch.bo.UASubawardInvoiceData" table="SUBAWARD_INV_FEED_DATA">
     <field-descriptor name="entryId" column="ENTRY_ID" jdbc-type="BIGINT" index="true" primarykey="true" />
     <field-descriptor name="executionId" column="EXECUTION_ID" jdbc-type="BIGINT" index="true"/>
-    <field-descriptor name="purchaseOrderNumber" column="FDOC_NBR" jdbc-type="VARCHAR" />
+    <field-descriptor name="financialDocNumber" column="FDOC_NBR" jdbc-type="VARCHAR" />
     <field-descriptor name="purchaseOrderNumber" column="PURCHASE_ORD_NBR" jdbc-type="VARCHAR" />
     <field-descriptor name="amountReleased" column="AMT_RELEASED" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
     <field-descriptor name="comments" column="COMMENTS" jdbc-type="VARCHAR" />
@@ -44,7 +44,7 @@
     <field-descriptor name="subAwardId" column="SUBAWARD_ID" jdbc-type="BIGINT" />
     <field-descriptor name="subAwardAmtReleasedId" column="SUBAWARD_AMT_RELEASED_ID" jdbc-type="INTEGER"/>
     <field-descriptor name="invoiceDocumentNumber" column="INVOICE_DOCUMENT_NBR" jdbc-type="VARCHAR" />
-    <field-descriptor name="importedDate" column="IMPORTED_DT" jdbc-type="TIMESTAMP" />
+    <field-descriptor name="importedDate" column="IMPORTED_DT" jdbc-type="DATE" />
   </class-descriptor>
 
 

@@ -14,31 +14,30 @@ public interface SubawardInvoiceErrorReportService {
     /**
      * Method that saves the occured exception with the given message
      */
-    public void recordError(Long executionId, String message, Exception e);
+    void recordError(Long executionId, String message, Exception e);
 
 
     /**
      * Method that reports a duplicate row problem and the associated glEntry data
      */
-    public void recordDuplicateRowError(Long executionId, UAGlEntry glEntry);
+    void recordDuplicateRowError(Long executionId, UAGlEntry glEntry);
 
 
     /**
      * Method that saves the occured exception with the given message
      */
-    public void recordError(Long executionId, String message, Long glEntryId, Long subawardId, Integer subawardAmtRelId, String invoiceDocNumber);
+    void recordError(Long executionId, String message, Long glEntryId, Long subawardId, Integer subawardAmtRelId, String invoiceDocNumber);
 
 
     /**
      * Method that returns the total error count for a particular execution of the Subaward Invoice Import Job
      */
-    public int findJobRunErrorCount(Long executionId);
+    int findJobRunErrorCount(Long executionId);
 
     /**
      * Method that returns all the errors occurred for a particular execution of the Subaward Invoice Import Job
      */
-    public List<UASubawardInvoiceError> findJobRunErrors(Long executionId);
-
+    List<UASubawardInvoiceError> findJobRunErrors(Long executionId);
 
 
 }

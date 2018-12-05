@@ -10,8 +10,14 @@ public final class InvoiceFeedConstants {
 
     public static final String SIF_JOB_LISTENER_NAME="SubawardInvoiceFeedJobListener";
     public static final String SIF_JOB_NAME="subawardInvoiceFeedJob";
+
+    public static final String SUBAWARD_INVOICE_FEED_MAINT_DOC_TYPE_NAME="SubAwardInvoiceMaintenanceDocument";
+
     public static final String SIF_JOB_EXECUTION_SUMMARY_KEY="subawardInvoiceFeedJobSummary";
+    public static final String GL_ENTRY_ID_KEY="entryId";
+    public static final String IMPORTED_DATE_KEY="importedDate";
     public static final String SIF_JOB_EXECUTION_ID_KEY="executionId";
+    public static final String SUBAWARD_ID_KEY="subAwardId";
 
     public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_ENABLED="subAwardInvoiceFeedJobEnabled";
     public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_SCHEDULE="subAwardInvoiceFeedJobRunSchedule";
@@ -19,6 +25,9 @@ public final class InvoiceFeedConstants {
     public static final String PARAM_NAME_SUBAWARD_INVOICE_FEED_EMAIL="subAwardInvoiceFeedNotificationEmail";
 
     public static String CLEAR_GL_IMPORT_TABLE_QUERY="truncate table SUBAWARD_GL_IMPORT";
+
+    public static String FIND_ACTIVE_SUBAWARD_ID_FOR_PO_QUERY="select SUBAWARD_ID from VERSION_HISTORY v inner join SUBAWARD s on v.SEQ_OWNER_VERSION_NAME_VALUE = s.SUBAWARD_CODE and v.SEQ_OWNER_SEQ_NUMBER = s.SEQUENCE_NUMBER " +
+            " where s.PURCHASE_ORDER_NUM = ?  and v.SEQ_OWNER_CLASS_NAME='org.kuali.kra.subaward.bo.SubAward' and v.SEQ_OWNER_VERSION_NAME_FIELD='subAwardCode' and v.VERSION_STATUS='ACTIVE'";
 
     public static String BI_GL_TABLE_SELECT_QUERY1="select * from KUALI_ADMIN.KF_UA_DPT_UAR_GL_ENTRY " +
             "WHERE ((FIN_OBJECT_CD IN ('3340', '3350')) AND (FIN_BALANCE_TYP_CD = 'AC') "+
@@ -65,6 +74,8 @@ public final class InvoiceFeedConstants {
 
     public static final String TIMESTAMP_ZERO = " 00:00:00";
     public static final String TIMESTAMP_EOD = " 23:59:59";
+
+    public static final String INVOICE_DOCUMENT_DESCRIPTION="Payment Entry";
 
     public static final String DUPLICATE_GLENTRY_ERROR_MSG = "ERROR: Trying to import a duplicate GL Entry! Skipping row... ";
     public static final String EMAIL_SUBJECT_KEY = "subaward.invoice.feed.message.batch.email.subject";
