@@ -1,5 +1,6 @@
 package edu.arizona.kra.subaward.batch.bo;
 
+import edu.arizona.kra.subaward.batch.InvoiceFeedConstants;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 
@@ -48,9 +49,12 @@ public class UASubawardInvoiceError extends KraPersistableBusinessObjectBase {
         return errorMessage;
     }
 
-    public UASubawardInvoiceError setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-        return this;
+    public void setErrorMessage(String errorMessage) {
+
+        if (errorMessage.length()> InvoiceFeedConstants.MAX_ERROR_MSG_LENGTH){
+            this.errorMessage = errorMessage.substring(0, InvoiceFeedConstants.MAX_ERROR_MSG_LENGTH-1);
+        } else
+            this.errorMessage = errorMessage;
     }
 
     public Long getGlEntryId() {

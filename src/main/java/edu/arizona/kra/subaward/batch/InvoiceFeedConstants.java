@@ -80,6 +80,7 @@ public final class InvoiceFeedConstants {
     public static final String DUPLICATE_GLENTRY_ERROR_MSG = "ERROR: Trying to import a duplicate GL Entry! Skipping row... ";
     public static final String EMAIL_SUBJECT_KEY = "subaward.invoice.feed.message.batch.email.subject";
     public static final String EMAIL_BODY_KEY = "subaward.invoice.feed.message.batch.email.body";
+    public static final int MAX_ERROR_MSG_LENGTH = 300;
 
 
 
