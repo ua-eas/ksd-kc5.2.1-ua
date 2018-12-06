@@ -115,8 +115,6 @@ public class NegotiationNegotiationAction extends NegotiationAction {
         negotiationForm.getMedusaBean().setModuleIdentifier(negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationId());
         negotiationForm.getMedusaBean().generateParentNodes();
 
-        //close the document overview as it can't be default closed via jsp.
-        //negotiationForm.getTabStates().put("DocumentOverview", "false");
         return mapping.findForward(NegotiationConstants.MAPPING_NEGOTIATION_MEDUSA_PAGE);
     }
     
