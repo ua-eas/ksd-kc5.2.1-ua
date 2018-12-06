@@ -700,13 +700,20 @@
       <action path="/negotiationNegotiation" name="NegotiationForm" input="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" type="org.kuali.kra.negotiations.web.struts.action.NegotiationNegotiationAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
           <forward name="Negotiation" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
           <forward name="basic" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
-     	  <forward name="customData" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
-     	  <forward name="notificationEditor" path="/WEB-INF/jsp/negotiation/NegotiationNotificationEditor.jsp" />
-     	  <forward name="portal" path="/portal.jsp" redirect="true" />
+     	    <forward name="customData" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
+     	    <forward name="notificationEditor" path="/WEB-INF/jsp/negotiation/NegotiationNotificationEditor.jsp" />
+     	    <forward name="portal" path="/portal.jsp" redirect="true" />
           <forward name="lostPlaceMessagePage" path="/WEB-INF/jsp/negotiation/NegotiationLostPlaceMessage.jsp" />
-       </action>
+          <forward name="medusa" path="/WEB-INF/jsp/negotiation/NegotiationMedusa.jsp" />
+      </action>
 
-       <action path="/negotiationNotificationEditor" name="NegotiationForm" input="/WEB-INF/jsp/negotiation/NegotiationNotificationEditor.jsp" type="org.kuali.kra.negotiations.web.struts.action.NegotiationNotificationAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+      <action path="/negotiationMedusa" name="NegotiationForm" input="/WEB-INF/jsp/negotiation/NegotiationMedusa.jsp" type="org.kuali.kra.negotiations.web.struts.action.NegotiationMedusaAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+        <forward name="basic" path="/WEB-INF/jsp/negotiation/NegotiationMedusa.jsp" />
+        <forward name="Negotiation" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
+      </action>
+
+
+      <action path="/negotiationNotificationEditor" name="NegotiationForm" input="/WEB-INF/jsp/negotiation/NegotiationNotificationEditor.jsp" type="org.kuali.kra.negotiations.web.struts.action.NegotiationNotificationAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
        	  <forward name="basic" path="/WEB-INF/jsp/negotiation/NegotiationNotificationEditor.jsp" />
        	  <forward name="negotiation" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
        </action>
@@ -716,6 +723,7 @@
             <forward name="home" path="/WEB-INF/jsp/personmasschange/PersonMassChangeHome.jsp" />
             <forward name="view" path="/WEB-INF/jsp/personmasschange/PersonMassChangeView.jsp" />
         </action>
+
      
     </action-mappings>
 

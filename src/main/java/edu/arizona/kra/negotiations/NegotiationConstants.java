@@ -16,6 +16,8 @@ public final class NegotiationConstants {
     public static final String MAX_SUBAWARD_CODE = "max(subAwardCode)";
     public static final String PROPOSAL_NUMBER = "proposalNumber";
 
+    public static final String MAPPING_NEGOTIATION_MEDUSA_PAGE = "medusa";
+
 
     public static final String AWARD_SEQUENCE_STATUS = "awardSequenceStatus";
     public static final String PROPOSAL_SEQUENCE_STATUS = "proposalSequenceStatus";
