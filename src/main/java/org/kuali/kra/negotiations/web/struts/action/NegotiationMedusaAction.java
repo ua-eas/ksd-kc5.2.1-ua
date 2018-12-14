@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.negotiations.web.struts.action;
 
+import edu.arizona.kra.negotiations.NegotiationConstants;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -48,11 +49,11 @@ public class NegotiationMedusaAction extends NegotiationAction {
             negotiationForm.getMedusaBean().setModuleIdentifier(negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationId());
             negotiationForm.getMedusaBean().generateParentNodes();
 
-            return mapping.findForward(Constants.MAPPING_AWARD_MEDUSA_PAGE);
+            return mapping.findForward(NegotiationConstants.MAPPING_NEGOTIATION_MEDUSA_PAGE);
     }
 
     public ActionForward refreshView(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return mapping.findForward(Constants.MAPPING_BASIC);
+        return mapping.findForward(NegotiationConstants.MAPPING_NEGOTIATION_MEDUSA_PAGE);
     }
 
     public ActionForward negotiation(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {

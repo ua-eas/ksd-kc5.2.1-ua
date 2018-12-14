@@ -710,6 +710,7 @@
       <action path="/negotiationMedusa" name="NegotiationForm" input="/WEB-INF/jsp/negotiation/NegotiationMedusa.jsp" type="org.kuali.kra.negotiations.web.struts.action.NegotiationMedusaAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
         <forward name="basic" path="/WEB-INF/jsp/negotiation/NegotiationMedusa.jsp" />
         <forward name="Negotiation" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
+        <forward name="medusa" path="/WEB-INF/jsp/negotiation/NegotiationMedusa.jsp" />
       </action>
 
 
