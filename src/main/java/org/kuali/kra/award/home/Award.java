@@ -1953,11 +1953,36 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      */
     public void add(InstitutionalProposal institutionalProposal) {
         if (institutionalProposal != null) {
-            AwardFundingProposal afp = new AwardFundingProposal(this, institutionalProposal);
-            fundingProposals.add(afp);
-            institutionalProposal.add(afp);
+            //avoid creating duplicate afps, if there is already one for this specific award existing in the IPs list
+            AwardFundingProposal afp = findExistingAwardFundingProposal(institutionalProposal);
+            if ( afp == null ) {
+                afp = new AwardFundingProposal(this, institutionalProposal);
+                institutionalProposal.add(afp);
+            }
+            if ( !fundingProposals.contains(afp))
+                fundingProposals.add(afp);
         }
     }
+
+    /**
+     * If there is already an AwardFunding Proposal for this Award in IP's list, return that one
+     * otherwise return null;
+     *  @param institutionalProposal
+     */
+    private AwardFundingProposal findExistingAwardFundingProposal(InstitutionalProposal institutionalProposal){
+        if ( this.getAwardId() == null) return null;
+        for ( AwardFundingProposal afp: institutionalProposal.getAwardFundingProposals() ){
+            if ( afp.isActive() &&
+                    this.getAwardId().equals(afp.getAwardId()) &&
+                    institutionalProposal.getProposalId().equals(afp.getProposalId())){
+                return afp;
+            }
+        }
+        return null;
+    }
+
+
+
 
     /**
      * @param awardSponsorContact
@@ -2906,10 +2931,9 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      * @param proposalNumber The proposal number of the IP version(s) to be removed
      */
     public List<AwardFundingProposal> removeFundingProposals(String proposalNumber) {
-        List<AwardFundingProposal> fundingProposals = getFundingProposals();
         List<AwardFundingProposal> collectedFundingProposals = new ArrayList<AwardFundingProposal>();
 
-        for (AwardFundingProposal afp : fundingProposals) {
+        for (AwardFundingProposal afp : getFundingProposals()) {
             if (afp.getProposal() != null && StringUtils.equals(afp.getProposal().getProposalNumber(), proposalNumber)) {
                 collectedFundingProposals.add(afp);
             }
@@ -2919,12 +2943,11 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
             removeFundingProposal(cfp);
         }
 
-        return fundingProposals;
+        return collectedFundingProposals;
     }
 
     public void removeFundingProposal(AwardFundingProposal afp) {
         fundingProposals.remove(afp);
-        //allFundingProposals.remove(afp);
         final InstitutionalProposal proposal = getInstitutionalProposalService().getInstitutionalProposal(afp.getProposalId().toString());
         if (proposal != null) {
             proposal.remove(afp);
