@@ -341,15 +341,13 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
 
     private void updateFundedProposals() {
         Set<String> modifiedProposals = new HashSet<String>();
-        List<AwardFundingProposal> pendingVersions = new ArrayList<AwardFundingProposal>();
         for (AwardFundingProposal afp : getAward().getFundingProposals()) {
             InstitutionalProposalBoLite proposal = afp.getProposal();
             if (!ProposalStatus.FUNDED.equals(proposal.getStatusCode())) {
                 modifiedProposals.add(proposal.getProposalNumber());
-                pendingVersions.add(afp);
             }
         }
-
+        // AFP need to be removed for old version of IP to avoid having duplicate ones on the Award side.
         if (modifiedProposals.size() > 0) {
             for(InstitutionalProposal ip: getInstitutionalProposalService().fundInstitutionalProposals(modifiedProposals)){
                 List<AwardFundingProposal> removedFundingProposals = getAward().removeFundingProposals(ip.getProposalNumber());
