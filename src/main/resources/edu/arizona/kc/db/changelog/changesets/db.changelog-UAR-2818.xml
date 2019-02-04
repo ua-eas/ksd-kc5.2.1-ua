@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="UAR-2818" author="Eric Lee">
+        <comment>
+            Adding parameter for allowable watermark attachment types
+        </comment>
+        <sql>
+            INSERT INTO KRCR_PARM_T (APPL_ID, NMSPC_CD, CMPNT_CD, PARM_NM, VAL, PARM_DESC_TXT, PARM_TYP_CD, EVAL_OPRTR_CD, OBJ_ID, VER_NBR)
+            VALUES ('KC', 'KC-PROTOCOL', 'Document', 'WATERMARK_ATTACHMENT_TYPES', '1', 'Allowable types for watermark attachments.', 'CONFG', 'A', sys_guid(), 1);
+        </sql>
+        <rollback>
+            delete from KRCR_PARM_T
+            where APPL_ID= 'KC'
+            and NMSPC_CD = 'KC-PROTOCOL'
+            and CMPNT_CD = 'Document'
+            and PARM_NM = 'WATERMARK_ATTACHMENT_TYPES'
+            and VAL = '1'
+            and PARM_DESC_TXT = 'Allowable types for watermark attachments.'
+            and PARM_TYP_CD = 'CONFG'
+            and EVAL_OPRTR_CD = 'A'
+            and VER_NBR = 1;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

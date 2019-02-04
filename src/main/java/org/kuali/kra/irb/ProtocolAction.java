@@ -433,9 +433,10 @@ public abstract class ProtocolAction extends ProtocolActionBase {
         byte[] attachmentFile =null;
         final AttachmentFile file = attachment.getFile();
         Protocol currentProtocol = (Protocol) form.getProtocolDocument().getProtocol();
-        Printable printableArtifacts= getProtocolPrintingService().getProtocolPrintArtifacts(currentProtocol);     
+        Printable printableArtifacts= getProtocolPrintingService().getProtocolPrintArtifacts(currentProtocol);
+        boolean isValidWaterMarkAttachmentType = getWatermarkService().isValidWaterMarkAttachmentType(attachment.getTypeCode());
         try {
-            if (printableArtifacts.isWatermarkEnabled() && ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(attachment.getStatusCode())){              
+            if (printableArtifacts.isWatermarkEnabled() && ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(attachment.getStatusCode()) && isValidWaterMarkAttachmentType){
                 if( attachment.isDraft() || 
                         ProtocolStatus.AMENDMENT_MERGED.equals(currentProtocol.getProtocolStatusCode()) ||
                         ProtocolStatus.RENEWAL_MERGED.equals(currentProtocol.getProtocolStatusCode()) ||
