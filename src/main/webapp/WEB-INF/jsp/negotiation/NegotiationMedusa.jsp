@@ -28,7 +28,9 @@
   	headerTabActive="medusa"
 	extraTopButtons="${KualiForm.extraButtons}" >
 
-
+	<script type="text/javascript">
+        var $jq = jQuery.noConflict();
+	</script>
 
 <kul:tabTop tabTitle="Medusa" defaultOpen="true" tabErrorKey="">
 <kra-m:medusa helpParameterNamespace="KC-NEGOTIATION" helpParameterDetailType="Document" helpParameterName="negotiationMedusaHelp" />
