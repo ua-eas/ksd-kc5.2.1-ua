@@ -27,7 +27,10 @@
 	auditCount="0"
   	headerDispatch="${KualiForm.headerDispatch}"
   	headerTabActive="negotiation">
-  	
+
+	<script type="text/javascript">
+        var $jq = jQuery.noConflict();
+	</script>
 
 <c:set var="readOnly" value="${not KualiForm.editingMode['modify']}"/>
 <c:set var="medusaLink" value="${KualiForm.methodToCall eq 'medusa'}"/>
