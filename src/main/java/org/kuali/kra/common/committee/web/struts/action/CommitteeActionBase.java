@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.common.committee.web.struts.action;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -27,9 +28,11 @@ import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.web.struts.action.KraTransactionalDocumentActionBase;
+import org.kuali.rice.core.api.util.RiceKeyConstants;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kns.lookup.LookupResultsService;
+import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.krad.bo.PersistableBusinessObject;
 import org.kuali.rice.krad.document.Document;
@@ -38,6 +41,7 @@ import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.rice.krad.util.KRADPropertyConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,10 +72,10 @@ public abstract class CommitteeActionBase extends KraTransactionalDocumentAction
      */
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-            throws Exception {    
-        
+            throws Exception {
+
         ActionForward actionForward = mapping.findForward(Constants.MAPPING_BASIC);
-        
+
         CommitteeFormBase committeeForm = (CommitteeFormBase) form;
         CommitteeDocumentBase doc = committeeForm.getCommitteeDocument();
 
@@ -84,10 +88,10 @@ public abstract class CommitteeActionBase extends KraTransactionalDocumentAction
 
         return actionForward;
     }
-    
+
     protected abstract CommitteeTaskBase getNewCommitteeTaskInstanceHook(String taskName, CommitteeBase committee);
 
-    
+
     /**
      * Can the committee be saved?  This method is normally overridden by
      * a subclass in order to invoke business rules to verify that the
@@ -100,7 +104,7 @@ public abstract class CommitteeActionBase extends KraTransactionalDocumentAction
     }
 
     /**
-     * 
+     *
      * @see org.kuali.kra.web.struts.action.KraTransactionalDocumentActionBase#close(org.apache.struts.action.ActionMapping,
      *      org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
@@ -109,13 +113,13 @@ public abstract class CommitteeActionBase extends KraTransactionalDocumentAction
             throws Exception {
         CommitteeFormBase committeeForm = (CommitteeFormBase) form;
         doProcessingAfterPost(committeeForm, request);
-        
+
         return super.close(mapping, committeeForm, request, response);
     }
 
     /**
      * We override this method to add in support for multi-lookups.
-     * 
+     *
      * @see org.kuali.core.web.struts.action.KualiDocumentActionBase#refresh(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @SuppressWarnings("unchecked")
@@ -145,13 +149,13 @@ public abstract class CommitteeActionBase extends KraTransactionalDocumentAction
 
         return mapping.findForward(Constants.MAPPING_BASIC );
     }
-    
+
     /**
-     * This method must be overridden by a derived class if that derived class has a field that requires a 
+     * This method must be overridden by a derived class if that derived class has a field that requires a
      * Lookup that returns multiple values.  The derived class should first check the class of the selected BOs.
      * Based upon the class, the CommitteeBase can be updated accordingly.  This is necessary since there may be
      * more than one multi-lookup on a web page.
-     * 
+     *
      * @param committeeForm the CommitteeBase Form
      * @param lookupResultsBOClass the class of the BOs that are returned by the Lookup
      * @param selectedBOs the selected BOs
@@ -160,7 +164,7 @@ public abstract class CommitteeActionBase extends KraTransactionalDocumentAction
     protected void processMultipleLookupResults(CommitteeFormBase committeeForm, Class lookupResultsBOClass, Collection<PersistableBusinessObject> selectedBOs) {
         // do nothing
     }
-    
+
     /**
      * @see org.kuali.core.web.struts.action.KualiDocumentActionBase#docHandler(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
@@ -321,5 +325,66 @@ public abstract class CommitteeActionBase extends KraTransactionalDocumentAction
             }
         }
     }
+
+    @Override
+    protected ActionForward saveOnClose(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        KualiDocumentFormBase documentForm = (KualiDocumentFormBase) form;
+
+        if (isInitialSave(getDocumentStatus(documentForm.getDocument()))) {
+            initialDocumentSave(documentForm);
+        }
+
+        return this.closeCommitteeDocument(mapping, form, request, response);
+    }
+
+    private ActionForward closeCommitteeDocument(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        KualiDocumentFormBase docForm = (KualiDocumentFormBase) form;
+        doProcessingAfterPost(docForm, request);
+        Document document = docForm.getDocument();
+        // only want to prompt them to save if they already can save
+        if (canSave(docForm)) {
+
+            Object question = getQuestion(request);
+            // logic for close question
+            if (question == null) {
+                // KULRICE-7306: Unconverted Values not carried through during a saveOnClose action.
+                // Stash the unconverted values to populate errors if the user elects to save
+                saveUnconvertedValuesToSession(request, docForm);
+
+                // ask question if not already asked
+                return super.performQuestionWithoutInput(mapping, form, request, response, KRADConstants.DOCUMENT_SAVE_BEFORE_CLOSE_QUESTION, getKualiConfigurationService().getPropertyValueAsString(
+                        RiceKeyConstants.QUESTION_SAVE_BEFORE_CLOSE), KRADConstants.CONFIRMATION_QUESTION, KRADConstants.MAPPING_CLOSE, "");
+            } else {
+                Object buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
+
+                // KULRICE-7306: Unconverted Values not carried through during a saveOnClose action.
+                // Side effecting in that it clears the session attribute that holds the unconverted values.
+                Map<String, Object> unconvertedValues = restoreUnconvertedValuesFromSession(request, docForm);
+
+                if ((KRADConstants.DOCUMENT_SAVE_BEFORE_CLOSE_QUESTION.equals(question)) && ConfirmationQuestion.YES.equals(buttonClicked)) {
+                    // if yes button clicked - save the doc
+
+                    // KULRICE-7306: Unconverted Values not carried through during a saveOnClose action.
+                    // If there were values that couldn't be converted, we attempt to populate them so that the
+                    // the appropriate errors get set on those fields
+                    if (MapUtils.isNotEmpty(unconvertedValues)) for (Map.Entry<String, Object> entry : unconvertedValues.entrySet()) {
+                        docForm.populateForProperty(entry.getKey(), entry.getValue(), unconvertedValues);
+                    }
+
+                    ActionForward forward = checkAndWarnAboutSensitiveData(mapping, form, request, response, KRADPropertyConstants.DOCUMENT_EXPLANATION, document.getDocumentHeader().getExplanation(), "save", "");
+                    if (forward != null) {
+                        return forward;
+                    }
+
+                    //UAR-1851 Save with kraDocumentService and not documentService
+                    getKraDocumentService().saveDocument(docForm.getDocument());
+                }
+                // else go to close logic below
+            }
+        }
+
+        return returnToSender(request, mapping, docForm);
+    }
+
 
 }
