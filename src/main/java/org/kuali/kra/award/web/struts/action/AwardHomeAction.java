@@ -27,6 +27,7 @@ import org.kuali.kra.award.home.keywords.AwardScienceKeyword;
 import org.kuali.kra.award.specialreview.AwardSpecialReview;
 import org.kuali.kra.bo.FundingSourceType;
 import org.kuali.kra.bo.SpecialReviewType;
+import org.kuali.kra.bo.Unit;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.common.specialreview.rule.event.SaveSpecialReviewLinkEvent;
@@ -44,6 +45,7 @@ import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -255,6 +257,13 @@ public class AwardHomeAction extends AwardAction {
         }
         if (awardDocument.getAward().getAwardAmountInfos().get(0).getAmountObligatedToDate() == null) {
             awardDocument.getAward().getAwardAmountInfos().get(0).setAmountObligatedToDate(new KualiDecimal(0));
+        }
+
+        //UAR-2802 Set the award with the selected lead unit only if it is different than the existing current award lead unit
+        Unit currentAwardLeadUnit = awardDocument.getAward().getLeadUnit();
+        Unit selectedLeadUnit = awardForm.getProjectPersonnelBean().getLeadUnitSelected();
+        if(ObjectUtils.isNotNull(selectedLeadUnit) && !currentAwardLeadUnit.equals(selectedLeadUnit)){
+            awardDocument.getAward().setLeadUnit(selectedLeadUnit);
         }
         
         awardForm.getProjectPersonnelBean().updateLeadUnit();

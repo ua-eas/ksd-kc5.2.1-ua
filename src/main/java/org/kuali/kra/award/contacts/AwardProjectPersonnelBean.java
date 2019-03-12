@@ -21,6 +21,7 @@ import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.home.ContactRole;
 import org.kuali.kra.bo.Unit;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPersonRole;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -307,5 +308,20 @@ public class AwardProjectPersonnelBean extends AwardContactsBean {
         person.setOptInUnitStatus(false);
         person.getUnits().clear();
         person.getCreditSplits().clear();
+    }
+
+    //UAR-2802 Return the lead selected unit indicated by selected radio button
+    public Unit getLeadUnitSelected(){
+        Unit selectedLeadUnit = null;
+        AwardPerson pi = findPrincipalInvestigator();
+        if (ObjectUtils.isNotNull(pi)) {
+            for (AwardPersonUnit curUnit : pi.getUnits()) {
+                if (curUnit.isLeadUnit()) {
+                    selectedLeadUnit = curUnit.getUnit();
+                    break;
+                }
+            }
+        }
+        return selectedLeadUnit;
     }
 }
