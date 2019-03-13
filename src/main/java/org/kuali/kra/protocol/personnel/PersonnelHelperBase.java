@@ -35,7 +35,6 @@ public abstract class PersonnelHelperBase implements Serializable {
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = -411537473714173061L;
-    private static final int maxPersonsSize = 20;
 
     /**
      * Each Helper must contain a reference to its document form
