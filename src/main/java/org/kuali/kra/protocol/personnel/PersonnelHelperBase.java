@@ -26,6 +26,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class PersonnelHelperBase implements Serializable {
@@ -34,6 +35,7 @@ public abstract class PersonnelHelperBase implements Serializable {
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = -411537473714173061L;
+    private static final int maxPersonsSize = 20;
 
     /**
      * Each Helper must contain a reference to its document form
@@ -49,9 +51,9 @@ public abstract class PersonnelHelperBase implements Serializable {
     protected transient ParameterService parameterService;
 
     public PersonnelHelperBase(ProtocolFormBase form) {
-        setForm(form); 
-        setNewProtocolPersonUnits(new ArrayList<ProtocolUnitBase>());
-        setNewProtocolAttachmentPersonnels(new ArrayList<ProtocolAttachmentPersonnelBase>());
+        setForm(form);
+        newProtocolPersonUnits = new ArrayList<>();
+        newProtocolAttachmentPersonnels = new ArrayList<>();
     }    
     
     public void prepareView() {
@@ -100,8 +102,11 @@ public abstract class PersonnelHelperBase implements Serializable {
     }
 
     public List<ProtocolUnitBase> getNewProtocolPersonUnits() {
-        if (getForm().getProtocolDocument().getProtocol().getProtocolPersons().size() > this.newProtocolPersonUnits.size()) {
-            this.newProtocolPersonUnits.add(this.newProtocolPersonUnits.size(), createNewProtocolUnitInstanceHook());
+        //UAR-2898: Initialize arrays to avoid errors on PersonUnitsSection edit
+        if (newProtocolPersonUnits == null || newProtocolPersonUnits.isEmpty()) {
+            for (int idx=0; idx<getForm().getProtocolDocument().getProtocol().getProtocolPersons().size(); idx++) {
+                this.newProtocolPersonUnits.add(createNewProtocolUnitInstanceHook());
+            }
         }
         return newProtocolPersonUnits;
     }
@@ -111,8 +116,11 @@ public abstract class PersonnelHelperBase implements Serializable {
     }
     
     public List<ProtocolAttachmentPersonnelBase> getNewProtocolAttachmentPersonnels() {
-        if (getForm().getProtocolDocument().getProtocol().getProtocolPersons().size() > this.newProtocolAttachmentPersonnels.size()) {
-            this.newProtocolAttachmentPersonnels.add(this.newProtocolAttachmentPersonnels.size(), createNewProtocolAttachmentPersonnelInstanceHook());
+        //UAR-2898: Initialize arrays to avoid errors on ProtocolAttachmentPersonnels edit
+        if (newProtocolAttachmentPersonnels == null || newProtocolAttachmentPersonnels.isEmpty()) {
+            for (int idx=0; idx<getForm().getProtocolDocument().getProtocol().getProtocolPersons().size(); idx++) {
+                this.newProtocolAttachmentPersonnels.add(createNewProtocolAttachmentPersonnelInstanceHook());
+            }
         }
         return newProtocolAttachmentPersonnels;
     }
