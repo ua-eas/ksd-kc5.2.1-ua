@@ -59,7 +59,7 @@ public class AwardContactsAction extends AwardAction {
         ActionForward forward;
         updateContactsBasedOnRoleChange(award);
         if (isValidSave(awardForm)) {
-            setLeadUnitOnAwardFromPILeadUnit(award, awardForm);
+            super.setLeadUnitOnAwardFromPILeadUnit(award);
             award.initCentralAdminContacts();
             forward = super.save(mapping, form, request, response);
         } else {
@@ -84,37 +84,6 @@ public class AwardContactsAction extends AwardAction {
 
         return forward;
     }
-    
-    /**
-     * This method is called to reset the Lead Unit on the award if the lead unit is changed on the PI.
-     * @param award
-     */
-    @SuppressWarnings("unchecked")
-    private void setLeadUnitOnAwardFromPILeadUnit(Award award, AwardForm awardForm) {
-        for (AwardPerson person : award.getProjectPersons()) {
-            if (person.isPrincipalInvestigator() && person.getUnits().size() >= 1) {
-                AwardPersonUnit selectedUnit = null;
-                for (AwardPersonUnit unit : person.getUnits()) {
-                    if (unit.isLeadUnit()) {
-                        selectedUnit = unit;
-                    }
-                }
-                //if a unit hasn't been selected as lead, use the first unit
-                if (selectedUnit == null) {
-                    selectedUnit = person.getUnit(0);
-                }
-                if (selectedUnit != null) {
-                    award.setUnitNumber(selectedUnit.getUnitNumber());
-                    award.setLeadUnit(selectedUnit.getUnit());
-                } else {
-                    award.setUnitNumber(null);
-                    award.setLeadUnit(null);
-                }
-            }
-        }
-    }
-    
-    
     /**
      * @param mapping
      * @param form
