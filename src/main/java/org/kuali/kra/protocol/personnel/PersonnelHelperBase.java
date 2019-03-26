@@ -102,8 +102,9 @@ public abstract class PersonnelHelperBase implements Serializable {
 
     public List<ProtocolUnitBase> getNewProtocolPersonUnits() {
         //UAR-2898: Initialize arrays to avoid errors on PersonUnitsSection edit
-        if (newProtocolPersonUnits == null || newProtocolPersonUnits.isEmpty()) {
-            for (int idx=0; idx<getForm().getProtocolDocument().getProtocol().getProtocolPersons().size(); idx++) {
+        if ( newProtocolPersonUnits.isEmpty() ||
+                getForm().getProtocolDocument().getProtocol().getProtocolPersons().size() > this.newProtocolPersonUnits.size()) {
+            for (int idx=newProtocolPersonUnits.size(); idx<getForm().getProtocolDocument().getProtocol().getProtocolPersons().size(); idx++) {
                 this.newProtocolPersonUnits.add(createNewProtocolUnitInstanceHook());
             }
         }
@@ -116,8 +117,9 @@ public abstract class PersonnelHelperBase implements Serializable {
     
     public List<ProtocolAttachmentPersonnelBase> getNewProtocolAttachmentPersonnels() {
         //UAR-2898: Initialize arrays to avoid errors on ProtocolAttachmentPersonnels edit
-        if (newProtocolAttachmentPersonnels == null || newProtocolAttachmentPersonnels.isEmpty()) {
-            for (int idx=0; idx<getForm().getProtocolDocument().getProtocol().getProtocolPersons().size(); idx++) {
+        if ( newProtocolAttachmentPersonnels.isEmpty() ||
+                getForm().getProtocolDocument().getProtocol().getProtocolPersons().size() > this.newProtocolPersonUnits.size()) {
+            for (int idx=newProtocolPersonUnits.size(); idx<getForm().getProtocolDocument().getProtocol().getProtocolPersons().size(); idx++) {
                 this.newProtocolAttachmentPersonnels.add(createNewProtocolAttachmentPersonnelInstanceHook());
             }
         }
@@ -177,3 +179,4 @@ public abstract class PersonnelHelperBase implements Serializable {
     public abstract ProtocolUnitBase createNewProtocolUnitInstanceHook();
     public abstract ProtocolAttachmentPersonnelBase createNewProtocolAttachmentPersonnelInstanceHook();
 }
+
