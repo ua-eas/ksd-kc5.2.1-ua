@@ -52,6 +52,7 @@ import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncCreationService;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncService;
 import org.kuali.kra.award.budget.AwardBudgetService;
 import org.kuali.kra.award.contacts.AwardPerson;
+import org.kuali.kra.award.contacts.AwardPersonUnit;
 import org.kuali.kra.award.contacts.AwardProjectPersonsSaveRule;
 import org.kuali.kra.award.customdata.AwardCustomData;
 import org.kuali.kra.award.document.AwardDocument;
@@ -401,6 +402,10 @@ public class AwardAction extends BudgetParentActionBase {
         AwardForm awardForm = (AwardForm) form;
 
         Award award = awardForm.getAwardDocument().getAward();
+
+        //UAR-2802
+        this.setLeadUnitOnAwardFromPILeadUnit(award);
+
         checkAwardNumber(award);
         String userId = GlobalVariables.getUserSession().getPrincipalName();
         
@@ -596,8 +601,12 @@ public class AwardAction extends BudgetParentActionBase {
             String userId = GlobalVariables.getUserSession().getPrincipalId();
             UnitAuthorizationService authService = KraServiceLocator.getService(UnitAuthorizationService.class);      
             //List<Unit> userUnits = authService.getUnits(userId, Constants.MODULE_NAMESPACE_AWARD, AwardPermissionConstants.CREATE_AWARD.getAwardPermission());
-            return authService.hasMatchingQualifiedUnits(userId, Constants.MODULE_NAMESPACE_AWARD, 
-                    AwardPermissionConstants.MODIFY_AWARD.getAwardPermission(), leadUnitNumber);
+            if(!authService.hasPermission(userId, leadUnitNumber, Constants.MODULE_NAMESPACE_AWARD,
+                    AwardPermissionConstants.MODIFY_AWARD.getAwardPermission())){
+                GlobalVariables.getMessageMap().putError(KRADConstants.GLOBAL_ERRORS, KeyConstants.ERROR_AWARD_CONTACTS_NO_PERM_FOR_NEW_UNIT);
+            }else{
+                return true;
+            }
         }
         return false; 
     }
@@ -1917,5 +1926,35 @@ public class AwardAction extends BudgetParentActionBase {
     @Override
     public ActionForward takeSuperUserActions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         return superUserActionHelper(SuperUserAction.TAKE_SUPER_USER_ACTIONS, mapping, form, request, response);
+    }
+
+
+    /**
+     * This method is called to reset the Lead Unit on the award if the lead unit is changed on the PI.
+     * @param award
+     */
+    @SuppressWarnings("unchecked")
+    protected void setLeadUnitOnAwardFromPILeadUnit(Award award) {
+        for (AwardPerson person : award.getProjectPersons()) {
+            if (person.isPrincipalInvestigator() && person.getUnits().size() >= 1) {
+                AwardPersonUnit selectedUnit = null;
+                for (AwardPersonUnit unit : person.getUnits()) {
+                    if (unit.isLeadUnit()) {
+                        selectedUnit = unit;
+                    }
+                }
+                //if a unit hasn't been selected as lead, use the first unit
+                if (selectedUnit == null) {
+                    selectedUnit = person.getUnit(0);
+                }
+                if (selectedUnit != null) {
+                    award.setUnitNumber(selectedUnit.getUnitNumber());
+                    award.setLeadUnit(selectedUnit.getUnit());
+                } else {
+                    award.setUnitNumber(null);
+                    award.setLeadUnit(null);
+                }
+            }
+        }
     }
 }
