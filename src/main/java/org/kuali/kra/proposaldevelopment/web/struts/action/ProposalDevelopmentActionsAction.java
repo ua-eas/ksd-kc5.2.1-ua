@@ -143,6 +143,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	private static final String ROUTING_WARNING_MESSAGE = "Validation Warning Exists.Are you sure want to submit to workflow routing.";
 	private static final String PROPOSAL_APPROVER_VIEW_URL = "proposalDevelopmentApproverView";
 
+	private static final String HIERARCHY_REQUEST_NODE = "Hierarchy Request";
 
 	private enum SuperUserAction {
 		SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
@@ -291,11 +292,13 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
 		org.kuali.rice.krad.workflow.service.WorkflowDocumentService workflowDocumentService = KRADServiceLocatorWeb.getService( "workflowDocumentService" );
 		String currentRouteNodeNames = workflowDocumentService.getCurrentRouteNodeNames( workflowDoc );
-
-		return ( hasAskedToNotReceiveFutureRequests( workflowDoc, principalId ) && canGenerateMultipleApprovalRequests( reportCriteriaBuilder.build(), principalId, currentRouteNodeNames ) );
+		boolean result = hasAskedToReceiveFutureRequests( workflowDoc, principalId ) && canGenerateMultipleApprovalRequests( reportCriteriaBuilder.build(), principalId, currentRouteNodeNames );
+		LOG.info("canGenerateRequestsInFuture currentRouteNodeNames="+currentRouteNodeNames+" principalId="+principalId+ " result="+result);
+		return result;
 	}
 
-	private boolean hasAskedToNotReceiveFutureRequests( WorkflowDocument workflowDoc, String principalId ) {
+	private boolean hasAskedToReceiveFutureRequests( WorkflowDocument workflowDoc, String principalId ) {
+
 		boolean receiveFutureRequests = false;
 		boolean doNotReceiveFutureRequests = false;
 
@@ -308,37 +311,51 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 				if ( variableKey.startsWith( KewApiConstants.RECEIVE_FUTURE_REQUESTS_BRANCH_STATE_KEY )
 						&& variableValue.toUpperCase().equals( KewApiConstants.RECEIVE_FUTURE_REQUESTS_BRANCH_STATE_VALUE )
 						&& variableKey.contains( principalId ) ) {
+					LOG.debug("hasAskedToReceiveFutureRequests: receiveFutureRequests = true");
 					receiveFutureRequests = true;
-					break;
 				}
 				else if ( variableKey.startsWith( KewApiConstants.RECEIVE_FUTURE_REQUESTS_BRANCH_STATE_KEY )
 						&& variableValue.toUpperCase().equals( KewApiConstants.DONT_RECEIVE_FUTURE_REQUESTS_BRANCH_STATE_VALUE )
 						&& variableKey.contains( principalId ) ) {
+					LOG.debug("hasAskedToReceiveFutureRequests: doNotReceiveFutureRequests = true");
 					doNotReceiveFutureRequests = true;
 					break;
 				}
 			}
 		}
 
-		return ( receiveFutureRequests == false && doNotReceiveFutureRequests == false );
+		//has to account for both cases, when the user first wants to receive further requests, but then later on decides he doesn't want to
+		LOG.info("hasAskedToReceiveFutureRequests: returning ="+ (!doNotReceiveFutureRequests || receiveFutureRequests));
+		return ( !doNotReceiveFutureRequests || receiveFutureRequests);
 	}
 
 	private boolean canGenerateMultipleApprovalRequests( RoutingReportCriteria reportCriteria, String loggedInPrincipalId, String currentRouteNodeNames ) throws Exception {
-		int approvalRequestsCount = 0;
 		WorkflowDocumentActionsService info = GlobalResourceLoader.getService( "rice.kew.workflowDocumentActionsService" );
-
 		DocumentDetail results1 = info.executeSimulation( reportCriteria );
+		int crtUserActiveActionRequestsCount = 0;
 		for ( ActionRequest actionRequest : results1.getActionRequests() ) {
-			// !actionRequest.isRoleRequest() && removed from condition for
-			if ( actionRequest.isPending() && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) &&
-					recipientMatchesUser( actionRequest, loggedInPrincipalId ) && !StringUtils.contains( currentRouteNodeNames, actionRequest.getNodeName() ) ) {
-				approvalRequestsCount += 1;
+			if ( actionRequest.isPending()
+			        && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) 
+			        && recipientMatchesUser( actionRequest, loggedInPrincipalId ) )	{
+				crtUserActiveActionRequestsCount++;
+				LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" crtUserActiveActionRequests="+crtUserActiveActionRequestsCount);
+				if ( crtUserActiveActionRequestsCount >1 ){
+					return true;
+				}
 			}
 		}
-
-		return ( approvalRequestsCount > 0 );
+		LOG.info("canGenerateMultipleApprovalRequests: crtUserActiveActionRequestsCount="+crtUserActiveActionRequestsCount +" Returning FALSE");
+		return false;
 	}
+	
+	private boolean isHierarchyRequestNode(String nodeName){     
+        return HIERARCHY_REQUEST_NODE.equals(nodeName);
+    }
 
+	private boolean isNodeInCurrentRoute(String nodeName, String currentRouteNodeNames){     
+        return StringUtils.contains( currentRouteNodeNames, nodeName);
+	}
+	
 	private boolean recipientMatchesUser( ActionRequest actionRequest, String loggedInPrincipalId ) {
 		if ( actionRequest != null && loggedInPrincipalId != null ) {
 			List<ActionRequest> actionRequests = Collections.singletonList( actionRequest );
