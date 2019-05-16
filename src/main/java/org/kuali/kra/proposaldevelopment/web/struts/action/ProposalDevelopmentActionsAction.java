@@ -311,13 +311,13 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 				if ( variableKey.startsWith( KewApiConstants.RECEIVE_FUTURE_REQUESTS_BRANCH_STATE_KEY )
 						&& variableValue.toUpperCase().equals( KewApiConstants.RECEIVE_FUTURE_REQUESTS_BRANCH_STATE_VALUE )
 						&& variableKey.contains( principalId ) ) {
-					LOG.info("hasAskedToReceiveFutureRequests: receiveFutureRequests = true");
+					LOG.debug("hasAskedToReceiveFutureRequests: receiveFutureRequests = true");
 					receiveFutureRequests = true;
 				}
 				else if ( variableKey.startsWith( KewApiConstants.RECEIVE_FUTURE_REQUESTS_BRANCH_STATE_KEY )
 						&& variableValue.toUpperCase().equals( KewApiConstants.DONT_RECEIVE_FUTURE_REQUESTS_BRANCH_STATE_VALUE )
 						&& variableKey.contains( principalId ) ) {
-					LOG.info("hasAskedToReceiveFutureRequests: doNotReceiveFutureRequests = true");
+					LOG.debug("hasAskedToReceiveFutureRequests: doNotReceiveFutureRequests = true");
 					doNotReceiveFutureRequests = true;
 					break;
 				}
@@ -338,7 +338,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			        && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) 
 			        && recipientMatchesUser( actionRequest, loggedInPrincipalId ) )	{
 				crtUserActiveActionRequestsCount++;
-				LOG.info("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" crtUserActiveActionRequests="+crtUserActiveActionRequestsCount);
+				LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" crtUserActiveActionRequests="+crtUserActiveActionRequestsCount);
 				if ( crtUserActiveActionRequestsCount >1 ){
 					return true;
 				}
