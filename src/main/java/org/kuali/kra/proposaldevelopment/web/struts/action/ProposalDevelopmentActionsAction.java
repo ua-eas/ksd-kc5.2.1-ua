@@ -133,6 +133,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	private static final String EMPTY_STRING = "";
 	private static final String SUPER_USER_ACTION_REQUESTS = "superUserActionRequests";
 
+	private static final String NODE_NAME_HIERARCHY_REQUEST = "Hierarchy Request";
+
 	private static final int OK = 0;
 	private static final int WARNING = 1;
 	private static final int ERROR = 2;
@@ -332,19 +334,27 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	private boolean canGenerateMultipleApprovalRequests( RoutingReportCriteria reportCriteria, String loggedInPrincipalId, String currentRouteNodeNames ) throws Exception {
 		WorkflowDocumentActionsService info = GlobalResourceLoader.getService( "rice.kew.workflowDocumentActionsService" );
 		DocumentDetail results1 = info.executeSimulation( reportCriteria );
-		int crtUserActiveActionRequestsCount = 0;
+		int hierarchyActionRequests = 0;
 		for ( ActionRequest actionRequest : results1.getActionRequests() ) {
 			if ( actionRequest.isPending()
 			        && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) 
 			        && recipientMatchesUser( actionRequest, loggedInPrincipalId ) )	{
-				crtUserActiveActionRequestsCount++;
-				LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" crtUserActiveActionRequests="+crtUserActiveActionRequestsCount);
-				if ( crtUserActiveActionRequestsCount >1 ){
-					return true;
-				}
+					if ( StringUtils.contains( currentRouteNodeNames, actionRequest.getNodeName() ) ){
+
+						if ( NODE_NAME_HIERARCHY_REQUEST.equalsIgnoreCase(actionRequest.getNodeName())){
+							hierarchyActionRequests++;
+							LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" hierarchyActionRequests="+hierarchyActionRequests);
+							if ( hierarchyActionRequests > 1)
+								return true;
+						}
+
+					} else {
+						LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" crtUserActiveActionRequests=1");
+						return true;
+					}
 			}
 		}
-		LOG.info("canGenerateMultipleApprovalRequests: crtUserActiveActionRequestsCount="+crtUserActiveActionRequestsCount +" Returning FALSE");
+		LOG.info("canGenerateMultipleApprovalRequests: Returning FALSE");
 		return false;
 	}
 	
