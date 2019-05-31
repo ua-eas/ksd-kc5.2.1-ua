@@ -332,19 +332,26 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	private boolean canGenerateMultipleApprovalRequests( RoutingReportCriteria reportCriteria, String loggedInPrincipalId, String currentRouteNodeNames ) throws Exception {
 		WorkflowDocumentActionsService info = GlobalResourceLoader.getService( "rice.kew.workflowDocumentActionsService" );
 		DocumentDetail results1 = info.executeSimulation( reportCriteria );
-		int crtUserActiveActionRequestsCount = 0;
+		int hierarchyActionRequests = 0;
 		for ( ActionRequest actionRequest : results1.getActionRequests() ) {
 			if ( actionRequest.isPending()
 			        && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) 
 			        && recipientMatchesUser( actionRequest, loggedInPrincipalId ) )	{
-				crtUserActiveActionRequestsCount++;
-				LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" crtUserActiveActionRequests="+crtUserActiveActionRequestsCount);
-				if ( crtUserActiveActionRequestsCount >1 ){
-					return true;
-				}
+					if ( StringUtils.contains( currentRouteNodeNames, actionRequest.getNodeName() ) ){
+						//UAR-2184: Note: All Hierarchy Request Nodes are named the same and the only thing that differentiates them and contains unit number/name is actionRequest.annotation
+						if ( isHierarchyRequestNode( actionRequest.getNodeName())){
+							hierarchyActionRequests++;
+							LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" hierarchyActionRequests="+hierarchyActionRequests);
+							if ( hierarchyActionRequests > 1)
+								return true;
+						}
+
+					} else {
+						return true;
+					}
 			}
 		}
-		LOG.info("canGenerateMultipleApprovalRequests: crtUserActiveActionRequestsCount="+crtUserActiveActionRequestsCount +" Returning FALSE");
+		LOG.info("canGenerateMultipleApprovalRequests: Returning FALSE");
 		return false;
 	}
 	
