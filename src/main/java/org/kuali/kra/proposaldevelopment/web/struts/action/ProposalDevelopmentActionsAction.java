@@ -133,8 +133,6 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 	private static final String EMPTY_STRING = "";
 	private static final String SUPER_USER_ACTION_REQUESTS = "superUserActionRequests";
 
-	private static final String NODE_NAME_HIERARCHY_REQUEST = "Hierarchy Request";
-
 	private static final int OK = 0;
 	private static final int WARNING = 1;
 	private static final int ERROR = 2;
@@ -340,8 +338,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 			        && actionRequest.getActionRequested().getCode().equalsIgnoreCase( KewApiConstants.ACTION_REQUEST_APPROVE_REQ ) 
 			        && recipientMatchesUser( actionRequest, loggedInPrincipalId ) )	{
 					if ( StringUtils.contains( currentRouteNodeNames, actionRequest.getNodeName() ) ){
-
-						if ( NODE_NAME_HIERARCHY_REQUEST.equalsIgnoreCase(actionRequest.getNodeName())){
+						//UAR-2184: Note: All Hierarchy Request Nodes are named the same and the only thing that differentiates them and contains unit number/name is actionRequest.annotation
+						if ( isHierarchyRequestNode( actionRequest.getNodeName())){
 							hierarchyActionRequests++;
 							LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" hierarchyActionRequests="+hierarchyActionRequests);
 							if ( hierarchyActionRequests > 1)
@@ -349,7 +347,6 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 						}
 
 					} else {
-						LOG.debug("MultipleApprovalRequests: actionRequestId="+actionRequest.getId()+" actionRequestAnnotation="+actionRequest.getAnnotation()+" crtUserActiveActionRequests=1");
 						return true;
 					}
 			}
