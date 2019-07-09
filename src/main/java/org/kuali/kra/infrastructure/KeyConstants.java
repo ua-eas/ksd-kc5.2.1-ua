@@ -522,7 +522,8 @@ public final class KeyConstants {
     public static final String ERROR_REQUIRED_ORGANIZATION = "error.required.organization";
     public static final String ERROR_PAYMENT_AND_INVOICE_COMMENT_NOT_ALLOWED = "error.invalid.award.payment.invoice.comment.comment.not.allowed";
     public static final String ERROR_PAYMENT_AND_INVOICE_COMMENT_REQUIRED = "error.invalid.award.payment.invoice.comment.required";
-    
+    public static final String ERROR_AWARD_CONTACTS_NO_PERM_FOR_NEW_UNIT = "error.award.contacts.no.perm.for.new.unit";
+
     //Award account creation validation error messages
     public static final String AWARD_NO_VALID_EFFECTIVE_DATE = "error.award.createAccount.invalid.effectiveDate";
     public static final String AWARD_ID_NOT_SPECIFIED = "error.award.createAccount.invalid.awardId";
