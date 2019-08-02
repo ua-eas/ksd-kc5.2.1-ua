@@ -15,9 +15,10 @@
  */
 package org.kuali.kra.protocol.onlinereview;
 
-import org.drools.core.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
+import edu.arizona.kra.protocol.onlinereview.dao.ProtocolOnlineReviewDao;
 import org.kuali.kra.protocol.onlinereview.lookup.ProtocolOnlineReviewLookupConstants;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.kns.lookup.HtmlData;
@@ -43,7 +44,6 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
      */
     private static final long serialVersionUID = 7269604308213091097L;
 
-
     private DictionaryValidationService dictionaryValidationService;
     
     //field names
@@ -68,6 +68,12 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
     @Override
     protected String getKeyFieldName() {
         return "protocolOnlineReviewId";
+    }
+
+    private ProtocolOnlineReviewDao protocolOnlineReviewDao;
+
+    public void setProtocolOnlineReviewDao(ProtocolOnlineReviewDao protocolOnlineReviewDao) {
+        this.protocolOnlineReviewDao = protocolOnlineReviewDao;
     }
 
    /**
@@ -121,7 +127,8 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
        } 
        
    }
-  
+
+   @SuppressWarnings("unchecked")
    @Override
    public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
        validateSearchParameters(fieldValues);
@@ -152,8 +159,20 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
        fieldValues.remove(LOOKUP_PROTOCOL_ONLINE_REVIEW_STATUS_CODES);
 
        super.setBackLocationDocFormKey(fieldValues);
-       results = (List<ProtocolOnlineReviewBase>)super.getSearchResults(fieldValues);
-       return filterResults(results);
+
+       // General query was returning more search results from the DB than the default resultSetLimit and relying on method
+       // org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewLookupableHelperServiceImpl.filterResults to filter the extras
+       // out on the webserver however the resultSetLimit was discarding the set that included the desired results
+       // to resolve this applied the filterResults() criteria at the database for cases where there were no from dates
+       // so that only desired results are returned from the DB and not excluded by the default resultSetLimit limitation
+       if ((StringUtils.isBlank(fieldValues.get("rangeLowerBoundKeyPrefix_dateDue"))) &&
+               (StringUtils.isBlank(fieldValues.get("rangeLowerBoundKeyPrefix_dateRequested")))) {
+           results = (List<ProtocolOnlineReviewBase>)this.protocolOnlineReviewDao.getCustomSearchResults(fieldValues);
+       } else {
+           results = filterResults((List<ProtocolOnlineReviewBase>)super.getSearchResults(fieldValues));
+       }
+
+       return results;
    }
 
    protected abstract List<ProtocolOnlineReviewBase> filterResults(List<ProtocolOnlineReviewBase> results);
@@ -203,5 +222,4 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
         String href  = UrlFactory.parameterizeUrl("../" + getHtmlAction(), parameters);
         return new AnchorHtmlData(href, KRADConstants.DOC_HANDLER_METHOD, displayText);
     }
-
 }

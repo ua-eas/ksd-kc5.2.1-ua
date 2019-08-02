@@ -629,13 +629,19 @@
         <property name="lookupableHelperService">
             <ref bean="protocolOnlineReviewLookupableHelperService" />
         </property>         
-    </bean> 
-	
+    </bean>
     
 	<bean id="protocolOnlineReviewLookupableHelperService" class="org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewLookupableHelperServiceImpl" 
         scope="prototype" parent="parentLookupableHelperService">
+        <property name="protocolOnlineReviewDao">
+            <ref bean="ProtocolOnlineReviewDao" />
+        </property>
     </bean>
-    
+
+    <bean id="ProtocolOnlineReviewDao" parent="platformAwareDao" class="edu.arizona.kra.protocol.onlinereview.dao.ProtocolOnlineReviewDaoOjb">
+        <property name="dateTimeService" ref="dateTimeService" />
+    </bean>
+
     <bean id="protocolSubmissionLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
         <property name="lookupableHelperService">
             <ref bean="protocolSubmissionLookupableHelperService" />
