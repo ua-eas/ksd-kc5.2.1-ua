@@ -15,9 +15,10 @@
  */
 package org.kuali.kra.protocol.onlinereview;
 
-import org.drools.core.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
+import edu.arizona.kra.protocol.onlinereview.dao.ProtocolOnlineReviewDao;
 import org.kuali.kra.protocol.onlinereview.lookup.ProtocolOnlineReviewLookupConstants;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.kns.lookup.HtmlData;
@@ -31,10 +32,7 @@ import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
 
 import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extends KraLookupableHelperServiceImpl {
 
@@ -42,7 +40,6 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = 7269604308213091097L;
-
 
     private DictionaryValidationService dictionaryValidationService;
     
@@ -68,6 +65,16 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
     @Override
     protected String getKeyFieldName() {
         return "protocolOnlineReviewId";
+    }
+
+    private ProtocolOnlineReviewDao protocolOnlineReviewDao;
+
+    public void setProtocolOnlineReviewDao(ProtocolOnlineReviewDao protocolOnlineReviewDao) {
+        this.protocolOnlineReviewDao = protocolOnlineReviewDao;
+    }
+
+    public ProtocolOnlineReviewDao getProtocolOnlineReviewDao() {
+        return protocolOnlineReviewDao;
     }
 
    /**
@@ -121,7 +128,8 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
        } 
        
    }
-  
+
+   @SuppressWarnings("unchecked")
    @Override
    public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
        validateSearchParameters(fieldValues);
@@ -152,7 +160,14 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
        fieldValues.remove(LOOKUP_PROTOCOL_ONLINE_REVIEW_STATUS_CODES);
 
        super.setBackLocationDocFormKey(fieldValues);
-       results = (List<ProtocolOnlineReviewBase>)super.getSearchResults(fieldValues);
+
+       if (((String)fieldValues.get("rangeLowerBoundKeyPrefix_dateDue")).isEmpty() &&
+               ((String)fieldValues.get("rangeLowerBoundKeyPrefix_dateRequested")).isEmpty()) {
+           results = (List<ProtocolOnlineReviewBase>)this.protocolOnlineReviewDao.getCustomSearchResults(fieldValues);
+       } else {
+           results = (List<ProtocolOnlineReviewBase>)super.getSearchResults(fieldValues);
+       }
+
        return filterResults(results);
    }
 
@@ -203,5 +218,4 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
         String href  = UrlFactory.parameterizeUrl("../" + getHtmlAction(), parameters);
         return new AnchorHtmlData(href, KRADConstants.DOC_HANDLER_METHOD, displayText);
     }
-
 }
