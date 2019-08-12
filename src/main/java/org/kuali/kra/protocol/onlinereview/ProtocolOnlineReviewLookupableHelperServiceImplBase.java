@@ -165,10 +165,10 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
                ((String)fieldValues.get("rangeLowerBoundKeyPrefix_dateRequested")).isEmpty()) {
            results = (List<ProtocolOnlineReviewBase>)this.protocolOnlineReviewDao.getCustomSearchResults(fieldValues);
        } else {
-           results = (List<ProtocolOnlineReviewBase>)super.getSearchResults(fieldValues);
+           results = filterResults((List<ProtocolOnlineReviewBase>)super.getSearchResults(fieldValues));
        }
 
-       return filterResults(results);
+       return results;
    }
 
    protected abstract List<ProtocolOnlineReviewBase> filterResults(List<ProtocolOnlineReviewBase> results);
