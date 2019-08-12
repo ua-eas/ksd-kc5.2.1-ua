@@ -106,6 +106,11 @@ public class ProtocolOnlineReviewDaoOjb extends LookupDaoOjb implements OjbColle
 
 
     @Override
+    // General query was returning more search results from the DB than the default resultSetLimit and relying on method
+    // org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewLookupableHelperServiceImpl.filterResults to filter the extras
+    // out on the webserver however the resultSetLimit was discarding the set that included the desired results
+    // to resolve this applied the filterResults() criteria at the database for cases where there were no from dates
+    // so that only desired results are returned from the DB and not excluded by the default resultSetLimit limitation
     public Collection<ProtocolOnlineReviewBase> getCustomSearchResults(Map<String, String> fieldValues) {
 
         Collection<ProtocolOnlineReviewBase> searchResults = new ArrayList();

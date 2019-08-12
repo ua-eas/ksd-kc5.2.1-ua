@@ -161,6 +161,11 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
 
        super.setBackLocationDocFormKey(fieldValues);
 
+       // General query was returning more search results from the DB than the default resultSetLimit and relying on method
+       // org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewLookupableHelperServiceImpl.filterResults to filter the extras
+       // out on the webserver however the resultSetLimit was discarding the set that included the desired results
+       // to resolve this applied the filterResults() criteria at the database for cases where there were no from dates
+       // so that only desired results are returned from the DB and not excluded by the default resultSetLimit limitation
        if (((String)fieldValues.get("rangeLowerBoundKeyPrefix_dateDue")).isEmpty() &&
                ((String)fieldValues.get("rangeLowerBoundKeyPrefix_dateRequested")).isEmpty()) {
            results = (List<ProtocolOnlineReviewBase>)this.protocolOnlineReviewDao.getCustomSearchResults(fieldValues);
