@@ -1,6 +1,6 @@
-mvn -Dmaven.test.skip=true install  &&     \
-mvn jar:jar  &&                            \
-mvn install:install-file                   \
+/var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven-3.2.3/bin/mvn -Dmaven.test.skip=true install  &&     \
+/var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven-3.2.3/bin/mvn jar:jar  &&                            \
+/var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven-3.2.3/bin/mvn install:install-file                   \
     -Dpackaging=jar                        \
         -DgroupId=org.kuali.kra            \
     -DartifactId=kc-printing-xsds          \
