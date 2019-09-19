@@ -23,8 +23,12 @@ import org.kuali.kra.protocol.onlinereview.lookup.ProtocolOnlineReviewLookupCons
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.kns.lookup.HtmlData;
 import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
+import org.kuali.rice.kns.lookup.LookupableHelperService;
 import org.kuali.rice.kns.service.DictionaryValidationService;
 import org.kuali.rice.kns.service.KNSServiceLocator;
+import org.kuali.rice.kns.web.struts.form.LookupForm;
+import org.kuali.rice.kns.web.ui.Field;
+import org.kuali.rice.kns.web.ui.Row;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.util.GlobalVariables;
@@ -32,10 +36,7 @@ import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.UrlFactory;
 
 import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extends KraLookupableHelperServiceImpl {
 
@@ -222,4 +223,28 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
         String href  = UrlFactory.parameterizeUrl("../" + getHtmlAction(), parameters);
         return new AnchorHtmlData(href, KRADConstants.DOC_HANDLER_METHOD, displayText);
     }
+
+    @Override
+    public void performClear(LookupForm lookupForm) {
+        for (Iterator iter = this.getRows().iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            for (Iterator iterator = row.getFields().iterator(); iterator.hasNext();) {
+                Field field = (Field) iterator.next();
+                if (field.isSecure()) {
+                    field.setSecure(false);
+                    field.setDisplayMaskValue(null);
+                    field.setEncryptedValue(null);
+                }
+
+                // Don't clear the REVIEWER_EMPLOYEE="lookupReviewerPersonId" so that subsequent searches still select just the currently logged in reviewer
+                if ((!field.getFieldType().equals(Field.RADIO)) && (!field.getPropertyName().equals(REVIEWER_EMPLOYEE))) {
+                    field.setPropertyValue(field.getDefaultValue());
+                    if (field.getFieldType().equals(Field.MULTISELECT)) {
+                        field.setPropertyValues(null);
+                    }
+                }
+            }
+        }
+    }
+
 }
