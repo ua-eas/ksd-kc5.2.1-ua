@@ -236,7 +236,8 @@ public abstract class ProtocolOnlineReviewLookupableHelperServiceImplBase extend
                     field.setEncryptedValue(null);
                 }
 
-                if ((!field.getFieldType().equals(Field.RADIO)) && (!field.getPropertyName().equals("lookupReviewerPersonId"))) {
+                // Don't clear the REVIEWER_EMPLOYEE="lookupReviewerPersonId" so that subsequent searches still select just the currently logged in reviewer
+                if ((!field.getFieldType().equals(Field.RADIO)) && (!field.getPropertyName().equals(REVIEWER_EMPLOYEE))) {
                     field.setPropertyValue(field.getDefaultValue());
                     if (field.getFieldType().equals(Field.MULTISELECT)) {
                         field.setPropertyValues(null);
