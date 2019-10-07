@@ -3,7 +3,7 @@
 	<jdbc-connection-descriptor
 		jcd-alias="dataSource"
 		default-connection="false"
-		jdbc-level="3.0"
+		jdbc-level="4.2"
 		eager-release="false"
 		batch-mode="false"
 		useAutoCommit="0"

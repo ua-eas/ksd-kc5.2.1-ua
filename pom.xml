@@ -18,6 +18,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <spring-context.version>3.2.3.RELEASE</spring-context.version>
         <kc-printing-xsds.version>2.0.0</kc-printing-xsds.version>
+        <xmlbeans.version>2.4.0</xmlbeans.version>
     </properties>
 
     <dependencies>
@@ -120,6 +121,17 @@
             <groupId>org.kuali.kra.print.xsds</groupId>
             <artifactId>kc-printing-xsds</artifactId>
             <version>${kc-printing-xsds.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>${xmlbeans.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>stax-api</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
