@@ -475,6 +475,8 @@
 		      <html:hidden property="document.protocolList[0].attachmentProtocols[${itrStatus.index}].file.name" value="${KualiForm.document.protocolList[0].attachmentProtocols[itrStatus.index].file.name}" />
 		    </c:otherwise>
 		  </c:choose>
+			<%-- UAR-2279 - Fix from IU - include the attachment id so IUProtocolForm can detect if we are trying to update the wrong attachments --%>
+			<html:hidden property="document.protocolList[0].attachmentProtocols[${itrStatus.index}].id" value="${KualiForm.document.protocolList[0].attachmentProtocols[itrStatus.index].id}" />
 		</c:forEach>
 		</tbody>
 		</table>
