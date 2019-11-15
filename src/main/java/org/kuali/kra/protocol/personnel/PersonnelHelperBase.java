@@ -179,3 +179,4 @@ public abstract class PersonnelHelperBase implements Serializable {
     public abstract ProtocolUnitBase createNewProtocolUnitInstanceHook();
     public abstract ProtocolAttachmentPersonnelBase createNewProtocolAttachmentPersonnelInstanceHook();
 }
+
