@@ -711,6 +711,8 @@ public final class KeyConstants {
     public static final String ERROR_PROTOCOL_ATTACHMENT_MISSING_FILE = "error.protocolAttachment.missing.file";
     public static final String ERROR_PROTOCOL_ATTACHMENT_INVALID_TYPE = "error.protocolAttachment.invalid.type";
     public static final String AUDIT_ERROR_PROTOCOL_ATTACHMENT_STATUS_COMPLETE = "error.protocolAttachment.not.complete";
+    public static final String AUDIT_ERROR_PROTOCOL_ATTACHMENT_NOT_IN_SYNC = "error.protocolAttachment.notInSync";
+
     
     // IRB Protocol Funding Sources Validation Messages
     public static final String ERROR_PROTOCOL_FUNDING_SOURCE_TYPE_NOT_FOUND = "error.protocolFundingSource.fundingSourceType.notFound";

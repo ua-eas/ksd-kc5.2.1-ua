@@ -561,19 +561,35 @@ public abstract class CommitteeScheduleBase<CS extends CommitteeScheduleBase<CS,
     }
 
     public List<CSM> getCommitteeScheduleMinutes() {
-        if (committeeScheduleMinutes != null) {
-            Collections.sort(committeeScheduleMinutes, new Comparator<CSM>() {
+        return committeeScheduleMinutes;
+    }
+
+    public void setCommitteeScheduleMinutes(List<CSM> committeeScheduleMinutes) {
+        this.committeeScheduleMinutes = committeeScheduleMinutes;
+        if (this.committeeScheduleMinutes != null) {
+            Collections.sort(this.committeeScheduleMinutes, new Comparator<CSM>() {
                 @Override
                 public int compare(CSM o1, CSM o2) {
                     return o1.getEntryNumber().compareTo(o2.getEntryNumber());
                 }
             });
         }
-        return committeeScheduleMinutes;
     }
 
-    public void setCommitteeScheduleMinutes(List<CSM> committeeScheduleMinutes) {
-        this.committeeScheduleMinutes = committeeScheduleMinutes;
+    public void addCommitteeScheduleMinute(CommitteeScheduleMinuteBase committeeScheduleMinute) {
+        if (committeeScheduleMinute != null) {
+            //lazy initialization
+            if (this.committeeScheduleMinutes == null ){
+                this.committeeScheduleMinutes = new ArrayList<CSM>();
+            }
+            this.committeeScheduleMinutes.add((CSM)committeeScheduleMinute);
+            Collections.sort(this.committeeScheduleMinutes, new Comparator<CSM>() {
+                @Override
+                public int compare(CSM o1, CSM o2) {
+                    return o1.getEntryNumber().compareTo(o2.getEntryNumber());
+                }
+            });
+        }
     }
 
     public List<CommitteeScheduleAttachmentsBase> getCommitteeScheduleAttachments() {

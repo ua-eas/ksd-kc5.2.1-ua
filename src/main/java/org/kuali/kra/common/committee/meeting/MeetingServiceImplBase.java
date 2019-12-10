@@ -476,28 +476,29 @@ public abstract class MeetingServiceImplBase<CS extends CommitteeScheduleBase<CS
      * @see org.kuali.kra.common.committee.meeting.CommonMeetingService#addCommitteeScheduleMinute(org.kuali.kra.common.committee.meeting.MeetingHelperBase)
      */
     public void addCommitteeScheduleMinute(MeetingHelperBase meetingHelper) {
-        meetingHelper.getNewCommitteeScheduleMinute().refreshReferenceObject("minuteEntryType");
-        meetingHelper.getNewCommitteeScheduleMinute().refreshReferenceObject("protocol");
-        meetingHelper.getNewCommitteeScheduleMinute().refreshReferenceObject("commScheduleActItem");
+        CommitteeScheduleMinuteBase newCommitteeScheduleMinute = meetingHelper.getNewCommitteeScheduleMinute();
+        newCommitteeScheduleMinute.refreshReferenceObject("minuteEntryType");
+        newCommitteeScheduleMinute.refreshReferenceObject("protocol");
+        newCommitteeScheduleMinute.refreshReferenceObject("commScheduleActItem");
         
         Long submissionId = null;
-        if (meetingHelper.getNewCommitteeScheduleMinute().getProtocol() != null) {
-            submissionId = meetingHelper.getNewCommitteeScheduleMinute().getProtocol().getProtocolSubmission().getSubmissionId();
+        if (newCommitteeScheduleMinute.getProtocol() != null) {
+            submissionId = newCommitteeScheduleMinute.getProtocol().getProtocolSubmission().getSubmissionId();
         }
         Long scheduleId = meetingHelper.getCommitteeSchedule().getId();
         Integer entryNumber = getNextMinuteEntryNumber((CS) meetingHelper.getCommitteeSchedule());
         String principalName = GlobalVariables.getUserSession().getPrincipalName();
         String minuteEntryTypeCode = meetingHelper.getNewCommitteeScheduleMinute().getMinuteEntryTypeCode();
         Timestamp createTimestamp = dateTimeService.getCurrentTimestamp();
-        
-        meetingHelper.getNewCommitteeScheduleMinute().setSubmissionIdFk(submissionId);
-        meetingHelper.getNewCommitteeScheduleMinute().setScheduleIdFk(scheduleId);
-        meetingHelper.getNewCommitteeScheduleMinute().setEntryNumber(entryNumber);
-        meetingHelper.getNewCommitteeScheduleMinute().setCreateUser(principalName);
-        meetingHelper.getNewCommitteeScheduleMinute().setUpdateUser(principalName);
-        meetingHelper.getNewCommitteeScheduleMinute().setCreateTimestamp(createTimestamp);
+
+        newCommitteeScheduleMinute.setSubmissionIdFk(submissionId);
+        newCommitteeScheduleMinute.setScheduleIdFk(scheduleId);
+        newCommitteeScheduleMinute.setEntryNumber(entryNumber);
+        newCommitteeScheduleMinute.setCreateUser(principalName);
+        newCommitteeScheduleMinute.setUpdateUser(principalName);
+        newCommitteeScheduleMinute.setCreateTimestamp(createTimestamp);
         // set this up for display when 'add'
-        meetingHelper.getNewCommitteeScheduleMinute().setUpdateTimestamp(createTimestamp);
+        newCommitteeScheduleMinute.setUpdateTimestamp(createTimestamp);
         
         if (MinuteEntryType.ATTENDANCE.equals(minuteEntryTypeCode)) {
             addAttendanceMinuteEntry(meetingHelper);
@@ -510,7 +511,7 @@ public abstract class MeetingServiceImplBase<CS extends CommitteeScheduleBase<CS
             resetActionItemFields(meetingHelper);
         }
         
-        ((List<CSM>)(meetingHelper.getCommitteeSchedule().getCommitteeScheduleMinutes())).add((CSM) meetingHelper.getNewCommitteeScheduleMinute());
+        meetingHelper.getCommitteeSchedule().addCommitteeScheduleMinute(newCommitteeScheduleMinute);
         meetingHelper.setNewCommitteeScheduleMinute(getNewCommitteeScheduleMinuteInstanceHook());
     }
     

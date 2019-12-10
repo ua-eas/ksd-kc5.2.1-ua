@@ -607,14 +607,15 @@ public class Budget extends BudgetVersionOverview {
     public List<RateClassType> getRateClassTypes() {
         if (rateClassTypes.isEmpty() && !rateClassTypesReloaded && (!this.getBudgetRates().isEmpty() || !this.getBudgetLaRates().isEmpty())) {
             getBudgetRatesService().syncBudgetRateCollectionsToExistingRates(this.rateClassTypes, getBudgetDocument());
+            Collections.sort(rateClassTypes, new RateClassTypeComparator());
         } else if (rateClassTypesReloaded) {
             if (!rateClassTypes.isEmpty()) {
                 rateClassTypes.clear();
             }
             rateClassTypesReloaded = false;
             getBudgetRatesService().getBudgetRates(this.rateClassTypes, getBudgetDocument());
+            Collections.sort(rateClassTypes, new RateClassTypeComparator());
         }
-        Collections.sort(rateClassTypes, new RateClassTypeComparator());
         return rateClassTypes;
     }
 
@@ -709,20 +710,20 @@ public class Budget extends BudgetVersionOverview {
     }
 
     public List<BudgetPerson> getBudgetPersons() {
-    	Collections.sort(budgetPersons, new Comparator<BudgetPerson>() {
-    		@Override
-    		public int compare(final BudgetPerson object1, final BudgetPerson object2) {
-    			if (StringUtils.equalsIgnoreCase(object1.getPersonName(), object2.getPersonName())){
-    				return object1.getJobCode().compareTo(object2.getJobCode());
-    			}
-    			return 0;    			
-    		}    		
-    	});    	
         return budgetPersons;
     }
 
     public void setBudgetPersons(List<BudgetPerson> budgetPersons) {
         this.budgetPersons = budgetPersons;
+        Collections.sort(this.budgetPersons, new Comparator<BudgetPerson>() {
+            @Override
+            public int compare(final BudgetPerson object1, final BudgetPerson object2) {
+                if (StringUtils.equalsIgnoreCase(object1.getPersonName(), object2.getPersonName())){
+                    return object1.getJobCode().compareTo(object2.getJobCode());
+                }
+                return 0;
+            }
+        });    	;
     }
 
     /**
