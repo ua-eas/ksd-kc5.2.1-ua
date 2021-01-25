@@ -4,13 +4,11 @@ import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWriterService;
 import jdk.internal.org.jline.utils.Log;
-import org.kuali.rice.krad.service.BusinessObjectService;
 
 import java.util.Set;
 
 
 public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
-    private BusinessObjectService businessObjectService;
     private ProtocolNumberDao protocolNumberDao;
 
 
@@ -19,7 +17,7 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
         boolean startedOk = true;
         try {
             Set<String> protocolNumbers = getProtocolNumberDao().getActiveProtocolNumbers();
-            ProtocolPdfWorker protocolPdfWorker = new ProtocolPdfWorker(protocolNumbers, getBusinessObjectService());
+            ProtocolPdfWorker protocolPdfWorker = new ProtocolPdfWorker(protocolNumbers);
             protocolPdfWorker.start(); // async, forked thread
         } catch (Throwable t) {
             Log.error("Could not process PDFs!: " + t.getMessage(), t);
@@ -27,16 +25,6 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
         }
 
         return startedOk;
-    }
-
-
-    public BusinessObjectService getBusinessObjectService() {
-        return businessObjectService;
-    }
-
-
-    public void setBusinessObjectService(BusinessObjectService businessObjectService) {
-        this.businessObjectService = businessObjectService;
     }
 
 
