@@ -1130,7 +1130,16 @@
        	<property name="businessObjectService" ref="businessObjectService" />
     	<property name="parameterService" ref="parameterService" />
     </bean>
- 	 
+
+    <bean id="protocolNumberDao" parent="platformAwareDao"
+          class="edu.arizona.kra.irb.pdf.impl.ProtocolNumberDaoOjb"/>
+
+
+    <bean id = "protocolPdfWriterService" class="edu.arizona.kra.irb.pdf.impl.ProtocolPdfWriterServiceImpl">
+        <property name="businessObjectService" ref="businessObjectService"/>
+        <property name="protocolIdDao" ref="protocolNumberDao"/>
+    </bean>
+
 </beans>
 
 

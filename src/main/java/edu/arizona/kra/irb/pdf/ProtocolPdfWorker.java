@@ -1,4 +1,4 @@
-package edu.arizona.kra.protocol.pdf;
+package edu.arizona.kra.irb.pdf;
 
 import org.apache.log4j.Logger;
 import org.kuali.kra.irb.Protocol;
@@ -35,7 +35,7 @@ public class ProtocolPdfWorker extends Thread {
             try {
                 processProtocol(protocol);
             } catch (Throwable t) {
-                LOG.error(String.format("Unexpected isssue, skipping protocol '%s': %s", protocolNumber, t.getMessage()));
+                LOG.error(String.format("Unexpected issue, skipping protocol '%s': %s", protocolNumber, t.getMessage()));
             }
 
             processedCount++;

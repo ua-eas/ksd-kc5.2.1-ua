@@ -1,6 +1,6 @@
-package edu.arizona.kra.protocol.pdf;
+package edu.arizona.kra.irb.pdf.impl;
 
-import edu.arizona.kra.protocol.pdf.ProtocolNumberDao;
+import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
 import edu.arizona.kra.util.DBConnection;
 import org.kuali.rice.core.framework.persistence.ojb.dao.PlatformAwareDaoBaseOjb;
 

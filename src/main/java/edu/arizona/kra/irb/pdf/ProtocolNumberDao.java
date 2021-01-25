@@ -1,4 +1,4 @@
-package edu.arizona.kra.protocol.pdf;
+package edu.arizona.kra.irb.pdf;
 
 import java.util.Set;
 
