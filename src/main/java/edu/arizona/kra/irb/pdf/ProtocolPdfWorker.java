@@ -28,16 +28,18 @@ public class ProtocolPdfWorker extends Thread {
     private final Set<String> protocolNumbers;
     private BusinessObjectService businessObjectService;
     private ProtocolPrintingService protocolPrintingService;
+    private int workerId;
 
 
-    public ProtocolPdfWorker(Set<String> protocolNumbers) {
+    public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers) {
+        this.workerId = workerId;
         this.protocolNumbers = protocolNumbers;
     }
 
 
     @Override
     public void run() {
-        LOG.info(String.format("Starting async processing with %d protocol numbers.", protocolNumbers.size()));
+        LOG.info(String.format("workerId%d: Starting async processing with %d protocol numbers.", workerId, protocolNumbers.size()));
 
         int processedCount = 0;
         int total = protocolNumbers.size();

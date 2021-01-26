@@ -5,16 +5,16 @@ import edu.arizona.kra.util.DBConnection;
 import org.kuali.rice.core.framework.persistence.ojb.dao.PlatformAwareDaoBaseOjb;
 
 import java.sql.ResultSet;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ProtocolNumberDaoOjb extends PlatformAwareDaoBaseOjb implements ProtocolNumberDao {
     private static final String PROTOCOL_NUMBER_QUERY = "select PROTOCOL_NUMBER from PROTOCOL where active = 'Y'";
 
     @Override
-    public Set<String> getActiveProtocolNumbers() {
-        Set<String> protocolNumbers = new HashSet<>();
+    public List<String> getActiveProtocolNumbers() {
+        List<String> protocolNumbers = new ArrayList<>();
         DBConnection dbc = new DBConnection(this.getPersistenceBroker(true));
 
         try {

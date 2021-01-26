@@ -1,7 +1,7 @@
 package edu.arizona.kra.irb.pdf;
 
-import java.util.Set;
+import java.util.List;
 
 public interface ProtocolNumberDao {
-    Set<String> getActiveProtocolNumbers();
+    List<String> getActiveProtocolNumbers();
 }

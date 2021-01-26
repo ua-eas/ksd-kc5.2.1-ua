@@ -1136,8 +1136,8 @@
 
 
     <bean id = "protocolPdfWriterService" class="edu.arizona.kra.irb.pdf.impl.ProtocolPdfWriterServiceImpl">
-        <property name="businessObjectService" ref="businessObjectService"/>
         <property name="protocolIdDao" ref="protocolNumberDao"/>
+        <property name="kualiConfigurationService" ref="kualiConfigurationService" />
     </bean>
 
 </beans>
