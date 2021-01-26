@@ -20,7 +20,7 @@ public class ProtocolNumberDaoOjb extends PlatformAwareDaoBaseOjb implements Pro
         DBConnection dbc = new DBConnection(this.getPersistenceBroker(true));
 
         try {
-            LOG.info("Starting protocol numbers query...");
+            LOG.info("Starting protocol number query...");
             ResultSet rs = dbc.executeQuery(PROTOCOL_NUMBER_QUERY, new Object[]{});
             while (rs.next()) {
                 protocolNumbers.add(rs.getString(1));

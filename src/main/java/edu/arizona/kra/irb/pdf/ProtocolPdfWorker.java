@@ -25,10 +25,10 @@ import java.util.Set;
 public class ProtocolPdfWorker extends Thread {
     private static final Logger LOG = Logger.getLogger(ProtocolPdfWorker.class);
 
+    private final int workerId;
     private final Set<String> protocolNumbers;
     private BusinessObjectService businessObjectService;
     private ProtocolPrintingService protocolPrintingService;
-    private int workerId;
 
 
     public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers) {
@@ -39,22 +39,22 @@ public class ProtocolPdfWorker extends Thread {
 
     @Override
     public void run() {
-        LOG.info(String.format("workerId%d: Starting async processing with %d protocol numbers.", workerId, protocolNumbers.size()));
+        logInfo(String.format("Starting async processing with %d protocol numbers.", protocolNumbers.size()));
 
         int processedCount = 0;
         int total = protocolNumbers.size();
 
         for (String protocolNumber : protocolNumbers) {
-            LOG.info(String.format("Processing protocol number '%s'", protocolNumber));
+            logInfo(String.format("Processing protocol number '%s'", protocolNumber));
             Protocol protocol = getProtocol(protocolNumber);
 
             try {
                 processProtocol(protocol);
             } catch (Throwable t) {
-                LOG.error(String.format("Unexpected issue, skipping protocol '%s'", protocolNumber), t);
+                logError(String.format("Unexpected issue, skipping protocol '%s'", protocolNumber), t);
             } finally {
                 processedCount++;
-                LOG.info(String.format("Protocol processed, %d/%d left to go.", total - processedCount, total));
+                logInfo(String.format("Protocol processed, %d/%d left to go.", total - processedCount, total));
             }
 
         }
@@ -69,10 +69,10 @@ public class ProtocolPdfWorker extends Thread {
         ProtocolPrintType printType = ProtocolPrintType.PROTOCOL_FULL_PROTOCOL_REPORT;
         String fileName = String.format("Protocol_Summary_Report_%s.pdf", protocolNumber);
         String reportName = protocol.getProtocolNumber() + "-" + printType.getReportName();
-        AttachmentDataSource dataStream = getProtocolPrintingService().print(reportName, getPrintArtifacts());
+        AttachmentDataSource dataStream = getProtocolPrintingService().print(reportName, getPrintArtifacts(protocol));
 
         if (dataStream.getContent() == null) {
-            LOG.warn("AttachmentDataSource.getContent() is null for protocol: " + protocolNumber);
+            logWarn("AttachmentDataSource.getContent() is null for protocol: " + protocolNumber);
             return;
         }
 
@@ -91,17 +91,17 @@ public class ProtocolPdfWorker extends Thread {
             fileOutputStream.write(bytes);
             fileOutputStream.flush();
         } catch (IOException e) {
-            LOG.error(String.format("Could not write PDF to disk for protocol '%s': %s", protocolNumber, fullPath), e);
+            logError(String.format("Could not write PDF to disk for protocol '%s': %s", protocolNumber, fullPath), e);
             return;
         }
 
-        LOG.info(String.format("Wrote protocol %s to disk: %s", protocolNumber, attachmentDataSource));
+        logInfo(String.format("Wrote protocol %s to disk: %s", protocolNumber, attachmentDataSource));
     }
 
 
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private List<Printable> getPrintArtifacts() {
+    private List<Printable> getPrintArtifacts(Protocol protocol) {
         ProtocolSummaryPrintOptions summaryOptions = new ProtocolSummaryPrintOptions();
         summaryOptions.setReviewComments(false);
 
@@ -111,6 +111,7 @@ public class ProtocolPdfWorker extends Thread {
         org.kuali.kra.protocol.actions.print.ProtocolPrintType printType
                 = org.kuali.kra.protocol.actions.print.ProtocolPrintType.valueOf("PROTOCOL_FULL_PROTOCOL_REPORT");
         AbstractPrint printable = (AbstractPrint)getProtocolPrintingService().getProtocolPrintable(printType);
+        printable.setPrintableBusinessObject(protocol);
         printable.setReportParameters(reportParameters);
 
         List<Printable> printableArtifactList = new ArrayList<>();
@@ -127,7 +128,22 @@ public class ProtocolPdfWorker extends Thread {
     }
 
 
-    public BusinessObjectService getBusinessObjectService() {
+    private void logInfo(String message) {
+        LOG.info(String.format("workerId-%d: %s", workerId, message));
+    }
+
+
+    private void logWarn(String message) {
+        LOG.warn(String.format("workerId-%d: %s", workerId, message));
+    }
+
+
+    private void logError(String message, Throwable t) {
+        LOG.error(String.format("workerId-%d: %s", workerId, message), t);
+    }
+
+
+    private BusinessObjectService getBusinessObjectService() {
         if (businessObjectService == null) {
             this.businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
         }
@@ -141,5 +157,4 @@ public class ProtocolPdfWorker extends Thread {
         }
         return protocolPrintingService;
     }
-
 }

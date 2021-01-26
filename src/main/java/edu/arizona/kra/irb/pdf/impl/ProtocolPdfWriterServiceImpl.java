@@ -20,10 +20,11 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
 
     @Override
     public boolean generateActiveProtocolPdfsToDisk() {
+        List<String> protocolNumbers = getProtocolNumberDao().getActiveProtocolNumbers();
+
         int numWorkerThreads = Integer.parseInt(
                 getKualiConfigurationService().getPropertyValueAsString("number.pdf.worker.threads"));
-
-        List<String> protocolNumbers = getProtocolNumberDao().getActiveProtocolNumbers();
+        LOG.info(String.format("Creating %d PdfWorkerThread(s)", numWorkerThreads));
 
         // The quantity of protocolNumbers that one worker should process
         int chunkSize = protocolNumbers.size() / numWorkerThreads;
