@@ -10,7 +10,9 @@ import org.kuali.kra.printing.PrintingException;
 import org.kuali.kra.printing.print.AbstractPrint;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.protocol.actions.print.ProtocolSummaryPrintOptions;
+import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.util.GlobalVariables;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,19 +29,24 @@ public class ProtocolPdfWorker extends Thread {
 
     private final int workerId;
     private final Set<String> protocolNumbers;
+    private final UserSession userSession;
     private BusinessObjectService businessObjectService;
     private ProtocolPrintingService protocolPrintingService;
 
 
-    public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers) {
+    public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers, UserSession userSession) {
         this.workerId = workerId;
         this.protocolNumbers = protocolNumbers;
+        this.userSession = userSession;
     }
 
 
     @Override
     public void run() {
         logInfo(String.format("Starting async processing with %d protocol numbers.", protocolNumbers.size()));
+
+        // Since this is a new thread, we need to set UserSession into global scope again
+        GlobalVariables.setUserSession(userSession);
 
         int processedCount = 0;
         int total = protocolNumbers.size();
@@ -95,7 +102,7 @@ public class ProtocolPdfWorker extends Thread {
             return;
         }
 
-        logInfo(String.format("Wrote protocol %s to disk: %s", protocolNumber, attachmentDataSource));
+        logInfo(String.format("Wrote protocol %s to disk: %s", protocolNumber, fullPath));
     }
 
 

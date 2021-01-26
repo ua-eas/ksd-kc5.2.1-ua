@@ -5,6 +5,7 @@ import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWriterService;
 import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
+import org.kuali.rice.krad.UserSession;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +20,7 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
 
 
     @Override
-    public boolean generateActiveProtocolPdfsToDisk() {
+    public boolean generateActiveProtocolPdfsToDisk(UserSession userSession) {
         List<String> protocolNumbers = getProtocolNumberDao().getActiveProtocolNumbers();
 
         int numWorkerThreads = Integer.parseInt(
@@ -50,7 +51,7 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
 
                 LOG.info(String.format("Starting ProtocolPdfWorker thread ID %d with %d protocol numbers.",
                         workerId, workerProtocolNumbers.size()));
-                ProtocolPdfWorker protocolPdfWorker = new ProtocolPdfWorker(workerId, workerProtocolNumbers);
+                ProtocolPdfWorker protocolPdfWorker = new ProtocolPdfWorker(workerId, workerProtocolNumbers, userSession);
                 protocolPdfWorker.start(); // async, forked thread
             }//for
         } catch (Throwable t) {
