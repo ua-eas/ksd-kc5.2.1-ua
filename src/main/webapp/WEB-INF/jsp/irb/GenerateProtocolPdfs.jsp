@@ -5,9 +5,9 @@
         <title>Generate Protocol PDFs Status</title>
     </head>
     <body>
-    <h1>Generate Protocol PDFs Status</h1>
-    <h4>
-        PDF worker started ok: <c:out value="GenerateProtocolPdfsForm.pdfWorkerStarted"/>
-    </h4>
+        <h1>Generate Protocol PDFs Status</h1>
+        <h4>
+            PDF worker started ok: <c:out value="${GenerateProtocolPdfsForm.pdfWorkerStarted}"/>
+        </h4>
     </body>
 </html>
