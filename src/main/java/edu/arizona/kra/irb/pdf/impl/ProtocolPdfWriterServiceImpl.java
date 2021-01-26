@@ -3,7 +3,7 @@ package edu.arizona.kra.irb.pdf.impl;
 import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWriterService;
-import jdk.internal.org.jline.utils.Log;
+import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 
 import java.util.HashSet;
@@ -12,6 +12,8 @@ import java.util.Set;
 
 
 public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
+    private static final Logger LOG = Logger.getLogger(ProtocolPdfWriterServiceImpl.class);
+
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
 
@@ -45,13 +47,13 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
                     protocolNumbers.clear();
                 }
 
-                Log.info(String.format("Starting ProtocolPdfWorker thread ID %d with %d protocol numbers.",
+                LOG.info(String.format("Starting ProtocolPdfWorker thread ID %d with %d protocol numbers.",
                         workerId, workerProtocolNumbers.size()));
                 ProtocolPdfWorker protocolPdfWorker = new ProtocolPdfWorker(workerId, workerProtocolNumbers);
                 protocolPdfWorker.start(); // async, forked thread
             }//for
         } catch (Throwable t) {
-            Log.error("Could not process PDFs!: " + t.getMessage(), t);
+            LOG.error("Could not process PDFs!: " + t.getMessage(), t);
             startedOk = false;
         }
 
