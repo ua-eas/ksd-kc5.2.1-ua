@@ -17,7 +17,12 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +78,11 @@ public class ProtocolPdfWorker extends Thread {
      */
     private void processProtocol(Protocol protocol) throws PrintingException {
         String protocolNumber = protocol.getProtocolNumber();
+        long protocolId = protocol.getProtocolId();
+        String dateString = getDateString(protocol);
+        String fileName = String.format("ProtocolSummary_%s_%s_%d.pdf", protocolNumber, dateString, protocolId);
+
         ProtocolPrintType printType = ProtocolPrintType.PROTOCOL_FULL_PROTOCOL_REPORT;
-        String fileName = String.format("Protocol_Summary_Report_%s.pdf", protocolNumber);
         String reportName = protocol.getProtocolNumber() + "-" + printType.getReportName();
         AttachmentDataSource dataStream = getProtocolPrintingService().print(reportName, getPrintArtifacts(protocol));
 
@@ -88,7 +96,16 @@ public class ProtocolPdfWorker extends Thread {
     }
 
 
-    public void streamToDisk(AttachmentDataSource attachmentDataSource, String protocolNumber) {
+    private String getDateString(Protocol protocol) {
+        Date updateTimestamp = protocol.getUpdateTimestamp();
+        LocalDate localDate = Instant.ofEpochMilli(updateTimestamp.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        return localDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    }
+
+
+    private void streamToDisk(AttachmentDataSource attachmentDataSource, String protocolNumber) {
         //TODO: Find out where this is on a deployed KC EC2, possibly make a sub folder
         String rootPath = System.getProperty("java.io.tmpdir");
         String fullPath = rootPath + File.separator + attachmentDataSource.getFileName();
