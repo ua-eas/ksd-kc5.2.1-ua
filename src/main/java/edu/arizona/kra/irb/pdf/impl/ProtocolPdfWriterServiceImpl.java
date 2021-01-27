@@ -34,7 +34,7 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
         boolean startedOk = true;
 
         try {
-            for (int workerId = 0; workerId <= numWorkerThreads; workerId++) {
+            for (int workerId = 0; workerId < numWorkerThreads; workerId++) {
                 Set<String> workerProtocolNumbers = new HashSet<>();
 
                 while (workerProtocolNumbers.size() <= chunkSize && !protocolNumbers.isEmpty()) {
@@ -42,7 +42,7 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
                     workerProtocolNumbers.add(protocolNumbers.remove(0));
                 }
 
-                if (workerId == numWorkerThreads && !protocolNumbers.isEmpty()) {
+                if (workerId == numWorkerThreads - 1 && !protocolNumbers.isEmpty()) {
                     // Need to account for even/odd quantity of numbers/workers; if we're at the
                     // last worker, give it all remaining work to be done (should only ever be +1)
                     workerProtocolNumbers.addAll(protocolNumbers);

@@ -70,6 +70,8 @@ public class ProtocolPdfWorker extends Thread {
             }
 
         }
+
+        logInfo("Completed all work, worker thread exiting.");
     }
 
 
