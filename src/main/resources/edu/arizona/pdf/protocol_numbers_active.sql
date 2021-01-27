@@ -1,8 +1,8 @@
 select protocol_number
 from protocol
 where active = 'Y'
-and update_timestamp >= to_date('?', 'yyyy-mm-dd hh24:mi:ss')
-and update_timestamp <= to_date('?', 'yyyy-mm-dd hh24:mi:ss')
+and update_timestamp >= to_date(?, 'yyyy-mm-dd hh24:mi:ss')
+and update_timestamp <= to_date(?, 'yyyy-mm-dd hh24:mi:ss')
 and protocol_type_code in (
     select protocol_type_code
     from protocol_type

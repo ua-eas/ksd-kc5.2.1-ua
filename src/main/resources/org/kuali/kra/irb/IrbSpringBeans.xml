@@ -1131,9 +1131,9 @@
     	<property name="parameterService" ref="parameterService" />
     </bean>
 
-    <bean id="protocolNumberDao" parent="platformAwareDao"
-          class="edu.arizona.kra.irb.pdf.impl.ProtocolNumberDaoOjb"/>
-
+    <bean id="protocolNumberDao" parent="platformAwareDao" class="edu.arizona.kra.irb.pdf.impl.ProtocolNumberDaoOjb">
+        <property name="kualiConfigurationService" ref="kualiConfigurationService" />
+    </bean>
 
     <bean id = "protocolPdfWriterService" class="edu.arizona.kra.irb.pdf.impl.ProtocolPdfWriterServiceImpl">
         <property name="protocolIdDao" ref="protocolNumberDao"/>
