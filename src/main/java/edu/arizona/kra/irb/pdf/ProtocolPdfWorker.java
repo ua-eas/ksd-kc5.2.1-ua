@@ -1,5 +1,7 @@
 package edu.arizona.kra.irb.pdf;
 
+import edu.arizona.kra.irb.pdf.sftp.ProtocolPdfFile;
+import edu.arizona.kra.irb.pdf.sftp.SftpTransferAgent;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
@@ -14,9 +16,6 @@ import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -35,6 +34,7 @@ public class ProtocolPdfWorker extends Thread {
     private final int workerId;
     private final Set<String> protocolNumbers;
     private final UserSession userSession;
+    private final SftpTransferAgent sftpTransferAgent;
     private BusinessObjectService businessObjectService;
     private ProtocolPrintingService protocolPrintingService;
 
@@ -43,6 +43,7 @@ public class ProtocolPdfWorker extends Thread {
         this.workerId = workerId;
         this.protocolNumbers = protocolNumbers;
         this.userSession = userSession;
+        this.sftpTransferAgent = new SftpTransferAgent();
     }
 
 
@@ -82,7 +83,7 @@ public class ProtocolPdfWorker extends Thread {
         String protocolNumber = protocol.getProtocolNumber();
         long protocolId = protocol.getProtocolId();
         String dateString = getDateString(protocol);
-        String fileName = String.format("ProtocolSummary_%s_%s_%d.pdf", protocolNumber, dateString, protocolId);
+        String filename = String.format("ProtocolSummary_%s_%s_%d.pdf", protocolNumber, dateString, protocolId);
 
         ProtocolPrintType printType = ProtocolPrintType.PROTOCOL_FULL_PROTOCOL_REPORT;
         String reportName = protocol.getProtocolNumber() + "-" + printType.getReportName();
@@ -93,8 +94,8 @@ public class ProtocolPdfWorker extends Thread {
             return;
         }
 
-        dataStream.setFileName(fileName);
-        streamToDisk(dataStream, protocol.getProtocolNumber());
+        dataStream.setFileName(filename);
+        pushToSftp(dataStream, protocol.getProtocolNumber());
     }
 
 
@@ -107,21 +108,12 @@ public class ProtocolPdfWorker extends Thread {
     }
 
 
-    private void streamToDisk(AttachmentDataSource attachmentDataSource, String protocolNumber) {
-        //TODO: Find out where this is on a deployed KC EC2, possibly make a sub folder
-        String rootPath = System.getProperty("java.io.tmpdir");
-        String fullPath = rootPath + File.separator + attachmentDataSource.getFileName();
-
+    private void pushToSftp(AttachmentDataSource attachmentDataSource, String protocolNumber) {
+        logInfo(String.format("Pushing protocol %s to sftp server complete", protocolNumber));
         byte[] bytes = attachmentDataSource.getContent();
-        try (FileOutputStream fileOutputStream = new FileOutputStream(fullPath)) {
-            fileOutputStream.write(bytes);
-            fileOutputStream.flush();
-        } catch (IOException e) {
-            logError(String.format("Could not write PDF to disk for protocol '%s': %s", protocolNumber, fullPath), e);
-            return;
-        }
-
-        logInfo(String.format("Wrote protocol %s to disk: %s", protocolNumber, fullPath));
+        ProtocolPdfFile pdfFile = new ProtocolPdfFile(attachmentDataSource.getFileName(), bytes);
+        sftpTransferAgent.put(pdfFile);
+        logInfo(String.format("Pushed protocol %s to sftp server complete", protocolNumber));
     }
 
 

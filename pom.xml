@@ -19,6 +19,8 @@
         <spring-context.version>3.2.3.RELEASE</spring-context.version>
         <kc-printing-xsds.version>2.0.0</kc-printing-xsds.version>
         <xmlbeans.version>2.4.0</xmlbeans.version>
+        <aws-ssm.version>2.15.70</aws-ssm.version>
+        <apache-poi.version>4.1.2</apache-poi.version>
     </properties>
 
     <dependencies>
@@ -132,6 +134,26 @@
                     <groupId>stax</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ssm</artifactId>
+            <version>${aws-ssm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache-poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${apache-poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hierynomus</groupId>
+            <artifactId>sshj</artifactId>
+            <version>0.30.0</version>
         </dependency>
     </dependencies>
     <build>
