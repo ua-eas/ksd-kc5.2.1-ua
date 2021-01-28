@@ -1,6 +1,7 @@
 package edu.arizona.kra.irb.pdf.impl;
 
 import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
+import edu.arizona.kra.irb.pdf.ProtocolPdfJobInfo;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWriterService;
 import org.apache.log4j.Logger;
@@ -20,8 +21,12 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
 
 
     @Override
-    public boolean generateActiveProtocolPdfsToDisk(UserSession userSession) {
-        List<String> protocolNumbers = getProtocolNumberDao().getActiveProtocolNumbers();
+    public ProtocolPdfJobInfo generateActiveProtocolPdfsToDisk(UserSession userSession) {
+        String startFromDate = getKualiConfigurationService().getPropertyValueAsString("protocol.pdf.start.from.date");
+        String endToDate = getKualiConfigurationService().getPropertyValueAsString("protocol.pdf.end.to.date");
+
+        List<String> protocolNumbers = getProtocolNumberDao().getActiveProtocolNumbers(startFromDate, endToDate);
+        int totalNumProtocols = protocolNumbers.size();
 
         int numWorkerThreads = Integer.parseInt(
                 getKualiConfigurationService().getPropertyValueAsString("number.pdf.worker.threads"));
@@ -59,7 +64,8 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
             startedOk = false;
         }
 
-        return startedOk;
+        String outputDir = System.getProperty("java.io.tmpdir");
+        return new ProtocolPdfJobInfo(totalNumProtocols, startFromDate, endToDate, startedOk, outputDir);
     }
 
 

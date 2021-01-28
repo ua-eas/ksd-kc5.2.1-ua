@@ -1,5 +1,6 @@
 package edu.arizona.kra.irb.pdf.action;
 
+import edu.arizona.kra.irb.pdf.ProtocolPdfJobInfo;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWriterService;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -21,10 +22,10 @@ public class GenerateProtocolPdfsAction extends Action {
         UserSession userSession = (UserSession) request.getSession(false).getAttribute(KRADConstants.USER_SESSION_KEY);
 
         ProtocolPdfWriterService protocolPdfWriterService = KraServiceLocator.getService(ProtocolPdfWriterService.class);
-        boolean pdfWorkerStartedOk = protocolPdfWriterService.generateActiveProtocolPdfsToDisk(userSession);
+        ProtocolPdfJobInfo protocolPdfJobInfo = protocolPdfWriterService.generateActiveProtocolPdfsToDisk(userSession);
 
         GenerateProtocolPdfsForm generateProtocolPdfsForm = (GenerateProtocolPdfsForm) form;
-        generateProtocolPdfsForm.setPdfWorkerStartedOk(pdfWorkerStartedOk);
+        generateProtocolPdfsForm.setProtocolPdfJobInfo(protocolPdfJobInfo);
 
         return mapping.findForward("pdfWorkerStarted");
     }

@@ -9,8 +9,6 @@ import org.kuali.rice.core.framework.persistence.ojb.dao.PlatformAwareDaoBaseOjb
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +17,6 @@ import java.util.List;
 public class ProtocolNumberDaoOjb extends PlatformAwareDaoBaseOjb implements ProtocolNumberDao {
     private static final Logger LOG = Logger.getLogger(ProtocolNumberDaoOjb.class);
     private String activeProtocolNumberQuery;
-    private String startFromDate;
-    private String endToDate;
     private boolean isInitialized;
     private ConfigurationService kualiConfigurationService;
 
@@ -38,14 +34,12 @@ public class ProtocolNumberDaoOjb extends PlatformAwareDaoBaseOjb implements Pro
         String activeSqlFilePath
                 = getKualiConfigurationService().getPropertyValueAsString("protocol.pdf.active.query.file");
         this.activeProtocolNumberQuery = getSqlQueryStringFromResource(activeSqlFilePath);
-        this.startFromDate = getKualiConfigurationService().getPropertyValueAsString("protocol.pdf.start.from.date");
-        this.endToDate = getKualiConfigurationService().getPropertyValueAsString("protocol.pdf.end.to.date");
         isInitialized = true;
     }
 
 
     @Override
-    public List<String> getActiveProtocolNumbers() {
+    public List<String> getActiveProtocolNumbers(String startFromDate, String endToDate) {
         if (!isInitialized) {
             init();
         }

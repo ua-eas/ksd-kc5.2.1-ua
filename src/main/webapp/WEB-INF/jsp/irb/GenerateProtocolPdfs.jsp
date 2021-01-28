@@ -7,8 +7,27 @@
     </head>
     <body>
         <h1>Generate Protocol PDFs Status</h1>
-        <h4>
-            PDF worker started ok: <c:out value="${GenerateProtocolPdfsForm.pdfWorkerStartedOk}"/>
-        </h4>
+        <table>
+            <tr>
+                <td>Job started ok: </td>
+                <td><c:out value="${GenerateProtocolPdfsForm.jobStartedOk}"/></td>
+            </tr>
+            <tr>
+                <td>Protocols to process: </td>
+                <td><c:out value="${GenerateProtocolPdfsForm.totalNumberProtocols}"/></td>
+            </tr>
+            <tr>
+                <td>Start from date: </td>
+                <td><c:out value="${GenerateProtocolPdfsForm.startFromDate}"/></td>
+            </tr>
+            <tr>
+                <td>End to date: </td>
+                <td><c:out value="${GenerateProtocolPdfsForm.endToDate}"/></td>
+            </tr>
+            <tr>
+                <td>Output dir: </td>
+                <td><c:out value="${GenerateProtocolPdfsForm.outputDir}"/></td>
+            </tr>
+        </table>
     </body>
 </html>
