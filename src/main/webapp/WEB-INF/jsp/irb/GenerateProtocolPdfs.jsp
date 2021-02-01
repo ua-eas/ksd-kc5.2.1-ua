@@ -24,10 +24,6 @@
                 <td>End to date: </td>
                 <td><c:out value="${GenerateProtocolPdfsForm.endToDate}"/></td>
             </tr>
-            <tr>
-                <td>Output dir: </td>
-                <td><c:out value="${GenerateProtocolPdfsForm.outputDir}"/></td>
-            </tr>
         </table>
     </body>
 </html>

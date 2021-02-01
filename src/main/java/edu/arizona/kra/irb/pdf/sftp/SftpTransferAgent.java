@@ -34,7 +34,7 @@ public class SftpTransferAgent {
     private void init() {
         destDir = getKualiConfigurationService().getPropertyValueAsString(DEST_DIR_KEY);
 
-        AwsParameterRetriever parameterRetriever = new AwsParameterRetriever();
+        AwsParameterAgent parameterRetriever = new AwsParameterAgent();
         String serverUrl = parameterRetriever.getSftpServerUrl();
         String serverPort = parameterRetriever.getSftpPort();
         String username = parameterRetriever.getSftpUsername();

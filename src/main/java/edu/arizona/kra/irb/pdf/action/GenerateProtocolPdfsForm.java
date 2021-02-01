@@ -25,8 +25,4 @@ public class GenerateProtocolPdfsForm extends ActionForm {
     public boolean isJobStartedOk() {
         return protocolPdfJobInfo.isJobStartedOk();
     }
-
-    public String getOutputDir() {
-        return protocolPdfJobInfo.getOutputDir();
-    }
 }

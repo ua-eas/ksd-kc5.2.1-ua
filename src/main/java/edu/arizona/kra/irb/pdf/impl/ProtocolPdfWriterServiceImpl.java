@@ -69,8 +69,7 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
             startedOk = false;
         }
 
-        String outputDir = System.getProperty("java.io.tmpdir");
-        return new ProtocolPdfJobInfo(totalNumProtocols, startFromDate, endToDate, startedOk, outputDir);
+        return new ProtocolPdfJobInfo(totalNumProtocols, startFromDate, endToDate, startedOk);
     }
 
 

@@ -8,7 +8,7 @@ import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 import software.amazon.awssdk.services.ssm.model.SsmException;
 
-public class AwsParameterRetriever {
+public class AwsParameterAgent {
     private static final String sftpServerUrlKey = "/uar/hdm/SFTP_SERVER";
     private static final String sftpPortKey = "/uar/hdm/SFTP_PORT";
     private static final String sftpUsernameKey = "/uar/hdm/SFTP_USERNAME";
@@ -22,7 +22,7 @@ public class AwsParameterRetriever {
     private ConfigurationService kualiConfigurationService;
 
 
-    public AwsParameterRetriever() {
+    public AwsParameterAgent() {
         this.sftpServerUrl = fetchSsmParameter(sftpServerUrlKey);
         this.sftpPort = fetchSsmParameter(sftpPortKey);
         this.sftpUsername = fetchSsmParameter(sftpUsernameKey);
