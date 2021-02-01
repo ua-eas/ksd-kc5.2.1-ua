@@ -15,10 +15,11 @@ import java.util.Set;
 
 public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
     private static final Logger LOG = Logger.getLogger(ProtocolPdfWriterServiceImpl.class);
+
+    // These 3 keys are shared with kc-config.xml
     private static final String START_FROM_DATE_KEY = "protocol.pdf.start.from.date";
     private static final String END_TO_DATE_KEY = "protocol.pdf.end.to.date";
     private static final String NUM_WORKER_THREADS_KEY = "protocol.pdf.num.worker.threads";
-    private static final String KEY = "";
 
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
