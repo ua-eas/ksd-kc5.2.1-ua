@@ -156,12 +156,10 @@
             <version>0.30.0</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>org.bouncycastle</artifactId>
-                    <groupId>bcprov-jdk15on</groupId>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
                 </exclusion>
             </exclusions>
-
-
         </dependency>
     </dependencies>
     <build>
