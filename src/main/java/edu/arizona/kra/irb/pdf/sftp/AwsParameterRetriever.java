@@ -1,5 +1,7 @@
 package edu.arizona.kra.irb.pdf.sftp;
 
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.rice.core.api.config.property.ConfigurationService;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
@@ -11,11 +13,13 @@ public class AwsParameterRetriever {
     private static final String sftpPortKey = "/uar/hdm/SFTP_PORT";
     private static final String sftpUsernameKey = "/uar/hdm/SFTP_USERNAME";
     private static final String sftpPasswordKey = "/uar/hdm/SFTP_PASSWORD";
+    private static final String awsRegionKey = "protocol.pdf.aws.region";
 
     private final String sftpServerUrl;
     private final String sftpPort;
     private final String sftpUsername;
     private final String sftpPassword;
+    private ConfigurationService kualiConfigurationService;
 
 
     public AwsParameterRetriever() {
@@ -27,12 +31,13 @@ public class AwsParameterRetriever {
 
 
     public String fetchSsmParameter(String key) {
-        Region region = Region.US_WEST_2;
+        String regionValue = getKualiConfigurationService().getPropertyValueAsString(awsRegionKey);
+        Region region = Region.of(regionValue);
         SsmClient ssmClient = SsmClient.builder()
                 .region(region)
                 .build();
 
-        GetParameterResponse parameterResponse = null;
+        GetParameterResponse parameterResponse;
         try {
             GetParameterRequest parameterRequest = GetParameterRequest.builder()
                     .name(key)
@@ -61,5 +66,12 @@ public class AwsParameterRetriever {
 
     public String getSftpPassword() {
         return sftpPassword;
+    }
+
+    private ConfigurationService getKualiConfigurationService() {
+        if (kualiConfigurationService == null) {
+            this.kualiConfigurationService = KraServiceLocator.getService(ConfigurationService.class);
+        }
+        return  kualiConfigurationService;
     }
 }

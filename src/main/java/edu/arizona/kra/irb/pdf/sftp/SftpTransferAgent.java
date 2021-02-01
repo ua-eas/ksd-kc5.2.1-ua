@@ -3,13 +3,18 @@ package edu.arizona.kra.irb.pdf.sftp;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.rice.core.api.config.property.ConfigurationService;
 
 import java.io.IOException;
 
 
 public class SftpTransferAgent {
-    private static final String DEST_DIR = "test/";//TODO: Make this config property
+    private static final String DEST_DIR_KEY = "protocol.pdf.dest.dir";
+
+    private String destDir;
     private SFTPClient sftpClient;
+    private ConfigurationService kualiConfigurationService;
 
 
     public SftpTransferAgent() {
@@ -19,14 +24,16 @@ public class SftpTransferAgent {
 
     public void put(ProtocolPdfFile pdfFile) {
         try {
-            sftpClient.put(pdfFile, DEST_DIR + pdfFile.getName());
+            sftpClient.put(pdfFile, destDir + pdfFile.getName());
         } catch (IOException e) {
-            throw new RuntimeException("Could no push file to sftp: " + pdfFile.getName(), e);
+            throw new RuntimeException("Could not push file to sftp: " + pdfFile.getName(), e);
         }
     }
 
 
     private void init() {
+        destDir = getKualiConfigurationService().getPropertyValueAsString(DEST_DIR_KEY);
+
         AwsParameterRetriever parameterRetriever = new AwsParameterRetriever();
         String serverUrl = parameterRetriever.getSftpServerUrl();
         String serverPort = parameterRetriever.getSftpPort();
@@ -43,6 +50,14 @@ public class SftpTransferAgent {
         } catch (IOException e) {
             throw new RuntimeException("Could not create sftp client.", e);
         }
+    }
+
+
+    private ConfigurationService getKualiConfigurationService() {
+        if (kualiConfigurationService == null) {
+            this.kualiConfigurationService = KraServiceLocator.getService(ConfigurationService.class);
+        }
+        return  kualiConfigurationService;
     }
 
 }
