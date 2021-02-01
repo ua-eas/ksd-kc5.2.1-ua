@@ -15,6 +15,10 @@ import java.util.Set;
 
 public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
     private static final Logger LOG = Logger.getLogger(ProtocolPdfWriterServiceImpl.class);
+    private static final String START_FROM_DATE_KEY = "protocol.pdf.start.from.date";
+    private static final String END_TO_DATE_KEY = "protocol.pdf.end.to.date";
+    private static final String NUM_WORKER_THREADS_KEY = "protocol.pdf.num.worker.threads";
+    private static final String KEY = "";
 
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
@@ -22,14 +26,14 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
 
     @Override
     public ProtocolPdfJobInfo generateActiveProtocolPdfsToDisk(UserSession userSession) {
-        String startFromDate = getKualiConfigurationService().getPropertyValueAsString("protocol.pdf.start.from.date");
-        String endToDate = getKualiConfigurationService().getPropertyValueAsString("protocol.pdf.end.to.date");
+        String startFromDate = getKualiConfigurationService().getPropertyValueAsString(START_FROM_DATE_KEY);
+        String endToDate = getKualiConfigurationService().getPropertyValueAsString(END_TO_DATE_KEY);
 
         List<String> protocolNumbers = getProtocolNumberDao().getActiveProtocolNumbers(startFromDate, endToDate);
         int totalNumProtocols = protocolNumbers.size();
 
         int numWorkerThreads = Integer.parseInt(
-                getKualiConfigurationService().getPropertyValueAsString("number.pdf.worker.threads"));
+                getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS_KEY));
         LOG.info(String.format("Creating %d PdfWorkerThread(s)", numWorkerThreads));
 
         // The quantity of protocolNumbers that one worker should process
