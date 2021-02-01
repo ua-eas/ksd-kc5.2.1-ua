@@ -44,8 +44,8 @@ public class SftpTransferAgent {
         sshClient.addHostKeyVerifier(new PromiscuousVerifier());
 
         try {
-            sshClient.authPassword(username, password);
             sshClient.connect(serverUrl, Integer.parseInt(serverPort));
+            sshClient.authPassword(username, password);
             this.sftpClient = sshClient.newSFTPClient();
         } catch (IOException e) {
             throw new RuntimeException("Could not create sftp client.", e);
