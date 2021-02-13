@@ -1,17 +1,11 @@
-select protocol_number
-from protocol
-where active = 'Y'
-and update_timestamp >= to_date(?, 'yyyy-mm-dd hh24:mi:ss')
-and update_timestamp <= to_date(?, 'yyyy-mm-dd hh24:mi:ss')
-and protocol_type_code in (
-    select protocol_type_code
-    from protocol_type
-    where description in (
-        '118 Letter', 'Deferral of IRB Oversight', 'Determination of Human Research',
-        'Emergency Use', 'Exempt', 'Exempt (2018 Rule)',
-        'Expedite', 'Expedite (2018 Rule)', 'Full Committee',
-        'Full Committee (2018 Rules)', 'Minimal Risk (2018 Rules)', 'Single Patient Use',
-        'Standard', 'Humanitarian Use Device (HUD)'
-    )
-)
+select count(protocol_number)
+from protocol p
+    join protocol_type pt on p.protocol_type_code = pt.protocol_type_code
+    join protocol_status ps on p.protocol_status_code = ps.protocol_status_code
+where p.active = 'Y'
+  and p.update_timestamp >= to_date(?, 'yyyy-mm-dd hh24:mi:ss')
+  and p.update_timestamp <= to_date(?, 'yyyy-mm-dd hh24:mi:ss')
+  and pt.description not in ('BAA','COI Management Plan','Data Use Agreement','Site Authorization')
+  and ps.description not in ('Abandoned', 'Closed by Investigator', 'Deleted', 'Not Human Subjects Research',
+                             'Recalled in Routing', 'Suspended by DSMB', 'Suspended by Investigator', 'Withdrawn')
 order by protocol_number
