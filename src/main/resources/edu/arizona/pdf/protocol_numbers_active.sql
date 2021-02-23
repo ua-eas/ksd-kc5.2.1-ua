@@ -1,4 +1,4 @@
-select count(protocol_number)
+select protocol_number
 from protocol p
     join protocol_type pt on p.protocol_type_code = pt.protocol_type_code
     join protocol_status ps on p.protocol_status_code = ps.protocol_status_code
