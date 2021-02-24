@@ -3,7 +3,7 @@ package edu.arizona.kra.irb.pdf.sql;
 public class QueryConstants {
     public static final String CREATE_SPREADSHEET_TABLE_SQL =
             "create table kraowner.attachment_spreadsheet ( \n" +
-                    "    id                VARCHAR2(30)   PRIMARY KEY, \n" +
+                    "    id                VARCHAR2(60)   PRIMARY KEY, \n" +
                     "    file_uuid         VARCHAR2(30)   not null, \n" +
                     "    dest_type         VARCHAR2(20)   not null, \n" +
                     "    protocol_number   VARCHAR2(20)   not null, \n" +
@@ -18,17 +18,7 @@ public class QueryConstants {
                     "    document_id       VARCHAR2(10) \n" +
                     ")";
 
-    public static final String CREATE_PROTOCOL_NUMBER_SUBSET_TABLE_SQL =
-            "create table kraowner.protocol_number_subset ( \n" +
-                    "PROTOCOL_NUMBER    VARCHAR2(30)   PRIMARY KEY)";
-
-    public static final String DROP_PROTOCOL_NUMBER_SUBSET_TABLE_SQL =
-            "drop table protocol_number_subset";
-
     public static final String TRUNCATE_SPREADSHEET_TABLE_SQL = "truncate table kraowner.attachment_spreadsheet";
-
-    public static final String INSERT_SUBSET_PROTOCOL_NUMBER_SQL =
-            "insert into protocol_number_subset (protocol_number) values (?)";
 
     public static final String INSERT_EXCEL_ROW =
             "insert into attachment_spreadsheet \n" +
@@ -39,7 +29,4 @@ public class QueryConstants {
 
     public static final String EXCEL_RECORD_COUNT = "select count(*) from attachment_spreadsheet";
 
-    public static final String COUNT_EXCEL_ROWS_FOR_FILE_PK_SQL = "select count(*) from attachment_spreadsheet where id = ?";
-
-    public static final String SELECT_PROTOCOL_NUMBERS_SQL = "select distinct protocol_number from %s";
 }
