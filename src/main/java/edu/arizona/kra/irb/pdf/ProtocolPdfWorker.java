@@ -17,6 +17,7 @@ import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
+import java.io.File;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -40,6 +41,7 @@ public class ProtocolPdfWorker extends Thread {
     private ProtocolPrintingService protocolPrintingService;
     private final EfsAgent efsAgent;
     private final ExcelDbAgent excelDbAgent;
+    private ClassLoader classLoader;
 
 
     public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers, UserSession userSession) {
@@ -48,6 +50,7 @@ public class ProtocolPdfWorker extends Thread {
         this.userSession = userSession;
         this.efsAgent = new EfsAgent();
         this.excelDbAgent = new ExcelDbAgent();
+        this.classLoader = getClass().getClassLoader();
     }
 
 
@@ -62,6 +65,11 @@ public class ProtocolPdfWorker extends Thread {
         int total = protocolNumbers.size();
 
         for (String protocolNumber : protocolNumbers) {
+            if (killSwitchClick()) {
+                logInfo("Detected file 'kill-switch.txt' on classpath, stopping pdf loop.");
+                break;
+            }
+
             logInfo(String.format("Processing protocol number '%s'", protocolNumber));
             Protocol protocol = getProtocol(protocolNumber);
 
@@ -161,6 +169,18 @@ public class ProtocolPdfWorker extends Thread {
         Map<String,Object> keymap = new HashMap<>();
         keymap.put("protocolNumber", protocolNumber);
         return getBusinessObjectService().findByPrimaryKey(Protocol.class, keymap);
+    }
+
+
+    private boolean killSwitchClick() {
+        File file;
+        try {
+            file = new File(classLoader.getResource("kill-switch.txt").getFile());
+        } catch (NullPointerException e) {
+            return false;
+        }
+
+        return file.exists();
     }
 
 
