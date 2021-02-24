@@ -4,7 +4,6 @@ public class QueryConstants {
     public static final String CREATE_SPREADSHEET_TABLE_SQL =
             "create table kraowner.attachment_spreadsheet ( \n" +
                     "    id                VARCHAR2(60)   PRIMARY KEY, \n" +
-                    "    file_uuid         VARCHAR2(30)   not null, \n" +
                     "    dest_type         VARCHAR2(20)   not null, \n" +
                     "    protocol_number   VARCHAR2(20)   not null, \n" +
                     "    huron_destination VARCHAR2(60)   not null, \n" +
