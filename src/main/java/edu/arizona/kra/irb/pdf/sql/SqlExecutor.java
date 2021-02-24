@@ -1,13 +1,9 @@
 package edu.arizona.kra.irb.pdf.sql;
 
 import edu.arizona.kra.irb.pdf.excel.ExcelAttachmentRecord;
-import edu.arizona.kra.irb.pdf.excel.ExcelSummaryRecord;
 import edu.arizona.kra.irb.pdf.excel.ExcelPSRowMapper;
 import edu.arizona.kra.irb.pdf.excel.ExcelRowMapper;
-
-import java.util.Properties;
-import edu.arizona.kra.irb.props.PropertyLoader;
-
+import edu.arizona.kra.irb.pdf.excel.ExcelSummaryRecord;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -19,6 +15,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
+
 
 public class SqlExecutor {
     private final JdbcTemplate jdbcTemplate;
@@ -26,8 +24,8 @@ public class SqlExecutor {
 
 
     public SqlExecutor() {
-        Properties properties = PropertyLoader.getProperties();
-        this.maxBatchInsert = Integer.parseInt(properties.getProperty("max.batch.insert"));
+        String maxString = getKualiConfigurationService().getPropertyValueAsString("max.batch.insert");
+        this.maxBatchInsert = Integer.parseInt(maxString);
         this.jdbcTemplate = new JdbcTemplate(getDataSource());
     }
 
@@ -114,13 +112,17 @@ public class SqlExecutor {
 
 
     private DataSource getDataSource() {
-        Properties properties = PropertyLoader.getProperties();
-
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
-        dataSource.setUrl(properties.getProperty("db.url"));
-        dataSource.setUsername(properties.getProperty("db.user"));
-        dataSource.setPassword(properties.getProperty("db.password"));
+
+        String dbUrl = getKualiConfigurationService().getPropertyValueAsString("datasource.url");
+        dataSource.setUrl(dbUrl);
+
+        String dbUser = getKualiConfigurationService().getPropertyValueAsString("datasource.username");
+        dataSource.setUsername(dbUser);
+
+        String dbPass = getKualiConfigurationService().getPropertyValueAsString("datasource.password");
+        dataSource.setPassword(dbPass);
 
         return dataSource;
     }

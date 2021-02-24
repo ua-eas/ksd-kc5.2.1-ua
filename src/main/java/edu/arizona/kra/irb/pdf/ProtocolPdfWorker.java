@@ -1,16 +1,7 @@
 package edu.arizona.kra.irb.pdf;
 
-import edu.arizona.kra.irb.pdf.excel.ExcelDbAgent;
-import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
-import edu.arizona.kra.irb.pdf.efs.EfsAgent;
-import java.util.Properties;
-import edu.arizona.kra.irb.props.PropertyLoader;
-import edu.arizona.kra.irb.pdf.sql.enums.Category;
-
 import edu.arizona.kra.irb.pdf.sftp.ProtocolPdfFile;
 import edu.arizona.kra.irb.pdf.sftp.SftpTransferAgent;
-import edu.arizona.kra.irb.pdf.sql.enums.Column;
-import edu.arizona.kra.irb.pdf.sql.enums.HuronDestination;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
@@ -25,9 +16,6 @@ import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
-import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -51,123 +39,11 @@ public class ProtocolPdfWorker extends Thread {
     private ProtocolPrintingService protocolPrintingService;
 
 
-    private final ExcelDbAgent excelDbAgent;
-    private final EfsAgent efsAgent;
-    private final int maxFailures;
-    private int processedCount;
-    private int numFailures;
-    private long unprocessedCount;
-    protected SqlExecutor sqlExecutor;
-    private ResultSet resultSet;
-    private String currentEfsFilePath;
-    private final String sftpRootDir;
-    private final String efsRootDir;
-    private boolean efsWriteModeIsOn;
-
-    public String uiFileName;
-
-
-    public String getCategory() {
-        return Category.Other.getDescription();
-    }
-
-
-    public String getColumnValue(Column column) {
-        return getColumnValue(column.toString());
-    }
-//
-//    public abstract String getColumnValue(Column protocolNumber);
-
-//    protected abstract String getColumnValue(String toString);
-
-    protected String getColumnValue(String columnName) {
-        String value;
-        try {
-            value = resultSet.getString(columnName);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return value;
-    }
-
-
-    public String getSourceUuid() {
-        return "PS" + getColumnValue(Column.PROTOCOL_NUMBER);
-    }
-
-    public String getFilePrimaryKey() {
-        return getColumnValue(Column.PROTOCOL_NUMBER);
-    }
-
-    public String getFileUuid() {
-        // 'PS' indicates this came from the PROTOCOL SUMMARIES Front end
-        String filePk = getFilePrimaryKey();
-        return "PS" + filePk;
-    }
-
-    String destType = "_IRBProtocolSummaries";
-
-    public String getHuronDestination() {
-        return HuronDestination.HistoricalDocuments.getDestination();
-    }
-
-    public String getUiFileName() {
-        return this.uiFileName;
-    }
-
-
-    public void setUiFileName(String uiFileName) {
-        this.uiFileName = uiFileName;
-    }
-
-    public String getUniqueFileName() {
-        return String.format("%s %s", getFileUuid(), getDbFileName());
-    }
-
-    public String getDbFileName() {
-        return getColumnValue(Column.FILE_NAME);
-    }
-
-    public String getSftpRootDir() {
-        return sftpRootDir;
-    }
-
-    public String getEfsRootDir() {
-        return efsRootDir;
-    }
-
-    private void setEfsWriteMode(String modeString) {
-        this.efsWriteModeIsOn = modeString.equals("on");
-    }
-
-    public String getSftpFilePath() {
-        String uniqueFileName = getUniqueFileName();
-        String efsRootDir = getEfsRootDir();
-        String sftpRootDir = getSftpRootDir();
-
-        return currentEfsFilePath.replace(efsRootDir, sftpRootDir) + File.separator + uniqueFileName;
-    }
-
-
-
     public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers, UserSession userSession) {
         this.workerId = workerId;
         this.protocolNumbers = protocolNumbers;
         this.userSession = userSession;
         this.sftpTransferAgent = new SftpTransferAgent();
-
-        Properties properties = PropertyLoader.getProperties();
-//        this.url = properties.getProperty("db.url");
-//        this.user = properties.getProperty("db.user");
-//        this.password = properties.getProperty("db.password");
-        this.maxFailures = Integer.parseInt(properties.getProperty("max.skip"));
-        this.sftpRootDir = properties.getProperty("sftp.root.dir");
-        this.efsRootDir = properties.getProperty("efs.root.dir");
-        this. processedCount = 1;
-        this.numFailures = 0;
-        this.excelDbAgent = new ExcelDbAgent();
-        this.efsAgent = new EfsAgent();
-        this.setEfsWriteMode(properties.getProperty("efs.write.mode"));
     }
 
 
@@ -220,11 +96,6 @@ public class ProtocolPdfWorker extends Thread {
 
         dataStream.setFileName(filename);
         pushToSftp(dataStream, protocol.getProtocolNumber());
-
-        this.setUiFileName(reportName);
-
-        excelDbAgent.writeToDb(this);
-//        sqlExecutor.updateIsProcessed(getUpdateIsProcessedSql(), getFilePrimaryKey());
     }
 
 
@@ -304,6 +175,4 @@ public class ProtocolPdfWorker extends Thread {
         }
         return protocolPrintingService;
     }
-
-
 }

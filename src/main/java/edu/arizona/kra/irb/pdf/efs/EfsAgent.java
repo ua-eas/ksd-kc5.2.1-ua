@@ -1,6 +1,5 @@
 package edu.arizona.kra.irb.pdf.efs;
 
-import edu.arizona.kra.irb.props.PropertyLoader;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -8,8 +7,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Properties;
 import java.util.UUID;
+
+import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
 public class EfsAgent {
@@ -22,9 +22,8 @@ public class EfsAgent {
 
 
     public EfsAgent() {
-        Properties properties = PropertyLoader.getProperties();
-        this.efsRootDir = properties.getProperty("efs.root.dir");
-        this.bucketSize = Integer.parseInt(properties.getProperty("efs.bucket.size"));
+        this.efsRootDir = getKualiConfigurationService().getPropertyValueAsString("efs.root.dir");
+        this.bucketSize = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString("efs.bucket.size"));
         this.bucktFileCounter = 0;
         createNewBucket();
     }
