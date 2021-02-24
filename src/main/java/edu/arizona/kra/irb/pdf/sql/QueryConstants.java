@@ -2,7 +2,7 @@ package edu.arizona.kra.irb.pdf.sql;
 
 public class QueryConstants {
     public static final String CREATE_SPREADSHEET_TABLE_SQL =
-            "create table kraowner.attachment_spreadsheet ( \n" +
+            "create table attachment_spreadsheet ( \n" +
                     "    id                VARCHAR2(60)   PRIMARY KEY, \n" +
                     "    dest_type         VARCHAR2(20)   not null, \n" +
                     "    protocol_number   VARCHAR2(20)   not null, \n" +

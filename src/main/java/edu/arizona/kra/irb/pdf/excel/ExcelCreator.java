@@ -34,7 +34,7 @@ public class ExcelCreator {
         this.workbookOutputFilePath = getKualiConfigurationService().getPropertyValueAsString("workbook.output.file.path");
 
         try {
-            InputStream inputStream = new FileInputStream(workbookTemplateFilePath);
+            InputStream inputStream = getClass().getResourceAsStream(workbookTemplateFilePath);
             this.workbook = new XSSFWorkbook(inputStream);
         } catch (Exception e) {
             throw new RuntimeException(e);
