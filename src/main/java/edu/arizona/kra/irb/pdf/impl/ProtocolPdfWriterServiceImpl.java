@@ -1,9 +1,12 @@
 package edu.arizona.kra.irb.pdf.impl;
 
+import edu.arizona.kra.irb.excel.ExcelCreator;
+import edu.arizona.kra.irb.sql.QueryConstants;
 import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
 import edu.arizona.kra.irb.pdf.ProtocolPdfJobInfo;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWriterService;
+import edu.arizona.kra.irb.sql.SqlExecutor;
 import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.krad.UserSession;
@@ -24,6 +27,7 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
 
+    protected SqlExecutor sqlExecutor;
 
     @Override
     public ProtocolPdfJobInfo generateActiveProtocolPdfsToDisk(UserSession userSession) {
@@ -42,6 +46,12 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
 
         // Reported back to the action/form for the jsp forward to display
         boolean startedOk = true;
+
+        LOG.info("Creating spreadsheet table if it doesn't exist");
+        createSpreadsheetTable();
+
+        ExcelCreator excelCreator = new ExcelCreator();
+        excelCreator.createSummariesSpreadsheet();
 
         try {
             for (int workerId = 0; workerId < numWorkerThreads; workerId++) {
@@ -88,4 +98,25 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
     public void setKualiConfigurationService(ConfigurationService kualiConfigurationService) {
         this.kualiConfigurationService = kualiConfigurationService;
     }
+
+
+
+    private void createSpreadsheetTable() {
+        try {
+            sqlExecutor.execute(QueryConstants.CREATE_SPREADSHEET_TABLE_SQL);
+        } catch (Exception e) {
+            if (!e.getMessage().contains("ORA-00955")) {
+                // This is not the "name is already used by an existing object" error, so fail fast
+                throw new RuntimeException(e);
+            }
+        }
+
+        sqlExecutor.execute(QueryConstants.TRUNCATE_SPREADSHEET_TABLE_SQL);
+//        String truncateSpreadsheetTableOnStart = properties.getProperty("truncate.spreadsheet.table.on.start");
+//        if (truncateSpreadsheetTableOnStart.equals("true")) {
+//            sqlExecutor.execute(QueryConstants.TRUNCATE_SPREADSHEET_TABLE_SQL);
+//        }
+    }
+
+
 }
