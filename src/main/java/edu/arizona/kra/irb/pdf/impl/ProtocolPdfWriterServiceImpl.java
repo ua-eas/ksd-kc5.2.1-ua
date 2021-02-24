@@ -4,6 +4,8 @@ import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
 import edu.arizona.kra.irb.pdf.ProtocolPdfJobInfo;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWriterService;
+import edu.arizona.kra.irb.pdf.sql.QueryConstants;
+import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
 import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.krad.UserSession;
@@ -27,6 +29,8 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
 
     @Override
     public ProtocolPdfJobInfo generateActiveProtocolPdfsToDisk(UserSession userSession) {
+        createSpreadsheetTable();
+
         String startFromDate = getKualiConfigurationService().getPropertyValueAsString(START_FROM_DATE_KEY);
         String endToDate = getKualiConfigurationService().getPropertyValueAsString(END_TO_DATE_KEY);
 
@@ -70,6 +74,25 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
         }
 
         return new ProtocolPdfJobInfo(totalNumProtocols, startFromDate, endToDate, startedOk);
+    }
+
+
+    private void createSpreadsheetTable() {
+        SqlExecutor sqlExecutor = new SqlExecutor();
+
+        try {
+            sqlExecutor.execute(QueryConstants.CREATE_SPREADSHEET_TABLE_SQL);
+        } catch (Exception e) {
+            if (!e.getMessage().contains("ORA-00955")) {
+                // This is not the "name is already used by an existing object" error, so fail fast
+                throw new RuntimeException(e);
+            }
+        }
+
+        String truncateSpreadsheetTableOnStart = getKualiConfigurationService().getPropertyValueAsString("truncate.spreadsheet.table.on.start");
+        if (truncateSpreadsheetTableOnStart.equals("true")) {
+            sqlExecutor.execute(QueryConstants.TRUNCATE_SPREADSHEET_TABLE_SQL);
+        }
     }
 
 

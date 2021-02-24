@@ -1,7 +1,8 @@
 package edu.arizona.kra.irb.pdf;
 
-import edu.arizona.kra.irb.pdf.sftp.ProtocolPdfFile;
-import edu.arizona.kra.irb.pdf.sftp.SftpTransferAgent;
+import edu.arizona.kra.irb.pdf.efs.EfsAgent;
+import edu.arizona.kra.irb.pdf.excel.ExcelCreator;
+import edu.arizona.kra.irb.pdf.excel.ExcelDbAgent;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 
 public class ProtocolPdfWorker extends Thread {
@@ -34,16 +36,18 @@ public class ProtocolPdfWorker extends Thread {
     private final int workerId;
     private final Set<String> protocolNumbers;
     private final UserSession userSession;
-    private final SftpTransferAgent sftpTransferAgent;
     private BusinessObjectService businessObjectService;
     private ProtocolPrintingService protocolPrintingService;
+    private final EfsAgent efsAgent;
+    private final ExcelDbAgent excelDbAgent;
 
 
     public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers, UserSession userSession) {
         this.workerId = workerId;
         this.protocolNumbers = protocolNumbers;
         this.userSession = userSession;
-        this.sftpTransferAgent = new SftpTransferAgent();
+        this.efsAgent = new EfsAgent();
+        this.excelDbAgent = new ExcelDbAgent();
     }
 
 
@@ -72,6 +76,14 @@ public class ProtocolPdfWorker extends Thread {
 
         }
 
+        //TODO: This is not threadsafe, need to have a wrapper thread master to be
+        // called by ProtocolPdfWriterServiceImpl which would spin off workers,
+        // wait to join them, and then call ExcelCreator. We can't do that in
+        // ProtocolPdfWriterServiceImpl since the request will time out, and won't
+        // be able to tell UI if workers started ok.
+        ExcelCreator excelCreator = new ExcelCreator();
+        excelCreator.createAttachmentsSpreadsheet();
+
         logInfo("Completed all work, worker thread exiting.");
     }
 
@@ -87,15 +99,22 @@ public class ProtocolPdfWorker extends Thread {
 
         ProtocolPrintType printType = ProtocolPrintType.PROTOCOL_FULL_PROTOCOL_REPORT;
         String reportName = protocol.getProtocolNumber() + "-" + printType.getReportName();
-        AttachmentDataSource dataStream = getProtocolPrintingService().print(reportName, getPrintArtifacts(protocol));
+        AttachmentDataSource attachmentDataSource = getProtocolPrintingService().print(reportName, getPrintArtifacts(protocol));
 
-        if (dataStream.getContent() == null) {
+        if (attachmentDataSource.getContent() == null) {
             logWarn("AttachmentDataSource.getContent() is null for protocol: " + protocolNumber);
             return;
         }
 
-        dataStream.setFileName(filename);
-        pushToSftp(dataStream, protocol.getProtocolNumber());
+        attachmentDataSource.setFileName(filename);
+        pushToEfs(attachmentDataSource, protocol.getProtocolNumber());
+        createExcelRecord(attachmentDataSource, protocolNumber);
+    }
+
+    private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber) {
+        String id = UUID.randomUUID().toString();
+        String fileName = attachmentDataSource.getFileName();
+        excelDbAgent.writeToDb(id, protocolNumber, fileName);
     }
 
 
@@ -108,11 +127,10 @@ public class ProtocolPdfWorker extends Thread {
     }
 
 
-    private void pushToSftp(AttachmentDataSource attachmentDataSource, String protocolNumber) {
+    private void pushToEfs(AttachmentDataSource attachmentDataSource, String protocolNumber) {
         logInfo(String.format("Pushing protocol %s to sftp server complete", protocolNumber));
         byte[] bytes = attachmentDataSource.getContent();
-        ProtocolPdfFile pdfFile = new ProtocolPdfFile(attachmentDataSource.getFileName(), bytes);
-        sftpTransferAgent.put(pdfFile);
+        efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, true);
         logInfo(String.format("Pushed protocol %s to sftp server complete", protocolNumber));
     }
 
