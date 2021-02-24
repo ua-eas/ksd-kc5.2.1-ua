@@ -1,4 +1,4 @@
-package edu.arizona.kra.irb.sql;
+package edu.arizona.kra.irb.pdf.sql;
 
 public class ViewConstants {
     public static final String CREATE_CURRENT_DOCS_V_SQL =

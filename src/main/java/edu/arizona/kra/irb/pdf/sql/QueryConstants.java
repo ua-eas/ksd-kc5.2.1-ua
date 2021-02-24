@@ -1,4 +1,4 @@
-package edu.arizona.kra.irb.sql;
+package edu.arizona.kra.irb.pdf.sql;
 
 public class QueryConstants {
     public static final String CREATE_SPREADSHEET_TABLE_SQL =

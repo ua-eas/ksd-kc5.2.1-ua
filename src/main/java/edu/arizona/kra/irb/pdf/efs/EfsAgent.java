@@ -1,11 +1,8 @@
-package edu.arizona.kra.irb.efs;
+package edu.arizona.kra.irb.pdf.efs;
 
 import edu.arizona.kra.irb.props.PropertyLoader;
-import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,7 +13,6 @@ import java.util.UUID;
 
 
 public class EfsAgent {
-//    private static final Logger LOG = LogManager.getLogger(EfsAgent.class);
     private static final Logger LOG = Logger.getLogger(EfsAgent.class);
 
     private final String efsRootDir;
@@ -43,7 +39,6 @@ public class EfsAgent {
         String fullFilePath = currentBucketPath + File.separator + fileName;
 
         if (efsWriteModeIsOn) {
-//            LOG.info("Writing file to EFS: %s", fullFilePath);
             LOG.info(String.format("Writing file to EFS: %s", fullFilePath));
             OutputStream outputStream = null;
             try {
@@ -81,9 +76,6 @@ public class EfsAgent {
         newDirectory.mkdir();
 
         LOG.info(String.format("Created new bucket: %s", currentBucketPath));
-//        LOG.info("Created new bucket: %s", currentBucketPath);
-
-
     }
 
 }

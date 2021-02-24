@@ -1,16 +1,16 @@
 package edu.arizona.kra.irb.pdf;
 
-import edu.arizona.kra.irb.excel.ExcelDbAgent;
-import edu.arizona.kra.irb.sql.SqlExecutor;
-import edu.arizona.kra.irb.efs.EfsAgent;
+import edu.arizona.kra.irb.pdf.excel.ExcelDbAgent;
+import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
+import edu.arizona.kra.irb.pdf.efs.EfsAgent;
 import java.util.Properties;
 import edu.arizona.kra.irb.props.PropertyLoader;
-import edu.arizona.kra.irb.sql.enums.Category;
+import edu.arizona.kra.irb.pdf.sql.enums.Category;
 
 import edu.arizona.kra.irb.pdf.sftp.ProtocolPdfFile;
 import edu.arizona.kra.irb.pdf.sftp.SftpTransferAgent;
-import edu.arizona.kra.irb.sql.enums.Column;
-import edu.arizona.kra.irb.sql.enums.HuronDestination;
+import edu.arizona.kra.irb.pdf.sql.enums.Column;
+import edu.arizona.kra.irb.pdf.sql.enums.HuronDestination;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;

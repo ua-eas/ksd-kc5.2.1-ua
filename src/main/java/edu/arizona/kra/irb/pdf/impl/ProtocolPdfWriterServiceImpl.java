@@ -1,12 +1,12 @@
 package edu.arizona.kra.irb.pdf.impl;
 
-import edu.arizona.kra.irb.excel.ExcelCreator;
-import edu.arizona.kra.irb.sql.QueryConstants;
+import edu.arizona.kra.irb.pdf.excel.ExcelCreator;
+import edu.arizona.kra.irb.pdf.sql.QueryConstants;
 import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
 import edu.arizona.kra.irb.pdf.ProtocolPdfJobInfo;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWriterService;
-import edu.arizona.kra.irb.sql.SqlExecutor;
+import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
 import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.krad.UserSession;

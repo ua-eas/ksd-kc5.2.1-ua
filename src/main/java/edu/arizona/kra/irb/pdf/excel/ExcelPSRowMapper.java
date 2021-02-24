@@ -1,9 +1,8 @@
-package edu.arizona.kra.irb.excel;
+package edu.arizona.kra.irb.pdf.excel;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import edu.arizona.kra.irb.sql.enums.Column;
-import org.springframework.jdbc.core.RowMapper;
+import edu.arizona.kra.irb.pdf.sql.enums.Column;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

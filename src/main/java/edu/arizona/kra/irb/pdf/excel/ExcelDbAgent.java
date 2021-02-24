@@ -1,8 +1,8 @@
-package edu.arizona.kra.irb.excel;
+package edu.arizona.kra.irb.pdf.excel;
 
-import edu.arizona.kra.irb.sql.QueryConstants;
-import edu.arizona.kra.irb.sql.SqlExecutor;
-import edu.arizona.kra.irb.sql.enums.Column;
+import edu.arizona.kra.irb.pdf.sql.QueryConstants;
+import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
+import edu.arizona.kra.irb.pdf.sql.enums.Column;
 //import edu.arizona.kc.thread.abstracts.AbstractViewWorker;
 import edu.arizona.kra.irb.pdf.ProtocolPdfWorker;
 

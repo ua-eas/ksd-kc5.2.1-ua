@@ -1,4 +1,4 @@
-package edu.arizona.kra.irb.sql.enums;
+package edu.arizona.kra.irb.pdf.sql.enums;
 
 public enum View {
     AMENDMENT_SUB_V,

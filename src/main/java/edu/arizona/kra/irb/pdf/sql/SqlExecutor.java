@@ -1,9 +1,9 @@
-package edu.arizona.kra.irb.sql;
+package edu.arizona.kra.irb.pdf.sql;
 
-import edu.arizona.kra.irb.excel.ExcelAttachmentRecord;
-import edu.arizona.kra.irb.excel.ExcelSummaryRecord;
-import edu.arizona.kra.irb.excel.ExcelPSRowMapper;
-import edu.arizona.kra.irb.excel.ExcelRowMapper;
+import edu.arizona.kra.irb.pdf.excel.ExcelAttachmentRecord;
+import edu.arizona.kra.irb.pdf.excel.ExcelSummaryRecord;
+import edu.arizona.kra.irb.pdf.excel.ExcelPSRowMapper;
+import edu.arizona.kra.irb.pdf.excel.ExcelRowMapper;
 
 import java.util.Properties;
 import edu.arizona.kra.irb.props.PropertyLoader;
@@ -17,7 +17,6 @@ import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 
