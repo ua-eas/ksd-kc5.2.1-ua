@@ -32,7 +32,7 @@ public class QueryConstants {
 
     public static final String INSERT_EXCEL_ROW =
             "insert into attachment_spreadsheet \n" +
-                "(id, file_uuid, dest_type, protocol_number, huron_destination, dest_att_is_set, ui_filename, sftp_path, category) \n" +
+                "(id, dest_type, protocol_number, huron_destination, dest_att_is_set, ui_filename, sftp_path, category) \n" +
                 "values (?, ?, ?, ?, ?, ?, ?, ?)";
 
     public static final String FIND_ALL_EXCEL_ROWS = "select * from attachment_spreadsheet";
