@@ -18,7 +18,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <spring-context.version>3.2.3.RELEASE</spring-context.version>
         <kc-printing-xsds.version>2.0.0</kc-printing-xsds.version>
-        <xmlbeans.version>4.0.0</xmlbeans.version>
+        <xmlbeans.version>3.1.0</xmlbeans.version>
         <aws-ssm.version>2.15.70</aws-ssm.version>
         <apache-poi.version>4.1.2</apache-poi.version>
     </properties>
