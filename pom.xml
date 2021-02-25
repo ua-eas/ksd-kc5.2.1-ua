@@ -175,6 +175,9 @@
                         <overlay>
                             <groupId>org.kuali.kra</groupId>
                             <artifactId>kc_project</artifactId>
+                            <excludes>
+                                <exclude>WEB-INF/lib/xmlbeans*.jar</exclude>
+                            </excludes>
                         </overlay>
                     </overlays>
                 </configuration>
