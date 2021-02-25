@@ -1,0 +1,18 @@
+<config>
+  <!-- Properties used by HURONSAAS-573 for Protocol Summary PDF generation -->
+  <param name="protocol.pdf.active.query.file">/edu/arizona/pdf/protocol_numbers_active.sql</param>
+  <param name="protocol.pdf.start.from.date">1970-01-01 00:00:00</param>
+  <param name="protocol.pdf.end.to.date">2077-01-01 00:00:00</param>
+  <param name="protocol.pdf.dest.dir">/University of Arizona/IRB/FromUA/protocol_summary/</param>
+  <param name="protocol.pdf.aws.region">us-west-2</param>
+  <param name="protocol.pdf.num.worker.threads">1</param>
+  <param name="max.batch.insert">2000</param>
+  <param name="sftp.root.dir">/University of Arizona/IRB/FromUA/attachments</param>
+  <param name="efs.root.dir">/huronsaas/kualiadm/attachments</param>
+  <param name="workbook.template.file.path">/edu/arizona/pdf/attachments-template.xlsx</param>
+  <param name="workbook.output.file.path">/huronsaas/kualiadm/attachments.xlsx</param>
+  <param name="efs.bucket.size">1000</param>
+  <param name="truncate.spreadsheet.table.on.start">true</param>
+  <param name="workbook.tab.name">data</param>
+  <param name="workbook.sheet.start.row">1</param>
+</config>

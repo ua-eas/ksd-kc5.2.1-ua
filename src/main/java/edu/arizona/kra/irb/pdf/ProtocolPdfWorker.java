@@ -41,7 +41,7 @@ public class ProtocolPdfWorker extends Thread {
     private ProtocolPrintingService protocolPrintingService;
     private final EfsAgent efsAgent;
     private final ExcelDbAgent excelDbAgent;
-    private ClassLoader classLoader;
+    private final ClassLoader classLoader;
 
 
     public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers, UserSession userSession) {
@@ -115,14 +115,14 @@ public class ProtocolPdfWorker extends Thread {
         }
 
         attachmentDataSource.setFileName(filename);
-        pushToEfs(attachmentDataSource, protocol.getProtocolNumber());
-        createExcelRecord(attachmentDataSource, protocolNumber);
+        String fullEfsFilePath = pushToEfs(attachmentDataSource, protocol.getProtocolNumber());
+        createExcelRecord(attachmentDataSource, protocolNumber, fullEfsFilePath);
     }
 
-    private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber) {
+    private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber, String fullEfsFilePath) {
         String id = UUID.randomUUID().toString();
         String fileName = attachmentDataSource.getFileName();
-        excelDbAgent.writeToDb(id, protocolNumber, fileName);
+        excelDbAgent.writeToDb(id, protocolNumber, fileName, fullEfsFilePath);
     }
 
 
@@ -135,11 +135,13 @@ public class ProtocolPdfWorker extends Thread {
     }
 
 
-    private void pushToEfs(AttachmentDataSource attachmentDataSource, String protocolNumber) {
+    private String pushToEfs(AttachmentDataSource attachmentDataSource, String protocolNumber) {
         logInfo(String.format("Pushing protocol %s to sftp server complete", protocolNumber));
         byte[] bytes = attachmentDataSource.getContent();
-        efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, true);
+        String fullEfsFilePath = efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, true);
         logInfo(String.format("Pushed protocol %s to sftp server complete", protocolNumber));
+
+        return fullEfsFilePath;
     }
 
 
@@ -172,6 +174,7 @@ public class ProtocolPdfWorker extends Thread {
     }
 
 
+    @SuppressWarnings("ConstantConditions")
     private boolean killSwitchClick() {
         File file;
         try {
