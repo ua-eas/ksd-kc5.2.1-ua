@@ -5,8 +5,6 @@ import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
 import edu.arizona.kra.irb.pdf.sql.enums.Category;
 import edu.arizona.kra.irb.pdf.sql.enums.HuronDestination;
 
-import java.io.File;
-
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 

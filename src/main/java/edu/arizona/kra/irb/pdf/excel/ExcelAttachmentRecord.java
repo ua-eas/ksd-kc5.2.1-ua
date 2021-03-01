@@ -1,5 +1,7 @@
 package edu.arizona.kra.irb.pdf.excel;
 
+import edu.arizona.kra.irb.pdf.sql.enums.HuronDestination;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class ExcelAttachmentRecord {
      */
     public List<String> getColumnValues() {
         List<String> columnValues = new ArrayList<>();
-        columnValues.add(getId());
+        columnValues.add("");//id should always be blank
         columnValues.add(getDestType());
         columnValues.add(getProtocolNumber());
         columnValues.add(getHuronDestination());
@@ -104,8 +106,13 @@ public class ExcelAttachmentRecord {
         this.sftpPath = sftpPath;
     }
 
-    // Column H: ???: TBD, spec doesn't have any info on this column
+    // Column H:
     public String getCategory() {
+        // Per spec, choose category based on this logic
+        if (HuronDestination.ConsentForms.getDestination().equals(huronDestination)) {
+            category = "";
+        }
+
         return category;
     }
 

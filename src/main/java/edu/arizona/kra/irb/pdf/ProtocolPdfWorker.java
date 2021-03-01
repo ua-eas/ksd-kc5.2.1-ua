@@ -18,12 +18,7 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 import java.io.File;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +28,7 @@ import java.util.UUID;
 
 public class ProtocolPdfWorker extends Thread {
     private static final Logger LOG = Logger.getLogger(ProtocolPdfWorker.class);
+    private static final String PS_NAME_FORMAT = "Protocol Summary Report %s.pdf";
 
     private final int workerId;
     private final Set<String> protocolNumbers;
@@ -101,9 +97,7 @@ public class ProtocolPdfWorker extends Thread {
      */
     private void processProtocol(Protocol protocol) throws PrintingException {
         String protocolNumber = protocol.getProtocolNumber();
-        long protocolId = protocol.getProtocolId();
-        String dateString = getDateString(protocol);
-        String filename = String.format("ProtocolSummary_%s_%s_%d.pdf", protocolNumber, dateString, protocolId);
+        String filename = String.format(PS_NAME_FORMAT, protocolNumber);
 
         ProtocolPrintType printType = ProtocolPrintType.PROTOCOL_FULL_PROTOCOL_REPORT;
         String reportName = protocol.getProtocolNumber() + "-" + printType.getReportName();
@@ -123,15 +117,6 @@ public class ProtocolPdfWorker extends Thread {
         String id = UUID.randomUUID().toString();
         String fileName = attachmentDataSource.getFileName();
         excelDbAgent.writeToDb(id, protocolNumber, fileName, fullEfsFilePath);
-    }
-
-
-    private String getDateString(Protocol protocol) {
-        Date updateTimestamp = protocol.getUpdateTimestamp();
-        LocalDate localDate = Instant.ofEpochMilli(updateTimestamp.getTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        return localDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     }
 
 
