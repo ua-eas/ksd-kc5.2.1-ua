@@ -18,7 +18,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <spring-context.version>3.2.3.RELEASE</spring-context.version>
         <kc-printing-xsds.version>2.0.0</kc-printing-xsds.version>
-        <xmlbeans.version>2.4.0</xmlbeans.version>
+        <xmlbeans.version>3.1.0</xmlbeans.version>
         <aws-ssm.version>2.15.70</aws-ssm.version>
         <apache-poi.version>4.1.2</apache-poi.version>
     </properties>
@@ -54,8 +54,8 @@
                     <artifactId>itext</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk16</artifactId>
+                    <groupId>org.apache.xmlbeans</groupId>
+                    <artifactId>xmlbeans</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -103,10 +103,6 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-expression</artifactId>                
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk16</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -158,12 +154,6 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${apache-poi.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.hierynomus</groupId>
-            <artifactId>sshj</artifactId>
-            <version>0.30.0</version>
-
-        </dependency>
     </dependencies>
     <build>
       <plugins>
@@ -185,6 +175,9 @@
                         <overlay>
                             <groupId>org.kuali.kra</groupId>
                             <artifactId>kc_project</artifactId>
+                            <excludes>
+                                <exclude>WEB-INF/lib/xmlbeans*.jar</exclude>
+                            </excludes>
                         </overlay>
                     </overlays>
                 </configuration>
