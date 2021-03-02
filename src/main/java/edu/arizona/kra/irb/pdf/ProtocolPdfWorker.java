@@ -96,23 +96,21 @@ public class ProtocolPdfWorker extends Thread {
      * Logic yanked from ProtocolProtocolActionsAction#printProtocolSelectedItems()
      */
     private void processProtocol(Protocol protocol) throws PrintingException {
+        String protocolNumber = protocol.getProtocolNumber();
+        String filename = String.format(PS_NAME_FORMAT, protocolNumber);
 
-        //TODO: Temporrialy skip any processing to write out spreadsheet
-//        String protocolNumber = protocol.getProtocolNumber();
-//        String filename = String.format(PS_NAME_FORMAT, protocolNumber);
-//
-//        ProtocolPrintType printType = ProtocolPrintType.PROTOCOL_FULL_PROTOCOL_REPORT;
-//        String reportName = protocol.getProtocolNumber() + "-" + printType.getReportName();
-//        AttachmentDataSource attachmentDataSource = getProtocolPrintingService().print(reportName, getPrintArtifacts(protocol));
-//
-//        if (attachmentDataSource.getContent() == null) {
-//            logWarn("AttachmentDataSource.getContent() is null for protocol: " + protocolNumber);
-//            return;
-//        }
-//
-//        attachmentDataSource.setFileName(filename);
-//        String fullEfsFilePath = pushToEfs(attachmentDataSource, protocol.getProtocolNumber());
-//        createExcelRecord(attachmentDataSource, protocolNumber, fullEfsFilePath);
+        ProtocolPrintType printType = ProtocolPrintType.PROTOCOL_FULL_PROTOCOL_REPORT;
+        String reportName = protocol.getProtocolNumber() + "-" + printType.getReportName();
+        AttachmentDataSource attachmentDataSource = getProtocolPrintingService().print(reportName, getPrintArtifacts(protocol));
+
+        if (attachmentDataSource.getContent() == null) {
+            logWarn("AttachmentDataSource.getContent() is null for protocol: " + protocolNumber);
+            return;
+        }
+
+        attachmentDataSource.setFileName(filename);
+        String fullEfsFilePath = pushToEfs(attachmentDataSource, protocol.getProtocolNumber());
+        createExcelRecord(attachmentDataSource, protocolNumber, fullEfsFilePath);
     }
 
     private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber, String fullEfsFilePath) {
