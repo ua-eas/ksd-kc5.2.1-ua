@@ -29,4 +29,10 @@ public class ProtocolPdfJobInfo {
     public boolean isJobStartedOk() {
         return jobStartedOk;
     }
+
+    @Override
+    public String toString() {
+        return String.format("totalNumberProtocols: %d, startFromDate: %s, endToDate: %s, jobStartedOk: %b",
+                totalNumberProtocols, startFromDate, endToDate, jobStartedOk);
+    }
 }
