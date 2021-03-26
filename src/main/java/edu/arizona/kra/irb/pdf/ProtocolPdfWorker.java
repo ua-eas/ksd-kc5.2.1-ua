@@ -121,10 +121,10 @@ public class ProtocolPdfWorker extends Thread {
 
 
     private String pushToEfs(AttachmentDataSource attachmentDataSource, String protocolNumber) {
-        logInfo(String.format("Pushing protocol %s to sftp server complete", protocolNumber));
+        logInfo(String.format("Pushing protocol %s to efs", protocolNumber));
         byte[] bytes = attachmentDataSource.getContent();
         String fullEfsFilePath = efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, true);
-        logInfo(String.format("Pushed protocol %s to sftp server complete", protocolNumber));
+        logInfo(String.format("Pushed protocol %s to efs complete", protocolNumber));
 
         return fullEfsFilePath;
     }

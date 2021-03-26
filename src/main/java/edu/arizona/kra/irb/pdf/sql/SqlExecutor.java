@@ -2,8 +2,8 @@ package edu.arizona.kra.irb.pdf.sql;
 
 import edu.arizona.kra.irb.pdf.excel.ExcelAttachmentRecord;
 import edu.arizona.kra.irb.pdf.excel.ExcelRowMapper;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -43,7 +43,7 @@ public class SqlExecutor {
 
 
     private DataSource getDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
 
         String dbUrl = getKualiConfigurationService().getPropertyValueAsString("datasource.url");
