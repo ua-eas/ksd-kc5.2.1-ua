@@ -28,6 +28,4 @@ public class QueryConstants {
 
     public static final String EXCEL_RECORD_COUNT = "select count(*) from attachment_spreadsheet_sum";
 
-    public static final String DROP_SPREADSHEET_TABLE = "drop table attachment_spreadsheet_sum";
-
 }

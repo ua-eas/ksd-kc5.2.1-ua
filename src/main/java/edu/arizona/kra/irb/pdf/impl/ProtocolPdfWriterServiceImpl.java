@@ -81,7 +81,6 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
         SqlExecutor sqlExecutor = new SqlExecutor();
 
         try {
-            sqlExecutor.execute(QueryConstants.DROP_SPREADSHEET_TABLE);
             sqlExecutor.execute(QueryConstants.CREATE_SPREADSHEET_TABLE_SQL);
         } catch (Exception e) {
             if (!e.getMessage().contains("ORA-00955")) {
