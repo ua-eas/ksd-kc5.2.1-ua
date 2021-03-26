@@ -2,7 +2,7 @@ package edu.arizona.kra.irb.pdf.sql;
 
 public class QueryConstants {
     public static final String CREATE_SPREADSHEET_TABLE_SQL =
-            "create table attachment_spreadsheet ( \n" +
+            "create table attachment_spreadsheet_sum ( \n" +
                     "    id                VARCHAR2(60)   PRIMARY KEY, \n" +
                     "    dest_type         VARCHAR2(20)   not null, \n" +
                     "    protocol_number   VARCHAR2(20)   not null, \n" +
@@ -17,17 +17,17 @@ public class QueryConstants {
                     "    document_id       VARCHAR2(10) \n" +
                     ")";
 
-    public static final String TRUNCATE_SPREADSHEET_TABLE_SQL = "truncate table kraowner.attachment_spreadsheet";
+    public static final String TRUNCATE_SPREADSHEET_TABLE_SQL = "truncate table attachment_spreadsheet_sum";
 
     public static final String INSERT_EXCEL_ROW =
-            "insert into attachment_spreadsheet \n" +
+            "insert into attachment_spreadsheet_sum \n" +
                 "(id, dest_type, protocol_number, huron_destination, dest_att_is_set, ui_filename, sftp_path, category) \n" +
                 "values (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public static final String FIND_ALL_EXCEL_ROWS = "select * from attachment_spreadsheet";
+    public static final String FIND_ALL_EXCEL_ROWS = "select * from attachment_spreadsheet_sum";
 
-    public static final String EXCEL_RECORD_COUNT = "select count(*) from attachment_spreadsheet";
+    public static final String EXCEL_RECORD_COUNT = "select count(*) from attachment_spreadsheet_sum";
 
-    public static final String DROP_SPREADSHEET_TABLE = "drop table attachment_spreadsheet";
+    public static final String DROP_SPREADSHEET_TABLE = "drop table attachment_spreadsheet_sum";
 
 }
