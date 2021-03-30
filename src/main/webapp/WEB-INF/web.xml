@@ -16,6 +16,12 @@
       <param-value>classpath:kc-bootstrap-springbeans.xml</param-value>
     </context-param>
 
+	<!-- Instructs all Spring view libraries (aka Freemarker) to html-escape values by default -->
+	<context-param>
+		<param-name>defaultHtmlEscape</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
 	${monitoring.filter}
 
 	<filter>
