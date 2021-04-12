@@ -31,7 +31,7 @@ public class ExcelAttachmentRecord {
         columnValues.add(getHuronDestination());
         columnValues.add(Integer.toString(getDestAttIsSet()));
         columnValues.add(getUiFilename());
-        columnValues.add(getSftpPath());
+        columnValues.add(getSftpPath().replaceAll("/", "\\\\"));//windows path for huron
         columnValues.add(getCategory());
         columnValues.add("");//getVersionId() unused
         columnValues.add("");//getIsProcessed() unused
