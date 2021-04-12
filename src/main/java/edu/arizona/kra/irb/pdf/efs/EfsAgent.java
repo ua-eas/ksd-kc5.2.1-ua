@@ -49,6 +49,8 @@ public class EfsAgent {
             } finally {
                 IOUtils.closeQuietly(outputStream);
             }
+        } else {
+            LOG.info(String.format("EFS writing turned off, would have written file to: %s", fullFilePath));
         }
 
         bucktFileCounter++;

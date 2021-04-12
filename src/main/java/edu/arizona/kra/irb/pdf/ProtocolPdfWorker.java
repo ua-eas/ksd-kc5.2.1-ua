@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
+
 
 public class ProtocolPdfWorker extends Thread {
     private static final Logger LOG = Logger.getLogger(ProtocolPdfWorker.class);
@@ -37,6 +39,7 @@ public class ProtocolPdfWorker extends Thread {
     private BusinessObjectService businessObjectService;
     private ProtocolPrintingService protocolPrintingService;
     private final EfsAgent efsAgent;
+    private final boolean pushToEfs;
     private final ExcelDbAgent excelDbAgent;
     private final ClassLoader classLoader;
 
@@ -48,6 +51,7 @@ public class ProtocolPdfWorker extends Thread {
         this.efsAgent = new EfsAgent();
         this.excelDbAgent = new ExcelDbAgent();
         this.classLoader = getClass().getClassLoader();
+        this.pushToEfs = getKualiConfigurationService().getPropertyValueAsBoolean("create.efs.files");
     }
 
 
@@ -124,7 +128,7 @@ public class ProtocolPdfWorker extends Thread {
     private String pushToEfs(AttachmentDataSource attachmentDataSource, String protocolNumber) {
         logInfo(String.format("Pushing protocol %s to efs", protocolNumber));
         byte[] bytes = attachmentDataSource.getContent();
-        String fullEfsFilePath = efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, true);
+        String fullEfsFilePath = efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, pushToEfs);
         logInfo(String.format("Pushed protocol %s to efs complete", protocolNumber));
 
         return fullEfsFilePath;

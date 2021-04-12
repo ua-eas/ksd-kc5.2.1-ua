@@ -51,6 +51,12 @@ public class ExcelCreator {
     public void createAttachmentsSpreadsheet() {
         LOG.info(String.format("Processing %d spreadsheet records", selectCount));
 
+        boolean createSpreadsheet = getKualiConfigurationService().getPropertyValueAsBoolean("create.excel.spreadsheet");
+        if (!createSpreadsheet) {
+            LOG.info("The 'create.excel.spreadsheet' is set to false, skipping spreadsheet creation.");
+            return;
+        }
+
         List<ExcelAttachmentRecord> records = sqlExecutor.findAllExcelRecords();
         for (ExcelAttachmentRecord record : records) {
             addRow(rowIndex, record);
