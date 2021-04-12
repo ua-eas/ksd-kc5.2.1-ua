@@ -19,6 +19,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,7 +156,15 @@ public class ProtocolPdfWorker extends Thread {
     private Protocol getProtocol(String protocolNumber) {
         Map<String,Object> keymap = new HashMap<>();
         keymap.put("protocolNumber", protocolNumber);
-        return getBusinessObjectService().findByPrimaryKey(Protocol.class, keymap);
+        keymap.put("active", "Y");
+
+        Collection<Protocol> protocols = getBusinessObjectService().findMatching(Protocol.class, keymap);
+        if (protocols.size() != 1) {
+            throw new RuntimeException("Unexpected number of protocols returned for protocol #"
+                    + protocolNumber + ", size: " + protocols.size());
+        }
+
+        return protocols.iterator().next();
     }
 
 
