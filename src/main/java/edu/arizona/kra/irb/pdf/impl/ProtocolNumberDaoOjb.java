@@ -45,12 +45,10 @@ public class ProtocolNumberDaoOjb extends PlatformAwareDaoBaseOjb implements Pro
         }
 
         LOG.info("Starting protocol number query...");
-        Object[] dateCriteria = new Object[]{startFromDate, endToDate};
-
         List<String> protocolNumbers = new ArrayList<>();
         try {
             DBConnection dbc = new DBConnection(this.getPersistenceBroker(true));
-            ResultSet rs = dbc.executeQuery(activeProtocolNumberQuery, dateCriteria);
+            ResultSet rs = dbc.executeQuery(activeProtocolNumberQuery, new Object[]{});
             while (rs.next()) {
                 protocolNumbers.add(rs.getString(1));
             }
