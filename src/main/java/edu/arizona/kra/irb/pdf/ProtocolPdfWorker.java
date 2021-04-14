@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -69,6 +70,15 @@ public class ProtocolPdfWorker extends Thread {
             if (killSwitchClick()) {
                 logInfo("Detected file 'kill-switch.txt' on classpath, stopping pdf loop.");
                 break;
+            }
+
+            if (protocolNumber.toLowerCase().contains("a") || protocolNumber.toLowerCase().contains("r")) {
+                // These are amendment/revision protocols acting as an active parent, which is an invalid state,
+                // the IRB office should clean these up before the final migration is started, warn for now and skip
+                LOG.warn(String.format("Parent protocol is invalid amendment/revision type, skipping protocol '%s'", protocolNumber));
+                processedCount++;
+                logInfo(String.format("Protocol skipped, %d/%d left to go.", total - processedCount, total));
+                continue;
             }
 
             logInfo(String.format("Processing protocol number '%s'", protocolNumber));
