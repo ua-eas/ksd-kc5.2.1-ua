@@ -584,7 +584,12 @@ public class ProtocolSummaryXmlStream extends ProtocolSummaryXmlStreamBase {
                 ProtocolKeyPersonsType protocolKeyPersonsType = protocolSummary.addNewProtocolKeyPersons();
                 protocolKeyPersonsType.setPersonId(protocolPerson.getPersonId());
                 protocolKeyPersonsType.setPersonName(protocolPerson.getPersonName());
-                protocolKeyPersonsType.setAffiliationTypeCode(protocolPerson.getAffiliationType().getAffiliationTypeCode());
+
+                if (protocolPerson.getAffiliationType() != null) {
+                    // 308 active protocol summaries do not have this aff type code, guard against this like in the first if case
+                    protocolKeyPersonsType.setAffiliationTypeCode(protocolPerson.getAffiliationType().getAffiliationTypeCode());
+                }
+
                 protocolKeyPersonsType.setNonEmployeeFlag( ( protocolPerson.isNonEmployee() ? "Y" : "N" ) );
                 protocolKeyPersonsType.setProtocolNumber(protocolPerson.getProtocolNumber());
                 protocolKeyPersonsType.setSequenceNumber(protocolPerson.getSequenceNumber());
