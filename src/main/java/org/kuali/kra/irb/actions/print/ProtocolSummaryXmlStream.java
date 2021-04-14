@@ -584,12 +584,6 @@ public class ProtocolSummaryXmlStream extends ProtocolSummaryXmlStreamBase {
                 ProtocolKeyPersonsType protocolKeyPersonsType = protocolSummary.addNewProtocolKeyPersons();
                 protocolKeyPersonsType.setPersonId(protocolPerson.getPersonId());
                 protocolKeyPersonsType.setPersonName(protocolPerson.getPersonName());
-
-                if (protocolPerson.getAffiliationType() != null) {
-                    // 308 active protocol summaries do not have this aff type code, guard against this like in the first if case
-                    protocolKeyPersonsType.setAffiliationTypeCode(protocolPerson.getAffiliationType().getAffiliationTypeCode());
-                }
-
                 protocolKeyPersonsType.setNonEmployeeFlag( ( protocolPerson.isNonEmployee() ? "Y" : "N" ) );
                 protocolKeyPersonsType.setProtocolNumber(protocolPerson.getProtocolNumber());
                 protocolKeyPersonsType.setSequenceNumber(protocolPerson.getSequenceNumber());
@@ -598,8 +592,10 @@ public class ProtocolSummaryXmlStream extends ProtocolSummaryXmlStreamBase {
                     protocolKeyPersonsType.setPersonRole(protocolPerson.getProtocolPersonRole().getDescription());
                 }
                 protocolKeyPersonsType.setTrainingFlag( ( protocolPerson.isTrained()  ? "Y" : "N" ) );
-                protocolKeyPersonsType.setAffiliationTypeCode(protocolPerson.getAffiliationType().getAffiliationTypeCode());
-                if(protocolPerson.getAffiliationType()!=null){
+
+                if(protocolPerson.getAffiliationType() != null){
+                    // 308 active protocol summaries do not have this aff type code, guard against this like in the first if case
+                    protocolKeyPersonsType.setAffiliationTypeCode(protocolPerson.getAffiliationType().getAffiliationTypeCode());
                     protocolKeyPersonsType.setAffiliationTypeDesc(protocolPerson.getAffiliationType().getDescription());
                 }
             }
