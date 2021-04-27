@@ -109,9 +109,12 @@ public class ProtocolPdfWorker extends Thread {
     }
 
 
+    /*
+     * Descending sort so most recent date is at top
+     */
     private void sortProtoclActions(Protocol protocol) {
         List<ProtocolActionBase> protocolActions = protocol.getProtocolActions();
-        protocolActions.sort(Comparator.comparing(ProtocolActionBase::getActualActionDate));
+        protocolActions.sort(Comparator.comparing(ProtocolActionBase::getActualActionDate).reversed());
     }
 
 
