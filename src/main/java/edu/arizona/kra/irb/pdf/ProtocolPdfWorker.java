@@ -12,6 +12,7 @@ import org.kuali.kra.printing.Printable;
 import org.kuali.kra.printing.PrintingException;
 import org.kuali.kra.printing.print.AbstractPrint;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
 import org.kuali.kra.protocol.actions.print.ProtocolSummaryPrintOptions;
 import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.service.BusinessObjectService;
@@ -20,9 +21,9 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -77,7 +78,7 @@ public class ProtocolPdfWorker extends Thread {
                 // the IRB office should clean these up before the final migration is started, warn for now and skip
                 LOG.warn(String.format("Parent protocol is invalid amendment/revision type, skipping protocol '%s'", protocolNumber));
                 processedCount++;
-                logInfo(String.format("Protocol skipped, %d/%d left to go.", total - processedCount, total));
+                logInfo(String.format("Protocol skipped, processed: %d/%d", processedCount, total));
                 continue;
             }
 
@@ -85,12 +86,13 @@ public class ProtocolPdfWorker extends Thread {
             Protocol protocol = getProtocol(protocolNumber);
 
             try {
+                sortProtoclActions(protocol);
                 processProtocol(protocol);
             } catch (Throwable t) {
                 logError(String.format("Unexpected issue, skipping protocol '%s'", protocolNumber), t);
             } finally {
                 processedCount++;
-                logInfo(String.format("Protocol processed, %d/%d left to go.", total - processedCount, total));
+                logInfo(String.format("Protocols processed: %d/%d.", processedCount, total));
             }
 
         }
@@ -104,6 +106,12 @@ public class ProtocolPdfWorker extends Thread {
         excelCreator.createAttachmentsSpreadsheet();
 
         logInfo("Completed all work, worker thread exiting.");
+    }
+
+
+    private void sortProtoclActions(Protocol protocol) {
+        List<ProtocolActionBase> protocolActions = protocol.getProtocolActions();
+        protocolActions.sort(Comparator.comparing(ProtocolActionBase::getActualActionDate));
     }
 
 
