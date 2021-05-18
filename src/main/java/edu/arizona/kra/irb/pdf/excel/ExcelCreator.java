@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import static edu.arizona.kra.irb.pdf.PdfConstants.*;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
@@ -29,8 +30,8 @@ public class ExcelCreator {
 
 
     public ExcelCreator() {
-        String workbookTemplateFilePath = getKualiConfigurationService().getPropertyValueAsString("workbook.template.file.path");
-        this.workbookOutputFilePath = getKualiConfigurationService().getPropertyValueAsString("workbook.output.file.path");
+        String workbookTemplateFilePath = getKualiConfigurationService().getPropertyValueAsString(WORKBOOK_TEMPLATE_PATH);
+        this.workbookOutputFilePath = getKualiConfigurationService().getPropertyValueAsString(WORKBOOK_OUTPUT_PATH);
 
         try {
             InputStream inputStream = getClass().getResourceAsStream(workbookTemplateFilePath);
@@ -39,9 +40,9 @@ public class ExcelCreator {
             throw new RuntimeException(e);
         }
 
-        String tabName  = getKualiConfigurationService().getPropertyValueAsString("workbook.tab.name");
+        String tabName  = getKualiConfigurationService().getPropertyValueAsString(WORKBOOK_TAB_NAME);
         this.sheet = workbook.getSheet(tabName);
-        this.rowIndex = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString("workbook.sheet.start.row"));
+        this.rowIndex = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(WORKBOOK_START_ROW));
         this.sqlExecutor = new SqlExecutor();
         this.rowsProcessed = 0;
         this.selectCount = sqlExecutor.counExcelRecords();
@@ -51,7 +52,7 @@ public class ExcelCreator {
     public void createAttachmentsSpreadsheet() {
         LOG.info(String.format("Processing %d spreadsheet records", selectCount));
 
-        boolean createSpreadsheet = getKualiConfigurationService().getPropertyValueAsBoolean("create.excel.spreadsheet");
+        boolean createSpreadsheet = getKualiConfigurationService().getPropertyValueAsBoolean(SHOULD_CREATE_SHEET);
         if (!createSpreadsheet) {
             LOG.info("The 'create.excel.spreadsheet' is set to false, skipping spreadsheet creation.");
             return;

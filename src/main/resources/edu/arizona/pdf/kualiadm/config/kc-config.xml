@@ -1,9 +1,7 @@
 <config>
   <!-- Properties used by HURONSAAS-573 for Protocol Summary PDF generation -->
   <param name="protocol.pdf.active.query.file">/edu/arizona/pdf/protocol_numbers_active.sql</param>
-  <param name="protocol.pdf.aws.region">us-west-2</param>
   <param name="protocol.pdf.num.worker.threads">1</param>
-  <param name="max.batch.insert">2000</param>
   <param name="sftp.root.dir">./attachments</param>
   <param name="efs.root.dir">/huronsaas/irb-migration/sandbox/attachments</param>
   <param name="workbook.template.file.path">/edu/arizona/pdf/attachments-template.xlsx</param>
@@ -14,4 +12,8 @@
   <param name="workbook.sheet.start.row">2</param>
   <param name="create.efs.files">true</param>
   <param name="create.excel.spreadsheet">true</param>
+  <param name="pdf.finish.file.path">/huronsaas/irb-migration/sandbox/protocol-summary-report.txt</param>
+  <param name="start.processing.file.path">/huronsaas/irb-migration/sandbox/start-protocol-summary-processing.txt</param>
+  <param name="get.protocol.numbers.from.file">false</param>
+  <param name="protocol.numbers.file.path">/huronsaas/irb-migration/sandbox/input-protocol-numbers.txt</param>
 </config>

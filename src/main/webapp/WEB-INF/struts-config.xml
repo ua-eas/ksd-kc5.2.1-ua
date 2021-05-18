@@ -63,7 +63,6 @@
 		<form-bean name="IacucResearchAreasForm" type="org.kuali.kra.iacuc.IacucResearchAreasForm" />
 		<form-bean name="IsrSsrReportGenerationForm" type="org.kuali.kra.subawardReporting.web.struts.form.IsrSsrReportGenerationForm" />
 		<form-bean name="AssociateWorkflowForm" type="edu.arizona.kra.irb.associateworkflow.ProtocolAssociateWorkflowForm"/>
-        <form-bean name="GenerateProtocolPdfsForm" type="edu.arizona.kra.irb.pdf.action.GenerateProtocolPdfsForm"/>
     </form-beans>
 
 <!-- Rice content Start -->
@@ -724,11 +723,6 @@
             <forward name="basic" path="/WEB-INF/jsp/personmasschange/PersonMassChange{1}.jsp" />
             <forward name="home" path="/WEB-INF/jsp/personmasschange/PersonMassChangeHome.jsp" />
             <forward name="view" path="/WEB-INF/jsp/personmasschange/PersonMassChangeView.jsp" />
-        </action>
-
-        <action path="/generateProtocolPdfs" name="GenerateProtocolPdfsForm" scope="request"
-                type="edu.arizona.kra.irb.pdf.action.GenerateProtocolPdfsAction" >
-            <forward name="pdfWorkerStarted" path="/WEB-INF/jsp/irb/GenerateProtocolPdfs.jsp" />
         </action>
      
     </action-mappings>
