@@ -5,6 +5,8 @@ import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
 import edu.arizona.kra.irb.pdf.sql.enums.Category;
 import edu.arizona.kra.irb.pdf.sql.enums.HuronDestination;
 
+import static edu.arizona.kra.irb.pdf.PdfConstants.EFS_ROOT_DIR;
+import static edu.arizona.kra.irb.pdf.PdfConstants.SFTP_ROOT_DIR;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
@@ -16,8 +18,8 @@ public class ExcelDbAgent {
 
     public ExcelDbAgent() {
         this.sqlExecutor = new SqlExecutor();
-        this.sftpRootDir = getKualiConfigurationService().getPropertyValueAsString("sftp.root.dir");
-        this.efsRootDir = getKualiConfigurationService().getPropertyValueAsString("efs.root.dir");
+        this.sftpRootDir = getKualiConfigurationService().getPropertyValueAsString(SFTP_ROOT_DIR);
+        this.efsRootDir = getKualiConfigurationService().getPropertyValueAsString(EFS_ROOT_DIR);
     }
 
 

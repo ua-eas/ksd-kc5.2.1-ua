@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import static edu.arizona.kra.irb.pdf.PdfConstants.EFS_BUCKET_SIZE;
+import static edu.arizona.kra.irb.pdf.PdfConstants.EFS_ROOT_DIR;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
@@ -22,8 +24,8 @@ public class EfsAgent {
 
 
     public EfsAgent() {
-        this.efsRootDir = getKualiConfigurationService().getPropertyValueAsString("efs.root.dir");
-        this.bucketSize = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString("efs.bucket.size"));
+        this.efsRootDir = getKualiConfigurationService().getPropertyValueAsString(EFS_ROOT_DIR);
+        this.bucketSize = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(EFS_BUCKET_SIZE));
         this.bucktFileCounter = 0;
         createNewBucket();
     }
@@ -66,15 +68,11 @@ public class EfsAgent {
 
         UUID uuid = UUID.randomUUID();
         currentBucketPath = efsRootDir + File.separator + uuid;
-        File newDirectory = new File(efsRootDir + File.separator + uuid);
-        while (newDirectory.exists()) {
-            uuid = UUID.randomUUID();
-            currentBucketPath = efsRootDir + File.separator + uuid;
-            newDirectory = new File(efsRootDir + File.separator + uuid);
-        }
 
-        //noinspection ResultOfMethodCallIgnored
-        newDirectory.mkdir();
+        File newDirectory = new File(currentBucketPath);
+        if (!newDirectory.mkdir()) {
+            throw new RuntimeException("Could not create directory!: " + newDirectory.getAbsolutePath());
+        }
 
         LOG.info(String.format("Created new bucket: %s", currentBucketPath));
     }

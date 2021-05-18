@@ -13,6 +13,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.arizona.kra.irb.pdf.PdfConstants.PROTOCOL_NUMBER_QUERY;
+
 
 public class ProtocolNumberDaoOjb extends PlatformAwareDaoBaseOjb implements ProtocolNumberDao {
     private static final Logger LOG = Logger.getLogger(ProtocolNumberDaoOjb.class);
@@ -32,14 +34,14 @@ public class ProtocolNumberDaoOjb extends PlatformAwareDaoBaseOjb implements Pro
      */
     private void init() {
         String activeSqlFilePath
-                = getKualiConfigurationService().getPropertyValueAsString("protocol.pdf.active.query.file");
+                = getKualiConfigurationService().getPropertyValueAsString(PROTOCOL_NUMBER_QUERY);
         this.activeProtocolNumberQuery = getSqlQueryStringFromResource(activeSqlFilePath);
         isInitialized = true;
     }
 
 
     @Override
-    public List<String> getActiveProtocolNumbers(String startFromDate, String endToDate) {
+    public List<String> getActiveProtocolNumbers() {
         if (!isInitialized) {
             init();
         }

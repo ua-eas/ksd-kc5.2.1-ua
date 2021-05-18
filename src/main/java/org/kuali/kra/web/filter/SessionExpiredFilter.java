@@ -19,6 +19,8 @@ import edu.arizona.kra.irb.pdf.StartFilePoller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.rice.core.api.config.property.ConfigurationService;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -27,7 +29,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
+
+import static edu.arizona.kra.irb.pdf.PdfConstants.FINISH_FILE_PATH;
+import static edu.arizona.kra.irb.pdf.PdfConstants.START_PROCESSING_FILE_PATH;
 
 public class SessionExpiredFilter implements Filter {
     private static final Log LOG = LogFactory.getLog(SessionExpiredFilter.class);
@@ -49,8 +55,30 @@ public class SessionExpiredFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         // Hack to get entrypoint into starting thread to watch for start file
         LOG.info("Starting StartFilePoller to watch when to start Protocol Summary generation");
+        clearSentinalFiles();
         StartFilePoller startFilePoller = new StartFilePoller();
         new Thread(startFilePoller).start();
+    }
+
+    /*
+     * Clear out cruft from past processing runs
+     */
+    private void clearSentinalFiles() {
+        ConfigurationService configService = KraServiceLocator.getService(ConfigurationService.class);
+
+        try {
+            File startFile = new File(configService.getPropertyValueAsString(START_PROCESSING_FILE_PATH));
+            if (startFile.exists()) {
+                startFile.delete();
+            }
+
+            File finishFile = new File(configService.getPropertyValueAsString(FINISH_FILE_PATH));
+            if (finishFile.exists()) {
+                finishFile.delete();
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
     }
 
 }

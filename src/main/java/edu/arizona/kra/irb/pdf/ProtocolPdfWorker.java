@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static edu.arizona.kra.irb.pdf.PdfConstants.SHOULD_CREATE_EFS_FILES;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
@@ -53,7 +54,7 @@ public class ProtocolPdfWorker extends Thread {
         this.efsAgent = new EfsAgent();
         this.excelDbAgent = new ExcelDbAgent();
         this.classLoader = getClass().getClassLoader();
-        this.pushToEfs = getKualiConfigurationService().getPropertyValueAsBoolean("create.efs.files");
+        this.pushToEfs = getKualiConfigurationService().getPropertyValueAsBoolean(SHOULD_CREATE_EFS_FILES);
     }
 
 
