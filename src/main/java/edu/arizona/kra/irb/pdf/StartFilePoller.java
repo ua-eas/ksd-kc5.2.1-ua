@@ -30,7 +30,7 @@ public class StartFilePoller implements Runnable {
             }
 
             try {
-                // No start file, sleep and check again later
+                LOG.info("Did not find start file: " + startFilePath);
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
                 LOG.warn("Thread unexpectedly woken up!");
