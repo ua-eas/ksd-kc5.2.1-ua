@@ -81,11 +81,10 @@ public class PdfThreadMaster {
             return null;
         }
 
-        int batchCount = 0;
         List<String> numberBatch = new ArrayList<>();
-
         Iterator<String> iter = protocolNumbers.iterator();
-        while (iter.hasNext() && batchCount < batchSize) {
+
+        while (iter.hasNext() && numberBatch.size() < batchSize) {
             numberBatch.add(iter.next());
             iter.remove();
         }
