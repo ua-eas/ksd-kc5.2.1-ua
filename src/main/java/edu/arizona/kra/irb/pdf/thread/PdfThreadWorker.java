@@ -46,12 +46,14 @@ public class PdfThreadWorker implements Runnable {
         this.workerId = workerId;
         this.pdfThreadMaster = pdfThreadMaster;
         this.pushToEfs = getKualiConfigurationService().getPropertyValueAsBoolean(SHOULD_CREATE_EFS_FILES);
-        GlobalVariables.setUserSession(new UserSession(KRADConstants.SYSTEM_USER));
     }
 
 
     @Override
     public void run() {
+        // Since this is a new thread, we need to set UserSession into global scope
+        GlobalVariables.setUserSession(new UserSession(KRADConstants.SYSTEM_USER));
+
         while (true) {
             PdfBatch pdfBatch = pdfThreadMaster.getNextPdfBatch();
             if (pdfBatch == null) {
