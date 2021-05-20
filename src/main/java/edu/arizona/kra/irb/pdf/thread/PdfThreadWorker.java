@@ -128,7 +128,7 @@ public class PdfThreadWorker implements Runnable {
         }
 
         attachmentDataSource.setFileName(filename);
-        String efsFilePath = currentBucketPath + File.pathSeparator + filename;
+        String efsFilePath = currentBucketPath + File.separator + filename;
 
         pushToEfs(attachmentDataSource, efsFilePath);
         createExcelRecord(attachmentDataSource, protocolNumber, efsFilePath);

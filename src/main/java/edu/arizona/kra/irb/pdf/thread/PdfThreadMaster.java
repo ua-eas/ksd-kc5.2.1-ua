@@ -3,7 +3,7 @@ package edu.arizona.kra.irb.pdf.thread;
 import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
 import edu.arizona.kra.irb.pdf.utils.FileUtils;
 import edu.arizona.kra.irb.pdf.excel.ExcelCreator;
-import edu.arizona.kra.irb.pdf.utils.BucketTracker;
+import edu.arizona.kra.irb.pdf.utils.BucketHandler;
 import edu.arizona.kra.irb.pdf.utils.SqlUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -25,7 +25,7 @@ public class PdfThreadMaster {
 
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
-    private final BucketTracker bucketTracker;
+    private final BucketHandler bucketHandler;
     private final List<String> protocolNumbers;
     private final int totalProtocolCount;
     private final int batchSize;
@@ -34,7 +34,7 @@ public class PdfThreadMaster {
     public PdfThreadMaster() {
         this.protocolNumbers = getProtocolNumbers();
         this.totalProtocolCount = protocolNumbers.size();
-        this.bucketTracker = new BucketTracker();
+        this.bucketHandler = new BucketHandler();
         this.batchSize = 100; //TODO: Make this configurable
     }
 
@@ -89,8 +89,8 @@ public class PdfThreadMaster {
             iter.remove();
         }
 
-        bucketTracker.incrementProtocolCount(numberBatch.size());
-        String bucketPath = bucketTracker.getBucketPath();
+        bucketHandler.incrementProtocolCount(numberBatch.size());
+        String bucketPath = bucketHandler.getCurrentBucketPath();
 
         return new PdfBatch(numberBatch, bucketPath);
     }

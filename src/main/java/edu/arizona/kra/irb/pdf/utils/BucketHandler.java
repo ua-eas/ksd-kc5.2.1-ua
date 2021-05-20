@@ -10,8 +10,8 @@ import static edu.arizona.kra.irb.pdf.PdfConstants.EFS_ROOT_DIR;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
-public class BucketTracker {
-    private static final Logger LOG = Logger.getLogger(BucketTracker.class);
+public class BucketHandler {
+    private static final Logger LOG = Logger.getLogger(BucketHandler.class);
 
     private final String efsRootDir;
     private final int bucketSize;
@@ -19,14 +19,15 @@ public class BucketTracker {
     private String currentBucketPath;
 
 
-    public BucketTracker() {
+    public BucketHandler() {
         this.efsRootDir = getKualiConfigurationService().getPropertyValueAsString(EFS_ROOT_DIR);
         this.bucketSize = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(EFS_BUCKET_SIZE));
         this.bucktFileCounter = 0;
+        createNewBucket();
     }
 
 
-    public String getBucketPath() {
+    public String getCurrentBucketPath() {
         if (bucktFileCounter >= bucketSize) {
             createNewBucket();
             bucktFileCounter = 0;
