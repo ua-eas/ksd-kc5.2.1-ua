@@ -1,4 +1,4 @@
-package edu.arizona.kra.irb.pdf.efs;
+package edu.arizona.kra.irb.pdf.utils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -18,7 +18,7 @@ public class FileUtils {
     private static final Logger LOG = Logger.getLogger(FileUtils.class);
 
 
-    public static void pushFileToEfs(String filePath, byte[] bytes) {
+    public static void pushFileToEfs(byte[] bytes, String filePath) {
         LOG.info(String.format("Writing file to EFS: %s", filePath));
         OutputStream outputStream = null;
         try {

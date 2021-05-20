@@ -1,7 +1,7 @@
 package edu.arizona.kra.irb.pdf.thread;
 
 import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
-import edu.arizona.kra.irb.pdf.efs.FileUtils;
+import edu.arizona.kra.irb.pdf.utils.FileUtils;
 import edu.arizona.kra.irb.pdf.excel.ExcelCreator;
 import edu.arizona.kra.irb.pdf.utils.BucketTracker;
 import edu.arizona.kra.irb.pdf.utils.SqlUtils;

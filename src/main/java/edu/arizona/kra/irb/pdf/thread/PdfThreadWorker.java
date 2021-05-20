@@ -1,6 +1,6 @@
 package edu.arizona.kra.irb.pdf.thread;
 
-import edu.arizona.kra.irb.pdf.efs.FileUtils;
+import edu.arizona.kra.irb.pdf.utils.FileUtils;
 import edu.arizona.kra.irb.pdf.utils.SqlUtils;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -71,7 +71,7 @@ public class PdfThreadWorker implements Runnable {
                     continue;
                 }
 
-                logInfo(String.format("Processing protocol number '%s'", protocolNumber));
+                logInfo(String.format("Processing protocol: %s", protocolNumber));
                 Protocol protocol = getProtocol(protocolNumber);
 
                 try {
@@ -128,9 +128,9 @@ public class PdfThreadWorker implements Runnable {
         }
 
         attachmentDataSource.setFileName(filename);
-        pushToEfs(attachmentDataSource);
-
         String efsFilePath = currentBucketPath + File.pathSeparator + filename;
+
+        pushToEfs(attachmentDataSource, efsFilePath);
         createExcelRecord(attachmentDataSource, protocolNumber, efsFilePath);
     }
 
@@ -142,12 +142,12 @@ public class PdfThreadWorker implements Runnable {
     }
 
 
-    private void pushToEfs(AttachmentDataSource attachmentDataSource) {
+    private void pushToEfs(AttachmentDataSource attachmentDataSource, String efsFilePath) {
         if (pushToEfs) {
             byte[] bytes = attachmentDataSource.getContent();
-            FileUtils.pushFileToEfs(attachmentDataSource.getFileName(), bytes);
+            FileUtils.pushFileToEfs(bytes, efsFilePath);
         } else {
-            LOG.info("EFS writing turned off, skipping file write.");
+            LOG.info("EFS writing turned off, skipped writing file to: " + efsFilePath);
         }
     }
 
