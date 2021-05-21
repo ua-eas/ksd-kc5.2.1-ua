@@ -54,8 +54,10 @@ public class PdfThreadWorker implements Runnable {
         // Since this is a new thread, we need to set UserSession into global scope
         GlobalVariables.setUserSession(new UserSession(KRADConstants.SYSTEM_USER));
 
+        BatchResult batchResult = null;
+
         while (true) {
-            PdfBatch pdfBatch = pdfThreadMaster.getNextPdfBatch();
+            PdfBatch pdfBatch = pdfThreadMaster.getNextPdfBatch(batchResult);
             if (pdfBatch == null) {
                 logInfo("Recieved null PdfBatch, exiting main loop.");
                 break;
@@ -64,24 +66,29 @@ public class PdfThreadWorker implements Runnable {
             List<String> protocolNumbers = pdfBatch.getProtocolNumbers();
             String currentBucketPath = pdfBatch.getBucketPath();
 
-            logInfo(String.format("Starting async processing with %d protocol numbers.", protocolNumbers.size()));
+            logInfo(String.format("Starting batch with %d protocol numbers.", protocolNumbers.size()));
+            batchResult = new BatchResult();
 
             for (String protocolNumber : protocolNumbers) {
+                logInfo(String.format("Processing protocol: %s", protocolNumber));
+
                 if (!isValidProtocolNumber(protocolNumber)) {
+                    batchResult.incrementFailed();
                     continue;
                 }
 
-                logInfo(String.format("Processing protocol: %s", protocolNumber));
                 Protocol protocol = getProtocol(protocolNumber);
 
                 try {
                     sortProtoclActions(protocol);
                     processProtocol(protocol, currentBucketPath);
                 } catch (Throwable t) {
+                    batchResult.incrementFailed();
                     logError(String.format("Unexpected issue, skipping protocol '%s'", protocolNumber), t);
                     continue;
                 }
 
+                batchResult.incrementSuccess();
                 logInfo("Processed protocol: " + protocolNumber);
             }//for
 

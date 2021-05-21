@@ -26,8 +26,11 @@ public class PdfThreadMaster {
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
     private final BucketHandler bucketHandler;
+    private final StatCollector statCollector;
     private final List<String> protocolNumbers;
+    private final int numWorkerThreads;
     private final int totalProtocolCount;
+    private int numProtocolsLeftToProcess;
     private final int batchSize;
 
 
@@ -35,6 +38,9 @@ public class PdfThreadMaster {
         this.protocolNumbers = getProtocolNumbers();
         this.totalProtocolCount = protocolNumbers.size();
         this.bucketHandler = new BucketHandler();
+        this.numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
+        this.numProtocolsLeftToProcess = protocolNumbers.size();
+        this .statCollector = new StatCollector(numWorkerThreads, 100);//TODO: Make report count configurable
         this.batchSize = 100; //TODO: Make this configurable
     }
 
@@ -57,6 +63,9 @@ public class PdfThreadMaster {
         int numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
         LOG.info(String.format("Kicking off %d PdfWorkerThread(s)", numWorkerThreads));
 
+        statCollector.startStopwatch();
+        statCollector.reportStats(numProtocolsLeftToProcess, true);
+
         List<Thread> workerThreads = new ArrayList<>();
         for (int workerId = 0; workerId < numWorkerThreads; workerId++) {
             PdfThreadWorker pdfThreadWorker = new PdfThreadWorker(workerId, this);
@@ -72,10 +81,13 @@ public class PdfThreadMaster {
                 throw new RuntimeException(e);
             }
         }
+
+        statCollector.stopStopwatch();
+        statCollector.reportStats(numProtocolsLeftToProcess, true);
     }
 
 
-    public synchronized PdfBatch getNextPdfBatch() {
+    public synchronized PdfBatch getNextPdfBatch(BatchResult batchResult) {
         if (protocolNumbers.isEmpty()) {
             // Signal to PdfThreadWorker that there's no more work so it can exit
             return null;
@@ -91,6 +103,11 @@ public class PdfThreadMaster {
 
         bucketHandler.incrementProtocolCount(numberBatch.size());
         String bucketPath = bucketHandler.getCurrentBucketPath();
+
+        if (batchResult != null) {
+            numProtocolsLeftToProcess -= batchResult.getTotalProcessed();
+            statCollector.recordDocProcessed(batchResult, numProtocolsLeftToProcess);
+        }
 
         return new PdfBatch(numberBatch, bucketPath);
     }
