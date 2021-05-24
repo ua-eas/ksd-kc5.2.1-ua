@@ -76,9 +76,8 @@ public class PdfThreadWorker implements Runnable {
                     continue;
                 }
 
-                Protocol protocol = getProtocol(protocolNumber);
-
                 try {
+                    Protocol protocol = getProtocol(protocolNumber);
                     sortProtoclActions(protocol);
                     processProtocol(protocol, currentBucketPath);
                 } catch (Throwable t) {
