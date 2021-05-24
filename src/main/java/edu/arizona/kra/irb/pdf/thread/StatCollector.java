@@ -65,10 +65,10 @@ public class StatCollector {
     }
 
 
-    public void recordDocProcessed(BatchResult batchResult, int numDocsLeftToProcess) {
+    public void recordDocProcessed(BatchResult batchResult, int numDocsLeftToProcess, int currentFailedCount) {
         totalNumProcessed += batchResult.getTotalProcessed();
         totalProcessedSuccess += batchResult.getNumSuccess();
-        totalProcessedFailed += batchResult.getNumFailed();
+        totalProcessedFailed = currentFailedCount;
 
         reportStats(numDocsLeftToProcess);
     }

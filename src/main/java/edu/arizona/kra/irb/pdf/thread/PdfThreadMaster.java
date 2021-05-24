@@ -27,27 +27,45 @@ public class PdfThreadMaster {
     private ProtocolNumberDao protocolNumberDao;
     private final BucketHandler bucketHandler;
     private final StatCollector statCollector;
-    private final List<String> protocolNumbers;
+    private List<String> protocolNumbers;
+    private final List<String> failedProtocolNumbers;
     private final int numWorkerThreads;
     private final int totalProtocolCount;
     private int numProtocolsLeftToProcess;
     private final int batchSize;
+    private int numRetries;
 
 
     public PdfThreadMaster() {
         this.protocolNumbers = getProtocolNumbers();
         this.totalProtocolCount = protocolNumbers.size();
+        this.failedProtocolNumbers = new ArrayList<>();
         this.bucketHandler = new BucketHandler();
         this.numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
         this.numProtocolsLeftToProcess = protocolNumbers.size();
         this .statCollector = new StatCollector(numWorkerThreads, 100);//TODO: Make report count configurable
         this.batchSize = 100; //TODO: Make this configurable
+        this.numRetries = 3; //TODO: Make this configurable
     }
 
 
     public void process() {
         SqlUtils.createSpreadsheetTable();
-        executeThreading();
+
+        // First time through the loop will be the input list, n-1 iterations
+        // will be any leftover failed protococol numbers that the threads report
+        while (numRetries + 1 > 0) {
+            numRetries--;
+            executeThreading();
+
+            if (failedProtocolNumbers.size() == 0) {
+                break;
+            }
+
+            protocolNumbers = failedProtocolNumbers;
+            numProtocolsLeftToProcess = failedProtocolNumbers.size();
+        }
+
         createSpreadsheet();
         FileUtils.createFinishFile(totalProtocolCount, true);
     }
@@ -60,7 +78,6 @@ public class PdfThreadMaster {
 
 
     private void executeThreading() {
-        int numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
         LOG.info(String.format("Kicking off %d PdfWorkerThread(s)", numWorkerThreads));
 
         statCollector.startStopwatch();
@@ -106,7 +123,8 @@ public class PdfThreadMaster {
 
         if (batchResult != null) {
             numProtocolsLeftToProcess -= batchResult.getTotalProcessed();
-            statCollector.recordDocProcessed(batchResult, numProtocolsLeftToProcess);
+            failedProtocolNumbers.addAll(batchResult.getFailedProtocolNumbers());
+            statCollector.recordDocProcessed(batchResult, numProtocolsLeftToProcess, failedProtocolNumbers.size());
         }
 
         return new PdfBatch(numberBatch, bucketPath);

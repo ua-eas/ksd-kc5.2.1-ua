@@ -1,12 +1,19 @@
 package edu.arizona.kra.irb.pdf.thread;
 
+import java.util.List;
+
 public class BatchResult {
     private long numSuccess;
-    private long numFailed;
+    private List<String> failedProtocolNumbers;
+
+
+    public BatchResult() {
+        numSuccess = 0;
+    }
 
 
     public long getTotalProcessed() {
-        return numSuccess + numFailed;
+        return numSuccess + failedProtocolNumbers.size();
     }
 
 
@@ -14,17 +21,25 @@ public class BatchResult {
         numSuccess++;
     }
 
+
     public long getNumSuccess() {
         return numSuccess;
     }
 
 
-    public void incrementFailed() {
-        numFailed++;
+    public void addFailed(String protocolNumber) {
+        failedProtocolNumbers.add(protocolNumber);
     }
 
+
     public long getNumFailed() {
-        return numFailed;
+        return failedProtocolNumbers.size();
+    }
+
+
+    public List<String> getFailedProtocolNumbers() {
+        return failedProtocolNumbers;
     }
 
 }
+

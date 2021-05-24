@@ -73,7 +73,6 @@ public class PdfThreadWorker implements Runnable {
                 logInfo(String.format("Processing protocol: %s", protocolNumber));
 
                 if (!isValidProtocolNumber(protocolNumber)) {
-                    batchResult.incrementFailed();
                     continue;
                 }
 
@@ -83,7 +82,7 @@ public class PdfThreadWorker implements Runnable {
                     sortProtoclActions(protocol);
                     processProtocol(protocol, currentBucketPath);
                 } catch (Throwable t) {
-                    batchResult.incrementFailed();
+                    batchResult.addFailed(protocolNumber);
                     logError(String.format("Unexpected issue, skipping protocol '%s'", protocolNumber), t);
                     continue;
                 }
@@ -113,7 +112,6 @@ public class PdfThreadWorker implements Runnable {
      * Descending sort so most recent date is at top
      */
     private void sortProtoclActions(Protocol protocol) {
-        protocol.refreshReferenceObject("protocolActions");//gets rid of weird XAException during sort below
         List<ProtocolActionBase> protocolActions = protocol.getProtocolActions();
         protocolActions.sort(Comparator.comparing(ProtocolActionBase::getActualActionDate).reversed());
     }
