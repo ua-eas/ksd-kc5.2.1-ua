@@ -41,11 +41,12 @@ public class StatCollector {
             LOG.info("#### Protocol Summaries ##############################################################");
             LOG.info(String.format("#     Total processed: %d", totalNumProcessed));
             LOG.info(String.format("#          To process: %d", unprocessedTotal));
-            LOG.info(String.format("#    Generate success: %d", totalProcessedSuccess));
-            LOG.info(String.format("#     Generate failed: %d", totalProcessedFailed));
-            LOG.info(String.format("#          Throughput: %.2f pdfs/min (%.2f per thread)", throughput, singleThreadThroughput));
+            LOG.info(String.format("#       Success count: %d", totalProcessedSuccess));
+            LOG.info(String.format("#       Failure count: %d", totalProcessedFailed));
+            LOG.info(String.format("#          Throughput: %.2f pdfs/min (%.2f pdfs/min/thread)", throughput, singleThreadThroughput));
             LOG.info(String.format("#        Time Elapsed: %s", formatMillis(elapsedMillis)));
             LOG.info(String.format("#           Time left: %s", getEstimatedTimeLeft(unprocessedTotal, throughput)));
+            LOG.info("######################################################################################");
         }
     }
 
