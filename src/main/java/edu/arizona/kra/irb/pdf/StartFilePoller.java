@@ -4,10 +4,9 @@ import edu.arizona.kra.irb.pdf.thread.PdfThreadMaster;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
-import org.kuali.rice.krad.UserSession;
-import org.kuali.rice.krad.util.KRADConstants;
 
 import java.io.File;
+
 
 import static edu.arizona.kra.irb.pdf.PdfConstants.START_PROCESSING_FILE_PATH;
 
@@ -51,7 +50,7 @@ public class StartFilePoller implements Runnable {
         LOG.info("Starting ProtocolPdfWriterService");
         PdfThreadMaster pdfThreadMaster = new PdfThreadMaster();
         pdfThreadMaster.process();
-        LOG.info("Service started.");
+        LOG.info("Service exiting.");
     }
 
 

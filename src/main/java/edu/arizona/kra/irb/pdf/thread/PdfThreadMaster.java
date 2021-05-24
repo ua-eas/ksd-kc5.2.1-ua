@@ -109,11 +109,6 @@ public class PdfThreadMaster {
 
 
     public synchronized PdfBatch getNextPdfBatch(BatchResult batchResult) {
-        if (protocolNumbers.isEmpty()) {
-            // Signal to PdfThreadWorker that there's no more work so it can exit
-            return null;
-        }
-
         List<String> numberBatch = new ArrayList<>();
         Iterator<String> iter = protocolNumbers.iterator();
 
@@ -131,6 +126,11 @@ public class PdfThreadMaster {
             statCollector.recordDocProcessed(batchResult, numProtocolsLeftToProcess, failedProtocolNumbers.size());
         }
 
+        if (protocolNumbers.isEmpty()) {
+            // Signal to PdfThreadWorker that there's no more work so it can exit
+            return null;
+        }
+
         return new PdfBatch(numberBatch, bucketPath);
     }
 
@@ -141,6 +141,7 @@ public class PdfThreadMaster {
         boolean getProtocolNumbersFromFile = getKualiConfigurationService().getPropertyValueAsBoolean(GET_PROTOCOL_NUMBERS_FROM_FILE);
         if (getProtocolNumbersFromFile) {
             String numbersFilePath = getKualiConfigurationService().getPropertyValueAsString(PROTOCOL_NUMBERS_FILE_PATH);
+            LOG.info("Pulling protocol numbers from file: " + numbersFilePath);
             try {
                 protocolNumbers = Files.readAllLines(Paths.get(numbersFilePath));
                 protocolNumbers.removeIf(StringUtils::isBlank);
@@ -148,9 +149,11 @@ public class PdfThreadMaster {
                 throw new RuntimeException(e);
             }
         } else {
+            LOG.info("Pulling protocol numbers from DB");
             protocolNumbers = getProtocolNumberDao().getActiveProtocolNumbers();
         }
 
+        LOG.info("Total protocol numbers pulled: " + protocolNumbers.size());
         return protocolNumbers;
     }
 
