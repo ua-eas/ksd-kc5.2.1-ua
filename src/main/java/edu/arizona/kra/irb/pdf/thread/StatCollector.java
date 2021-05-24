@@ -18,7 +18,7 @@ public class StatCollector {
 
 
     public StatCollector(long numWorkers, long reportCountThreshold) {
-        this.stopwatch = Stopwatch.createUnstarted();
+        this.stopwatch = new Stopwatch();
         this.totalNumProcessed = 0;
         this.totalProcessedSuccess = 0;
         this.totalProcessedFailed = 0;
@@ -74,7 +74,7 @@ public class StatCollector {
 
 
     private long getElapsedMillis() {
-        return stopwatch.elapsed(TimeUnit.MILLISECONDS);
+        return stopwatch.elapsedMillis();
     }
 
 

@@ -21,7 +21,7 @@
         <xmlbeans.version>3.1.0</xmlbeans.version>
         <aws-ssm.version>2.15.70</aws-ssm.version>
         <apache-poi.version>4.1.2</apache-poi.version>
-        <guava.version>20.0</guava.version>
+        <guava.version>11.0</guava.version>
     </properties>
 
     <dependencies>
