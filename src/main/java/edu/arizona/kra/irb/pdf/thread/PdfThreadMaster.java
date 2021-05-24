@@ -68,6 +68,10 @@ public class PdfThreadMaster {
 
         createSpreadsheet();
         FileUtils.createFinishFile(totalProtocolCount, true);
+
+        if (failedProtocolNumbers.size() > 0) {
+            LOG.warn("Some protocols faile to process: " + failedProtocolNumbers);
+        }
     }
 
 
