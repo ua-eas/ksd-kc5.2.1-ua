@@ -1,23 +1,24 @@
 package edu.arizona.kra.irb.pdf.thread;
 
-import org.apache.log4j.Logger;
-
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static edu.arizona.kra.irb.pdf.PdfConstants.NUM_WORKER_THREADS;
+import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
 public class StatReporter implements Runnable{
-    private static final Logger LOG = Logger.getLogger(StatReporter.class);
-
     private final StatCollector statCollector;
     private Thread worker;
     private final AtomicBoolean running;
-    private final int interval;
+    private final int intervalMillis;
 
 
     public StatReporter(StatCollector statCollector) {
         this.statCollector = statCollector;
         this.running = new AtomicBoolean(false);
-        this.interval = 30*1000;//TODO:Make this configurable
+
+        int intervalSeconds = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
+        this.intervalMillis = intervalSeconds *1000;
     }
 
 
@@ -38,17 +39,20 @@ public class StatReporter implements Runnable{
     }
 
 
+    @SuppressWarnings("BusyWait")
     public void run() {
         running.set(true);
 
         while (running.get()) {
             try {
-                Thread.sleep(interval);
+                Thread.sleep(intervalMillis);
             } catch (InterruptedException e){
-                LOG.warn("Recieved interupt!");
+                return;
             }
 
             statCollector.reportStats();
         }
+
     }
+
 }
