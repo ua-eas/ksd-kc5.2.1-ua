@@ -2,7 +2,7 @@ package edu.arizona.kra.irb.pdf.thread;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static edu.arizona.kra.irb.pdf.PdfConstants.NUM_WORKER_THREADS;
+import static edu.arizona.kra.irb.pdf.PdfConstants.REPORTING_INTERVAL_SECONDS;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
@@ -17,7 +17,7 @@ public class StatReporter implements Runnable{
         this.statCollector = statCollector;
         this.running = new AtomicBoolean(false);
 
-        int intervalSeconds = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
+        int intervalSeconds = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(REPORTING_INTERVAL_SECONDS));
         this.intervalMillis = intervalSeconds *1000;
     }
 

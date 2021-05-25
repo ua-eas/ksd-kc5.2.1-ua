@@ -59,6 +59,7 @@ public class PdfThreadMaster {
             executeThreading();
 
             if (failedProtocolNumbers.size() == 0) {
+                LOG.info("No failures to re-process");
                 break;
             }
 
@@ -68,6 +69,7 @@ public class PdfThreadMaster {
 
         createSpreadsheet();
         FileUtils.createFinishFile(totalProtocolCount, true);
+        statCollector.reportStats();
 
         if (failedProtocolNumbers.size() > 0) {
             LOG.warn("Some protocols faile to process: " + failedProtocolNumbers);
@@ -128,7 +130,7 @@ public class PdfThreadMaster {
             statCollector.recordBatchProcessed(batchResult, numProtocolsLeftToProcess, failedProtocolNumbers.size());
         }
 
-        if (protocolNumbers.isEmpty()) {
+        if (protocolNumbers.isEmpty() && numberBatch.isEmpty()) {
             // Signal to PdfThreadWorker that there's no more work so it can exit
             return null;
         }
