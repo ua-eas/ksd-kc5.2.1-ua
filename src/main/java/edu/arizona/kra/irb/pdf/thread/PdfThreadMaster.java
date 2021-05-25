@@ -123,7 +123,7 @@ public class PdfThreadMaster {
         if (batchResult != null) {
             numProtocolsLeftToProcess -= batchResult.getTotalProcessed();
             failedProtocolNumbers.addAll(batchResult.getFailedProtocolNumbers());
-            statCollector.recordDocProcessed(batchResult, numProtocolsLeftToProcess, failedProtocolNumbers.size());
+            statCollector.recordBatchProcessed(batchResult, numProtocolsLeftToProcess, failedProtocolNumbers.size());
         }
 
         if (protocolNumbers.isEmpty()) {

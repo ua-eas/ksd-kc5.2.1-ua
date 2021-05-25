@@ -14,6 +14,7 @@ public class StatCollector {
     private long totalNumProcessed;
     private long totalProcessedSuccess;
     private long totalProcessedFailed;
+    private long lastReportedAtCount;
     private final long numWorkers;
 
 
@@ -22,6 +23,7 @@ public class StatCollector {
         this.totalNumProcessed = 0;
         this.totalProcessedSuccess = 0;
         this.totalProcessedFailed = 0;
+        this.lastReportedAtCount = 0;
         this.reportCountThreshold = reportCountThreshold;
         this.numWorkers = numWorkers;
     }
@@ -33,7 +35,13 @@ public class StatCollector {
 
 
     public void reportStats(long unprocessedTotal, boolean forceReport) {
-        if (forceReport || (totalNumProcessed % reportCountThreshold == 0)) {
+        long deltaCount = totalNumProcessed - lastReportedAtCount;
+
+        // Only report if we're forced, or if we've accumualted
+        // enough reports' info to surpass the reporting threshold
+        if (forceReport || deltaCount >= reportCountThreshold) {
+            lastReportedAtCount = totalNumProcessed;
+
             long elapsedMillis = getElapsedMillis();
             double throughput = getThroughputPerMinute(elapsedMillis);
             double singleThreadThroughput = throughput / (double) numWorkers;
@@ -65,7 +73,7 @@ public class StatCollector {
     }
 
 
-    public void recordDocProcessed(BatchResult batchResult, int numDocsLeftToProcess, int currentFailedCount) {
+    public void recordBatchProcessed(BatchResult batchResult, int numDocsLeftToProcess, int currentFailedCount) {
         totalNumProcessed += batchResult.getTotalProcessed();
         totalProcessedSuccess += batchResult.getSuccessCount();
         totalProcessedFailed = currentFailedCount;
