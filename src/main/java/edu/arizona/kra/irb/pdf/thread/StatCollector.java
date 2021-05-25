@@ -20,19 +20,11 @@ public class StatCollector {
 
     public StatCollector(long numWorkers) {
         this.stopwatch = new Stopwatch();
+        this.statReporter = new StatReporter(this);
         this.totalNumProcessed = 0;
         this.totalProcessedSuccess = 0;
         this.totalProcessedFailed = 0;
         this.numWorkers = numWorkers;
-    }
-
-
-    public void init() {
-        // Weird bug where statReport would have an initialized
-        // statCollector if start() called in constructor
-        this.statReporter = new StatReporter();
-        statReporter.setStatCollector(this);
-        statReporter.start();
     }
 
 
@@ -98,7 +90,6 @@ public class StatCollector {
 
 
     public void processingComplete() {
-        statReporter.stop();
         statReporter.interrupt();
     }
 
