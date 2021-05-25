@@ -7,7 +7,7 @@ import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfiguratio
 
 
 public class StatReporter implements Runnable{
-    private volatile StatCollector statCollector;
+    private final StatCollector statCollector;
     private Thread worker;
     private final AtomicBoolean running;
     private final int intervalMillis;

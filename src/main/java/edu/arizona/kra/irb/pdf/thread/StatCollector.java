@@ -24,8 +24,13 @@ public class StatCollector {
         this.totalProcessedSuccess = 0;
         this.totalProcessedFailed = 0;
         this.numWorkers = numWorkers;
-
         this.statReporter = new StatReporter(this);
+    }
+
+
+    public void init() {
+        // Weird bug where statReport would have an initialized
+        // statCollector if start() called in constructor
         statReporter.start();
     }
 
