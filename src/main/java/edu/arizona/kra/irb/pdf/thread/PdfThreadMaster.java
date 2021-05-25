@@ -31,9 +31,9 @@ public class PdfThreadMaster {
     private final List<String> failedProtocolNumbers;
     private final int numWorkerThreads;
     private final int totalProtocolCount;
-    private int numProtocolsLeftToProcess;
+    private final int numRetries;
     private final int batchSize;
-    private int numRetries;
+    private int numProtocolsLeftToProcess;
 
 
     public PdfThreadMaster() {
@@ -51,15 +51,37 @@ public class PdfThreadMaster {
 
     public void process() {
         SqlUtils.createSpreadsheetTable();
+        processMainProtocolNumberList();
+        processFailedProtocolNumbers();
+        createSpreadsheet();
+        FileUtils.createFinishFile(totalProtocolCount, true);
 
-        // First time through the loop will be the input list, next n+1 iterations
-        // will be any leftover failed protocol numbers that the threads report
-        while (numRetries + 1 > 0) {
-            numRetries--;
+        if (failedProtocolNumbers.size() > 0) {
+            LOG.error("Some protocols failed to process: " + failedProtocolNumbers);
+        }
+    }
+
+
+    private void processMainProtocolNumberList() {
+        LOG.info("Processing main protocol number list.");
+        executeThreading();
+        LOG.info("Main list processing complete.");
+    }
+
+
+    private void processFailedProtocolNumbers() {
+        LOG.info("Processing failed protocol numbers.");
+        if (failedProtocolNumbers.isEmpty()) {
+            LOG.info("Found no failed protocols to process.");
+        }
+
+        for (int attempts = 1; attempts <= numRetries; attempts++) {
+            LOG.info(String.format("Starting attempt %d/%d at re-processing failed protocols", attempts, numRetries));
             executeThreading();
+            LOG.info(String.format("Completed attempt %d/%d at re-processing failed protocols", attempts, numRetries));
 
             if (failedProtocolNumbers.size() == 0) {
-                LOG.info("No failures to re-process");
+                LOG.info("No more failures found to re-process");
                 break;
             }
 
@@ -67,13 +89,7 @@ public class PdfThreadMaster {
             numProtocolsLeftToProcess = failedProtocolNumbers.size();
         }
 
-        createSpreadsheet();
-        FileUtils.createFinishFile(totalProtocolCount, true);
-        statCollector.reportStats();
-
-        if (failedProtocolNumbers.size() > 0) {
-            LOG.warn("Some protocols faile to process: " + failedProtocolNumbers);
-        }
+        LOG.info("Failed protocol numbers complete.");
     }
 
 
