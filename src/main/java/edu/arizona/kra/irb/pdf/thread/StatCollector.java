@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 public class StatCollector {
     private static final Logger LOG = Logger.getLogger(StatCollector.class);
 
-    private final Stopwatch stopwatch;
+    private volatile Stopwatch stopwatch;
     private StatReporter statReporter;
     private long totalNumProcessed;
     private long totalProcessedSuccess;
