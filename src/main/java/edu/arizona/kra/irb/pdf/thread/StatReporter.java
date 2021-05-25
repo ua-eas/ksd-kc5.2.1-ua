@@ -7,14 +7,13 @@ import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfiguratio
 
 
 public class StatReporter implements Runnable{
-    private final StatCollector statCollector;
+    private StatCollector statCollector;
     private Thread worker;
     private final AtomicBoolean running;
     private final int intervalMillis;
 
 
-    public StatReporter(StatCollector statCollector) {
-        this.statCollector = statCollector;
+    public StatReporter() {
         this.running = new AtomicBoolean(false);
 
         int intervalSeconds = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(REPORTING_INTERVAL_SECONDS));
@@ -55,4 +54,7 @@ public class StatReporter implements Runnable{
 
     }
 
+    public void setStatCollector(StatCollector statCollector) {
+        this.statCollector = statCollector;
+    }
 }

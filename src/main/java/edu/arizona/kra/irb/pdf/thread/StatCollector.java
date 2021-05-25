@@ -10,7 +10,7 @@ public class StatCollector {
     private static final Logger LOG = Logger.getLogger(StatCollector.class);
 
     private final Stopwatch stopwatch;
-    private final StatReporter statReporter;
+    private StatReporter statReporter;
     private long totalNumProcessed;
     private long totalProcessedSuccess;
     private long totalProcessedFailed;
@@ -24,13 +24,14 @@ public class StatCollector {
         this.totalProcessedSuccess = 0;
         this.totalProcessedFailed = 0;
         this.numWorkers = numWorkers;
-        this.statReporter = new StatReporter(this);
     }
 
 
     public void init() {
         // Weird bug where statReport would have an initialized
         // statCollector if start() called in constructor
+        this.statReporter = new StatReporter();
+        statReporter.setStatCollector(this);
         statReporter.start();
     }
 

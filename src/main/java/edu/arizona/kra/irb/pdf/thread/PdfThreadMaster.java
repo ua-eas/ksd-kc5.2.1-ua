@@ -44,6 +44,7 @@ public class PdfThreadMaster {
         this.numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
         this.numProtocolsLeftToProcess = protocolNumbers.size();
         this .statCollector = new StatCollector(numWorkerThreads);//TODO: Make report count configurable
+        this.statCollector.init();
         this.batchSize = 100; //TODO: Make this configurable
         this.numRetries = 3; //TODO: Make this configurable
     }
