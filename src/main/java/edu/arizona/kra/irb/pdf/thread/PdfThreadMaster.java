@@ -1,9 +1,9 @@
 package edu.arizona.kra.irb.pdf.thread;
 
 import edu.arizona.kra.irb.pdf.ProtocolNumberDao;
-import edu.arizona.kra.irb.pdf.utils.FileUtils;
 import edu.arizona.kra.irb.pdf.excel.ExcelCreator;
 import edu.arizona.kra.irb.pdf.utils.BucketHandler;
+import edu.arizona.kra.irb.pdf.utils.FileUtils;
 import edu.arizona.kra.irb.pdf.utils.SqlUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,7 +43,7 @@ public class PdfThreadMaster {
         this.bucketHandler = new BucketHandler();
         this.numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
         this.numProtocolsLeftToProcess = protocolNumbers.size();
-        this .statCollector = new StatCollector(numWorkerThreads, 100);//TODO: Make report count configurable
+        this .statCollector = new StatCollector(numWorkerThreads);//TODO: Make report count configurable
         this.batchSize = 100; //TODO: Make this configurable
         this.numRetries = 3; //TODO: Make this configurable
     }
@@ -52,8 +52,8 @@ public class PdfThreadMaster {
     public void process() {
         SqlUtils.createSpreadsheetTable();
 
-        // First time through the loop will be the input list, n-1 iterations
-        // will be any leftover failed protococol numbers that the threads report
+        // First time through the loop will be the input list, next n+1 iterations
+        // will be any leftover failed protocol numbers that the threads report
         while (numRetries + 1 > 0) {
             numRetries--;
             executeThreading();
@@ -84,8 +84,9 @@ public class PdfThreadMaster {
     private void executeThreading() {
         LOG.info(String.format("Kicking off %d PdfWorkerThread(s)", numWorkerThreads));
 
+        statCollector.setUnprocessedTotal(numProtocolsLeftToProcess);
         statCollector.startStopwatch();
-        statCollector.reportStats(numProtocolsLeftToProcess, true);
+        statCollector.reportStats();
 
         List<Thread> workerThreads = new ArrayList<>();
         for (int workerId = 0; workerId < numWorkerThreads; workerId++) {
@@ -104,7 +105,8 @@ public class PdfThreadMaster {
         }
 
         statCollector.stopStopwatch();
-        statCollector.reportStats(numProtocolsLeftToProcess, true);
+        statCollector.processingComplete();
+        statCollector.reportStats();
     }
 
 

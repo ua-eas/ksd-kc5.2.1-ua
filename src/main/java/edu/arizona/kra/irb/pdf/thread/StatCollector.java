@@ -10,52 +10,40 @@ public class StatCollector {
     private static final Logger LOG = Logger.getLogger(StatCollector.class);
 
     private final Stopwatch stopwatch;
-    private final long reportCountThreshold;
+    private final StatReporter statReporter;
     private long totalNumProcessed;
     private long totalProcessedSuccess;
     private long totalProcessedFailed;
-    private long lastReportedAtCount;
+    private long unprocessedTotal;
     private final long numWorkers;
 
 
-    public StatCollector(long numWorkers, long reportCountThreshold) {
+    public StatCollector(long numWorkers) {
         this.stopwatch = new Stopwatch();
         this.totalNumProcessed = 0;
         this.totalProcessedSuccess = 0;
         this.totalProcessedFailed = 0;
-        this.lastReportedAtCount = 0;
-        this.reportCountThreshold = reportCountThreshold;
         this.numWorkers = numWorkers;
+
+        this.statReporter = new StatReporter(this);
+        statReporter.start();
     }
 
 
-    private void reportStats(long unprocessedTotal) {
-        reportStats(unprocessedTotal, false);
-    }
+    public void reportStats() {
+        long elapsedMillis = getElapsedMillis();
+        double throughput = getThroughputPerMinute(elapsedMillis);
+        double singleThreadThroughput = throughput / (double) numWorkers;
 
-
-    public void reportStats(long unprocessedTotal, boolean forceReport) {
-        long deltaCount = totalNumProcessed - lastReportedAtCount;
-
-        // Only report if we're forced, or if we've accumualted
-        // enough reports' info to surpass the reporting threshold
-        if (forceReport || deltaCount >= reportCountThreshold) {
-            lastReportedAtCount = totalNumProcessed;
-
-            long elapsedMillis = getElapsedMillis();
-            double throughput = getThroughputPerMinute(elapsedMillis);
-            double singleThreadThroughput = throughput / (double) numWorkers;
-
-            LOG.info("#### Protocol Summaries ##############################################################");
-            LOG.info(String.format("#     Total processed: %d", totalNumProcessed));
-            LOG.info(String.format("#          To process: %d", unprocessedTotal));
-            LOG.info(String.format("#       Success count: %d", totalProcessedSuccess));
-            LOG.info(String.format("#       Failure count: %d", totalProcessedFailed));
-            LOG.info(String.format("#          Throughput: %.2f pdfs/min (%.2f pdfs/min/thread)", throughput, singleThreadThroughput));
-            LOG.info(String.format("#        Time Elapsed: %s", formatMillis(elapsedMillis)));
-            LOG.info(String.format("#           Time left: %s", getEstimatedTimeLeft(unprocessedTotal, throughput)));
-            LOG.info("######################################################################################");
-        }
+        LOG.info("#### Protocol Summaries ##############################################################");
+        LOG.info(String.format("#     Total processed: %d", totalNumProcessed));
+        LOG.info(String.format("#          To process: %d", unprocessedTotal));
+        LOG.info(String.format("#       Success count: %d", totalProcessedSuccess));
+        LOG.info(String.format("#       Failure count: %d", totalProcessedFailed));
+        LOG.info(String.format("#          Throughput: %.2f pdfs/min (%.2f pdfs/min/thread)", throughput, singleThreadThroughput));
+        LOG.info(String.format("#        Time Elapsed: %s", formatMillis(elapsedMillis)));
+        LOG.info(String.format("#           Time left: %s", getEstimatedTimeLeft(unprocessedTotal, throughput)));
+        LOG.info("######################################################################################");
     }
 
 
@@ -73,12 +61,11 @@ public class StatCollector {
     }
 
 
-    public void recordBatchProcessed(BatchResult batchResult, int numDocsLeftToProcess, int currentFailedCount) {
+    public void recordBatchProcessed(BatchResult batchResult, int unprocessedTotal, int currentFailedCount) {
+        this.unprocessedTotal = unprocessedTotal;
         totalNumProcessed += batchResult.getTotalProcessed();
         totalProcessedSuccess += batchResult.getSuccessCount();
         totalProcessedFailed = currentFailedCount;
-
-        reportStats(numDocsLeftToProcess);
     }
 
 
@@ -96,6 +83,17 @@ public class StatCollector {
     public void stopStopwatch() {
         stopwatch.stop();
         LOG.info("Stopped stopwatch.");
+    }
+
+
+    public void setUnprocessedTotal(long unprocessedTotal) {
+        this.unprocessedTotal = unprocessedTotal;
+    }
+
+
+    public void processingComplete() {
+        statReporter.stop();
+        statReporter.interrupt();
     }
 
 
