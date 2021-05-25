@@ -9,8 +9,7 @@ import java.util.concurrent.TimeUnit;
 public class StatCollector {
     private static final Logger LOG = Logger.getLogger(StatCollector.class);
 
-    private Stopwatch stopwatch;
-    private StatReporter statReporter;
+    private final Stopwatch stopwatch;
     private long totalNumProcessed;
     private long totalProcessedSuccess;
     private long totalProcessedFailed;
@@ -20,7 +19,6 @@ public class StatCollector {
 
     public StatCollector(long numWorkers) {
         this.stopwatch = new Stopwatch();
-        this.statReporter = new StatReporter(this);
         this.totalNumProcessed = 0;
         this.totalProcessedSuccess = 0;
         this.totalProcessedFailed = 0;
@@ -86,11 +84,6 @@ public class StatCollector {
 
     public void setUnprocessedTotal(long unprocessedTotal) {
         this.unprocessedTotal = unprocessedTotal;
-    }
-
-
-    public void processingComplete() {
-        statReporter.interrupt();
     }
 
 

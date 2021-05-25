@@ -27,6 +27,7 @@ public class PdfThreadMaster {
     private ProtocolNumberDao protocolNumberDao;
     private final BucketHandler bucketHandler;
     private final StatCollector statCollector;
+    private final StatReporter statReporter;
     private List<String> protocolNumbers;
     private final List<String> failedProtocolNumbers;
     private final int numWorkerThreads;
@@ -44,6 +45,7 @@ public class PdfThreadMaster {
         this.numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
         this.numProtocolsLeftToProcess = protocolNumbers.size();
         this.statCollector = new StatCollector(numWorkerThreads);//TODO: Make report count configurable
+        this.statReporter = new StatReporter(this);
         this.batchSize = 100; //TODO: Make this configurable
         this.numRetries = 3; //TODO: Make this configurable
     }
@@ -51,6 +53,7 @@ public class PdfThreadMaster {
 
     public void process() {
         SqlUtils.createSpreadsheetTable();
+        statReporter.start();
         processMainProtocolNumberList();
         processFailedProtocolNumbers();
         createSpreadsheet();
@@ -123,7 +126,6 @@ public class PdfThreadMaster {
         }
 
         statCollector.stopStopwatch();
-        statCollector.processingComplete();
         statCollector.reportStats();
     }
 
@@ -175,6 +177,11 @@ public class PdfThreadMaster {
 
         LOG.info("Total protocol numbers pulled: " + protocolNumbers.size());
         return protocolNumbers;
+    }
+
+
+    public void reportStats() {
+        statCollector.reportStats();
     }
 
 

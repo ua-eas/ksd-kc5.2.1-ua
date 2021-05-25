@@ -5,14 +5,14 @@ import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfiguratio
 
 
 public class StatReporter extends Thread {
-    private final StatCollector statCollector;
+    private final PdfThreadMaster pdfThreadMaster;
     private final int intervalMillis;
 
 
-    public StatReporter(StatCollector statCollector) {
+    public StatReporter(PdfThreadMaster pdfThreadMaster) {
         int intervalSeconds = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(REPORTING_INTERVAL_SECONDS));
         this.intervalMillis = intervalSeconds * 1000;
-        this.statCollector = statCollector;
+        this.pdfThreadMaster = pdfThreadMaster;
     }
 
 
@@ -25,7 +25,7 @@ public class StatReporter extends Thread {
                 return;
             }
 
-            statCollector.reportStats();
+            pdfThreadMaster.reportStats();
         }
 
     }
