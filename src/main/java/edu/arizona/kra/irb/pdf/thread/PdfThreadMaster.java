@@ -56,6 +56,7 @@ public class PdfThreadMaster {
         statReporter.start();
         processMainProtocolNumberList();
         processFailedProtocolNumbers();
+        statReporter.interrupt();
         createSpreadsheet();
         FileUtils.createFinishFile(totalProtocolCount, true);
 
@@ -76,6 +77,7 @@ public class PdfThreadMaster {
         LOG.info("Processing failed protocol numbers.");
         if (failedProtocolNumbers.isEmpty()) {
             LOG.info("Found no failed protocols to process.");
+            return;
         }
 
         for (int attempts = 1; attempts <= numRetries; attempts++) {
