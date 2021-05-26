@@ -1,5 +1,6 @@
 package edu.arizona.kra.irb.pdf.excel;
 
+import edu.arizona.kra.irb.pdf.EfsAttachment;
 import edu.arizona.kra.irb.pdf.sql.QueryConstants;
 import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
 import edu.arizona.kra.irb.pdf.sql.enums.Category;
@@ -23,15 +24,16 @@ public class ExcelDbAgent {
     }
 
 
-    public void writeToDb(String id, String protocolNumber, String fileName, String fullEfsFilePath) {
+    public void writeToDb(String id, String protocolNumber, String fileName, EfsAttachment efsAttachment) {
         String destType = "_IRBSubmission";
         String huronDestination = HuronDestination.HistoricalDocuments.getDestination();
         int destAttrIsSet = 1;
-        String fullSftpFilePath = fullEfsFilePath.replace(efsRootDir, sftpRootDir);
+        String fullSftpFilePath = efsAttachment.getEfsPath().replace(efsRootDir, sftpRootDir);
         String category = Category.Other.getDescription();
+        String md5hash = efsAttachment.getMd5hash();
 
         sqlExecutor.insert(QueryConstants.INSERT_EXCEL_ROW,
-                id, destType, protocolNumber, huronDestination, destAttrIsSet, fileName, fullSftpFilePath, category);
+                id, destType, protocolNumber, huronDestination, destAttrIsSet, fileName, fullSftpFilePath, category, md5hash);
     }
 
 }

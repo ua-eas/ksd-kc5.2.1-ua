@@ -15,14 +15,15 @@ public class QueryConstants {
                     "    is_processed      VARCHAR2(10), \n" +
                     "    error             VARCHAR2(10), \n" +
                     "    document_id       VARCHAR2(10) \n" +
+                    "    md5checksum       VARCHAR2(10) \n" +
                     ")";
 
     public static final String TRUNCATE_SPREADSHEET_TABLE_SQL = "truncate table attachment_spreadsheet_sum";
 
     public static final String INSERT_EXCEL_ROW =
             "insert into attachment_spreadsheet_sum \n" +
-                "(id, dest_type, protocol_number, huron_destination, dest_att_is_set, ui_filename, sftp_path, category) \n" +
-                "values (?, ?, ?, ?, ?, ?, ?, ?)";
+                "(id, dest_type, protocol_number, huron_destination, dest_att_is_set, ui_filename, sftp_path, category, md5checksum) \n" +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     public static final String FIND_ALL_EXCEL_ROWS = "select * from attachment_spreadsheet_sum";
 
