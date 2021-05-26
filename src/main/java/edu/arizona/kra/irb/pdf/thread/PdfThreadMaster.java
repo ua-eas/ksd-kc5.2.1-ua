@@ -23,13 +23,13 @@ import static edu.arizona.kra.irb.pdf.PdfConstants.*;
 public class PdfThreadMaster {
     private static final Logger LOG = Logger.getLogger(PdfThreadMaster.class);
 
+    private final BucketHandler bucketHandler;
+    private final StatCollector statCollector;
+    private final StatReporter statReporter;
+    private final List<String> failedProtocolNumbers;
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
-    private final BucketHandler bucketHandler;
-    private volatile StatCollector statCollector;
-    private final StatReporter statReporter;
     private List<String> protocolNumbers;
-    private final List<String> failedProtocolNumbers;
     private final int numWorkerThreads;
     private final int totalProtocolCount;
     private final int numRetries;
