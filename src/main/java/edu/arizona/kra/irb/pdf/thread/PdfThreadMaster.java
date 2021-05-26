@@ -80,6 +80,9 @@ public class PdfThreadMaster {
             return;
         }
 
+        protocolNumbers = failedProtocolNumbers;
+        numProtocolsLeftToProcess = failedProtocolNumbers.size();
+
         for (int attempts = 1; attempts <= numRetries; attempts++) {
             LOG.info(String.format("Starting attempt %d/%d at re-processing failed protocols", attempts, numRetries));
             executeThreading();

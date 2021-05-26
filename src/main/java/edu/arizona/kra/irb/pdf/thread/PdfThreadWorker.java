@@ -66,7 +66,7 @@ public class PdfThreadWorker implements Runnable {
             List<String> protocolNumbers = pdfBatch.getProtocolNumbers();
             String currentBucketPath = pdfBatch.getBucketPath();
 
-            logInfo(String.format("Starting batch with %d protocol numbers.", protocolNumbers.size()));
+            logInfo(String.format("Starting batch with %d protocol number(s).", protocolNumbers.size()));
             batchResult = new BatchResult();
 
             for (String protocolNumber : protocolNumbers) {
