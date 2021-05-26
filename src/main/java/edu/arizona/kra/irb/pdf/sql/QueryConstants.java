@@ -14,7 +14,7 @@ public class QueryConstants {
                     "    version_id        VARCHAR2(255), \n" +
                     "    is_processed      VARCHAR2(10), \n" +
                     "    error             VARCHAR2(10), \n" +
-                    "    document_id       VARCHAR2(10) \n" +
+                    "    document_id       VARCHAR2(10), \n" +
                     "    md5checksum       VARCHAR2(10) \n" +
                     ")";
 
