@@ -185,7 +185,7 @@ public class PdfThreadMaster {
     }
 
 
-    public void reportStats() {
+    public synchronized void reportStats() {
         statCollector.reportStats();
     }
 
