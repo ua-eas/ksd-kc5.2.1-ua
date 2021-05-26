@@ -10,10 +10,10 @@ public class StatCollector {
     private static final Logger LOG = Logger.getLogger(StatCollector.class);
 
     private final Stopwatch stopwatch;
-    private volatile long totalNumProcessed;
-    private volatile long totalProcessedSuccess;
-    private volatile long totalProcessedFailed;
-    private volatile long unprocessedTotal;
+    private long totalNumProcessed;
+    private long totalProcessedSuccess;
+    private long totalProcessedFailed;
+    private long unprocessedTotal;
     private final long numWorkers;
 
 
