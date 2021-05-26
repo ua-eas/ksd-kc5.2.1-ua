@@ -26,7 +26,7 @@ public class PdfThreadMaster {
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
     private final BucketHandler bucketHandler;
-    private final StatCollector statCollector;
+    private volatile StatCollector statCollector;
     private final StatReporter statReporter;
     private List<String> protocolNumbers;
     private final List<String> failedProtocolNumbers;
@@ -44,7 +44,7 @@ public class PdfThreadMaster {
         this.bucketHandler = new BucketHandler();
         this.numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
         this.numProtocolsLeftToProcess = protocolNumbers.size();
-        this.statCollector = new StatCollector(numWorkerThreads);//TODO: Make report count configurable
+        this.statCollector = new StatCollector(numWorkerThreads);
         this.statReporter = new StatReporter(this);
         this.batchSize = 100; //TODO: Make this configurable
         this.numRetries = 3; //TODO: Make this configurable
