@@ -147,11 +147,9 @@ public class PdfThreadMaster {
         bucketHandler.incrementProtocolCount(numberBatch.size());
         String bucketPath = bucketHandler.getCurrentBucketPath();
 
-        if (batchResult != null) {
-            numProtocolsLeftToProcess -= batchResult.getTotalProcessed();
-            failedProtocolNumbers.addAll(batchResult.getFailedProtocolNumbers());
-            statCollector.recordBatchProcessed(batchResult, numProtocolsLeftToProcess, failedProtocolNumbers.size());
-        }
+        numProtocolsLeftToProcess -= batchResult.getTotalProcessed();
+        failedProtocolNumbers.addAll(batchResult.getFailedProtocolNumbers());
+        statCollector.recordBatchProcessed(batchResult, numProtocolsLeftToProcess, failedProtocolNumbers.size());
 
         if (protocolNumbers.isEmpty() && numberBatch.isEmpty()) {
             // Signal to PdfThreadWorker that there's no more work so it can exit

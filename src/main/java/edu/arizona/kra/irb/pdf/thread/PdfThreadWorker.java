@@ -54,7 +54,7 @@ public class PdfThreadWorker implements Runnable {
         // Since this is a new thread, we need to set UserSession into global scope
         GlobalVariables.setUserSession(new UserSession(KRADConstants.SYSTEM_USER));
 
-        BatchResult batchResult = null;
+        BatchResult batchResult = new BatchResult();
 
         while (true) {
             PdfBatch pdfBatch = pdfThreadMaster.getNextPdfBatch(batchResult);
