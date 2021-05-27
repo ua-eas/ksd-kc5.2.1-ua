@@ -3,6 +3,7 @@ package edu.arizona.kra.irb.pdf;
 import edu.arizona.kra.irb.pdf.efs.EfsAgent;
 import edu.arizona.kra.irb.pdf.excel.ExcelCreator;
 import edu.arizona.kra.irb.pdf.excel.ExcelDbAgent;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
@@ -136,24 +137,29 @@ public class ProtocolPdfWorker extends Thread {
         }
 
         attachmentDataSource.setFileName(filename);
-        String fullEfsFilePath = pushToEfs(attachmentDataSource, protocol.getProtocolNumber());
-        createExcelRecord(attachmentDataSource, protocolNumber, fullEfsFilePath);
+        EfsAttachment efsAttachment = pushToEfs(attachmentDataSource, protocol.getProtocolNumber());
+        createExcelRecord(attachmentDataSource, protocolNumber, efsAttachment);
     }
 
-    private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber, String fullEfsFilePath) {
+    private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber, EfsAttachment efsAttachment) {
         String id = UUID.randomUUID().toString();
         String fileName = attachmentDataSource.getFileName();
-        excelDbAgent.writeToDb(id, protocolNumber, fileName, fullEfsFilePath);
+        excelDbAgent.writeToDb(id, protocolNumber, fileName, efsAttachment);
     }
 
 
-    private String pushToEfs(AttachmentDataSource attachmentDataSource, String protocolNumber) {
+    private EfsAttachment pushToEfs(AttachmentDataSource attachmentDataSource, String protocolNumber) {
         logInfo(String.format("Pushing protocol %s to efs", protocolNumber));
+
         byte[] bytes = attachmentDataSource.getContent();
+        String md5hash = DigestUtils.md5Hex(bytes);
+
         String fullEfsFilePath = efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, pushToEfs);
+        EfsAttachment efsAttachment = new EfsAttachment(fullEfsFilePath, md5hash);
+
         logInfo(String.format("Pushed protocol %s to efs complete", protocolNumber));
 
-        return fullEfsFilePath;
+        return efsAttachment;
     }
 
 
