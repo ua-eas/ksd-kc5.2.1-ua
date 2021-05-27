@@ -30,10 +30,10 @@ public class ExcelDbAgent {
         int destAttrIsSet = 1;
         String fullSftpFilePath = efsAttachment.getEfsPath().replace(efsRootDir, sftpRootDir);
         String category = Category.Other.getDescription();
-        String md5hash = efsAttachment.getMd5hash();
+        String md5checksum = efsAttachment.getMd5hash();
 
         sqlExecutor.insert(QueryConstants.INSERT_EXCEL_ROW,
-                id, destType, protocolNumber, huronDestination, destAttrIsSet, fileName, fullSftpFilePath, category, md5hash);
+                id, destType, protocolNumber, huronDestination, destAttrIsSet, fileName, fullSftpFilePath, category, md5checksum);
     }
 
 }

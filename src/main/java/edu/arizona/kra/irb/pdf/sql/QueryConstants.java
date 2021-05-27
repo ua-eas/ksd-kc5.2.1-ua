@@ -15,7 +15,7 @@ public class QueryConstants {
                     "    is_processed      VARCHAR2(10), \n" +
                     "    error             VARCHAR2(10), \n" +
                     "    document_id       VARCHAR2(10), \n" +
-                    "    md5checksum       VARCHAR2(10) \n" +
+                    "    md5checksum       VARCHAR2(32) \n" +
                     ")";
 
     public static final String DROP_SPREADSHEET_TABLE_SQL = "drop table attachment_spreadsheet_sum";
