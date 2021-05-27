@@ -18,7 +18,7 @@ public class QueryConstants {
                     "    md5checksum       VARCHAR2(10) \n" +
                     ")";
 
-    public static final String TRUNCATE_SPREADSHEET_TABLE_SQL = "truncate table attachment_spreadsheet_sum";
+    public static final String DROP_SPREADSHEET_TABLE_SQL = "drop table attachment_spreadsheet_sum";
 
     public static final String INSERT_EXCEL_ROW =
             "insert into attachment_spreadsheet_sum \n" +

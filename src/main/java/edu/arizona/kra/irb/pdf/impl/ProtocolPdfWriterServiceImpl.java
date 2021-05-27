@@ -132,6 +132,15 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
     private void createSpreadsheetTable() {
         SqlExecutor sqlExecutor = new SqlExecutor();
 
+        String truncateSpreadsheetTableOnStart = getKualiConfigurationService().getPropertyValueAsString(SHOULD_TRUNCATE);
+        if (truncateSpreadsheetTableOnStart.equals("true")) {
+            try {
+                sqlExecutor.execute(QueryConstants.DROP_SPREADSHEET_TABLE_SQL);
+            } catch (Exception e) {
+                // Bootstrap, table doesn't exist yet
+            }
+        }
+
         try {
             sqlExecutor.execute(QueryConstants.CREATE_SPREADSHEET_TABLE_SQL);
         } catch (Exception e) {
@@ -141,10 +150,6 @@ public class ProtocolPdfWriterServiceImpl implements ProtocolPdfWriterService {
             }
         }
 
-        String truncateSpreadsheetTableOnStart = getKualiConfigurationService().getPropertyValueAsString(SHOULD_TRUNCATE);
-        if (truncateSpreadsheetTableOnStart.equals("true")) {
-            sqlExecutor.execute(QueryConstants.TRUNCATE_SPREADSHEET_TABLE_SQL);
-        }
     }
 
 
