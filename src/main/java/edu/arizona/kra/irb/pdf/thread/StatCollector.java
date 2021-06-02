@@ -43,6 +43,7 @@ public class StatCollector extends Thread {
         LOG.info(String.format("#          To process: %d", unprocessedTotal));
         LOG.info(String.format("#       Success count: %d", totalProcessedSuccess));
         LOG.info(String.format("#       Failure count: %d", totalProcessedFailed));
+        LOG.info(String.format("#        Thread count: %d", numWorkers));
         LOG.info(String.format("#          Throughput: %.2f pdfs/min (%.2f pdfs/min/thread)", throughput, singleThreadThroughput));
         LOG.info(String.format("#        Time Elapsed: %s", formatMillis(elapsedMillis)));
         LOG.info(String.format("#           Time left: %s", getEstimatedTimeLeft(unprocessedTotal, throughput)));
@@ -65,9 +66,9 @@ public class StatCollector extends Thread {
 
 
     public void recordBatchProcessed(BatchResult batchResult, int unprocessedTotal, int currentFailedCount) {
-        this.unprocessedTotal = unprocessedTotal;
         totalNumProcessed += batchResult.getTotalProcessed();
         totalProcessedSuccess += batchResult.getSuccessCount();
+        this.unprocessedTotal = unprocessedTotal;
         totalProcessedFailed = currentFailedCount;
     }
 

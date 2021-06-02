@@ -58,8 +58,8 @@ public class PdfThreadWorker implements Runnable {
 
         while (true) {
             PdfBatch pdfBatch = pdfThreadMaster.getNextPdfBatch(batchResult);
-            if (pdfBatch == null) {
-                logInfo("Recieved null PdfBatch, exiting main loop.");
+            if (pdfBatch.getProtocolNumbers().isEmpty()) {
+                logInfo("Recieved PdfBatch with no more work, exiting.");
                 break;
             }
 
