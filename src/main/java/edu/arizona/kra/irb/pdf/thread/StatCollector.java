@@ -5,8 +5,11 @@ import org.apache.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
+import static edu.arizona.kra.irb.pdf.PdfConstants.REPORTING_INTERVAL_SECONDS;
+import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
-public class StatCollector {
+
+public class StatCollector extends Thread {
     private static final Logger LOG = Logger.getLogger(StatCollector.class);
 
     private final Stopwatch stopwatch;
@@ -15,6 +18,7 @@ public class StatCollector {
     private long totalProcessedFailed;
     private long unprocessedTotal;
     private final long numWorkers;
+    private final int reportInterval;
 
 
     public StatCollector(long numWorkers) {
@@ -23,6 +27,9 @@ public class StatCollector {
         this.totalProcessedSuccess = 0;
         this.totalProcessedFailed = 0;
         this.numWorkers = numWorkers;
+
+        int intervalSeconds = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(REPORTING_INTERVAL_SECONDS));
+        this.reportInterval = intervalSeconds * 1000;
     }
 
 
@@ -99,4 +106,19 @@ public class StatCollector {
         return String.format("%02dd %02dh %02dm %02ds", days, hours, minutes, seconds);
     }
 
+
+    @SuppressWarnings("BusyWait")
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(reportInterval);
+            } catch (InterruptedException e){
+                return;
+            }
+
+            reportStats();
+        }
+
+    }
 }

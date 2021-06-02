@@ -4,19 +4,20 @@ import static edu.arizona.kra.irb.pdf.PdfConstants.REPORTING_INTERVAL_SECONDS;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
-public class StatReporter extends Thread {
-    private final PdfThreadMaster pdfThreadMaster;
+public class PeriodicReporter extends Thread {
+    private final StatCollector statCollector;
     private final int intervalMillis;
 
 
-    public StatReporter(PdfThreadMaster pdfThreadMaster) {
+    public PeriodicReporter(StatCollector statCollector) {
+        this.statCollector = statCollector;
         int intervalSeconds = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(REPORTING_INTERVAL_SECONDS));
         this.intervalMillis = intervalSeconds * 1000;
-        this.pdfThreadMaster = pdfThreadMaster;
     }
 
 
     @SuppressWarnings("BusyWait")
+    @Override
     public void run() {
         while (true) {
             try {
@@ -25,7 +26,7 @@ public class StatReporter extends Thread {
                 return;
             }
 
-            pdfThreadMaster.reportStats();
+            statCollector.reportStats();
         }
 
     }
