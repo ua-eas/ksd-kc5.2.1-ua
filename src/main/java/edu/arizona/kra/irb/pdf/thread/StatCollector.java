@@ -115,6 +115,7 @@ public class StatCollector extends Thread {
             try {
                 Thread.sleep(reportInterval);
             } catch (InterruptedException e){
+                // PdfThreadMaster calls interupt once all worker threads have been joined
                 return;
             }
 

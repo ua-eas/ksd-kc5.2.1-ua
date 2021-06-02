@@ -133,6 +133,9 @@ public class PdfThreadMaster {
     }
 
 
+    /*
+     * Called by PdfThreadWorkers, so needs to be threadsafe
+     */
     public synchronized PdfBatch getNextPdfBatch(BatchResult batchResult) {
         numProtocolsLeftToProcess -= batchResult.getTotalProcessed();
         failedProtocolNumbers.addAll(batchResult.getFailedProtocolNumbers());
@@ -173,11 +176,6 @@ public class PdfThreadMaster {
 
         LOG.info("Total protocol numbers pulled: " + protocolNumbers.size());
         return protocolNumbers;
-    }
-
-
-    public synchronized void reportStats() {
-        statCollector.reportStats();
     }
 
 
