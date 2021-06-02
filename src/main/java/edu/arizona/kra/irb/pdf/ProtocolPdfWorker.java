@@ -152,10 +152,10 @@ public class ProtocolPdfWorker extends Thread {
         logInfo(String.format("Pushing protocol %s to efs", protocolNumber));
 
         byte[] bytes = attachmentDataSource.getContent();
-        String md5hash = DigestUtils.md5Hex(bytes);
+        int bytesLength = bytes.length;
 
         String fullEfsFilePath = efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, pushToEfs);
-        EfsAttachment efsAttachment = new EfsAttachment(fullEfsFilePath, md5hash);
+        EfsAttachment efsAttachment = new EfsAttachment(fullEfsFilePath, bytesLength);
 
         logInfo(String.format("Pushed protocol %s to efs complete", protocolNumber));
 
