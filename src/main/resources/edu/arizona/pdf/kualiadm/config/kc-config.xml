@@ -7,7 +7,6 @@
   <param name="workbook.template.file.path">/edu/arizona/pdf/attachments-template.xlsx</param>
   <param name="workbook.output.file.path">/huronsaas/irb-migration/sandbox/attachments_ps.xlsx</param>
   <param name="efs.bucket.size">1000</param>
-  <param name="truncate.spreadsheet.table.on.start">true</param>
   <param name="workbook.tab.name">Sheet2</param>
   <param name="workbook.sheet.start.row">2</param>
   <param name="create.efs.files">true</param>

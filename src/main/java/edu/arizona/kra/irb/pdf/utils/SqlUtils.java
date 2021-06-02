@@ -51,18 +51,12 @@ public class SqlUtils {
 
     public static void createSpreadsheetTable() {
         try {
-            jdbcTemplate.execute(QueryConstants.CREATE_SPREADSHEET_TABLE_SQL);
+            jdbcTemplate.execute(QueryConstants.DROP_SPREADSHEET_TABLE_SQL);
         } catch (Exception e) {
-            if (!e.getMessage().contains("ORA-00955")) {
-                // This is not the "name is already used by an existing object" error, so fail fast
-                throw new RuntimeException(e);
-            }
+            // Bootstrap, table doesn't exist yet
         }
 
-        boolean truncateSpreadsheetTableOnStart = getKualiConfigurationService().getPropertyValueAsBoolean(SHOULD_TRUNCATE);
-        if (truncateSpreadsheetTableOnStart) {
-            jdbcTemplate.execute(QueryConstants.DROP_SPREADSHEET_TABLE_SQL);
-        }
+        jdbcTemplate.execute(QueryConstants.CREATE_SPREADSHEET_TABLE_SQL);
     }
 
 

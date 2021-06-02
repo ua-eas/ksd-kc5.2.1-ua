@@ -3,7 +3,6 @@ package edu.arizona.kra.irb.pdf;
 public class PdfConstants {
     public static final String NUM_WORKER_THREADS = "protocol.pdf.num.worker.threads";
     public static final String FINISH_FILE_PATH = "pdf.finish.file.path";
-    public static final String SHOULD_TRUNCATE = "truncate.spreadsheet.table.on.start";
     public static final String PROTOCOL_NUMBER_QUERY = "protocol.pdf.active.query.file";
     public static final String SFTP_ROOT_DIR = "sftp.root.dir";
     public static final String EFS_ROOT_DIR = "efs.root.dir";
