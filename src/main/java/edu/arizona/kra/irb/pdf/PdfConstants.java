@@ -18,4 +18,6 @@ public class PdfConstants {
     public static final String GET_PROTOCOL_NUMBERS_FROM_FILE = "get.protocol.numbers.from.file";
     public static final String PROTOCOL_NUMBERS_FILE_PATH = "protocol.numbers.file.path";
     public static final String REPORTING_INTERVAL_SECONDS = "reporting.interval.seconds";
+    public static final String PROTOCOL_NUMBER_BATCH_SIZE = "protocol.number.batch.size";
+    public static final String NUMBER_FAILURE_RETRIES = "number.failure.retries";
 }

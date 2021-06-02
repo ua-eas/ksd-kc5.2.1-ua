@@ -37,14 +37,14 @@ public class PdfThreadMaster {
 
 
     public PdfThreadMaster() {
+        this.numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
+        this.batchSize = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(PROTOCOL_NUMBER_BATCH_SIZE));
+        this.numRetries = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUMBER_FAILURE_RETRIES));
         this.protocolNumbers = getProtocolNumbers();
         this.totalProtocolCount = protocolNumbers.size();
         this.failedProtocolNumbers = new ArrayList<>();
         this.bucketHandler = new BucketHandler();
-        this.numWorkerThreads = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(NUM_WORKER_THREADS));
         this.numProtocolsLeftToProcess = protocolNumbers.size();
-        this.batchSize = 100; //TODO: Make this configurable
-        this.numRetries = 3; //TODO: Make this configurable
         this.statCollector = new StatCollector(numWorkerThreads);
     }
 

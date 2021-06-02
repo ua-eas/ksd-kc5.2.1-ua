@@ -16,5 +16,7 @@
   <param name="start.processing.file.path">/huronsaas/irb-migration/sandbox/start-protocol-summary-processing.txt</param>
   <param name="get.protocol.numbers.from.file">false</param>
   <param name="protocol.numbers.file.path">/huronsaas/irb-migration/sandbox/input-protocol-numbers.txt</param>
-  <param name="reporting.interval.seconds">10</param>
+  <param name="reporting.interval.seconds">30</param>
+  <param name="protocol.number.batch.size">100</param>
+  <param name="number.failure.retries">10</param>
 </config>
