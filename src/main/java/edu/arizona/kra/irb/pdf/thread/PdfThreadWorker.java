@@ -142,9 +142,8 @@ public class PdfThreadWorker implements Runnable {
 
 
     private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber, EfsAttachment efsAttachment) {
-        String id = UUID.randomUUID().toString();
         String fileName = attachmentDataSource.getFileName();
-        SqlUtils.writeToDb(id, protocolNumber, fileName, efsAttachment);
+        SqlUtils.writeToDb(protocolNumber, protocolNumber, fileName, efsAttachment);
     }
 
 
