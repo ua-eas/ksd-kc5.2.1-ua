@@ -1,5 +1,6 @@
 package edu.arizona.kra.irb.pdf.thread;
 
+import edu.arizona.kra.irb.pdf.EfsAttachment;
 import edu.arizona.kra.irb.pdf.utils.FileUtils;
 import edu.arizona.kra.irb.pdf.utils.SqlUtils;
 import org.apache.log4j.Logger;
@@ -135,25 +136,29 @@ public class PdfThreadWorker implements Runnable {
         attachmentDataSource.setFileName(filename);
         String efsFilePath = currentBucketPath + File.separator + filename;
 
-        pushToEfs(attachmentDataSource, efsFilePath);
-        createExcelRecord(attachmentDataSource, protocolNumber, efsFilePath);
+        EfsAttachment efsAttachment = pushToEfs(attachmentDataSource, efsFilePath);
+        createExcelRecord(attachmentDataSource, protocolNumber, efsAttachment);
     }
 
 
-    private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber, String fullEfsFilePath) {
+    private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber, EfsAttachment efsAttachment) {
         String id = UUID.randomUUID().toString();
         String fileName = attachmentDataSource.getFileName();
-        SqlUtils.writeToDb(id, protocolNumber, fileName, fullEfsFilePath);
+        SqlUtils.writeToDb(id, protocolNumber, fileName, efsAttachment);
     }
 
 
-    private void pushToEfs(AttachmentDataSource attachmentDataSource, String efsFilePath) {
+    private EfsAttachment pushToEfs(AttachmentDataSource attachmentDataSource, String efsFilePath) {
+        byte[] bytes = attachmentDataSource.getContent();
+        EfsAttachment efsAttachment = new EfsAttachment(efsFilePath, bytes.length);
+
         if (pushToEfs) {
-            byte[] bytes = attachmentDataSource.getContent();
             FileUtils.pushFileToEfs(bytes, efsFilePath);
         } else {
             LOG.info("EFS writing turned off, skipped writing file to: " + efsFilePath);
         }
+
+        return efsAttachment;
     }
 
 

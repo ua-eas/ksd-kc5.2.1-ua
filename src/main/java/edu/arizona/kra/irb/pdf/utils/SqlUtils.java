@@ -1,5 +1,6 @@
 package edu.arizona.kra.irb.pdf.utils;
 
+import edu.arizona.kra.irb.pdf.EfsAttachment;
 import edu.arizona.kra.irb.pdf.excel.ExcelAttachmentRecord;
 import edu.arizona.kra.irb.pdf.excel.ExcelRowMapper;
 import edu.arizona.kra.irb.pdf.sql.QueryConstants;
@@ -19,6 +20,7 @@ public class SqlUtils {
     private static final JdbcTemplate jdbcTemplate;
     private static final String sftpRootDir;
     private static final String efsRootDir;
+
     static {
         jdbcTemplate = new JdbcTemplate(getDataSource());
         sftpRootDir = getKualiConfigurationService().getPropertyValueAsString(SFTP_ROOT_DIR);
@@ -26,23 +28,23 @@ public class SqlUtils {
     }
 
 
-    public  static void execute(String sql) {
+    public static void execute(String sql) {
         jdbcTemplate.execute(sql);
     }
 
 
-    public  static void insert(String sql, Object... args) {
+    public static void insert(String sql, Object... args) {
         jdbcTemplate.update(sql, args);
 
     }
 
 
-    public  static List<ExcelAttachmentRecord> findAllExcelRecords() {
+    public static List<ExcelAttachmentRecord> findAllExcelRecords() {
         return jdbcTemplate.query(QueryConstants.FIND_ALL_EXCEL_ROWS, new ExcelRowMapper());
     }
 
 
-    public  static Integer counExcelRecords() {
+    public static Integer counExcelRecords() {
         return jdbcTemplate.queryForObject(QueryConstants.EXCEL_RECORD_COUNT, Integer.class);
     }
 
@@ -59,22 +61,22 @@ public class SqlUtils {
 
         boolean truncateSpreadsheetTableOnStart = getKualiConfigurationService().getPropertyValueAsBoolean(SHOULD_TRUNCATE);
         if (truncateSpreadsheetTableOnStart) {
-            jdbcTemplate.execute(QueryConstants.TRUNCATE_SPREADSHEET_TABLE_SQL);
+            jdbcTemplate.execute(QueryConstants.DROP_SPREADSHEET_TABLE_SQL);
         }
     }
 
 
-    public static void writeToDb(String id, String protocolNumber, String fileName, String fullEfsFilePath) {
+    public static void writeToDb(String id, String protocolNumber, String fileName, EfsAttachment efsAttachment) {
         String destType = "_IRBSubmission";
         String huronDestination = HuronDestination.HistoricalDocuments.getDestination();
         int destAttrIsSet = 1;
-        String fullSftpFilePath = fullEfsFilePath.replace(efsRootDir, sftpRootDir);
+        String fullSftpFilePath = efsAttachment.getEfsPath().replace(efsRootDir, sftpRootDir);
         String category = Category.Other.getDescription();
+        int bytesLength = efsAttachment.getBytesLength();
 
         insert(QueryConstants.INSERT_EXCEL_ROW,
-                id, destType, protocolNumber, huronDestination, destAttrIsSet, fileName, fullSftpFilePath, category);
+                id, destType, protocolNumber, huronDestination, destAttrIsSet, fileName, fullSftpFilePath, category, bytesLength);
     }
-
 
 
     private static DataSource getDataSource() {
