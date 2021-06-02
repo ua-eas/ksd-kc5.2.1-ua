@@ -20,7 +20,7 @@ import java.util.List;
 import static edu.arizona.kra.irb.pdf.PdfConstants.*;
 
 
-public class PdfThreadMaster {
+public class PdfThreadMaster implements Runnable {
     private static final Logger LOG = Logger.getLogger(PdfThreadMaster.class);
 
     private final BucketHandler bucketHandler;
@@ -49,17 +49,21 @@ public class PdfThreadMaster {
     }
 
 
-    public void process() {
+    @Override
+    public void run() {
         SqlUtils.createSpreadsheetTable();
         statCollector.start();
         processMainProtocolNumberList();
         processFailedProtocolNumbers();
         createSpreadsheet();
         FileUtils.createFinishFile(totalProtocolCount, true);
+        statCollector.reportStats();
 
         if (failedProtocolNumbers.size() > 0) {
             LOG.error("Some protocols failed to process: " + failedProtocolNumbers);
         }
+
+        LOG.info("All processing complete, exiting.");
     }
 
 

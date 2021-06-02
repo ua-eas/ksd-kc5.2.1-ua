@@ -47,10 +47,10 @@ public class StartFilePoller implements Runnable {
 
 
     private void startProcessing() {
-        LOG.info("Starting ProtocolPdfWriterService");
+        LOG.info("Starting PdfThreadMaster");
         PdfThreadMaster pdfThreadMaster = new PdfThreadMaster();
-        pdfThreadMaster.process();
-        LOG.info("Service exiting.");
+        Thread thread = new Thread(pdfThreadMaster);
+        thread.start();
     }
 
 
