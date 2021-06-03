@@ -7,7 +7,6 @@
   <param name="workbook.template.file.path">/edu/arizona/pdf/attachments-template.xlsx</param>
   <param name="workbook.output.file.path">/huronsaas/irb-migration/sandbox/attachments_ps.xlsx</param>
   <param name="efs.bucket.size">1000</param>
-  <param name="truncate.spreadsheet.table.on.start">true</param>
   <param name="workbook.tab.name">Sheet2</param>
   <param name="workbook.sheet.start.row">2</param>
   <param name="create.efs.files">true</param>
@@ -16,4 +15,7 @@
   <param name="start.processing.file.path">/huronsaas/irb-migration/sandbox/start-protocol-summary-processing.txt</param>
   <param name="get.protocol.numbers.from.file">false</param>
   <param name="protocol.numbers.file.path">/huronsaas/irb-migration/sandbox/input-protocol-numbers.txt</param>
+  <param name="reporting.interval.seconds">30</param>
+  <param name="protocol.number.batch.size">100</param>
+  <param name="number.failure.retries">10</param>
 </config>

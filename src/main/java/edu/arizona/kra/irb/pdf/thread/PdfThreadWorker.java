@@ -1,9 +1,8 @@
-package edu.arizona.kra.irb.pdf;
+package edu.arizona.kra.irb.pdf.thread;
 
-import edu.arizona.kra.irb.pdf.efs.EfsAgent;
-import edu.arizona.kra.irb.pdf.excel.ExcelCreator;
-import edu.arizona.kra.irb.pdf.excel.ExcelDbAgent;
-import org.apache.commons.codec.digest.DigestUtils;
+import edu.arizona.kra.irb.pdf.EfsAttachment;
+import edu.arizona.kra.irb.pdf.utils.FileUtils;
+import edu.arizona.kra.irb.pdf.utils.SqlUtils;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
@@ -18,6 +17,7 @@ import org.kuali.kra.protocol.actions.print.ProtocolSummaryPrintOptions;
 import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.krad.util.KRADConstants;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,88 +26,85 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import static edu.arizona.kra.irb.pdf.PdfConstants.SHOULD_CREATE_EFS_FILES;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
 
 
-public class ProtocolPdfWorker extends Thread {
-    private static final Logger LOG = Logger.getLogger(ProtocolPdfWorker.class);
+public class PdfThreadWorker implements Runnable {
+    private static final Logger LOG = Logger.getLogger(PdfThreadWorker.class);
     private static final String PS_NAME_FORMAT = "Protocol Summary Report %s.pdf";
 
-    private final int workerId;
-    private final Set<String> protocolNumbers;
-    private final UserSession userSession;
+    private final PdfThreadMaster pdfThreadMaster;
     private BusinessObjectService businessObjectService;
     private ProtocolPrintingService protocolPrintingService;
-    private final EfsAgent efsAgent;
     private final boolean pushToEfs;
-    private final ExcelDbAgent excelDbAgent;
-    private final ClassLoader classLoader;
+    private final int workerId;
 
 
-    public ProtocolPdfWorker(int workerId, Set<String> protocolNumbers, UserSession userSession) {
+    public PdfThreadWorker(int workerId, PdfThreadMaster pdfThreadMaster) {
         this.workerId = workerId;
-        this.protocolNumbers = protocolNumbers;
-        this.userSession = userSession;
-        this.efsAgent = new EfsAgent();
-        this.excelDbAgent = new ExcelDbAgent();
-        this.classLoader = getClass().getClassLoader();
+        this.pdfThreadMaster = pdfThreadMaster;
         this.pushToEfs = getKualiConfigurationService().getPropertyValueAsBoolean(SHOULD_CREATE_EFS_FILES);
     }
 
 
     @Override
     public void run() {
-        logInfo(String.format("Starting async processing with %d protocol numbers.", protocolNumbers.size()));
+        // Since this is a new thread, we need to set UserSession into global scope
+        GlobalVariables.setUserSession(new UserSession(KRADConstants.SYSTEM_USER));
 
-        // Since this is a new thread, we need to set UserSession into global scope again
-        GlobalVariables.setUserSession(userSession);
+        BatchResult batchResult = new BatchResult();
 
-        int processedCount = 0;
-        int total = protocolNumbers.size();
-
-        for (String protocolNumber : protocolNumbers) {
-            if (killSwitchClick()) {
-                logInfo("Detected file 'kill-switch.txt' on classpath, stopping pdf loop.");
+        while (true) {
+            PdfBatch pdfBatch = pdfThreadMaster.getNextPdfBatch(batchResult);
+            if (pdfBatch.getProtocolNumbers().isEmpty()) {
+                logInfo("Recieved PdfBatch with no more work, exiting.");
                 break;
             }
 
-            if (protocolNumber.toLowerCase().contains("a") || protocolNumber.toLowerCase().contains("r")) {
-                // These are amendment/revision protocols acting as an active parent, which is an invalid state,
-                // the IRB office should clean these up before the final migration is started, warn for now and skip
-                LOG.warn(String.format("Parent protocol is invalid amendment/revision type, skipping protocol '%s'", protocolNumber));
-                processedCount++;
-                logInfo(String.format("Protocol skipped, processed: %d/%d", processedCount, total));
-                continue;
-            }
+            List<String> protocolNumbers = pdfBatch.getProtocolNumbers();
+            String currentBucketPath = pdfBatch.getBucketPath();
 
-            logInfo(String.format("Processing protocol number '%s'", protocolNumber));
-            Protocol protocol = getProtocol(protocolNumber);
+            logInfo(String.format("Starting batch with %d protocol number(s).", protocolNumbers.size()));
+            batchResult = new BatchResult();
 
-            try {
-                sortProtoclActions(protocol);
-                processProtocol(protocol);
-            } catch (Throwable t) {
-                logError(String.format("Unexpected issue, skipping protocol '%s'", protocolNumber), t);
-            } finally {
-                processedCount++;
-                logInfo(String.format("Protocols processed: %d/%d.", processedCount, total));
-            }
+            for (String protocolNumber : protocolNumbers) {
+                logInfo(String.format("Processing protocol: %s", protocolNumber));
 
-        }
+                if (!isValidProtocolNumber(protocolNumber)) {
+                    continue;
+                }
 
-        //TODO: This is not threadsafe, need to have a wrapper thread master to be
-        // called by ProtocolPdfWriterServiceImpl which would spin off workers,
-        // wait to join them, and then call ExcelCreator. We can't do that in
-        // ProtocolPdfWriterServiceImpl since the request will time out, and won't
-        // be able to tell UI if workers started ok.
-        ExcelCreator excelCreator = new ExcelCreator();
-        excelCreator.createAttachmentsSpreadsheet();
+                try {
+                    Protocol protocol = getProtocol(protocolNumber);
+                    sortProtoclActions(protocol);
+                    processProtocol(protocol, currentBucketPath);
+                } catch (Throwable t) {
+                    batchResult.addFailed(protocolNumber);
+                    logError(String.format("Unexpected issue, skipping protocol '%s'", protocolNumber), t);
+                    continue;
+                }
+
+                batchResult.incrementSuccess();
+                logInfo("Processed protocol: " + protocolNumber);
+            }//for
+
+        }//while
 
         logInfo("Completed all work, worker thread exiting.");
+    }
+
+
+    public boolean isValidProtocolNumber(String protocolNumber) {
+        if (protocolNumber.toLowerCase().contains("a") || protocolNumber.toLowerCase().contains("r")) {
+            // These are amendment/revision protocols acting as an active parent, which is an invalid state,
+            // the IRB office should clean these up before the final migration is started, warn for now and skip
+            LOG.warn(String.format("Parent protocol is invalid amendment/revision type, skipping protocol '%s'", protocolNumber));
+            return false;
+        }
+        return true;
     }
 
 
@@ -123,7 +120,7 @@ public class ProtocolPdfWorker extends Thread {
     /*
      * Logic yanked from ProtocolProtocolActionsAction#printProtocolSelectedItems()
      */
-    private void processProtocol(Protocol protocol) throws PrintingException {
+    private void processProtocol(Protocol protocol, String currentBucketPath) throws PrintingException {
         String protocolNumber = protocol.getProtocolNumber();
         String filename = String.format(PS_NAME_FORMAT, protocolNumber);
 
@@ -137,31 +134,31 @@ public class ProtocolPdfWorker extends Thread {
         }
 
         attachmentDataSource.setFileName(filename);
-        EfsAttachment efsAttachment = pushToEfs(attachmentDataSource, protocol.getProtocolNumber());
+        String efsFilePath = currentBucketPath + File.separator + filename;
+
+        EfsAttachment efsAttachment = pushToEfs(attachmentDataSource, efsFilePath);
         createExcelRecord(attachmentDataSource, protocolNumber, efsAttachment);
     }
 
+
     private void createExcelRecord(AttachmentDataSource attachmentDataSource, String protocolNumber, EfsAttachment efsAttachment) {
-        String id = UUID.randomUUID().toString();
         String fileName = attachmentDataSource.getFileName();
-        excelDbAgent.writeToDb(id, protocolNumber, fileName, efsAttachment);
+        SqlUtils.writeToDb(protocolNumber, protocolNumber, fileName, efsAttachment);
     }
 
 
-    private EfsAttachment pushToEfs(AttachmentDataSource attachmentDataSource, String protocolNumber) {
-        logInfo(String.format("Pushing protocol %s to efs", protocolNumber));
-
+    private EfsAttachment pushToEfs(AttachmentDataSource attachmentDataSource, String efsFilePath) {
         byte[] bytes = attachmentDataSource.getContent();
-        int bytesLength = bytes.length;
+        EfsAttachment efsAttachment = new EfsAttachment(efsFilePath, bytes.length);
 
-        String fullEfsFilePath = efsAgent.pushFileToEfs(attachmentDataSource.getFileName(), bytes, pushToEfs);
-        EfsAttachment efsAttachment = new EfsAttachment(fullEfsFilePath, bytesLength);
-
-        logInfo(String.format("Pushed protocol %s to efs complete", protocolNumber));
+        if (pushToEfs) {
+            FileUtils.pushFileToEfs(bytes, efsFilePath);
+        } else {
+            LOG.info("EFS writing turned off, skipped writing file to: " + efsFilePath);
+        }
 
         return efsAttachment;
     }
-
 
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -197,19 +194,6 @@ public class ProtocolPdfWorker extends Thread {
         }
 
         return protocols.iterator().next();
-    }
-
-
-    @SuppressWarnings("ConstantConditions")
-    private boolean killSwitchClick() {
-        File file;
-        try {
-            file = new File(classLoader.getResource("kill-switch.txt").getFile());
-        } catch (NullPointerException e) {
-            return false;
-        }
-
-        return file.exists();
     }
 
 

@@ -1,6 +1,6 @@
 package edu.arizona.kra.irb.pdf.excel;
 
-import edu.arizona.kra.irb.pdf.sql.SqlExecutor;
+import edu.arizona.kra.irb.pdf.utils.SqlUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -24,7 +24,6 @@ public class ExcelCreator {
     private final XSSFWorkbook workbook;
     private final XSSFSheet sheet;
     private final int selectCount;
-    private final SqlExecutor sqlExecutor;
     private int rowIndex;
     private int rowsProcessed;
 
@@ -43,9 +42,8 @@ public class ExcelCreator {
         String tabName  = getKualiConfigurationService().getPropertyValueAsString(WORKBOOK_TAB_NAME);
         this.sheet = workbook.getSheet(tabName);
         this.rowIndex = Integer.parseInt(getKualiConfigurationService().getPropertyValueAsString(WORKBOOK_START_ROW));
-        this.sqlExecutor = new SqlExecutor();
         this.rowsProcessed = 0;
-        this.selectCount = sqlExecutor.counExcelRecords();
+        this.selectCount = SqlUtils.counExcelRecords();
     }
 
 
@@ -58,7 +56,7 @@ public class ExcelCreator {
             return;
         }
 
-        List<ExcelAttachmentRecord> records = sqlExecutor.findAllExcelRecords();
+        List<ExcelAttachmentRecord> records = SqlUtils.findAllExcelRecords();
         for (ExcelAttachmentRecord record : records) {
             addRow(rowIndex, record);
             rowIndex++;
