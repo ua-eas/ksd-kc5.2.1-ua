@@ -924,7 +924,7 @@
         </bean>
         
         <bean id="protocolSummaryXmlStream"
-            class="org.kuali.kra.irb.actions.print.ProtocolSummaryXmlStream" parent="printBaseXmlStream">
+            class="org.kuali.kra.irb.actions.print.ProtocolSummaryXmlStream" parent="printBaseXmlStream" scope="protocol">
         </bean>
         
         <bean id="correspondenceXmlStream"
