@@ -8,14 +8,23 @@ import edu.arizona.kra.irb.pdf.utils.SqlUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.Protocol;
+import org.kuali.kra.irb.actions.print.ProtocolPrintingService;
+import org.kuali.kra.printing.Printable;
+import org.kuali.kra.printing.PrintingException;
+import org.kuali.kra.printing.print.AbstractPrint;
+import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
+import org.kuali.kra.protocol.actions.print.ProtocolSummaryPrintOptions;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static edu.arizona.kra.irb.pdf.PdfConstants.*;
 
@@ -28,6 +37,7 @@ public class PdfThreadMaster implements Runnable {
     private final List<String> failedProtocolNumbers;
     private ConfigurationService kualiConfigurationService;
     private ProtocolNumberDao protocolNumberDao;
+    private ProtocolPrintingService protocolPrintingService;
     private List<String> protocolNumbers;
     private final int numWorkerThreads;
     private final int totalProtocolCount;
@@ -160,6 +170,27 @@ public class PdfThreadMaster implements Runnable {
     }
 
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public synchronized AttachmentDataSource getAttachmentDataSource(String reportName, Protocol protocol) throws PrintingException {
+        ProtocolSummaryPrintOptions summaryOptions = new ProtocolSummaryPrintOptions();
+        summaryOptions.setReviewComments(false);
+
+        Map reportParameters = new HashMap();
+        reportParameters.put(ProtocolSummaryPrintOptions.class, summaryOptions);
+
+        org.kuali.kra.protocol.actions.print.ProtocolPrintType printType
+                = org.kuali.kra.protocol.actions.print.ProtocolPrintType.valueOf("PROTOCOL_FULL_PROTOCOL_REPORT");
+        AbstractPrint printable = (AbstractPrint)getProtocolPrintingService().getProtocolPrintable(printType);
+        printable.setPrintableBusinessObject(protocol);
+        printable.setReportParameters(reportParameters);
+
+        List<Printable> printableArtifactList = new ArrayList<>();
+        printableArtifactList.add(printable);
+
+        return getProtocolPrintingService().print(reportName, printableArtifactList);
+    }
+
+
     private List<String> getProtocolNumbers() {
         List<String> protocolNumbers;
 
@@ -196,6 +227,14 @@ public class PdfThreadMaster implements Runnable {
             this.kualiConfigurationService = KraServiceLocator.getService(ConfigurationService.class);
         }
         return kualiConfigurationService;
+    }
+
+
+    private ProtocolPrintingService getProtocolPrintingService() {
+        if (protocolPrintingService == null) {
+            this.protocolPrintingService = KraServiceLocator.getService(ProtocolPrintingService.class);
+        }
+        return protocolPrintingService;
     }
 
 }

@@ -7,26 +7,20 @@ import org.apache.log4j.Logger;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.actions.print.ProtocolPrintType;
-import org.kuali.kra.irb.actions.print.ProtocolPrintingService;
-import org.kuali.kra.printing.Printable;
 import org.kuali.kra.printing.PrintingException;
-import org.kuali.kra.printing.print.AbstractPrint;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.protocol.actions.ProtocolActionBase;
-import org.kuali.kra.protocol.actions.print.ProtocolSummaryPrintOptions;
 import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static edu.arizona.kra.irb.pdf.PdfConstants.SHOULD_CREATE_EFS_FILES;
 import static org.kuali.rice.core.api.CoreApiServiceLocator.getKualiConfigurationService;
@@ -38,7 +32,6 @@ public class PdfThreadWorker implements Runnable {
 
     private final PdfThreadMaster pdfThreadMaster;
     private BusinessObjectService businessObjectService;
-    private ProtocolPrintingService protocolPrintingService;
     private final boolean pushToEfs;
     private final int workerId;
 
@@ -126,7 +119,7 @@ public class PdfThreadWorker implements Runnable {
 
         ProtocolPrintType printType = ProtocolPrintType.PROTOCOL_FULL_PROTOCOL_REPORT;
         String reportName = protocol.getProtocolNumber() + "-" + printType.getReportName();
-        AttachmentDataSource attachmentDataSource = getProtocolPrintingService().print(reportName, getPrintArtifacts(protocol));
+        AttachmentDataSource attachmentDataSource = pdfThreadMaster.getAttachmentDataSource(reportName, protocol);
 
         if (attachmentDataSource.getContent() == null) {
             logWarn("AttachmentDataSource.getContent() is null for protocol: " + protocolNumber);
@@ -158,27 +151,6 @@ public class PdfThreadWorker implements Runnable {
         }
 
         return efsAttachment;
-    }
-
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private List<Printable> getPrintArtifacts(Protocol protocol) {
-        ProtocolSummaryPrintOptions summaryOptions = new ProtocolSummaryPrintOptions();
-        summaryOptions.setReviewComments(false);
-
-        Map reportParameters = new HashMap();
-        reportParameters.put(ProtocolSummaryPrintOptions.class, summaryOptions);
-
-        org.kuali.kra.protocol.actions.print.ProtocolPrintType printType
-                = org.kuali.kra.protocol.actions.print.ProtocolPrintType.valueOf("PROTOCOL_FULL_PROTOCOL_REPORT");
-        AbstractPrint printable = (AbstractPrint)getProtocolPrintingService().getProtocolPrintable(printType);
-        printable.setPrintableBusinessObject(protocol);
-        printable.setReportParameters(reportParameters);
-
-        List<Printable> printableArtifactList = new ArrayList<>();
-        printableArtifactList.add(printable);
-
-        return printableArtifactList;
     }
 
 
@@ -219,11 +191,4 @@ public class PdfThreadWorker implements Runnable {
         return businessObjectService;
     }
 
-
-    private ProtocolPrintingService getProtocolPrintingService() {
-        if (protocolPrintingService == null) {
-            this.protocolPrintingService = KraServiceLocator.getService(ProtocolPrintingService.class);
-        }
-        return protocolPrintingService;
-    }
 }
