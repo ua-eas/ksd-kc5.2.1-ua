@@ -8,9 +8,9 @@
 ################################################################################
 
 # Change these for machine specific paths
-PDF_DIR_ONE="/huronsaas/irb-migration/2021.06.04/attachments"
-PDF_DIR_TWO="/efs/irb-migration/2021.05.12/attachments"
-OUTPUT_DIR="/home/ec2-user/pdf-comparison-analysis/pdf-text"
+PDF_DIR_ONE="$HOME/ua/uar/irb-migration/rehearsal-1/summary-equivalence/equivalence/pre-threaded"
+PDF_DIR_TWO="$HOME/ua/uar/irb-migration/rehearsal-1/summary-equivalence/equivalence/threaded"
+OUTPUT_DIR="$HOME/ua/uar/irb-migration/rehearsal-1/summary-equivalence/pdf-text"
 
 # How many threads should be forked
 THREAD_COUNT=8
@@ -26,9 +26,6 @@ TEXT_CHUNK_DIR="$CHUNK_DIR/text_chunk"
 PDF_FILE_LIST_ONE="$CHUNK_DIR/pdf_file_list_one.txt"
 PDF_FILE_LIST_TWO="$CHUNK_DIR/pdf_file_list_two.txt"
 TEXT_FILE_LIST="$CHUNK_DIR/text_file_list.txt"
-DIFF_HITS="$OUTPUT_DIR/diff-hits"
-DIFF_ONE="$DIFF_HITS/env-one"
-DIFF_TWO="$DIFF_HITS/env-two"
 
 
 # Delete dynamically generated output upon any type of exit
@@ -58,8 +55,6 @@ function setup_file_system() {
     mkdir -p "$PDF_CHUNK_DIR_ONE"
     mkdir -p "$PDF_CHUNK_DIR_TWO"
     mkdir -p "$TEXT_CHUNK_DIR"
-    mkdir -p "$DIFF_ONE"
-    mkdir -p "$DIFF_TWO"
     touch "$LOG_FILE"
 }
 
@@ -78,7 +73,6 @@ function _chunk_pdf_filenames() {
     pdf_dir="$2"
     chunk_dir="$3"
 
-    log "Finding pdfs for path: '$pdf_dir'"
     while IFS= read -r file; do
         echo "$file" >> "$pdf_file_list"
     done < <(find "$pdf_dir" -type f -name 'Protocol Summary Report*.pdf')
@@ -155,23 +149,14 @@ function run_text_diff_threads() {
 
 
 # $1: chunk_file
-# shellcheck disable=SC2001
 function diff_text_files() {
     chunk_file="$1"
 
     # Diff the two converted text files
     while IFS= read -r text_file; do
-        text_file_one="$TEXT_DIR_ONE/$text_file"
-        text_file_two="$TEXT_DIR_TWO/$text_file"
-
-        result=$(diff "$text_file_one" "$text_file_two")
+        result=$(diff "$TEXT_DIR_ONE/$text_file" "$TEXT_DIR_TWO/$text_file")
         if [[ -n "$result" ]]; then
             log "ERROR: '$text_file' is not equivalent!"
-            filename_no_spaces=$(echo "$text_file" | sed 's/ //g')
-            diff_file=$(echo "$DIFF_HITS/$filename_no_spaces" | sed 's/txt$/diff/')
-            echo "$result" > "$diff_file"
-            cp "$text_file_one" "$DIFF_ONE/$filename_no_spaces"
-            cp "$text_file_two" "$DIFF_TWO/$filename_no_spaces"
         fi
     done < "$chunk_file"
 }
