@@ -68,7 +68,7 @@ public class WatermarkServiceImpl implements WatermarkService {
                 PdfReader origFile = new PdfReader(pdfBytes);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 PdfStamper stamper = new PdfStamper(origFile, byteArrayOutputStream);
-                stamper.setFormFlattening(true);
+                stamper.setFormFlattening(false);
                 stamper.close();
                 byteArrayOutputStream = attachWatermarking(watermarkBean, byteArrayOutputStream.toByteArray());
                 pdfFileData = byteArrayOutputStream.toByteArray();
@@ -147,7 +147,7 @@ public class WatermarkServiceImpl implements WatermarkService {
      *        for decoration
      */
     private void decorateWatermark(PdfStamper watermarkPdfStamper, WatermarkBean watermarkBean) {
-        watermarkPdfStamper.setFormFlattening(true);  
+        watermarkPdfStamper.setFormFlattening(false);
         PdfReader pdfReader = watermarkPdfStamper.getReader();
         int pageCount = pdfReader.getNumberOfPages();
         int pdfPageNumber = 0;
@@ -164,7 +164,7 @@ public class WatermarkServiceImpl implements WatermarkService {
             if (watermarkBean.getType().equalsIgnoreCase(WatermarkConstants.WATERMARK_TYPE_TEXT)) {    
                 decoratePdfWatermarkText(pdfContents, rectangle, watermarkBean);
             }
-            watermarkPdfStamper.setFormFlattening(true);
+            watermarkPdfStamper.setFormFlattening(false);
         }
         try {
             watermarkPdfStamper.close();
