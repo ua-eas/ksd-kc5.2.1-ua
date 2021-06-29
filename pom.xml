@@ -22,6 +22,7 @@
         <aws-ssm.version>2.15.70</aws-ssm.version>
         <apache-poi.version>4.1.2</apache-poi.version>
         <guava.version>11.0</guava.version>
+        <itext.version>2.1.7</itext.version>
     </properties>
 
     <dependencies>
@@ -172,6 +173,25 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
             <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>${itext.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bcprov-jdk14</artifactId>
+                    <groupId>bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcmail-jdk14</artifactId>
+                    <groupId>bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcprov-jdk14</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
